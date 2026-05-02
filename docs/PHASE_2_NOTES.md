@@ -48,3 +48,13 @@ Trump CNN 鏡像 (https://ix.cnn.io/...) 含有 32,881 則歷史貼文。
   - `data_store/trump_seen.json`(Batch 3)
   - `data_store/rss_seen.json`(Batch 3)
   - `data_store/tsmc_revenue_history.json`(Batch 3)
+
+## Batch 7 後待重構
+
+### LAYER0_SUBMODIFIER_RANGES 結構不一致
+- 現況:LAYER0_SUBMODIFIER_RANGES["distribution_days"] = (-20, 0)(單一範圍)
+- 但 v4 spec 規定 distribution 對 sell_call 是 +5(正向),不在範圍內
+- Batch 5 暫時用 distribution.sell_call 獨立 (0, 10) 處理
+- Batch 7 完成後重構:LAYER0_SUBMODIFIER_RANGES 改成 per-signal 結構
+  例如 {"distribution_days": {"sell_call": (0, 10), "sell_put": (-15, 0), "leaps_entry": (-20, 0)}}
+- 同步檢查其他 layer 是否有類似不一致
