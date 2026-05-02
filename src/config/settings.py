@@ -20,6 +20,15 @@ TIMEZONE_TW_MARKET = pytz.timezone("Asia/Taipei")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
+# FRED(St. Louis Fed)API key — fred_api.py 會在 client init 時驗證,
+# 未設不允許 fallback,直接 raise(避免靜默退回假資料)
+FRED_API_KEY = os.getenv("FRED_API_KEY", "")
+
+# SEC EDGAR User-Agent — sec_edgar / form4_insider / institutional_holdings 共用
+# SEC 要求格式:"Sample Company Name AdminContact@example.com"
+# 未設一律 raise(避免無 identity 觸發 SEC IP ban)
+SEC_EDGAR_USER_AGENT = os.getenv("SEC_EDGAR_USER_AGENT", "")
+
 # ============================================
 # Position Mode 三模式切換
 # ============================================

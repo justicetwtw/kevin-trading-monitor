@@ -1,6 +1,6 @@
 # Core
 pandas>=2.0.0
-numpy>=1.24.0
+numpy>=1.24.0                 # pandas-ta-classic 0.5.44+ 已相容 numpy 2.x;Phase 4 indicators 會做 RSI/BB 實測再決定是否回鎖
 
 # Data sources
 yfinance>=0.2.40
@@ -10,8 +10,10 @@ edgartools>=2.0.0
 feedparser>=6.0.0
 httpx>=0.25.0
 selectolax>=0.3.17
+beautifulsoup4>=4.12.0           # 部分 scraping 用 BS4 較穩
+requests>=2.31.0
 
-# Technical analysis
+# Technical analysis (pandas-ta 已停止維護,改用社群維護的 fork pandas-ta-classic)
 pandas-ta-classic>=0.5.0
 scipy>=1.11.0
 
@@ -20,6 +22,9 @@ pyarrow>=14.0.0
 
 # Telegram
 python-telegram-bot>=20.0
+
+# Twstock(台股)
+twstock>=1.3.0                   # 台股報價套件(yfinance 替補)
 
 # Utilities
 pytz>=2024.1
@@ -30,3 +35,6 @@ loguru>=0.7.0
 # Testing
 pytest>=7.4.0
 pytest-cov>=4.1.0
+
+# Backtesting (Phase 3 — 暫不安裝,Phase 3 開工再啟用)
+# vectorbt>=0.26.0
