@@ -9,26 +9,26 @@ fredapi>=0.5.1
 edgartools>=2.0.0
 feedparser>=6.0.0
 httpx>=0.25.0
-selectolax>=0.3.17  # 輕量 HTML 解析
+selectolax>=0.3.17
 
 # Technical analysis
-pandas-ta>=0.3.14b
-scipy>=1.11.0  # for Black-Scholes / IV calc
+pandas-ta>=0.3.14b0
+scipy>=1.11.0
 
 # Storage
-pyarrow>=14.0.0  # parquet support
+pyarrow>=14.0.0
 
 # Telegram
 python-telegram-bot>=20.0
 
 # Backtesting (階段 3)
-vectorbt>=0.26.0  # 主回測引擎
+vectorbt>=0.26.0
 
 # Utilities
 pytz>=2024.1
 python-dateutil>=2.8.2
-tenacity>=8.2.0  # retry 邏輯
-loguru>=0.7.0  # 結構化 log
+tenacity>=8.2.0
+loguru>=0.7.0
 
 # Testing
 pytest>=7.4.0
