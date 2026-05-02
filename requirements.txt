@@ -1,6 +1,6 @@
 # Core
 pandas>=2.0.0
-numpy>=1.24.0
+numpy>=1.24.0,<2.0.0
 
 # Data sources
 yfinance>=0.2.40
@@ -11,8 +11,8 @@ feedparser>=6.0.0
 httpx>=0.25.0
 selectolax>=0.3.17
 
-# Technical analysis
-pandas-ta>=0.3.14b0
+# Technical analysis - 用社群維護版,避免相容性問題
+pandas-ta-classic>=1.0.0
 scipy>=1.11.0
 
 # Storage
@@ -20,9 +20,6 @@ pyarrow>=14.0.0
 
 # Telegram
 python-telegram-bot>=20.0
-
-# Backtesting (階段 3)
-vectorbt>=0.26.0
 
 # Utilities
 pytz>=2024.1
