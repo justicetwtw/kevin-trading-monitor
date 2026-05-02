@@ -11,8 +11,8 @@ feedparser>=6.0.0
 httpx>=0.25.0
 selectolax>=0.3.17
 
-# Technical analysis - 用社群維護版,避免相容性問題
-pandas-ta-classic>=1.0.0
+# Technical analysis
+pandas-ta-classic>=0.5.0
 scipy>=1.11.0
 
 # Storage
