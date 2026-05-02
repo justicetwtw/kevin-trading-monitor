@@ -34,6 +34,25 @@ Section 12 的 11 個 runner 程式碼是早期草稿,**沒有一支能直接抄
 - 補 insider 大額賣出 alert(`form4_insider.py` 已實作買入,賣出 alert 還沒)
 - `data.sec_edgar` 改成 `fetch_recent_filings(symbol, forms=[...])` 通用介面
 
+## Phase 2.5 完成記錄 (market brief)
+
+每日 4 次 brief(台北時間):
+- 08:30 us_eod      美股盤後 brief
+- 13:30 tw_eod      台股盤後 brief
+- 21:00 us_premarket 美股盤前 brief
+- 06:00 us_midday   美股盤中 brief(起床看)
+
+實作:
+- src/alerts/brief_generator.py     共用組裝(每 section _safe wrapper)
+- src/runners/run_market_brief.py   BRIEF_TYPE env 切換
+- .github/workflows/market_brief.yml 1 yml 4 cron + workflow_dispatch input
+
+特色:
+- Layer 0 modifier 白話化(中性/略偏好/略偏不利等)
+- scan 文字分「冷啟動」/「掃過 0 達門檻」/「N 已推播」
+- HTML escape 防 <script> 注入
+- 不走 alert_router(brief 是被動推送,不需 dedup/quota)
+
 ## Phase 3 workflow 待辦
 
 ### Secrets 動態化
