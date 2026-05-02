@@ -34,3 +34,17 @@ Trump CNN 鏡像 (https://ix.cnn.io/...) 含有 32,881 則歷史貼文。
 - etf_flows 三層 fallback + SchemaError exception(原 spec 是 placeholder)
 
 完整偏離記錄見 git log 與 commit message。
+
+## 常見路徑(避免 Claude Code 記憶模糊)
+
+- 持久化 state 統一寫到 `data_store/`(不是 data/state/、不是 state/)
+- src.storage.state_manager 的 `read_json` / `write_json` 預設目錄就是 `data_store/`
+- 已驗證寫入過的檔:
+  - `data_store/distribution_days_log.json`(Batch 4)
+  - `data_store/iv_history.json`(Batch 1)
+  - `data_store/etf_flows_cache.json`(Batch 2)
+  - `data_store/earnings_calendar.json`(Batch 2)
+  - `data_store/fundamentals_snapshot.json`(Batch 2)
+  - `data_store/trump_seen.json`(Batch 3)
+  - `data_store/rss_seen.json`(Batch 3)
+  - `data_store/tsmc_revenue_history.json`(Batch 3)
