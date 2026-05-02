@@ -58,3 +58,34 @@ Trump CNN 鏡像 (https://ix.cnn.io/...) 含有 32,881 則歷史貼文。
 - Batch 7 完成後重構:LAYER0_SUBMODIFIER_RANGES 改成 per-signal 結構
   例如 {"distribution_days": {"sell_call": (0, 10), "sell_put": (-15, 0), "leaps_entry": (-20, 0)}}
 - 同步檢查其他 layer 是否有類似不一致
+
+## Batch 8 完成時要重構
+
+1. current_positions.py 實作後:
+   - evaluate_all_exit_rules() 移除 try/except import 失敗 fallback
+   - 改成正常 import,Batch 8 後不該再有 ImportError
+
+2. hedge_dte_tracker.py + account_drawdown.py 實作後:
+   - veto_checker 的 3 個 stub (lock_2 / lock_5 / lock_6) 從 context 讀真實值
+   - context=None 的 fallback 拿掉
+   - test_veto_checker.py 對應測試案例改成測「真實邏輯」而非 stub 行為
+
+3. HARD_RULES 補:
+   - min_hedge_dte_days: 45
+   - max_drawdown_pct_for_new_leaps: -0.20
+   - require_covered_for_short_call: True
+   - 3 個 stub 改從 config 讀
+
+## Phase 2 全部完成後重構
+
+4. LAYER0_SUBMODIFIER_RANGES 改 per-signal 結構
+   - 現況:LAYER0_SUBMODIFIER_RANGES["distribution_days"] = (-20, 0)
+   - 應改:{"sell_call": (0, 10), "sell_put": (-15, 0), "leaps_entry": (-20, 0)}
+   - 同步檢查其他 layer 的 sub-modifier 範圍是否有類似結構不一致
+   - distribution.py 內 sell_call 獨立 (0, 10) 範圍移到 config
+
+5. mock patch 路徑筆記:
+   - 用 from X import Y 後,test 必須 patch 「本模組.Y」不是 「X.Y」
+   - 這是 Python 標準行為(import 時綁定到本模組命名空間)
+   - 例:test_veto_checker.py patch src.signals.veto_checker.is_earnings_within_days
+     不是 src.data.earnings_calendar.is_earnings_within_days
