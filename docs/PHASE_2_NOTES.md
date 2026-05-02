@@ -34,6 +34,27 @@ Section 12 的 11 個 runner 程式碼是早期草稿,**沒有一支能直接抄
 - 補 insider 大額賣出 alert(`form4_insider.py` 已實作買入,賣出 alert 還沒)
 - `data.sec_edgar` 改成 `fetch_recent_filings(symbol, forms=[...])` 通用介面
 
+## Phase 3 workflow 待辦
+
+### Secrets 動態化
+若未來 institutional_scan 改成推 alert(例如機構大幅減倉警示),
+需要在 .github/workflows/institutional_scan.yml 補加:
+TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+目前不帶是因為 Batch 11 設計為「純 dashboard 更新」。
+
+### 可選優化
+- 改用 GitHub Actions cache 持久化 state(替代 git commit 機制)
+  優點:消除 push race 風險
+  缺點:cache 7 天會過期,IVR 252 天歷史會被截斷
+  → 需評估
+
+- 改用 Repository Dispatch event 串接 EOD 鏈
+  優點:真實「上一個跑完才觸發下一個」
+  缺點:複雜度高
+  → Phase 3 視穩定性需求決定
+
 ## 通用規則(已落實在 src/data/ 20 模組)
 
 - 全部 import pandas_ta_classic as ta(注意底線)

@@ -1,0 +1,32 @@
+name: Institutional & Insider Scan
+
+on:
+  schedule:
+    - cron: '0 23 * * 1-5'  # 美股收盤後 23:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: institutional-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run institutional & insider scan
+        env:
+          SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}
+        run: python -m src.runners.run_institutional_scan
+      - if: always()
+        uses: ./.github/actions/commit-state

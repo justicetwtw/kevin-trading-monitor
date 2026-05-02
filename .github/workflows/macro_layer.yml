@@ -1,0 +1,32 @@
+name: Macro Layer Update
+
+on:
+  schedule:
+    - cron: '30 22 * * 1-5'  # 美股收盤後 22:30 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: macro-layer
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run macro layer update
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python -m src.runners.run_macro_layer
+      - if: always()
+        uses: ./.github/actions/commit-state

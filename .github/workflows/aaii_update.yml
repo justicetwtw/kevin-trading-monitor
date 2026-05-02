@@ -1,0 +1,30 @@
+name: AAII Sentiment Update
+
+on:
+  schedule:
+    - cron: '0 22 * * 4'  # 每週四 22:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: aaii-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run AAII update
+        run: python -m src.runners.run_aaii_update
+      - if: always()
+        uses: ./.github/actions/commit-state

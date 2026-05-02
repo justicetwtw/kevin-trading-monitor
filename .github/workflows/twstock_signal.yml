@@ -1,0 +1,33 @@
+name: Taiwan Stock Signal Scan
+
+on:
+  schedule:
+    - cron: '30 6 * * 1-5'  # 台股收盤後 06:30 UTC (台北 14:30)
+  workflow_dispatch:
+
+concurrency:
+  group: twstock-signal
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Taiwan stock signal scan
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m src.runners.run_twstock_signal
+      - if: always()
+        uses: ./.github/actions/commit-state
