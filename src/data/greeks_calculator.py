@@ -24,6 +24,19 @@ def calc_delta(
     return float(norm.cdf(d1) - 1)
 
 
+def calc_bs_price(
+    S: float, K: float, T: float, r: float, sigma: float,
+    option_type: str = "call",
+) -> float:
+    """Black-Scholes 理論價(per share)。T<=0 / sigma<=0 / S<=0 / K<=0 回 0.0。"""
+    if T <= 0 or sigma <= 0 or S <= 0 or K <= 0:
+        return 0.0
+    d1, d2 = calc_d1_d2(S, K, T, r, sigma)
+    if option_type == "call":
+        return float(S * norm.cdf(d1) - K * math.exp(-r * T) * norm.cdf(d2))
+    return float(K * math.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1))
+
+
 def calc_gamma(S: float, K: float, T: float, r: float, sigma: float) -> float:
     if T <= 0 or sigma <= 0 or S <= 0:
         return 0.0
