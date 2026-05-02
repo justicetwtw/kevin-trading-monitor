@@ -1,0 +1,117 @@
+{
+  "NVDA": {
+    "symbol": "NVDA",
+    "earnings_date": "2026-05-20",
+    "fetched_at": "2026-05-02T08:58:14.111185-04:00"
+  },
+  "TSM": {
+    "symbol": "TSM",
+    "earnings_date": "2026-07-16",
+    "fetched_at": "2026-05-02T08:58:14.181453-04:00"
+  },
+  "MU": {
+    "symbol": "MU",
+    "earnings_date": "2026-06-24",
+    "fetched_at": "2026-05-02T08:58:14.258777-04:00"
+  },
+  "MSFT": {
+    "symbol": "MSFT",
+    "earnings_date": "2026-07-29",
+    "fetched_at": "2026-05-02T08:58:14.303039-04:00"
+  },
+  "GOOG": {
+    "symbol": "GOOG",
+    "earnings_date": "2026-07-23",
+    "fetched_at": "2026-05-02T08:58:14.346390-04:00"
+  },
+  "GOOGL": {
+    "symbol": "GOOGL",
+    "earnings_date": "2026-07-23",
+    "fetched_at": "2026-05-02T08:58:14.389772-04:00"
+  },
+  "META": {
+    "symbol": "META",
+    "earnings_date": "2026-07-29",
+    "fetched_at": "2026-05-02T08:58:14.444302-04:00"
+  },
+  "AVGO": {
+    "symbol": "AVGO",
+    "earnings_date": "2026-06-03",
+    "fetched_at": "2026-05-02T08:58:14.487801-04:00"
+  },
+  "AMZN": {
+    "symbol": "AMZN",
+    "earnings_date": "2026-07-30",
+    "fetched_at": "2026-05-02T08:58:14.548423-04:00"
+  },
+  "AMD": {
+    "symbol": "AMD",
+    "earnings_date": "2026-05-05",
+    "fetched_at": "2026-05-02T08:58:14.608349-04:00"
+  },
+  "ASML": {
+    "symbol": "ASML",
+    "earnings_date": "2026-07-15",
+    "fetched_at": "2026-05-02T08:58:14.687280-04:00"
+  },
+  "ORCL": {
+    "symbol": "ORCL",
+    "earnings_date": "2026-06-10",
+    "fetched_at": "2026-05-02T08:58:14.742388-04:00"
+  },
+  "AAPL": {
+    "symbol": "AAPL",
+    "earnings_date": "2026-07-30",
+    "fetched_at": "2026-05-02T08:58:14.801878-04:00"
+  },
+  "PLTR": {
+    "symbol": "PLTR",
+    "earnings_date": "2026-05-04",
+    "fetched_at": "2026-05-02T08:58:14.862922-04:00"
+  },
+  "TSLA": {
+    "symbol": "TSLA",
+    "earnings_date": "2026-07-22",
+    "fetched_at": "2026-05-02T08:58:14.925130-04:00"
+  },
+  "INTC": {
+    "symbol": "INTC",
+    "earnings_date": "2026-07-23",
+    "fetched_at": "2026-05-02T08:58:14.991748-04:00"
+  },
+  "CRM": {
+    "symbol": "CRM",
+    "earnings_date": "2026-05-27",
+    "fetched_at": "2026-05-02T08:58:15.056714-04:00"
+  },
+  "ADBE": {
+    "symbol": "ADBE",
+    "earnings_date": "2026-06-11",
+    "fetched_at": "2026-05-02T08:58:15.114429-04:00"
+  },
+  "CRWD": {
+    "symbol": "CRWD",
+    "earnings_date": "2026-06-09",
+    "fetched_at": "2026-05-02T08:58:15.198261-04:00"
+  },
+  "NOW": {
+    "symbol": "NOW",
+    "earnings_date": "2026-07-22",
+    "fetched_at": "2026-05-02T08:58:15.255043-04:00"
+  },
+  "SMCI": {
+    "symbol": "SMCI",
+    "earnings_date": "2026-05-05",
+    "fetched_at": "2026-05-02T08:58:15.311854-04:00"
+  },
+  "ARM": {
+    "symbol": "ARM",
+    "earnings_date": "2026-05-06",
+    "fetched_at": "2026-05-02T08:58:15.368275-04:00"
+  },
+  "SNDK": {
+    "symbol": "SNDK",
+    "earnings_date": "2026-04-30",
+    "fetched_at": "2026-05-02T08:58:15.423732-04:00"
+  }
+}
