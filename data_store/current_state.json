@@ -1,0 +1,10 @@
+{
+  "_comment": "系統狀態快照 - 由各 runner 寫入,階段 2 開始填充",
+  "last_health_check": null,
+  "last_signal_scan": null,
+  "last_macro_layer": null,
+  "last_trump_check": null,
+  "last_news_check": null,
+  "layer0_modifier_current": 0,
+  "active_warnings": []
+}

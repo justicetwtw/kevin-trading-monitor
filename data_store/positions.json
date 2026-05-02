@@ -1,0 +1,30 @@
+{
+  "_comment": "三模式範本 - 視 POSITION_MODE 設定填寫對應內容",
+  "_modes": {
+    "mode_1": "必填 - 所有現股+選擇權",
+    "mode_2": "選填 - 只填關鍵防守用部位(預設)",
+    "mode_3": "不填 - 只跑訊號掃描"
+  },
+  "last_updated": "2026-05-01T00:00:00+08:00",
+  "stocks": [
+    {
+      "_example": true,
+      "symbol": "PLTR",
+      "shares": 100,
+      "cost_basis": 164.95
+    }
+  ],
+  "options": [
+    {
+      "_example": true,
+      "id": "MSFT_400C_2027",
+      "symbol": "MSFT",
+      "type": "long_call",
+      "strike": 400.00,
+      "expiry": "2027-01-15",
+      "contracts": 1,
+      "cost_per_contract": 99.70,
+      "opened_date": "2026-01-15"
+    }
+  ]
+}

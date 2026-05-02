@@ -1,0 +1,136 @@
+{
+  "_comment": "value_thesis 標籤 - 五級分類,人腦判斷為最終裁決",
+  "_thesis_options": [
+    "deep_value",
+    "fair_value",
+    "expensive",
+    "review",
+    "exit"
+  ],
+  "tickers": {
+    "NVDA": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "fair_value_estimate": null,
+        "thesis": "AI 半導體龍頭,預估持續成長",
+        "confidence": "high",
+        "review_date": "2026-05-01"
+      }
+    },
+    "TSM": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "fair_value_estimate": null,
+        "thesis": "全球晶圓代工龍頭",
+        "confidence": "high",
+        "review_date": "2026-05-01"
+      }
+    },
+    "MU": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "記憶體龍頭",
+        "review_date": "2026-05-01"
+      }
+    },
+    "MSFT": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "雲端 + AI 軟體龍頭",
+        "review_date": "2026-05-01"
+      }
+    },
+    "GOOG": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "搜尋 + 雲端 + AI",
+        "review_date": "2026-05-01"
+      }
+    },
+    "GOOGL": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "GOOG 投票權版本",
+        "review_date": "2026-05-01"
+      }
+    },
+    "META": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "廣告 + AI",
+        "review_date": "2026-05-01"
+      }
+    },
+    "AVGO": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "半導體 + 網通",
+        "review_date": "2026-05-01"
+      }
+    },
+    "AMZN": {
+      "tier": "A",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "AWS 雲端 + 電商",
+        "review_date": "2026-05-01"
+      }
+    },
+    "AMD": {
+      "tier": "B",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "AI 半導體成長股",
+        "review_date": "2026-05-01"
+      }
+    },
+    "ASML": {
+      "tier": "B",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "EUV 設備獨佔",
+        "review_date": "2026-05-01"
+      }
+    },
+    "ORCL": {
+      "tier": "B",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "雲端轉型",
+        "review_date": "2026-05-01"
+      }
+    },
+    "AAPL": {
+      "tier": "B",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "消費電子龍頭",
+        "review_date": "2026-05-01"
+      }
+    },
+    "PLTR": {
+      "tier": "C",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "AI 應用,波動大",
+        "review_date": "2026-05-01"
+      }
+    },
+    "TSLA": {
+      "tier": "C",
+      "value_thesis": {
+        "rating": "fair_value",
+        "thesis": "EV + 自駕,波動極大",
+        "review_date": "2026-05-01"
+      }
+    }
+  }
+}
