@@ -2,17 +2,37 @@
 
 > 這份檔案存放跨 batch、跨對話必須記住的設計決策與待辦。每個新對話啟動時請優先閱讀。
 
-## Batch 11 (runners) 待辦
+## ⚠ PHASE_2_STRATEGY_AND_DATA.md Section 12 已廢棄 (Batch 11)
 
-### run_trump_monitor.py 冷啟動保護
-Trump CNN 鏡像 (https://ix.cnn.io/...) 含有 32,881 則歷史貼文。
-第一次跑時 fetch_and_classify_new() 必須:
-- 只處理「最近 24 小時」內的貼文(以 created_at 過濾)
-- 舊貼文一次性標記進 trump_seen.json,但不推播
-- 否則第一次跑會 Telegram 轟炸幾百則歷史 Tier 1 訊號
+Section 12 的 11 個 runner 程式碼是早期草稿,**沒有一支能直接抄**。
+真實實作以 git 為準(`src/runners/*.py`)。Section 12 引用大量不存在的函式名:
+- `fetch_latest_trump_posts` / `classify_trump_post` / `save_tier1_timestamp`(都不存在)
+- `fetch_all_rss` / `classify_news`(實際是 `fetch_all_feeds` / `scan_recent_news`)
+- `fetch_recent_filings(forms=[...])`(實際只有 `scan_watchlist_8k`,**只支援 8-K**)
+- `refresh_earnings_calendar` / `update_aaii_sentiment` / `update_macro_regime` 等都改名
+- `scan_all_insider_signals`(實際是 `build_insider_dashboard`,回 dict 非 alert list)
+- `config.universe.US_UNIVERSE`(不存在,用 `ALL_US_STOCKS`)
 
-實作位置:src/runners/run_trump_monitor.py 入口
-參考測試:Batch 3 已驗證 CNN 鏡像活著,32,881 則為實測數字
+每支 runner 開頭 docstring 已標註 spec→實際 mapping。
+
+### Batch 11 偏離決策(已執行)
+- **B**:`run_institutional_scan.py` 改純 dashboard 更新,不推 alert(下游 final_scorer 透過 `get_insider_modifier` 加分,觸發 sell_put/leaps_entry 訊號時才推)
+- **C**:`run_sec_monitor.py` 只跑 8-K(10-Q/10-K 留 Phase 3)
+- **D**:`_cold_start.py` helper 三支(Trump/News/SEC)全包,defense-in-depth
+- **E**:`US_UNIVERSE` → `ALL_US_STOCKS`(不含 ETF,SEC 不報 ETF)
+- **F**:只測 `_cold_start` helper(9 cases),runner 僅 import smoke
+
+### Batch 11 冷啟動保護(已實作 src/runners/_cold_start.py)
+共用 helper `filter_with_cold_start_protection`:
+- 偵測 seen 是否為空 → 冷啟動模式
+- 冷啟動模式只放行 24h 內的 items,舊 items 標 seen 不推
+- 已驗證:Trump 32k 炸彈場景(`test_all_old_32k_bomb`)+ 真實 drill(50 老貼標 seen 0 則推)
+
+## Phase 3 backlog (run_sec_monitor)
+
+- 補 10-Q / 10-K filings(目前模組層 `fetch_recent_8k` 寫死 8-K)
+- 補 insider 大額賣出 alert(`form4_insider.py` 已實作買入,賣出 alert 還沒)
+- `data.sec_edgar` 改成 `fetch_recent_filings(symbol, forms=[...])` 通用介面
 
 ## 通用規則(已落實在 src/data/ 20 模組)
 
