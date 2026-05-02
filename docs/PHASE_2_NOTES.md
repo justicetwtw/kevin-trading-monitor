@@ -84,7 +84,12 @@ Trump CNN 鏡像 (https://ix.cnn.io/...) 含有 32,881 則歷史貼文。
    - 同步檢查其他 layer 的 sub-modifier 範圍是否有類似結構不一致
    - distribution.py 內 sell_call 獨立 (0, 10) 範圍移到 config
 
-5. mock patch 路徑筆記:
+5. 重命名 `TWSTOCK_ACTIVE_ETF_RULES.tier1_single_etf_min_nav_pct`
+   - 現況:鍵名 `_pct` 暗示「比例(0~1)」,但實際值 `0.01` 在 Batch 9 用作「百分點(1.0=1%)」
+   - 應改:`tier1_single_etf_min_nav_diff_pp`(pp = percentage point,消除歧義)
+   - 同步檢查 TWSTOCK_ACTIVE_ETF_RULES 其他鍵單位是否清楚
+
+6. mock patch 路徑筆記:
    - 用 from X import Y 後,test 必須 patch 「本模組.Y」不是 「X.Y」
    - 這是 Python 標準行為(import 時綁定到本模組命名空間)
    - 例:test_veto_checker.py patch src.signals.veto_checker.is_earnings_within_days

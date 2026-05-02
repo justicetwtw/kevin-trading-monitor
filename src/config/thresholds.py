@@ -335,7 +335,9 @@ TWSTOCK_MIN_DAYS_BETWEEN_DEPLOYMENTS = 14  # 加碼後等 ≥2 週
 # ============================================
 
 TWSTOCK_ACTIVE_ETF_RULES = {
-    "tier1_single_etf_min_nav_pct": 0.01,          # 單一 ETF 加碼 ≥ 1% NAV
+    # 單位:百分點(percentage point, pp),1.0 = 1%。
+    # 鍵名 _pct 歧義(看似比例),post-Phase 2 將改名為 _diff_pp(見 PHASE_2_NOTES)。
+    "tier1_single_etf_min_nav_pct": 1.0,           # 單一 ETF 加碼 ≥ 1 pp
     "tier2_multi_etf_count": 3,                    # 7 天內 ≥3 檔加碼同一股
     "tier2_lookback_days": 7,
     "tier3_consensus_etf_count": 5,                # ≥5 檔共同持有
