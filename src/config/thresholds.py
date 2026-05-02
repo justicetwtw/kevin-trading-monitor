@@ -254,6 +254,7 @@ LEAPS_MANAGEMENT_TRIGGERS = {
 LEAPS_SPEC = {
     "min_dte_days": 365,                  # ≥ 12 個月
     "ideal_dte_days": (540, 720),         # 18-24 個月
+    "default_scan_dte": 540,              # scorer 掃描預設假設 DTE(理想範圍中點)
     "delta_range": (0.55, 0.75),
     "max_premium_per_position_usd": 20_000,
     "max_position_pct_of_account": 0.12,
