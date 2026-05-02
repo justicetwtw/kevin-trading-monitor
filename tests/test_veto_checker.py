@@ -29,30 +29,90 @@ def test_lock1_tier_a_passes():
 
 
 # ============================
-# 用戶 L2 stub no_naked_call
+# 用戶 L2 — covered call(實邏輯,從 load_positions 讀)
 # ============================
-def test_lock2_naked_call_stub_passes_when_context_none():
-    """Batch 7 stub:context=None → pass(視同 covered)"""
-    ok, reason = veto_checker.check_lock_no_naked_call("AAPL", context=None)
-    assert ok is True
-    assert "stub" in reason.lower()
-
-
-def test_lock2_naked_call_vetoes_when_uncovered():
-    """context={covered_by: None} → veto"""
-    ok, reason = veto_checker.check_lock_no_naked_call("AAPL", context={"covered_by": None})
+def test_lock2_naked_call_uncovered_vetoes(monkeypatch):
+    """sell_call AAPL,positions 空 → veto"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.load_positions",
+        lambda: {"stocks": [], "options": []},
+    )
+    ok, reason = veto_checker.check_lock_no_naked_call("sell_call", "AAPL")
     assert ok is False
     assert "naked" in reason.lower()
 
 
-def test_lock2_naked_call_passes_when_covered_by_leaps():
-    ok, _ = veto_checker.check_lock_no_naked_call("AAPL", context={"covered_by": "LEAPS"})
+def test_lock2_passes_when_holding_shares(monkeypatch):
+    monkeypatch.setattr(
+        "src.signals.veto_checker.load_positions",
+        lambda: {"stocks": [{"symbol": "AAPL", "shares": 100}], "options": []},
+    )
+    ok, _ = veto_checker.check_lock_no_naked_call("sell_call", "AAPL")
     assert ok is True
 
 
-def test_lock2_naked_call_passes_when_covered_by_shares():
-    ok, _ = veto_checker.check_lock_no_naked_call("AAPL", context={"covered_by": "shares"})
+def test_lock2_passes_when_holding_long_call(monkeypatch):
+    monkeypatch.setattr(
+        "src.signals.veto_checker.load_positions",
+        lambda: {
+            "stocks": [],
+            "options": [{"symbol": "AAPL", "type": "long_call", "strike": 200,
+                         "expiry": "2027-01-15"}],
+        },
+    )
+    ok, _ = veto_checker.check_lock_no_naked_call("sell_call", "AAPL")
     assert ok is True
+
+
+def test_lock2_skips_for_non_sell_call(monkeypatch):
+    """sell_put / leaps_entry → n/a"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.load_positions",
+        lambda: {"stocks": [], "options": []},
+    )
+    ok, reason = veto_checker.check_lock_no_naked_call("sell_put", "AAPL")
+    assert ok is True
+    assert reason == "n/a"
+
+
+def test_lock2_context_override_covered(monkeypatch):
+    """context={covered_by:'LEAPS'} 顯式短路 → pass(不讀 positions)"""
+    called = {"n": 0}
+
+    def fail(*a, **k):
+        called["n"] += 1
+        raise AssertionError("load_positions should not be called")
+
+    monkeypatch.setattr("src.signals.veto_checker.load_positions", fail)
+    ok, reason = veto_checker.check_lock_no_naked_call(
+        "sell_call", "AAPL", context={"covered_by": "LEAPS"}
+    )
+    assert ok is True
+    assert "leaps" in reason.lower()
+    assert called["n"] == 0
+
+
+def test_lock2_disabled_via_hard_rules(monkeypatch):
+    """require_covered_for_short_call=False → 整條 pass"""
+    monkeypatch.setitem(
+        veto_checker.HARD_RULES, "require_covered_for_short_call", False
+    )
+    ok, reason = veto_checker.check_lock_no_naked_call("sell_call", "AAPL")
+    assert ok is True
+    assert reason == "rule_disabled"
+
+
+def test_lock2_ignores_example_positions(monkeypatch):
+    """_example: True 不算真實部位 → 仍視為 naked"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.load_positions",
+        lambda: {
+            "stocks": [{"symbol": "AAPL", "shares": 100, "_example": True}],
+            "options": [],
+        },
+    )
+    ok, _ = veto_checker.check_lock_no_naked_call("sell_call", "AAPL")
+    assert ok is False
 
 
 # ============================
@@ -95,48 +155,115 @@ def test_lock4_pass_when_no_earnings():
 
 
 # ============================
-# 用戶 L5 stub hedge_dte<45
+# 用戶 L5 — hedge_dte<45(實邏輯,從 get_min_hedge_dte 讀)
 # ============================
-def test_lock5_no_new_short_during_hedge_dte():
-    """hedge_dte=30 → veto"""
-    ok, reason = veto_checker.check_lock_hedge_dte("sell_call", context={"hedge_dte_days": 30})
+def test_lock5_no_hedge_position_passes(monkeypatch):
+    """無 hedge 部位 → pass(冷啟動安全)"""
+    monkeypatch.setattr("src.signals.veto_checker.get_min_hedge_dte", lambda: None)
+    ok, reason = veto_checker.check_lock_hedge_dte("sell_call")
+    assert ok is True
+    assert reason == "no_hedge_position"
+
+
+def test_lock5_below_threshold_vetoes(monkeypatch):
+    """hedge DTE 30 < 45 → veto"""
+    monkeypatch.setattr("src.signals.veto_checker.get_min_hedge_dte", lambda: 30)
+    ok, reason = veto_checker.check_lock_hedge_dte("sell_call")
     assert ok is False
-    assert "hedge" in reason.lower() or "45" in reason, f"got {reason}"
+    assert "lock5" in reason
+    assert "30" in reason
 
 
-def test_lock5_hedge_dte_stub_passes_when_context_none():
-    """Batch 7 stub:context=None → pass"""
-    ok, reason = veto_checker.check_lock_hedge_dte("sell_call", context=None)
-    assert ok is True
-    assert "stub" in reason.lower()
-
-
-def test_lock5_hedge_dte_passes_when_above_45():
-    ok, _ = veto_checker.check_lock_hedge_dte("sell_put", context={"hedge_dte_days": 60})
+def test_lock5_above_threshold_passes(monkeypatch):
+    monkeypatch.setattr("src.signals.veto_checker.get_min_hedge_dte", lambda: 60)
+    ok, _ = veto_checker.check_lock_hedge_dte("sell_put")
     assert ok is True
 
 
-# ============================
-# 用戶 L6 stub drawdown
-# ============================
-def test_lock6_no_new_leaps_during_drawdown_20():
-    """drawdown=-22% → veto"""
-    ok, reason = veto_checker.check_lock_drawdown("leaps_entry", context={"drawdown_pct": -0.22})
+def test_lock5_skips_for_leaps_entry(monkeypatch):
+    """leaps_entry → n/a(L5 只擋短倉)"""
+    monkeypatch.setattr("src.signals.veto_checker.get_min_hedge_dte", lambda: 10)
+    ok, reason = veto_checker.check_lock_hedge_dte("leaps_entry")
+    assert ok is True
+    assert reason == "n/a"
+
+
+def test_lock5_context_override(monkeypatch):
+    """context={hedge_dte_days:30} 短路,不讀 management"""
+    called = {"n": 0}
+
+    def fail():
+        called["n"] += 1
+        raise AssertionError("get_min_hedge_dte should not be called")
+
+    monkeypatch.setattr("src.signals.veto_checker.get_min_hedge_dte", fail)
+    ok, _ = veto_checker.check_lock_hedge_dte(
+        "sell_call", context={"hedge_dte_days": 30}
+    )
     assert ok is False
-    assert "drawdown" in reason.lower() or "20" in reason, f"got {reason}"
+    assert called["n"] == 0
 
 
-def test_lock6_drawdown_stub_passes_when_context_none():
-    """Batch 7 stub:context=None → pass"""
-    ok, reason = veto_checker.check_lock_drawdown("leaps_entry", context=None)
+# ============================
+# 用戶 L6 — drawdown(實邏輯,從 get_current_drawdown 讀)
+# ============================
+def test_lock6_no_account_history_passes(monkeypatch):
+    """無 account 歷史 → pass(冷啟動安全)"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.get_current_drawdown",
+        lambda: {"drawdown_pct": None, "alert_level": "normal"},
+    )
+    ok, reason = veto_checker.check_lock_drawdown("leaps_entry")
     assert ok is True
-    assert "stub" in reason.lower()
+    assert reason == "no_account_value_history"
 
 
-def test_lock6_drawdown_passes_when_above_20pct():
-    """drawdown=-10% → pass(尚未達 -20%)"""
-    ok, _ = veto_checker.check_lock_drawdown("leaps_entry", context={"drawdown_pct": -0.10})
+def test_lock6_at_or_below_threshold_vetoes(monkeypatch):
+    """drawdown -22% → veto"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.get_current_drawdown",
+        lambda: {"drawdown_pct": -0.22, "alert_level": "level_2"},
+    )
+    ok, reason = veto_checker.check_lock_drawdown("leaps_entry")
+    assert ok is False
+    assert "lock6" in reason
+
+
+def test_lock6_above_threshold_passes(monkeypatch):
+    """drawdown -10% → pass"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.get_current_drawdown",
+        lambda: {"drawdown_pct": -0.10, "alert_level": "level_1"},
+    )
+    ok, _ = veto_checker.check_lock_drawdown("leaps_entry")
     assert ok is True
+
+
+def test_lock6_skips_for_short_premium(monkeypatch):
+    """sell_call / sell_put → n/a(L6 只擋新 LEAPS)"""
+    monkeypatch.setattr(
+        "src.signals.veto_checker.get_current_drawdown",
+        lambda: {"drawdown_pct": -0.50, "alert_level": "level_3"},
+    )
+    ok, reason = veto_checker.check_lock_drawdown("sell_put")
+    assert ok is True
+    assert reason == "n/a"
+
+
+def test_lock6_context_override(monkeypatch):
+    """context={drawdown_pct:-0.22} 短路,不讀 management"""
+    called = {"n": 0}
+
+    def fail():
+        called["n"] += 1
+        raise AssertionError("get_current_drawdown should not be called")
+
+    monkeypatch.setattr("src.signals.veto_checker.get_current_drawdown", fail)
+    ok, _ = veto_checker.check_lock_drawdown(
+        "leaps_entry", context={"drawdown_pct": -0.22}
+    )
+    assert ok is False
+    assert called["n"] == 0
 
 
 # ============================
@@ -172,9 +299,14 @@ def test_v4_vix_consecutive_above_30_blocks_leaps():
 # 全鎖通過情境
 # ============================
 def test_all_locks_pass_for_clean_nvda_leaps():
-    """乾淨 NVDA LEAPS:無財報、VIX 正常、DTE 540、非 2x ETF、無 context → 全 pass"""
-    with patch("src.data.earnings_calendar.is_earnings_within_days", return_value=False), \
-         patch("src.data.vix_structure.is_vix_consecutive_above", return_value=False):
+    """乾淨 NVDA LEAPS:無財報、VIX 正常、DTE 540、非 2x ETF、無 hedge / drawdown → 全 pass"""
+    with patch("src.signals.veto_checker.is_earnings_within_days", return_value=False), \
+         patch("src.signals.veto_checker.is_vix_consecutive_above", return_value=False), \
+         patch("src.signals.veto_checker.get_min_hedge_dte", return_value=None), \
+         patch("src.signals.veto_checker.get_current_drawdown",
+               return_value={"drawdown_pct": None, "alert_level": "normal"}), \
+         patch("src.signals.veto_checker.load_positions",
+               return_value={"stocks": [], "options": []}):
         fails = veto_checker.check_all_hard_rules("leaps_entry", "NVDA", dte_days=540, ivr=50)
     reasons = [r for ok, r in fails if not ok]
     assert reasons == [], f"unexpected vetoes: {reasons}"

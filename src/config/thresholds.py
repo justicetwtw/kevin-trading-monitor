@@ -371,4 +371,9 @@ HARD_RULES = {
     "no_long_premium_after_vix_high_days": 3,       # 第 4 條
     "tier_c_no_sell_put": ["PLTR", "TSLA"],         # 第 5 條
     "no_long_position_for_2x_single_etf": True,     # 第 6 條
+
+    # Batch 8 新增 — 從 management 讀資料的學習鎖
+    "min_hedge_dte_days": 45,                       # L5: hedge DTE 下限
+    "max_drawdown_pct_for_new_leaps": -0.20,        # L6: 新 LEAPS 容許回撤底線
+    "require_covered_for_short_call": True,         # L2: 賣 CALL 必須 covered
 }

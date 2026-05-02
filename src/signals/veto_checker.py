@@ -1,9 +1,8 @@
 """跨訊號通用否決(學習鎖)檢查。
 
-實作 v4 真實 6 條學習鎖(全部從 src/config/thresholds.py HARD_RULES 讀,絕不 hardcode)
-+ 3 條 Batch 8 依賴的 stub(L2 covered call / L5 hedge DTE / L6 drawdown);
-stub 在 context=None 時 pass(視同 covered / 無 hedge 資料 / 無 drawdown 資料),
-Batch 8 接入 management 模組後改為「依 context 判斷」。
+實作 v4 真實 6 條 + Batch 8 三條從 management 讀資料的學習鎖
+(L2 covered call / L5 hedge DTE / L6 drawdown)。
+全部閾值從 src/config/thresholds.py HARD_RULES 讀,絕不 hardcode。
 
 公開介面:
 - check_lock_*  各鎖獨立函式,回傳 (passed: bool, reason: str)
@@ -16,6 +15,9 @@ from src.config.thresholds import HARD_RULES
 from src.config.universe import ETF_LEVERAGED_SINGLE_STOCK
 from src.data.earnings_calendar import is_earnings_within_days
 from src.data.vix_structure import is_vix_consecutive_above
+from src.management.account_drawdown import get_current_drawdown
+from src.management.current_positions import load_positions
+from src.management.hedge_dte_tracker import get_min_hedge_dte
 
 
 # ============================
@@ -92,50 +94,96 @@ def check_lock_2x_etf_no_leaps(symbol: str, signal_type: str) -> tuple[bool, str
 
 
 # ============================
-# Batch 8 依賴 stub(context=None → pass)
+# Batch 8 — 從 management 讀資料的學習鎖
 # ============================
 
-def check_lock_no_naked_call(symbol: str, context: dict | None = None) -> tuple[bool, str]:
-    """L2 賣 CALL 必須 covered。Batch 7 stub:無 context 視同 covered。
-    Batch 8 接入 current_positions 後,context["covered_by"] ∈ {"LEAPS", "shares", None}。
+def check_lock_no_naked_call(
+    signal_type: str,
+    symbol: str,
+    context: dict | None = None,
+) -> tuple[bool, str]:
+    """L2 賣 CALL 必須 covered(同標的有現股或 long_call)。
+    HARD_RULES["require_covered_for_short_call"] = False 可整條停用。
+    僅對 sell_call 生效。
     """
-    if context is None:
-        return True, "stub_pre_batch8_assume_covered"
-    covered_by = context.get("covered_by")
-    if covered_by in ("LEAPS", "shares"):
-        return True, f"covered_by_{covered_by}"
+    if signal_type != "sell_call":
+        return True, "n/a"
+    if not HARD_RULES.get("require_covered_for_short_call", True):
+        return True, "rule_disabled"
+
+    # context["covered_by"] 顯式指定可短路(供呼叫端覆寫,例如 backtest)
+    if context is not None:
+        covered_by = context.get("covered_by")
+        if covered_by in ("LEAPS", "shares"):
+            return True, f"covered_by_{covered_by}"
+
+    try:
+        positions = load_positions() or {}
+    except Exception as e:
+        logger.warning(f"load_positions failed in lock2: {e} → assume pass")
+        return True, "lock2_load_failed_assume_pass"
+
+    has_shares = any(
+        s.get("symbol") == symbol and not s.get("_example")
+        for s in positions.get("stocks", []) or []
+    )
+    has_long_call = any(
+        o.get("symbol") == symbol
+        and o.get("type") == "long_call"
+        and not o.get("_example")
+        for o in positions.get("options", []) or []
+    )
+    if has_shares or has_long_call:
+        return True, "covered"
     return False, f"lock2_naked_call_{symbol}_no_cover"
 
 
 def check_lock_hedge_dte(signal_type: str, context: dict | None = None) -> tuple[bool, str]:
-    """L5 對沖 DTE < 45 → 擋新短倉(sell_call / sell_put)。Batch 7 stub:無 context pass。
-    Batch 8 接入 hedge_dte_tracker 後,context["hedge_dte_days"]: int。
+    """L5 對沖 DTE < HARD_RULES.min_hedge_dte_days → 擋新短倉(sell_call / sell_put)。
+    無 hedge 部位 → pass(冷啟動安全)。
     """
     if signal_type not in ("sell_call", "sell_put"):
         return True, "n/a"
-    if context is None:
-        return True, "stub_pre_batch8_no_hedge_dte_check"
-    dte = context.get("hedge_dte_days")
+
+    # context override(若呼叫端已查過,避免重複讀檔)
+    if context is not None and "hedge_dte_days" in context:
+        dte = context.get("hedge_dte_days")
+    else:
+        try:
+            dte = get_min_hedge_dte()
+        except Exception as e:
+            logger.warning(f"get_min_hedge_dte failed: {e} → assume pass")
+            return True, "lock5_query_failed_assume_pass"
+
     if dte is None:
-        return True, "no_hedge_dte_provided"
-    if dte < 45:
-        return False, f"lock5_hedge_dte_{dte}_below_45"
+        return True, "no_hedge_position"
+    threshold = HARD_RULES.get("min_hedge_dte_days", 45)
+    if dte < threshold:
+        return False, f"lock5_hedge_dte_{dte}_below_{threshold}"
     return True, "ok"
 
 
 def check_lock_drawdown(signal_type: str, context: dict | None = None) -> tuple[bool, str]:
-    """L6 帳戶回撤 <= -20% → 擋新 LEAPS。Batch 7 stub:無 context pass。
-    Batch 8 接入 account_drawdown 後,context["drawdown_pct"]: float(負數)。
+    """L6 帳戶回撤 <= HARD_RULES.max_drawdown_pct_for_new_leaps → 擋新 LEAPS。
+    無 account 歷史 → pass(冷啟動安全)。
     """
     if signal_type != "leaps_entry":
         return True, "n/a"
-    if context is None:
-        return True, "stub_pre_batch8_no_drawdown_check"
-    drawdown = context.get("drawdown_pct")
+
+    if context is not None and "drawdown_pct" in context:
+        drawdown = context.get("drawdown_pct")
+    else:
+        try:
+            drawdown = get_current_drawdown().get("drawdown_pct")
+        except Exception as e:
+            logger.warning(f"get_current_drawdown failed: {e} → assume pass")
+            return True, "lock6_query_failed_assume_pass"
+
     if drawdown is None:
-        return True, "no_drawdown_provided"
-    if drawdown <= -0.20:
-        return False, f"lock6_drawdown_{drawdown * 100:.1f}pct_at_or_below_-20pct"
+        return True, "no_account_value_history"
+    threshold = HARD_RULES.get("max_drawdown_pct_for_new_leaps", -0.20)
+    if drawdown <= threshold:
+        return False, f"lock6_drawdown_{drawdown * 100:.1f}pct_at_or_below_{threshold * 100:.0f}pct"
     return True, "ok"
 
 
@@ -169,7 +217,7 @@ def check_all_hard_rules(
         check_lock_vix_consecutive(signal_type),
         check_lock_tier_c_no_sell_put(symbol, signal_type),
         check_lock_2x_etf_no_leaps(symbol, signal_type),
-        check_lock_no_naked_call(symbol, context if signal_type == "sell_call" else None),
+        check_lock_no_naked_call(signal_type, symbol, context),
         check_lock_hedge_dte(signal_type, context),
         check_lock_drawdown(signal_type, context),
     ]

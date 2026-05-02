@@ -14,6 +14,7 @@ from src.data.analyst_actions import has_recent_downgrades
 from src.data.fundamentals import detect_consecutive_eps_miss
 from src.data.price_data import fetch_history, get_52w_high_low
 from src.indicators.basic import get_rsi_latest, get_bbands_position, get_ma_position
+from src.management.current_positions import load_positions
 from src.signals.leaps_entry_scorer import get_value_thesis
 
 
@@ -194,13 +195,7 @@ def evaluate_exit_rules_for_symbol(symbol: str, leaps_dte: int | None = None) ->
 
 
 def evaluate_all_exit_rules() -> list[dict]:
-    """iterate positions wrapper。Batch 8 才有 current_positions,現在 import 失敗 → 回 []。"""
-    try:
-        from src.management.current_positions import load_positions  # noqa: F401  (Batch 8)
-    except ImportError:
-        logger.info("evaluate_all_exit_rules: current_positions not yet (Batch 8) → return []")
-        return []
-
+    """iterate positions wrapper。冷啟動沒 positions → 回 []。"""
     try:
         positions = load_positions() or {}
     except Exception as e:
