@@ -1,0 +1,75 @@
+{
+  "spy": {
+    "symbol": "SPY",
+    "lookback": 25,
+    "count": 4,
+    "days": [
+      {
+        "date": "2026-03-27",
+        "drop_pct": -0.017051883523328024,
+        "volume": 103649400,
+        "prev_volume": 96494400
+      },
+      {
+        "date": "2026-04-21",
+        "drop_pct": -0.006546949154936224,
+        "volume": 58941400,
+        "prev_volume": 43546800
+      },
+      {
+        "date": "2026-04-23",
+        "drop_pct": -0.0038807239498252085,
+        "volume": 56174000,
+        "prev_volume": 42518500
+      },
+      {
+        "date": "2026-04-28",
+        "drop_pct": -0.00486594872814618,
+        "volume": 43117400,
+        "prev_volume": 33135900
+      }
+    ],
+    "level": "pressure",
+    "fetched_at": "2026-05-02T07:52:27.317058+00:00"
+  },
+  "qqq": {
+    "symbol": "QQQ",
+    "lookback": 25,
+    "count": 4,
+    "days": [
+      {
+        "date": "2026-03-27",
+        "drop_pct": -0.019536696991535454,
+        "volume": 82702200,
+        "prev_volume": 81492100
+      },
+      {
+        "date": "2026-04-21",
+        "drop_pct": -0.003803338055735926,
+        "volume": 39580500,
+        "prev_volume": 37138500
+      },
+      {
+        "date": "2026-04-23",
+        "drop_pct": -0.005632645699066887,
+        "volume": 40099800,
+        "prev_volume": 37368400
+      },
+      {
+        "date": "2026-04-28",
+        "drop_pct": -0.010056746717555793,
+        "volume": 34147900,
+        "prev_volume": 32717000
+      }
+    ],
+    "level": "pressure",
+    "fetched_at": "2026-05-02T07:52:27.335110+00:00"
+  },
+  "level": "pressure",
+  "modifiers": {
+    "leaps_entry": -10,
+    "sell_put": -5,
+    "sell_call": 0
+  },
+  "fetched_at": "2026-05-02T07:52:27.335339+00:00"
+}

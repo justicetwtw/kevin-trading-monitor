@@ -1,0 +1,12 @@
+{
+  "snapshot": {
+    "spx_above_50ma_pct": null,
+    "spx_above_200ma_pct": null,
+    "nyse_new_highs": null,
+    "advance_decline_line": null,
+    "fetched_at": "2026-05-02T03:52:26.692273-04:00"
+  },
+  "modifier": 0,
+  "regime": "cold_start",
+  "fetched_at": "2026-05-02T07:52:27.297525+00:00"
+}

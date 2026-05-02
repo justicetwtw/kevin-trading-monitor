@@ -1,0 +1,10 @@
+{
+  "pcr": null,
+  "regime": "cold_start",
+  "modifiers": {
+    "sell_put": 0,
+    "sell_call": 0,
+    "leaps_entry": 0
+  },
+  "fetched_at": "2026-05-02T07:52:28.397751+00:00"
+}

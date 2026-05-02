@@ -1,0 +1,18 @@
+{
+  "score": 0,
+  "stage": "normal",
+  "modifier": 0,
+  "breakdown": {},
+  "snapshot": {
+    "score": null,
+    "indicators": {
+      "buffett_indicator": 2.3,
+      "shiller_cape": 41.06,
+      "sp500_top10_concentration": null,
+      "margin_debt_yoy": null
+    },
+    "n_available": 2,
+    "fetched_at": "2026-05-02T03:52:28.008010-04:00"
+  },
+  "fetched_at": "2026-05-02T07:52:28.008059+00:00"
+}
