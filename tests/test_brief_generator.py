@@ -459,6 +459,44 @@ def test_us_premarket_no_duplicate_macro_section(isolated_data_store):
 
 
 # ============================================================
+# Phase 2.5.6 — DST / timing 變體
+# ============================================================
+
+def test_us_premarket_to_intraday_cold_start(isolated_data_store):
+    """DST 變體:us_premarket → intraday brief 不崩 + 含開盤標註。"""
+    msg = BriefGenerator("us_premarket_to_intraday").generate()
+    assert "美股開盤即時 brief" in msg
+    assert "開盤即時異動" in msg
+    assert "美股已開盤" in msg
+    assert "下次 brief" in msg
+
+
+def test_us_midday_to_afterhours_cold_start(isolated_data_store):
+    """DST 變體:us_midday → afterhours brief 不崩 + 含收盤標註。"""
+    msg = BriefGenerator("us_midday_to_afterhours").generate()
+    assert "美股盤後早晨 brief" in msg
+    assert "美股當日完整收盤" in msg
+    assert "美股已收盤" in msg
+    assert "下次 brief" in msg
+
+
+def test_us_midday_to_afterhours_includes_close_summary(isolated_data_store):
+    """afterhours 變體應有 SPY/QQQ/DIA/VIX 收盤總覽。"""
+    msg = BriefGenerator("us_midday_to_afterhours").generate()
+    assert "SPY 收盤" in msg
+    assert "QQQ 收盤" in msg
+    assert "DIA 收盤" in msg
+    assert "VIX 收盤" in msg
+
+
+def test_dst_variants_in_valid_types():
+    """新增變體應被視為合法 brief_type。"""
+    from src.alerts.brief_generator import VALID_BRIEF_TYPES
+    assert "us_premarket_to_intraday" in VALID_BRIEF_TYPES
+    assert "us_midday_to_afterhours" in VALID_BRIEF_TYPES
+
+
+# ============================================================
 # tw_eod 加碼條件檢視 + 美股盤前 TSM 推估
 # ============================================================
 

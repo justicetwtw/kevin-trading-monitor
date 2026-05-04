@@ -2,10 +2,21 @@ name: Market Brief
 
 on:
   schedule:
-    - cron: '30 0 * * 2-6'   # us_eod       台北 08:30 (週二到週六)
-    - cron: '30 5 * * 1-5'   # tw_eod       台北 13:30 (週一到週五)
-    - cron: '0 13 * * 1-5'   # us_premarket 台北 21:00 (週一到週五)
-    - cron: '0 22 * * 2-6'   # us_midday    台北 06:00 (週二到週六,起床看)
+    # us_eod 美股盤後
+    - cron: '30 0 * * 2-6'   # 主 (台北週二~週六 08:30)
+    - cron: '0 1 * * 2-6'    # 備 (台北 09:00)
+
+    # tw_eod 台股盤後
+    - cron: '30 5 * * 1-5'   # 主 (台北 13:30)
+    - cron: '0 6 * * 1-5'    # 備 (台北 14:00)
+
+    # us_premarket 美股盤前
+    - cron: '0 13 * * 1-5'   # 主 (台北 21:00)
+    - cron: '30 13 * * 1-5'  # 備 (台北 21:30)
+
+    # us_midday 美股盤中
+    - cron: '0 22 * * 2-6'   # 主 (台北 06:00)
+    - cron: '30 22 * * 2-6'  # 備 (台北 06:30)
   workflow_dispatch:
     inputs:
       brief_type:
@@ -46,16 +57,16 @@ jobs:
           else
             SCHEDULE="${{ github.event.schedule }}"
             case "$SCHEDULE" in
-              "30 0 * * 2-6")
+              "30 0 * * 2-6"|"0 1 * * 2-6")
                 echo "brief_type=us_eod" >> $GITHUB_OUTPUT
                 ;;
-              "30 5 * * 1-5")
+              "30 5 * * 1-5"|"0 6 * * 1-5")
                 echo "brief_type=tw_eod" >> $GITHUB_OUTPUT
                 ;;
-              "0 13 * * 1-5")
+              "0 13 * * 1-5"|"30 13 * * 1-5")
                 echo "brief_type=us_premarket" >> $GITHUB_OUTPUT
                 ;;
-              "0 22 * * 2-6")
+              "0 22 * * 2-6"|"30 22 * * 2-6")
                 echo "brief_type=us_midday" >> $GITHUB_OUTPUT
                 ;;
               *)

@@ -36,13 +36,23 @@ from src.twstock.active_etf_signals import scan_all_active_etfs
 from src.twstock.twstock_signals import scan_twstock_core
 
 
-VALID_BRIEF_TYPES = ("us_eod", "tw_eod", "us_premarket", "us_midday")
+VALID_BRIEF_TYPES = (
+    "us_eod",
+    "tw_eod",
+    "us_premarket",
+    "us_midday",
+    # Phase 2.5.6 DST/timing 變體
+    "us_premarket_to_intraday",
+    "us_midday_to_afterhours",
+)
 
 _BRIEF_TITLE = {
     "us_eod": "📊 美股盤後 brief",
     "tw_eod": "🇹🇼 台股盤後 brief",
     "us_premarket": "🌎 美股盤前 brief",
     "us_midday": "🌃 美股盤中 brief",
+    "us_premarket_to_intraday": "🌎 美股開盤即時 brief",
+    "us_midday_to_afterhours": "🌃 美股盤後早晨 brief",
 }
 
 _NEXT_BRIEF_LABEL = {
@@ -50,6 +60,8 @@ _NEXT_BRIEF_LABEL = {
     "tw_eod": "美股盤前 (台北 21:00)",
     "us_premarket": "美股盤中 (隔日 台北 06:00,間隔 9 小時)",
     "us_midday": "美股盤後 (台北 08:30)",
+    "us_premarket_to_intraday": "美股盤中 (隔日 台北 06:00,間隔 9 小時)",
+    "us_midday_to_afterhours": "美股盤後 (台北 08:30)",
 }
 
 # 給結論句的「段別中文名稱」
@@ -202,6 +214,8 @@ class BriefGenerator:
             "tw_eod": self._build_tw_eod,
             "us_premarket": self._build_us_premarket,
             "us_midday": self._build_us_midday,
+            "us_premarket_to_intraday": self._build_us_premarket_to_intraday,
+            "us_midday_to_afterhours": self._build_us_midday_to_afterhours,
         }
         title = _BRIEF_TITLE[self.brief_type]
         try:
@@ -534,6 +548,73 @@ class BriefGenerator:
                 f"  → 預期 2330 隔日 {lo:+.2f}% ~ {hi:+.2f}% "
                 f"(TSM × 0.7~1.0)"
             )
+        return "\n".join(lines)
+
+    # ---- DST / timing 變體 builders (Phase 2.5.6) ----
+
+    def _build_us_premarket_to_intraday(self) -> str:
+        """夏令時間 + 延後觸發,推送時美股已開盤。
+
+        內容:整體環境 + 開盤即時異動 + Sell PUT/LEAPS + 今日事件
+        + 結尾標明「美股已開盤(夏令時間)」。
+        """
+        parts = []
+        parts.append(_safe("整體環境", self._format_market_regime))
+        parts.append(_safe("開盤即時異動", self._format_intraday_movers))
+        parts.append(_safe("Sell PUT 機會", self._format_sell_put_section))
+        parts.append(_safe("LEAPS 進場", self._format_leaps_section))
+        parts.append(_safe("今日事件", self._format_events_today))
+        parts.append(
+            "<i>⚠ 美股已開盤(推送時超過 09:30 ET);夏令時間下台北 21:00 = 09:00 ET,"
+            "如延後觸發或備援 cron 觸發,可能落入盤中。</i>"
+        )
+        return "\n\n".join(p for p in parts if p)
+
+    def _build_us_midday_to_afterhours(self) -> str:
+        """夏令/冬令時間下,06:00 台北推送時美股皆已收盤。
+
+        內容:整體環境 + 美股當日完整收盤 + Sell PUT/LEAPS
+        + 結尾標明「美股已收盤」。
+        """
+        parts = []
+        parts.append(_safe("整體環境", self._format_market_regime))
+        parts.append(_safe("美股當日完整收盤", self._format_us_close_summary))
+        parts.append(_safe("Sell PUT 機會", self._format_sell_put_section))
+        sell_call = _safe("Sell CALL 機會", self._format_sell_call_section)
+        if sell_call:
+            parts.append(sell_call)
+        parts.append(_safe("LEAPS 進場", self._format_leaps_section))
+        parts.append(
+            "<i>⚠ 美股已收盤(推送時超過 16:00 ET);"
+            "夏令時間台北 06:00 = 18:00 ET、冬令時間 = 17:00 ET,屬盤後早晨 brief。</i>"
+        )
+        return "\n\n".join(p for p in parts if p)
+
+    def _format_intraday_movers(self) -> str:
+        """開盤即時異動:跟 pre-market movers 同 watchlist,但標題改盤中。"""
+        watch = ["NVDA", "AAPL", "MSFT", "TSLA", "META", "GOOGL", "AMZN"]
+        movers = []
+        for s in watch:
+            try:
+                price, chg = _day_change(s)
+                if chg is not None and abs(chg) >= 0.02:
+                    movers.append((s, price, chg))
+            except Exception as e:
+                logger.warning(f"intraday {s} failed: {e}")
+        lines = ["<b>📈 開盤即時異動 (>2%)</b>"]
+        if not movers:
+            lines.append("  <i>無顯著異動</i>")
+            return "\n".join(lines)
+        for s, p, c in movers:
+            lines.append(f"  • {escape(s)}: {_fmt_price(p)} ({_fmt_pct(c)})")
+        return "\n".join(lines)
+
+    def _format_us_close_summary(self) -> str:
+        """美股當日完整收盤:SPY/QQQ/VIX 收盤價 + 漲跌(資料源同 _day_change)。"""
+        lines = ["<b>📈 美股當日完整收盤</b>"]
+        for sym, name in (("SPY", "SPY"), ("QQQ", "QQQ"), ("DIA", "DIA"), ("^VIX", "VIX")):
+            price, chg = _day_change(sym)
+            lines.append(f"  {escape(name)} 收盤: {_fmt_price(price)} ({_fmt_pct(chg)})")
         return "\n".join(lines)
 
     # ---- us_premarket-specific ----

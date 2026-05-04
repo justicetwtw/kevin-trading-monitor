@@ -49,3 +49,6 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Brief preview output (scripts/preview_briefs.py)
+brief_previews.txt
