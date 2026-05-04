@@ -1,14 +1,34 @@
 {
-  "scan_time": "2026-05-04T20:10:28.874417+00:00",
+  "scan_time": "2026-05-04T21:18:56.191471+00:00",
   "submodules": {
     "macro_regime": {
-      "indicators": {},
-      "risk_on_count": 0,
-      "risk_off_count": 0,
-      "modifier": 0,
-      "regime": "cold_start",
-      "fetched_at": "2026-05-04T20:10:29.768957+00:00",
-      "error": "Internal Server Error"
+      "indicators": {
+        "yield_curve": {
+          "value": 50.99999999999998,
+          "regime": "risk_on"
+        },
+        "hy_oas": {
+          "value": 277.0,
+          "regime": "risk_on"
+        },
+        "dxy": {
+          "value": 118.3926,
+          "regime": "risk_off"
+        },
+        "vix": {
+          "value": 18.290000915527344,
+          "regime": "neutral"
+        },
+        "copper_gold": {
+          "value": 0.08579489899969954,
+          "regime": "neutral"
+        }
+      },
+      "risk_on_count": 2,
+      "risk_off_count": 1,
+      "modifier": 5,
+      "regime": "neutral",
+      "fetched_at": "2026-05-04T21:18:58.246642+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -16,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-05-04T16:10:29.768977-04:00"
+        "fetched_at": "2026-05-04T17:18:58.246907-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-04T20:10:30.731248+00:00"
+      "fetched_at": "2026-05-04T21:18:59.662710+00:00"
     },
     "distribution": {
       "spy": {
@@ -48,13 +68,13 @@
           },
           {
             "date": "2026-05-04",
-            "drop_pct": -0.0036355998451782947,
+            "drop_pct": -0.0036633796697419273,
             "volume": 48021468,
             "prev_volume": 42888700
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-05-04T20:10:31.156760+00:00"
+        "fetched_at": "2026-05-04T21:18:59.907745+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -81,7 +101,7 @@
           }
         ],
         "level": "healthy",
-        "fetched_at": "2026-05-04T20:10:31.291168+00:00"
+        "fetched_at": "2026-05-04T21:19:00.176068+00:00"
       },
       "level": "pressure",
       "modifiers": {
@@ -89,7 +109,7 @@
         "sell_put": -5,
         "sell_call": 0
       },
-      "fetched_at": "2026-05-04T20:10:31.291478+00:00"
+      "fetched_at": "2026-05-04T21:19:00.176346+00:00"
     },
     "bubble": {
       "score": 0,
@@ -105,9 +125,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-05-04T16:10:32.224357-04:00"
+        "fetched_at": "2026-05-04T17:19:00.940166-04:00"
       },
-      "fetched_at": "2026-05-04T20:10:32.224396+00:00"
+      "fetched_at": "2026-05-04T21:19:00.940208+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -117,13 +137,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-05-04T20:10:32.799169+00:00"
+      "fetched_at": "2026-05-04T21:19:01.859892+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 18.299999237060547,
-        "vix9d": 16.690000534057617,
-        "vix3m": 21.020000457763672,
+        "vix": 18.290000915527344,
+        "vix9d": 16.600000381469727,
+        "vix3m": 21.049999237060547,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -133,19 +153,19 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-05-04T20:10:33.137416+00:00"
+      "fetched_at": "2026-05-04T21:19:01.953744+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-04T20:10:37.375998+00:00"
+      "fetched_at": "2026-05-04T21:19:06.410818+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": 0,
-    "sell_put": -5,
-    "leaps_entry": -10,
+    "sell_call": -1,
+    "sell_put": 0,
+    "leaps_entry": -5,
     "leaps_entry_veto": false
   }
 }
