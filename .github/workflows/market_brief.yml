@@ -44,19 +44,25 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "brief_type=${{ github.event.inputs.brief_type }}" >> $GITHUB_OUTPUT
           else
-            HOUR=$(date -u +%H)
-            MIN=$(date -u +%M)
-            if [ "$HOUR" = "00" ] && [ "$MIN" -ge "25" ] && [ "$MIN" -le "35" ]; then
-              echo "brief_type=us_eod" >> $GITHUB_OUTPUT
-            elif [ "$HOUR" = "05" ] && [ "$MIN" -ge "25" ] && [ "$MIN" -le "35" ]; then
-              echo "brief_type=tw_eod" >> $GITHUB_OUTPUT
-            elif [ "$HOUR" = "13" ] && [ "$MIN" -lt "10" ]; then
-              echo "brief_type=us_premarket" >> $GITHUB_OUTPUT
-            elif [ "$HOUR" = "22" ] && [ "$MIN" -lt "10" ]; then
-              echo "brief_type=us_midday" >> $GITHUB_OUTPUT
-            else
-              echo "brief_type=us_eod" >> $GITHUB_OUTPUT
-            fi
+            SCHEDULE="${{ github.event.schedule }}"
+            case "$SCHEDULE" in
+              "30 0 * * 2-6")
+                echo "brief_type=us_eod" >> $GITHUB_OUTPUT
+                ;;
+              "30 5 * * 1-5")
+                echo "brief_type=tw_eod" >> $GITHUB_OUTPUT
+                ;;
+              "0 13 * * 1-5")
+                echo "brief_type=us_premarket" >> $GITHUB_OUTPUT
+                ;;
+              "0 22 * * 2-6")
+                echo "brief_type=us_midday" >> $GITHUB_OUTPUT
+                ;;
+              *)
+                echo "Unknown schedule: $SCHEDULE, fallback us_eod"
+                echo "brief_type=us_eod" >> $GITHUB_OUTPUT
+                ;;
+            esac
           fi
       - name: Run market brief
         env:
