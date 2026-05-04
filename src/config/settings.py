@@ -18,7 +18,16 @@ TIMEZONE_TW_MARKET = pytz.timezone("Asia/Taipei")
 
 # Telegram(從 GitHub Secrets 讀取)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
+
+# Phase 2.5.7 — 多 chat_id 支援:逗號分隔(e.g. "123,456")
+_raw_chat_ids = os.getenv("TELEGRAM_CHAT_ID", "")
+TELEGRAM_CHAT_IDS = [
+    chat_id.strip()
+    for chat_id in _raw_chat_ids.split(",")
+    if chat_id.strip()
+]
+# 單數版本相容性:取第一個(用於外部仍取單值的場景)
+TELEGRAM_CHAT_ID = TELEGRAM_CHAT_IDS[0] if TELEGRAM_CHAT_IDS else ""
 
 # FRED(St. Louis Fed)API key — fred_api.py 會在 client init 時驗證,
 # 未設不允許 fallback,直接 raise(避免靜默退回假資料)

@@ -195,3 +195,23 @@ TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
    - 這是 Python 標準行為(import 時綁定到本模組命名空間)
    - 例:test_veto_checker.py patch src.signals.veto_checker.is_earnings_within_days
      不是 src.data.earnings_calendar.is_earnings_within_days
+
+## TELEGRAM_CHAT_ID 多人支援 (Phase 2.5.7)
+
+從 Phase 2.5.7 起,`TELEGRAM_CHAT_ID` 支援逗號分隔多個 chat_id。
+所有訊息會推給列表內所有人。
+
+範例:`TELEGRAM_CHAT_ID=123456789,987654321`
+
+實作:
+- `src/config/settings.py` 解析逗號分隔 → `TELEGRAM_CHAT_IDS: list[str]`
+- 保留 `TELEGRAM_CHAT_ID` 單值(取第一個)向後相容
+- `src/alerts/telegram_bot.py` 對列表內每個 chat_id 都 `send_message`
+  - 部分成功(any True)即算整體成功
+  - 全失敗才回 False(觸發 retry / 上層錯誤)
+  - 任何單筆失敗 logger.error 記錄
+
+驗證流程:
+1. 在 GitHub Secrets 填 `TELEGRAM_CHAT_ID="A,B"`
+2. 手動觸發 health_check workflow
+3. A、B 雙方都應收到測試訊息
