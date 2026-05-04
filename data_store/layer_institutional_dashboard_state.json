@@ -1,0 +1,33 @@
+{
+  "dashboard": {
+    "scanned_at": "2026-05-04T19:42:05.964526-04:00",
+    "n_institutions_scanned": 12,
+    "by_symbol": {}
+  },
+  "target_symbols": [
+    "NVDA",
+    "TSM",
+    "MU",
+    "MSFT",
+    "GOOG",
+    "GOOGL",
+    "META",
+    "AVGO",
+    "AMZN",
+    "AMD",
+    "ASML",
+    "ORCL",
+    "AAPL",
+    "PLTR",
+    "TSLA",
+    "INTC",
+    "CRM",
+    "ADBE",
+    "CRWD",
+    "NOW",
+    "SMCI",
+    "ARM",
+    "SNDK"
+  ],
+  "fetched_at": "2026-05-04T23:42:05.964557+00:00"
+}
