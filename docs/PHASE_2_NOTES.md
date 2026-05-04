@@ -34,6 +34,47 @@ Section 12 的 11 個 runner 程式碼是早期草稿,**沒有一支能直接抄
 - 補 insider 大額賣出 alert(`form4_insider.py` 已實作買入,賣出 alert 還沒)
 - `data.sec_edgar` 改成 `fetch_recent_filings(symbol, forms=[...])` 通用介面
 
+## Phase 3 必修:IV history 累積
+
+**問題**:`calc_iv_rank` 依賴 `data_store/iv_history.json`,
+但 Phase 2 沒設計任何 runner 寫這個檔。
+導致 sell_put / leaps / sell_call 訊號的 IVR 條件**永遠失能**。
+
+**Phase 3 要做**:
+- 新增 `src/runners/run_iv_history_update.py`(每日 EOD 後對 SELL_PUT_WHITELIST 抓 IV 寫入 history)
+- 對應 `.github/workflows/iv_history_update.yml`(cron after us_eod brief)
+- 累積 ≥ 30 天後 IVR 才有意義(`iv_rank.MIN_SAMPLES_FOR_RANK`)
+- 寫法骨架(已驗證):
+  ```python
+  from src.config.universe import SELL_PUT_WHITELIST
+  from src.data.iv_rank import update_iv_history
+  for sym in SELL_PUT_WHITELIST:
+      update_iv_history(sym)
+  ```
+
+**暫時(Phase 2.5.2)brief / InvestorView logic 已修正**:
+IVR n/a 不計入 conditions_total,不影響其他條件評估。
+LEAPS 段同理:VIX n/a 也不計入分母。
+
+## Phase 2.5.2 完成記錄 (InvestorView + brief 重寫)
+
+新增:
+- `src/alerts/investor_view.py` — `InvestorView` 類:三段候選 + status_text + ranking
+- `docs/STRATEGY_PHILOSOPHY.md` — 給人看的策略哲學摘要
+
+重寫:
+- `src/alerts/brief_generator.py` 改用 `InvestorView` 三段(Sell PUT / Sell CALL / LEAPS)
+- 結論句 logic 動態:`fully_met` / `partial_met` / `none_met`
+- 部位健康度段 conditional(positions 空 → 整段不顯示)
+- Sell CALL 段 conditional(同上)
+
+關鍵設計:
+- **conditions_total 動態**:IVR n/a → 從分母拿掉(不是算「未達」)
+- **顯示文字保留**:"IVR n/a (歷史不足 30 天)" 仍出現,只是不算入 met/total
+- **status_text 用比例**:1.0 強烈 / ≥0.5 候選 / >0 部分 / 0 全未達
+- **ranking**:conditions_met 降序、平手 distance_to_high_pct 升序(更深回檔優先)
+- **top N 預設 = 3**(Sell PUT / Sell CALL / LEAPS 三段一致)
+
 ## Phase 2.5 完成記錄 (market brief)
 
 每日 4 次 brief(台北時間):
