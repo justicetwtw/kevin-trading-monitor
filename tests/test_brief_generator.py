@@ -596,3 +596,83 @@ def test_us_eod_section_order(isolated_data_store):
     # 持倉空 → 兩段 skip
     assert "Sell CALL 機會檢視" not in msg
     assert "部位健康度" not in msg
+
+
+# ============================================================
+# Phase 2.5.7 hotfix — HTML escape 防 Telegram parse error
+# ============================================================
+
+import re
+
+
+_VALID_BRIEF_TYPES_FOR_ESCAPE_TEST = (
+    "us_eod",
+    "tw_eod",
+    "us_premarket",
+    "us_midday",
+    "us_premarket_to_intraday",
+    "us_midday_to_afterhours",
+)
+
+
+def _assert_no_unescaped_lt(msg: str):
+    """檢查訊息內不應有「< 數字」pattern(會被 Telegram HTML parse_mode 拒收)。"""
+    # `<` 後接空白 + 數字 / 字母(會被誤當 tag 開頭)→ 應該已 escape 為 &lt;
+    bad = re.search(r'<\s*\d', msg)
+    assert bad is None, f"unescaped `< 數字` found at offset {bad.start()}: ...{msg[max(0,bad.start()-30):bad.end()+30]}..."
+    # `<` 後接純文字(非 b/i/B/I/開頭的合法 tag)也算違規
+    illegal_tag = re.search(r'<[^/!a-zA-Z]', msg)
+    assert illegal_tag is None, f"unescaped `<` (not a tag) at offset {illegal_tag.start()}"
+
+
+@pytest.mark.parametrize("brief_type", _VALID_BRIEF_TYPES_FOR_ESCAPE_TEST)
+def test_brief_no_unescaped_lt_cold_start(isolated_data_store, brief_type):
+    """6 種 brief cold-start 輸出不該含未 escape 的 `< 數字`。"""
+    msg = BriefGenerator(brief_type).generate()
+    _assert_no_unescaped_lt(msg)
+
+
+def test_tw_eod_twstock_signals_escape_lt(isolated_data_store):
+    """tw_eod 的 twstock 加碼條件檢視段含 `(A 級需 < 40)` 文字 → 必須 escape 為 `&lt;`。
+
+    這是 2026/05/05 真實出包的位置(brief_generator.py line 484, 489)。
+    """
+    fake_sigs = [
+        {
+            "symbol": "00631L.TW",
+            "name": "元大台灣 50 正 2",
+            "price": 30.94,
+            "pct_from_52w_high": -0.05,
+            "rsi14_weekly": 80.0,   # 80 >= 40 → 走 「還差」branch (line 489)
+            "tier": None,
+            "action": "觀望",
+        },
+        {
+            "symbol": "2330.TW",
+            "name": "台積電",
+            "price": 1000.0,
+            "pct_from_52w_high": -0.20,
+            "rsi14_weekly": 30.0,   # 30 < 40 → 走 「✓」branch (line 484)
+            "tier": "A",
+            "action": "預備子彈 25% 加碼",
+        },
+    ]
+    with patch("src.alerts.brief_generator.scan_twstock_core",
+               return_value=fake_sigs):
+        msg = BriefGenerator("tw_eod").generate()
+    # 兩條 branch 都要走過
+    assert "週 RSI(14) 80" in msg
+    assert "週 RSI(14) 30" in msg
+    # 不該有未 escape 的 `< 數字`
+    _assert_no_unescaped_lt(msg)
+    # 應該看到 escape 後的 &lt;
+    assert "&lt;" in msg
+
+
+def test_legitimate_html_tags_preserved(isolated_data_store):
+    """escape 後合法 <b>/</b>/<i>/</i> tag 仍存在(不該被誤殺)。"""
+    msg = BriefGenerator("us_eod").generate()
+    assert "<b>" in msg
+    assert "</b>" in msg
+    assert "<i>" in msg
+    assert "</i>" in msg

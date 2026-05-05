@@ -481,12 +481,12 @@ class BriefGenerator:
                 lines.append("      - 週 RSI(14) n/a")
             elif wrsi < a_rsi:
                 lines.append(
-                    f"      - 週 RSI(14) {wrsi:.0f} (A 級需 < {a_rsi}) ✓"
+                    f"      - 週 RSI(14) {wrsi:.0f} (A 級需 &lt; {a_rsi}) ✓"
                 )
             else:
                 gap = wrsi - a_rsi
                 lines.append(
-                    f"      - 週 RSI(14) {wrsi:.0f} (A 級需 < {a_rsi}, 還差 {gap:.0f})"
+                    f"      - 週 RSI(14) {wrsi:.0f} (A 級需 &lt; {a_rsi}, 還差 {gap:.0f})"
                 )
 
             # 狀態
@@ -601,7 +601,7 @@ class BriefGenerator:
                     movers.append((s, price, chg))
             except Exception as e:
                 logger.warning(f"intraday {s} failed: {e}")
-        lines = ["<b>📈 開盤即時異動 (>2%)</b>"]
+        lines = ["<b>📈 開盤即時異動 (&gt;2%)</b>"]
         if not movers:
             lines.append("  <i>無顯著異動</i>")
             return "\n".join(lines)
@@ -630,7 +630,7 @@ class BriefGenerator:
                     movers.append((s, price, chg))
             except Exception as e:
                 logger.warning(f"premarket {s} failed: {e}")
-        lines = ["<b>📈 Pre-market 異動 (>2%)</b>"]
+        lines = ["<b>📈 Pre-market 異動 (&gt;2%)</b>"]
         if not movers:
             lines.append("  <i>無顯著異動</i>")
             return "\n".join(lines)
