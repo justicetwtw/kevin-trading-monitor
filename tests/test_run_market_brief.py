@@ -1,4 +1,10 @@
-"""Phase 2.5.5 + 2.5.6 — runner 層測試:dedup、DST 偵測、actual_brief_type。"""
+"""Phase 2.5.5 + Sprint 2.5.9 — runner 層測試:
+- dedup
+- 6 種 BRIEF_TYPE 驗證
+- silent push (us_eod / us_midday)
+- dedup migration (tw_eod → tw_close)
+- get_market_state (logging-only)
+"""
 
 import json
 from datetime import datetime, timedelta
@@ -32,7 +38,7 @@ def test_dedup_after_mark_returns_true(tmp_dedup):
 
 def test_dedup_isolates_by_brief_type(tmp_dedup):
     rmb.mark_sent("us_eod")
-    assert rmb.is_already_sent_today("tw_eod") is False
+    assert rmb.is_already_sent_today("tw_close") is False
     assert rmb.is_already_sent_today("us_eod") is True
 
 
@@ -43,28 +49,95 @@ def test_dedup_corrupt_file_treated_as_empty(tmp_dedup):
 
 
 def test_dedup_clears_records_older_than_7_days(tmp_dedup):
-    """7 天前紀錄會被 mark_sent 清掉。"""
     today = datetime.now(rmb.TIMEZONE_USER).date()
     old_day = (today - timedelta(days=10)).strftime("%Y-%m-%d")
     tmp_dedup.parent.mkdir(parents=True, exist_ok=True)
     tmp_dedup.write_text(
         json.dumps({old_day: {"us_eod": True}}), encoding="utf-8"
     )
-    rmb.mark_sent("tw_eod")
+    rmb.mark_sent("tw_close")
     data = json.loads(tmp_dedup.read_text(encoding="utf-8"))
     assert old_day not in data
     assert today.strftime("%Y-%m-%d") in data
 
 
 # ------------------------------------------------------------
-# get_market_state phase 判斷(用 freezegun 風格的 patch)
+# Sprint 2.5.9 — dedup migration tw_eod → tw_close
+# ------------------------------------------------------------
+
+def test_migrate_tw_eod_to_tw_close_pure():
+    state = {
+        "2026-05-04": {"us_eod": True, "tw_eod": True},
+        "2026-05-05": {"us_eod": True},
+    }
+    out = rmb._migrate_dedup_keys(state)
+    assert "tw_eod" not in out["2026-05-04"]
+    assert out["2026-05-04"]["tw_close"] is True
+    assert out["2026-05-04"]["us_eod"] is True
+    # 2026-05-05 沒 tw_eod,不動
+    assert "tw_eod" not in out["2026-05-05"]
+    assert "tw_close" not in out["2026-05-05"]
+
+
+def test_migrate_tw_eod_with_existing_tw_close_or_merges():
+    """同一天既有 tw_eod=True 又有 tw_close=False → 應 OR 合併為 True。"""
+    state = {"2026-05-04": {"tw_eod": True, "tw_close": False}}
+    out = rmb._migrate_dedup_keys(state)
+    assert "tw_eod" not in out["2026-05-04"]
+    assert out["2026-05-04"]["tw_close"] is True
+
+
+def test_load_dedup_applies_migration_on_disk(tmp_dedup):
+    """讀檔時 tw_eod 自動 rename。"""
+    tmp_dedup.parent.mkdir(parents=True, exist_ok=True)
+    today = datetime.now(rmb.TIMEZONE_USER).strftime("%Y-%m-%d")
+    tmp_dedup.write_text(
+        json.dumps({today: {"tw_eod": True}}), encoding="utf-8"
+    )
+    # is_already_sent_today("tw_close") 應為 True (因為被 migrate)
+    assert rmb.is_already_sent_today("tw_close") is True
+    # tw_eod key 不再存在
+    assert rmb.is_already_sent_today("tw_eod") is False
+
+
+# ------------------------------------------------------------
+# Sprint 2.5.9 — silent push 判斷
+# ------------------------------------------------------------
+
+def test_silent_us_eod():
+    assert rmb.is_silent("us_eod") is True
+
+
+def test_silent_us_midday():
+    assert rmb.is_silent("us_midday") is True
+
+
+def test_not_silent_tw_open():
+    assert rmb.is_silent("tw_open") is False
+
+
+def test_not_silent_tw_close():
+    assert rmb.is_silent("tw_close") is False
+
+
+def test_not_silent_us_premarket():
+    assert rmb.is_silent("us_premarket") is False
+
+
+def test_not_silent_us_open():
+    assert rmb.is_silent("us_open") is False
+
+
+def test_silent_brief_types_set_size():
+    assert rmb.SILENT_BRIEF_TYPES == {"us_eod", "us_midday"}
+
+
+# ------------------------------------------------------------
+# Sprint 2.5.9 — get_market_state (logging-only, no dispatch)
 # ------------------------------------------------------------
 
 def _fake_now_et(hour: int, minute: int = 0, dst: bool = True):
-    """產一個指定 ET 時間的 datetime,用來 patch datetime.now()。"""
     et = pytz.timezone("America/New_York")
-    # 夏令時間:5/4 是 DST = True (US DST 從 3 月第 2 個週日起)
-    # 冬令時間:1/15 是 DST = False
     base_date = "2026-05-04" if dst else "2026-01-15"
     naive = datetime.strptime(f"{base_date} {hour:02d}:{minute:02d}:00",
                               "%Y-%m-%d %H:%M:%S")
@@ -105,37 +178,33 @@ def test_market_state_winter_no_dst():
 
 
 # ------------------------------------------------------------
-# resolve_actual_brief_type
+# Sprint 2.5.9 — VALID_BRIEF_TYPES validation in main()
 # ------------------------------------------------------------
 
-def test_resolve_us_premarket_intraday_switches():
-    market = {"phase": "intraday", "is_dst": True, "et_time": "10:00 ET"}
-    assert rmb.resolve_actual_brief_type("us_premarket", market) == \
-        "us_premarket_to_intraday"
+def test_main_invalid_brief_type_returns_1(tmp_dedup, monkeypatch):
+    monkeypatch.setenv("BRIEF_TYPE", "garbage")
+    rc = rmb.main()
+    assert rc == 1
 
 
-def test_resolve_us_premarket_premarket_unchanged():
-    market = {"phase": "premarket", "is_dst": True, "et_time": "09:00 ET"}
-    assert rmb.resolve_actual_brief_type("us_premarket", market) == "us_premarket"
+def test_main_old_tw_eod_rejected(tmp_dedup, monkeypatch):
+    """舊 tw_eod 不再合法。"""
+    monkeypatch.setenv("BRIEF_TYPE", "tw_eod")
+    rc = rmb.main()
+    assert rc == 1
 
 
-def test_resolve_us_midday_afterhours_switches():
-    market = {"phase": "afterhours", "is_dst": True, "et_time": "18:00 ET"}
-    assert rmb.resolve_actual_brief_type("us_midday", market) == \
-        "us_midday_to_afterhours"
-
-
-def test_resolve_us_midday_intraday_unchanged():
-    market = {"phase": "intraday", "is_dst": True, "et_time": "13:00 ET"}
-    assert rmb.resolve_actual_brief_type("us_midday", market) == "us_midday"
-
-
-def test_resolve_us_eod_never_changes():
-    """us_eod / tw_eod 永遠原樣返回。"""
-    for phase in ("premarket", "intraday", "afterhours"):
-        market = {"phase": phase, "is_dst": True, "et_time": "X"}
-        assert rmb.resolve_actual_brief_type("us_eod", market) == "us_eod"
-        assert rmb.resolve_actual_brief_type("tw_eod", market) == "tw_eod"
+@pytest.mark.parametrize("brief_type", [
+    "us_eod", "tw_open", "tw_close", "us_premarket", "us_open", "us_midday",
+])
+def test_main_accepts_all_six_types(tmp_dedup, monkeypatch, brief_type):
+    monkeypatch.setenv("BRIEF_TYPE", brief_type)
+    with patch("src.runners.run_market_brief.BriefGenerator") as mock_gen, \
+         patch("src.runners.run_market_brief.send_telegram",
+               return_value=True):
+        mock_gen.return_value.generate.return_value = "<b>fake</b>"
+        rc = rmb.main()
+    assert rc == 0
 
 
 # ------------------------------------------------------------
@@ -149,12 +218,6 @@ def test_main_skips_when_already_sent(tmp_dedup, monkeypatch):
         rc = rmb.main()
     assert rc == 0
     mock_send.assert_not_called()
-
-
-def test_main_invalid_brief_type_returns_1(tmp_dedup, monkeypatch):
-    monkeypatch.setenv("BRIEF_TYPE", "garbage")
-    rc = rmb.main()
-    assert rc == 1
 
 
 def test_main_marks_after_successful_send(tmp_dedup, monkeypatch):
@@ -178,3 +241,28 @@ def test_main_does_not_mark_when_send_fails(tmp_dedup, monkeypatch):
         rc = rmb.main()
     assert rc == 1
     assert rmb.is_already_sent_today("us_eod") is False
+
+
+# ------------------------------------------------------------
+# Sprint 2.5.9 — main() 把 silent 旗標傳給 send_telegram
+# ------------------------------------------------------------
+
+@pytest.mark.parametrize("brief_type,expect_silent", [
+    ("us_eod", True),
+    ("us_midday", True),
+    ("tw_open", False),
+    ("tw_close", False),
+    ("us_premarket", False),
+    ("us_open", False),
+])
+def test_main_passes_silent_flag(
+    tmp_dedup, monkeypatch, brief_type, expect_silent,
+):
+    monkeypatch.setenv("BRIEF_TYPE", brief_type)
+    with patch("src.runners.run_market_brief.BriefGenerator") as mock_gen, \
+         patch("src.runners.run_market_brief.send_telegram",
+               return_value=True) as mock_send:
+        mock_gen.return_value.generate.return_value = "<b>fake</b>"
+        rmb.main()
+    args, kwargs = mock_send.call_args
+    assert kwargs.get("disable_notification") is expect_silent

@@ -1,10 +1,19 @@
-"""Phase 2.5.2 — 每日 4 次 market brief 共用組裝邏輯(InvestorView 版)。
+"""Phase 2.5.9 — 每日 6 次 market brief 共用組裝邏輯(InvestorView 版)。
 
-dispatch by brief_type:
-  us_eod        台北 08:30 — 美股盤後
-  tw_eod        台北 13:30 — 台股盤後
-  us_premarket  台北 21:00 — 美股盤前
-  us_midday     台北 06:00 — 美股盤中(起床看)
+dispatch by brief_type(夏令時間 / 冬令美股相關 +1h):
+  us_eod        台北 05:30 / 06:30 — 美股收盤紀要 (silent)
+  tw_open       台北 08:30           — 台股開盤前
+  tw_close      台北 13:30           — 台股收盤
+  us_premarket  台北 17:00 / 18:00 — 美股夜盤(盤前)
+  us_open       台北 22:00 / 23:00 — 美股開盤
+  us_midday     台北 02:00 / 03:00 — 美股盤中 (silent)
+
+Sprint 2.5.9 變更:
+  * tw_eod → tw_close(命名更準確)
+  * 新增 tw_open / us_open
+  * us_eod 標題「盤後」→「收盤」
+  * 移除 DST 變體(us_premarket_to_intraday / us_midday_to_afterhours);
+    新時間表已避開「推送時段跨越市場 phase」的問題,DST 變體不再需要。
 
 設計:
 - 每段 try/except 內回 fallback 字串("資料抓取失敗"),整支 brief 不死
@@ -38,30 +47,29 @@ from src.twstock.twstock_signals import scan_twstock_core
 
 VALID_BRIEF_TYPES = (
     "us_eod",
-    "tw_eod",
+    "tw_open",
+    "tw_close",
     "us_premarket",
+    "us_open",
     "us_midday",
-    # Phase 2.5.6 DST/timing 變體
-    "us_premarket_to_intraday",
-    "us_midday_to_afterhours",
 )
 
 _BRIEF_TITLE = {
-    "us_eod": "📊 美股盤後 brief",
-    "tw_eod": "🇹🇼 台股盤後 brief",
+    "us_eod": "📊 美股收盤 brief",
+    "tw_open": "🇹🇼 台股開盤 brief",
+    "tw_close": "🇹🇼 台股收盤 brief",
     "us_premarket": "🌎 美股盤前 brief",
+    "us_open": "🚀 美股開盤 brief",
     "us_midday": "🌃 美股盤中 brief",
-    "us_premarket_to_intraday": "🌎 美股開盤即時 brief",
-    "us_midday_to_afterhours": "🌃 美股盤後早晨 brief",
 }
 
 _NEXT_BRIEF_LABEL = {
-    "us_eod": "台股盤後 (台北 13:30)",
-    "tw_eod": "美股盤前 (台北 21:00)",
-    "us_premarket": "美股盤中 (隔日 台北 06:00,間隔 9 小時)",
-    "us_midday": "美股盤後 (台北 08:30)",
-    "us_premarket_to_intraday": "美股盤中 (隔日 台北 06:00,間隔 9 小時)",
-    "us_midday_to_afterhours": "美股盤後 (台北 08:30)",
+    "us_eod": "台股開盤 (台北 08:30)",
+    "tw_open": "台股收盤 (台北 13:30)",
+    "tw_close": "美股盤前 (台北 17:00 夏令 / 18:00 冬令)",
+    "us_premarket": "美股開盤 (台北 22:00 夏令 / 23:00 冬令)",
+    "us_open": "美股盤中 (隔日 台北 02:00 夏令 / 03:00 冬令)",
+    "us_midday": "美股收盤 (台北 05:30 夏令 / 06:30 冬令)",
 }
 
 # 給結論句的「段別中文名稱」
@@ -211,11 +219,11 @@ class BriefGenerator:
 
         builders = {
             "us_eod": self._build_us_eod,
-            "tw_eod": self._build_tw_eod,
+            "tw_open": self._build_tw_open,
+            "tw_close": self._build_tw_close,
             "us_premarket": self._build_us_premarket,
+            "us_open": self._build_us_open,
             "us_midday": self._build_us_midday,
-            "us_premarket_to_intraday": self._build_us_premarket_to_intraday,
-            "us_midday_to_afterhours": self._build_us_midday_to_afterhours,
         }
         title = _BRIEF_TITLE[self.brief_type]
         try:
@@ -242,12 +250,47 @@ class BriefGenerator:
         parts.append(_safe("今日事件", self._format_events_today))
         return "\n\n".join(p for p in parts if p)
 
-    def _build_tw_eod(self) -> str:
+    def _build_tw_close(self) -> str:
         parts = []
         parts.append(_safe("台股當日", self._format_tw_today))
         parts.append(_safe("加碼訊號", self._format_twstock_signals))
         parts.append(_safe("主動 ETF", self._format_active_etfs))
         parts.append(_safe("美股盤前展望", self._format_us_premarket_preview))
+        return "\n\n".join(p for p in parts if p)
+
+    def _build_tw_open(self) -> str:
+        """台股開盤前 brief(台北 08:30)。
+
+        - 整體環境(SPY/QQQ/VIX 美股昨夜收盤狀態)
+        - 美股昨夜收盤摘要(SPY/QQQ/DIA % change)
+        - 台股盤前展望(ES futures + TSM ADR 推估 2330)
+        - 今日台股事件
+        - 結論句:基於美股昨夜收盤環境給台股開盤建議
+        """
+        parts = []
+        parts.append(_safe("整體環境", self._format_market_regime))
+        parts.append(_safe("美股昨夜收盤", self._format_us_close_summary))
+        parts.append(_safe("台股盤前展望", self._format_us_premarket_preview))
+        parts.append(_safe("今日台股事件", self._format_tw_events_today))
+        parts.append(_safe("台股開盤結論", self._format_tw_open_conclusion))
+        return "\n\n".join(p for p in parts if p)
+
+    def _build_us_open(self) -> str:
+        """美股開盤 brief(台北 22:00 夏令 / 23:00 冬令)。
+
+        - 整體環境(SPY/QQQ/VIX)
+        - Pre-market 最終異動 (>2%)
+        - Sell PUT / LEAPS 高優先候選 top 3(P0)
+        - 今日事件(財報前哨)
+        - 結論句:基於最後盤前狀態給開盤計畫建議
+        """
+        parts = []
+        parts.append(_safe("整體環境", self._format_market_regime))
+        parts.append(_safe("Pre-market 最終異動", self._format_premarket_movers))
+        parts.append(_safe("Sell PUT 機會", self._format_sell_put_section))
+        parts.append(_safe("LEAPS 進場", self._format_leaps_section))
+        parts.append(_safe("今日事件", self._format_events_today))
+        parts.append(_safe("美股開盤結論", self._format_us_open_conclusion))
         return "\n\n".join(p for p in parts if p)
 
     def _build_us_premarket(self) -> str:
@@ -550,71 +593,83 @@ class BriefGenerator:
             )
         return "\n".join(lines)
 
-    # ---- DST / timing 變體 builders (Phase 2.5.6) ----
-
-    def _build_us_premarket_to_intraday(self) -> str:
-        """夏令時間 + 延後觸發,推送時美股已開盤。
-
-        內容:整體環境 + 開盤即時異動 + Sell PUT/LEAPS + 今日事件
-        + 結尾標明「美股已開盤(夏令時間)」。
-        """
-        parts = []
-        parts.append(_safe("整體環境", self._format_market_regime))
-        parts.append(_safe("開盤即時異動", self._format_intraday_movers))
-        parts.append(_safe("Sell PUT 機會", self._format_sell_put_section))
-        parts.append(_safe("LEAPS 進場", self._format_leaps_section))
-        parts.append(_safe("今日事件", self._format_events_today))
-        parts.append(
-            "<i>⚠ 美股已開盤(推送時超過 09:30 ET);夏令時間下台北 21:00 = 09:00 ET,"
-            "如延後觸發或備援 cron 觸發,可能落入盤中。</i>"
-        )
-        return "\n\n".join(p for p in parts if p)
-
-    def _build_us_midday_to_afterhours(self) -> str:
-        """夏令/冬令時間下,06:00 台北推送時美股皆已收盤。
-
-        內容:整體環境 + 美股當日完整收盤 + Sell PUT/LEAPS
-        + 結尾標明「美股已收盤」。
-        """
-        parts = []
-        parts.append(_safe("整體環境", self._format_market_regime))
-        parts.append(_safe("美股當日完整收盤", self._format_us_close_summary))
-        parts.append(_safe("Sell PUT 機會", self._format_sell_put_section))
-        sell_call = _safe("Sell CALL 機會", self._format_sell_call_section)
-        if sell_call:
-            parts.append(sell_call)
-        parts.append(_safe("LEAPS 進場", self._format_leaps_section))
-        parts.append(
-            "<i>⚠ 美股已收盤(推送時超過 16:00 ET);"
-            "夏令時間台北 06:00 = 18:00 ET、冬令時間 = 17:00 ET,屬盤後早晨 brief。</i>"
-        )
-        return "\n\n".join(p for p in parts if p)
-
-    def _format_intraday_movers(self) -> str:
-        """開盤即時異動:跟 pre-market movers 同 watchlist,但標題改盤中。"""
-        watch = ["NVDA", "AAPL", "MSFT", "TSLA", "META", "GOOGL", "AMZN"]
-        movers = []
-        for s in watch:
-            try:
-                price, chg = _day_change(s)
-                if chg is not None and abs(chg) >= 0.02:
-                    movers.append((s, price, chg))
-            except Exception as e:
-                logger.warning(f"intraday {s} failed: {e}")
-        lines = ["<b>📈 開盤即時異動 (&gt;2%)</b>"]
-        if not movers:
-            lines.append("  <i>無顯著異動</i>")
-            return "\n".join(lines)
-        for s, p, c in movers:
-            lines.append(f"  • {escape(s)}: {_fmt_price(p)} ({_fmt_pct(c)})")
-        return "\n".join(lines)
+    # ---- shared formatters: 美股收盤摘要 / 結論 ----
 
     def _format_us_close_summary(self) -> str:
-        """美股當日完整收盤:SPY/QQQ/VIX 收盤價 + 漲跌(資料源同 _day_change)。"""
+        """美股當日完整收盤:SPY/QQQ/DIA/VIX 收盤價 + 漲跌(資料源同 _day_change)。
+
+        sprint 2.5.9: 留作 tw_open(看美股昨夜收盤)使用。
+        """
         lines = ["<b>📈 美股當日完整收盤</b>"]
         for sym, name in (("SPY", "SPY"), ("QQQ", "QQQ"), ("DIA", "DIA"), ("^VIX", "VIX")):
             price, chg = _day_change(sym)
             lines.append(f"  {escape(name)} 收盤: {_fmt_price(price)} ({_fmt_pct(chg)})")
+        return "\n".join(lines)
+
+    def _format_tw_events_today(self) -> str:
+        """今日台股事件 — 目前 placeholder,Phase 3 接 TWSE 公司行事曆。
+
+        現階段:回最小提示文字,讓 brief 結構齊全。
+        """
+        lines = ["<b>⏰ 今日台股事件</b>"]
+        lines.append("  <i>n/a (Phase 3 接 TWSE 公司行事曆待辦)</i>")
+        return "\n".join(lines)
+
+    def _format_tw_open_conclusion(self) -> str:
+        """台股開盤結論 — 基於美股昨夜收盤 + Layer 0 給簡短判斷。"""
+        spy_price, spy_chg = _day_change("SPY")
+        qqq_price, qqq_chg = _day_change("QQQ")
+        tsm_price, tsm_chg = _day_change("TSM")
+
+        lines = ["<b>🎯 台股開盤判斷</b>"]
+        # 美股強弱(以 SPY/QQQ 平均)
+        chgs = [c for c in (spy_chg, qqq_chg) if c is not None]
+        if not chgs:
+            lines.append("  <i>美股昨夜資料缺,無法判斷</i>")
+            return "\n".join(lines)
+        avg = sum(chgs) / len(chgs)
+        if avg >= 0.005:
+            tone = "美股昨夜收紅 → 台股開盤偏多"
+        elif avg <= -0.005:
+            tone = "美股昨夜收黑 → 台股開盤偏空"
+        else:
+            tone = "美股昨夜平盤 → 台股開盤觀望"
+        lines.append(f"  • {tone}({_fmt_pct(avg)})")
+        # TSM ADR 對應 2330
+        if tsm_chg is not None:
+            lines.append(
+                f"  • TSM ADR {_fmt_pct(tsm_chg)} → 2330 預估 "
+                f"{tsm_chg * 0.7 * 100:+.2f}% ~ {tsm_chg * 1.0 * 100:+.2f}%"
+            )
+        else:
+            lines.append("  • TSM ADR 資料缺,2330 推估略過")
+        return "\n".join(lines)
+
+    def _format_us_open_conclusion(self) -> str:
+        """美股開盤結論 — 基於 pre-market 最終狀態 + Layer 0 給開盤計畫。"""
+        spy_price, spy_chg = _day_change("SPY")
+        qqq_price, qqq_chg = _day_change("QQQ")
+        vix = self._view._vix()
+        regime = classify_market_regime(vix)
+
+        lines = ["<b>🎯 美股開盤計畫</b>"]
+        chgs = [c for c in (spy_chg, qqq_chg) if c is not None]
+        if chgs:
+            avg = sum(chgs) / len(chgs)
+            if avg >= 0.005:
+                tone = "Pre-market 偏多 → 觀察延續性"
+            elif avg <= -0.005:
+                tone = "Pre-market 偏空 → 留意 Sell PUT 接貨機會"
+            else:
+                tone = "Pre-market 平盤 → 待開盤明朗"
+            lines.append(f"  • {tone}({_fmt_pct(avg)})")
+        else:
+            lines.append("  • Pre-market 資料缺,無法判斷")
+        # VIX regime 提示
+        if vix is not None:
+            lines.append(f"  • VIX 環境: {regime}({vix:.1f})")
+        else:
+            lines.append(f"  • VIX 環境: {escape(regime)}")
         return "\n".join(lines)
 
     # ---- us_premarket-specific ----

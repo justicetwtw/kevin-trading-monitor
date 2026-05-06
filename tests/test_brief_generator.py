@@ -1,7 +1,7 @@
-"""Phase 2.5.2 — brief_generator + InvestorView unit tests。
+"""Phase 2.5.2 + Sprint 2.5.9 — brief_generator + InvestorView unit tests。
 
 涵蓋:
-- 4 種 brief cold-start 不崩(全部 mock 外部回 None / 空)
+- 6 種 brief cold-start 不崩(全部 mock 外部回 None / 空)
 - invalid brief_type raises
 - HTML escape 防注入
 - InvestorView conditions_total 動態(IVR n/a 不計入)
@@ -12,6 +12,8 @@
 - ranking 邏輯(conditions_met 降序、平手 d2h 升序)
 - VIX 從 layer0_history 讀
 - classify_market_regime 6 區間
+- Sprint 2.5.9: tw_open / us_open 結構齊全 + 標題正確
+- Sprint 2.5.9: 6 種 brief 都檢查 no unescaped lt
 """
 
 import json
@@ -21,7 +23,7 @@ import pandas as pd
 import pytest
 
 from src.alerts import brief_generator as bg_mod
-from src.alerts.brief_generator import BriefGenerator
+from src.alerts.brief_generator import BriefGenerator, VALID_BRIEF_TYPES
 from src.alerts.investor_view import (
     InvestorView, _ratio_to_status, classify_market_regime,
 )
@@ -59,7 +61,7 @@ def patch_externals():
 
 
 # ============================================================
-# Helpers (sample candidate dicts for unit testing pure logic)
+# Helpers
 # ============================================================
 
 def _make_cand(symbol, met, total, d2h=-0.10, ivr=None, vix=None,
@@ -81,25 +83,53 @@ def _make_cand(symbol, met, total, d2h=-0.10, ivr=None, vix=None,
 
 
 # ============================================================
-# 4 種 brief cold-start
+# Sprint 2.5.9 — VALID_BRIEF_TYPES 6 種
+# ============================================================
+
+def test_valid_brief_types_is_six():
+    assert set(VALID_BRIEF_TYPES) == {
+        "us_eod", "tw_open", "tw_close",
+        "us_premarket", "us_open", "us_midday",
+    }
+
+
+def test_old_dst_variants_removed():
+    assert "tw_eod" not in VALID_BRIEF_TYPES
+    assert "us_premarket_to_intraday" not in VALID_BRIEF_TYPES
+    assert "us_midday_to_afterhours" not in VALID_BRIEF_TYPES
+
+
+# ============================================================
+# 6 種 brief cold-start
 # ============================================================
 
 def test_us_eod_cold_start(isolated_data_store):
     msg = BriefGenerator("us_eod").generate()
-    assert "美股盤後" in msg
+    assert "美股收盤" in msg  # Sprint 2.5.9: 盤後 → 收盤
     assert "下次 brief" in msg
-    assert isinstance(msg, str) and len(msg) > 0
 
 
-def test_tw_eod_cold_start(isolated_data_store):
-    msg = BriefGenerator("tw_eod").generate()
-    assert "台股盤後" in msg
+def test_tw_close_cold_start(isolated_data_store):
+    msg = BriefGenerator("tw_close").generate()
+    assert "台股收盤" in msg
+    assert "下次 brief" in msg
+
+
+def test_tw_open_cold_start(isolated_data_store):
+    msg = BriefGenerator("tw_open").generate()
+    assert "台股開盤" in msg
     assert "下次 brief" in msg
 
 
 def test_us_premarket_cold_start(isolated_data_store):
     msg = BriefGenerator("us_premarket").generate()
     assert "美股盤前" in msg
+    assert "下次 brief" in msg
+
+
+def test_us_open_cold_start(isolated_data_store):
+    msg = BriefGenerator("us_open").generate()
+    assert "美股開盤" in msg
     assert "下次 brief" in msg
 
 
@@ -114,10 +144,56 @@ def test_invalid_brief_type_raises():
         BriefGenerator("nonsense").generate()
 
 
+def test_old_tw_eod_raises():
+    """舊 tw_eod 名稱應 raise(已 rename 為 tw_close)。"""
+    with pytest.raises(ValueError):
+        BriefGenerator("tw_eod").generate()
+
+
 def test_next_brief_time_each_type(isolated_data_store):
-    for t in ("us_eod", "tw_eod", "us_premarket", "us_midday"):
+    for t in VALID_BRIEF_TYPES:
         nb = BriefGenerator(t)._next_brief_time()
         assert isinstance(nb, str) and len(nb) > 0
+
+
+# ============================================================
+# Sprint 2.5.9 — 標題正確
+# ============================================================
+
+def test_brief_titles_correct(isolated_data_store):
+    """6 種 brief 標題符合 spec(us_eod 是「收盤」不是「盤後」)。"""
+    titles = bg_mod._BRIEF_TITLE
+    assert titles["us_eod"] == "📊 美股收盤 brief"
+    assert titles["tw_open"] == "🇹🇼 台股開盤 brief"
+    assert titles["tw_close"] == "🇹🇼 台股收盤 brief"
+    assert titles["us_premarket"] == "🌎 美股盤前 brief"
+    assert titles["us_open"] == "🚀 美股開盤 brief"
+    assert titles["us_midday"] == "🌃 美股盤中 brief"
+
+
+# ============================================================
+# Sprint 2.5.9 — tw_open / us_open 結構齊全
+# ============================================================
+
+def test_tw_open_brief_structure(isolated_data_store):
+    """tw_open brief 應含:整體環境 + 美股昨夜收盤 + 台股盤前展望 + 今日台股事件 + 台股開盤判斷。"""
+    msg = BriefGenerator("tw_open").generate()
+    assert "整體環境" in msg
+    assert "美股當日完整收盤" in msg  # 美股昨夜收盤
+    assert "美股盤前展望" in msg  # 台股盤前展望(用 ES + TSM)
+    assert "今日台股事件" in msg
+    assert "台股開盤判斷" in msg  # 結論段
+
+
+def test_us_open_brief_structure(isolated_data_store):
+    """us_open brief 應含:整體環境 + Pre-market 異動 + Sell PUT + LEAPS + 今日事件 + 開盤計畫。"""
+    msg = BriefGenerator("us_open").generate()
+    assert "整體環境" in msg
+    assert "Pre-market 異動" in msg
+    assert "Sell PUT 機會檢視" in msg
+    assert "LEAPS 進場檢視" in msg
+    assert "今日事件" in msg
+    assert "美股開盤計畫" in msg
 
 
 # ============================================================
@@ -129,7 +205,7 @@ def test_section_failure_does_not_kill_brief(isolated_data_store):
     with patch.object(bg_mod.InvestorView, "get_sell_put_candidates",
                       side_effect=RuntimeError("api died")):
         msg = BriefGenerator("us_eod").generate()
-    assert "美股盤後" in msg  # 整支 brief 仍生成
+    assert "美股收盤" in msg
     assert "失敗" in msg
 
 
@@ -151,7 +227,6 @@ def test_html_escape_in_candidates(isolated_data_store):
 # ============================================================
 
 def test_sell_put_ivr_none_excludes_from_total(isolated_data_store):
-    """IVR n/a → conditions_total = 2(不是 3)。"""
     with patch("src.alerts.investor_view.get_52w_high_low",
                return_value={"current": 100.0, "pct_from_high": -0.20}), \
          patch("src.alerts.investor_view.calc_iv_rank",
@@ -163,14 +238,11 @@ def test_sell_put_ivr_none_excludes_from_total(isolated_data_store):
             cands = view.get_sell_put_candidates(top_n=3)
     assert len(cands) > 0
     for c in cands:
-        # IVR None → conditions_total 應 = 2
         assert c["conditions_total"] == 2
-        # passed_flags 應有 1 個 None
         assert sum(1 for f in c["passed_flags"] if f is None) == 1
 
 
 def test_sell_put_ivr_present_total_3(isolated_data_store):
-    """IVR 有值 → conditions_total = 3。"""
     with patch("src.alerts.investor_view.get_52w_high_low",
                return_value={"current": 100.0, "pct_from_high": -0.20}), \
          patch("src.alerts.investor_view.calc_iv_rank",
@@ -182,12 +254,10 @@ def test_sell_put_ivr_present_total_3(isolated_data_store):
             cands = view.get_sell_put_candidates(top_n=3)
     for c in cands:
         assert c["conditions_total"] == 3
-        # 全條件達標
         assert c["conditions_met"] == 3
 
 
 def test_leaps_vix_none_excludes_from_total(isolated_data_store):
-    """VIX n/a → LEAPS conditions_total = 2(d2h + RSI)。"""
     with patch("src.alerts.investor_view.get_52w_high_low",
                return_value={"current": 100.0, "pct_from_high": -0.30}), \
          patch("src.alerts.investor_view.fetch_vix_term_structure",
@@ -199,7 +269,6 @@ def test_leaps_vix_none_excludes_from_total(isolated_data_store):
             cands = view.get_leaps_candidates(top_n=3)
     for c in cands:
         assert c["conditions_total"] == 2
-        # VIX 應該是 None,passed_flag 應該是 None
         assert c["vix"] is None
 
 
@@ -242,7 +311,6 @@ def test_conclusion_fully_met(isolated_data_store):
 
 
 def test_conclusion_partial_met(isolated_data_store):
-    """partial_met → 「接近接貨區,等 X」(不再是冗餘的「部分條件達, 仍有條件未滿足」)。"""
     cands = [
         _make_cand("NVDA", 1, 3, unmet_codes=["rsi_too_high", "ivr_too_low"]),
         _make_cand("META", 1, 3, unmet_codes=["rsi_too_high", "ivr_too_low"]),
@@ -251,12 +319,10 @@ def test_conclusion_partial_met(isolated_data_store):
     assert "結論" in msg
     assert "接近接貨區" in msg
     assert ("NVDA" in msg or "META" in msg)
-    # 不再出現冗餘文字
     assert "仍有條件未滿足" not in msg
 
 
 def test_conclusion_partial_wait_rsi(isolated_data_store):
-    """所有 partial_met 都缺 RSI → 「等 RSI 過低」。"""
     cands = [
         _make_cand("A", 2, 3, unmet_codes=["rsi_too_high"]),
         _make_cand("B", 2, 3, unmet_codes=["rsi_too_high"]),
@@ -275,7 +341,6 @@ def test_conclusion_partial_wait_distance(isolated_data_store):
 
 
 def test_conclusion_partial_truly_mixed(isolated_data_store):
-    """每筆 partial_met 缺不同條件 → 「等多重條件成熟」。"""
     cands = [
         _make_cand("A", 2, 3, unmet_codes=["rsi_too_high"]),
         _make_cand("B", 2, 3, unmet_codes=["distance_not_enough"]),
@@ -295,7 +360,6 @@ def test_conclusion_all_none_met(isolated_data_store):
 
 
 def test_conclusion_partial_with_all_ivr_none_warning(isolated_data_store):
-    """sell_put 全部 IVR=None 時,結論應加 IV history 提示。"""
     cands = [
         _make_cand("NVDA", 1, 2, ivr=None, unmet_codes=["rsi_too_high"]),
         _make_cand("META", 1, 2, ivr=None, unmet_codes=["rsi_too_high"]),
@@ -305,7 +369,6 @@ def test_conclusion_partial_with_all_ivr_none_warning(isolated_data_store):
 
 
 def test_conclusion_leaps_all_vix_none_warning(isolated_data_store):
-    """leaps 全部 VIX=None 時,結論應加 VIX 提示。"""
     cands = [
         _make_cand("NVDA", 1, 2, vix=None, unmet_codes=["rsi_too_high"]),
         _make_cand("META", 1, 2, vix=None, unmet_codes=["rsi_too_high"]),
@@ -320,12 +383,10 @@ def test_conclusion_empty_candidates(isolated_data_store):
 
 
 # ============================================================
-# positions 空 vs 有 → Sell CALL / 部位健康度顯示
+# positions 空 vs 有
 # ============================================================
 
 def test_positions_empty_skips_sell_call_and_health(isolated_data_store, tmp_path):
-    """全 _example positions → Sell CALL 段、部位健康度段都不顯示。"""
-    # 寫入全 _example positions(就用預設範本即可)
     pos = {
         "stocks": [{"_example": True, "symbol": "PLTR", "shares": 100}],
         "options": [{"_example": True, "symbol": "MSFT", "type": "long_call"}],
@@ -333,9 +394,7 @@ def test_positions_empty_skips_sell_call_and_health(isolated_data_store, tmp_pat
     (isolated_data_store / "positions.json").write_text(
         json.dumps(pos), encoding="utf-8"
     )
-    # 其他必要的 mock 已在 patch_externals 處理
     msg = BriefGenerator("us_eod").generate()
-    # 不應出現 Sell CALL 或 部位健康度 段標題
     assert "Sell CALL 機會檢視" not in msg
     assert "部位健康度" not in msg
 
@@ -343,7 +402,6 @@ def test_positions_empty_skips_sell_call_and_health(isolated_data_store, tmp_pat
 def test_positions_with_real_holding_shows_sell_call_and_health(
     isolated_data_store, tmp_path,
 ):
-    """真實持倉 → Sell CALL + 部位健康度 段都顯示。"""
     pos = {
         "stocks": [],
         "options": [{
@@ -370,7 +428,6 @@ def test_positions_with_real_holding_shows_sell_call_and_health(
 # ============================================================
 
 def test_rank_by_conditions_met_descending(isolated_data_store):
-    """conditions_met 高的排前。"""
     raw = [
         _make_cand("A", 1, 3, d2h=-0.10),
         _make_cand("B", 3, 3, d2h=-0.10),
@@ -381,7 +438,6 @@ def test_rank_by_conditions_met_descending(isolated_data_store):
 
 
 def test_rank_tiebreak_by_deeper_pullback(isolated_data_store):
-    """conditions_met 平手 → distance_to_high_pct 升序(更深回檔優先,負數越小越前)。"""
     raw = [
         _make_cand("A", 2, 3, d2h=-0.05),
         _make_cand("B", 2, 3, d2h=-0.30),
@@ -432,7 +488,6 @@ def test_vix_read_from_layer0_history(isolated_data_store):
 
 
 def test_vix_fallback_when_layer0_missing(isolated_data_store):
-    """layer0_history 不存在 → 回退到 fetch_vix_term_structure。"""
     with patch("src.alerts.investor_view.fetch_vix_term_structure",
                return_value={"vix": 18.7}):
         view = InvestorView()
@@ -440,68 +495,38 @@ def test_vix_fallback_when_layer0_missing(isolated_data_store):
 
 
 # ============================================================
-# 整合:us_eod 段順序
+# us_eod / us_midday / us_premarket: 段順序 + 不重複
 # ============================================================
 
 def test_us_midday_no_duplicate_macro_section(isolated_data_store):
-    """us_midday 不再有重複的「📈 美股當日」段(整體環境已含 SPY/QQQ/VIX)。"""
     msg = BriefGenerator("us_midday").generate()
-    # 「整體環境」段標題只出現一次,「美股當日」段標題不應出現
     assert msg.count("整體環境") == 1
     assert "美股當日" not in msg
 
 
 def test_us_premarket_no_duplicate_macro_section(isolated_data_store):
-    """us_premarket 同樣不應有重複的美股當日段。"""
     msg = BriefGenerator("us_premarket").generate()
     assert msg.count("整體環境") == 1
     assert "美股當日" not in msg
 
 
-# ============================================================
-# Phase 2.5.6 — DST / timing 變體
-# ============================================================
-
-def test_us_premarket_to_intraday_cold_start(isolated_data_store):
-    """DST 變體:us_premarket → intraday brief 不崩 + 含開盤標註。"""
-    msg = BriefGenerator("us_premarket_to_intraday").generate()
-    assert "美股開盤即時 brief" in msg
-    assert "開盤即時異動" in msg
-    assert "美股已開盤" in msg
-    assert "下次 brief" in msg
-
-
-def test_us_midday_to_afterhours_cold_start(isolated_data_store):
-    """DST 變體:us_midday → afterhours brief 不崩 + 含收盤標註。"""
-    msg = BriefGenerator("us_midday_to_afterhours").generate()
-    assert "美股盤後早晨 brief" in msg
-    assert "美股當日完整收盤" in msg
-    assert "美股已收盤" in msg
-    assert "下次 brief" in msg
-
-
-def test_us_midday_to_afterhours_includes_close_summary(isolated_data_store):
-    """afterhours 變體應有 SPY/QQQ/DIA/VIX 收盤總覽。"""
-    msg = BriefGenerator("us_midday_to_afterhours").generate()
-    assert "SPY 收盤" in msg
-    assert "QQQ 收盤" in msg
-    assert "DIA 收盤" in msg
-    assert "VIX 收盤" in msg
-
-
-def test_dst_variants_in_valid_types():
-    """新增變體應被視為合法 brief_type。"""
-    from src.alerts.brief_generator import VALID_BRIEF_TYPES
-    assert "us_premarket_to_intraday" in VALID_BRIEF_TYPES
-    assert "us_midday_to_afterhours" in VALID_BRIEF_TYPES
+def test_us_eod_section_order(isolated_data_store):
+    msg = BriefGenerator("us_eod").generate()
+    idx_env = msg.find("整體環境")
+    idx_put = msg.find("Sell PUT 機會檢視")
+    idx_leaps = msg.find("LEAPS 進場檢視")
+    idx_events = msg.find("今日事件")
+    assert idx_env != -1 and idx_put != -1 and idx_leaps != -1 and idx_events != -1
+    assert idx_env < idx_put < idx_leaps < idx_events
+    assert "Sell CALL 機會檢視" not in msg
+    assert "部位健康度" not in msg
 
 
 # ============================================================
-# tw_eod 加碼條件檢視 + 美股盤前 TSM 推估
+# tw_close (舊 tw_eod) 加碼條件 + TSM 推估
 # ============================================================
 
 def test_tw_signals_show_distance_and_rsi(isolated_data_store):
-    """tw_eod 應顯示距 52W 高 / 週 RSI / A 級門檻 / 狀態,不只 「tier=— 觀望」。"""
     fake_sigs = [{
         "symbol": "00631L.TW",
         "name": "元大台灣 50 正 2",
@@ -513,17 +538,15 @@ def test_tw_signals_show_distance_and_rsi(isolated_data_store):
     }]
     with patch("src.alerts.brief_generator.scan_twstock_core",
                return_value=fake_sigs):
-        msg = BriefGenerator("tw_eod").generate()
+        msg = BriefGenerator("tw_close").generate()
     assert "加碼條件檢視" in msg
     assert "距 52W 高" in msg
     assert "週 RSI(14)" in msg
     assert "A 級需" in msg
-    # 狀態行:應提示「不符合」/「接近 A 級」/「符合 X 級」
     assert ("不符合" in msg) or ("接近 A 級" in msg) or ("符合" in msg)
 
 
 def test_tw_signals_tier_a_status(isolated_data_store):
-    """tier=A 時 → 狀態:符合 A 級。"""
     fake_sigs = [{
         "symbol": "00631L.TW",
         "name": "元大台灣 50 正 2",
@@ -535,115 +558,121 @@ def test_tw_signals_tier_a_status(isolated_data_store):
     }]
     with patch("src.alerts.brief_generator.scan_twstock_core",
                return_value=fake_sigs):
-        msg = BriefGenerator("tw_eod").generate()
+        msg = BriefGenerator("tw_close").generate()
     assert "符合 A 級" in msg
 
 
 def test_tw_signals_near_a_status(isolated_data_store):
-    """距高 -7%(A 需 -10%)→ 接近 A 級門檻。"""
     fake_sigs = [{
         "symbol": "00631L.TW",
         "name": "元大",
         "price": 30.0,
-        "pct_from_52w_high": -0.07,  # 接近 A
-        "rsi14_weekly": 45.0,        # 接近 A
+        "pct_from_52w_high": -0.07,
+        "rsi14_weekly": 45.0,
         "tier": None,
         "action": "觀望",
     }]
     with patch("src.alerts.brief_generator.scan_twstock_core",
                return_value=fake_sigs):
-        msg = BriefGenerator("tw_eod").generate()
+        msg = BriefGenerator("tw_close").generate()
     assert "接近 A 級" in msg
 
 
-def test_tw_eod_premarket_preview_uses_tsm_with_estimate(isolated_data_store):
-    """tw_eod 美股盤前展望:用 TSM ADR(對應 2330)+ 漲跌 + 推估 2330 隔日。"""
-    # ES + TSM 都回 (price, chg)
+def test_tw_close_premarket_preview_uses_tsm_with_estimate(isolated_data_store):
     def fake_day_change(sym):
         if sym == "ES=F":
             return 5800.0, 0.002
         if sym == "TSM":
-            return 250.34, 0.012  # +1.2%
+            return 250.34, 0.012
         return None, None
     with patch("src.alerts.brief_generator._day_change",
                side_effect=fake_day_change):
-        msg = BriefGenerator("tw_eod").generate()
+        msg = BriefGenerator("tw_close").generate()
     assert "TSM ADR" in msg
     assert "預期 2330 隔日" in msg
     assert "TSM × 0.7~1.0" in msg
-    # NVDA 應已從 preview 移掉(它原本對應不到 2330)
-    # 注意:Sell PUT / LEAPS 段內可能仍有 NVDA(那些段在 us_eod 才有,tw_eod 沒)
-    # 在 tw_eod brief 內 NVDA 不應出現
-    # 但 fake_day_change 內若沒 NVDA mock,也不會印
-    # 這裡用更弱的 assertion:preview 內標題不再對 NVDA
-    # (找到 "🌎 美股盤前展望" 起到「下次 brief」之間的段)
     preview_start = msg.find("🌎 美股盤前展望")
     preview_end = msg.find("下次 brief", preview_start)
     preview_section = msg[preview_start:preview_end]
     assert "NVDA" not in preview_section
 
 
-def test_us_eod_section_order(isolated_data_store):
-    """整體環境 → Sell PUT → (Sell CALL skip if empty) → LEAPS → (健康度 skip) → 今日事件。"""
-    msg = BriefGenerator("us_eod").generate()
-    # Cold-start 下 positions 空,Sell CALL / 健康度 應 skip
-    idx_env = msg.find("整體環境")
-    idx_put = msg.find("Sell PUT 機會檢視")
-    idx_leaps = msg.find("LEAPS 進場檢視")
-    idx_events = msg.find("今日事件")
-    assert idx_env != -1 and idx_put != -1 and idx_leaps != -1 and idx_events != -1
-    assert idx_env < idx_put < idx_leaps < idx_events
-    # 持倉空 → 兩段 skip
-    assert "Sell CALL 機會檢視" not in msg
-    assert "部位健康度" not in msg
+# ============================================================
+# Sprint 2.5.9 — tw_open 美股昨夜收盤段
+# ============================================================
+
+def test_tw_open_includes_us_close_summary(isolated_data_store):
+    """tw_open 應有 SPY/QQQ/DIA/VIX 收盤段(美股昨夜)。"""
+    msg = BriefGenerator("tw_open").generate()
+    assert "SPY 收盤" in msg
+    assert "QQQ 收盤" in msg
+    assert "DIA 收盤" in msg
+    assert "VIX 收盤" in msg
+
+
+def test_tw_open_conclusion_uses_us_close_data(isolated_data_store):
+    """tw_open 結論基於美股昨夜 SPY/QQQ 平均漲跌。"""
+    def fake_day_change(sym):
+        if sym in ("SPY", "QQQ", "DIA"):
+            return 500.0, 0.012  # +1.2%
+        if sym == "TSM":
+            return 250.0, 0.015
+        return None, None
+    with patch("src.alerts.brief_generator._day_change",
+               side_effect=fake_day_change):
+        msg = BriefGenerator("tw_open").generate()
+    assert "台股開盤判斷" in msg
+    assert "美股昨夜收紅" in msg or "偏多" in msg
+
+
+def test_tw_open_conclusion_handles_missing_us_data(isolated_data_store):
+    """tw_open 美股資料全 None → 結論段不崩。"""
+    msg = BriefGenerator("tw_open").generate()  # patch_externals 已 mock 全 None
+    assert "台股開盤判斷" in msg
+    # 應有 fallback 文字或無法判斷提示
+    assert ("無法判斷" in msg) or ("資料缺" in msg) or ("觀望" in msg)
 
 
 # ============================================================
-# Phase 2.5.7 hotfix — HTML escape 防 Telegram parse error
+# Sprint 2.5.9 — us_open 結論
+# ============================================================
+
+def test_us_open_conclusion_present(isolated_data_store):
+    msg = BriefGenerator("us_open").generate()
+    assert "美股開盤計畫" in msg
+
+
+# ============================================================
+# Sprint 2.5.7 hotfix — HTML escape 防 Telegram parse error
+# Sprint 2.5.9 — 6 種 brief 都檢查
 # ============================================================
 
 import re
 
 
-_VALID_BRIEF_TYPES_FOR_ESCAPE_TEST = (
-    "us_eod",
-    "tw_eod",
-    "us_premarket",
-    "us_midday",
-    "us_premarket_to_intraday",
-    "us_midday_to_afterhours",
-)
-
-
 def _assert_no_unescaped_lt(msg: str):
-    """檢查訊息內不應有「< 數字」pattern(會被 Telegram HTML parse_mode 拒收)。"""
-    # `<` 後接空白 + 數字 / 字母(會被誤當 tag 開頭)→ 應該已 escape 為 &lt;
     bad = re.search(r'<\s*\d', msg)
-    assert bad is None, f"unescaped `< 數字` found at offset {bad.start()}: ...{msg[max(0,bad.start()-30):bad.end()+30]}..."
-    # `<` 後接純文字(非 b/i/B/I/開頭的合法 tag)也算違規
+    assert bad is None, f"unescaped `< 數字` at offset {bad.start()}: ...{msg[max(0,bad.start()-30):bad.end()+30]}..."
     illegal_tag = re.search(r'<[^/!a-zA-Z]', msg)
     assert illegal_tag is None, f"unescaped `<` (not a tag) at offset {illegal_tag.start()}"
 
 
-@pytest.mark.parametrize("brief_type", _VALID_BRIEF_TYPES_FOR_ESCAPE_TEST)
+@pytest.mark.parametrize("brief_type", VALID_BRIEF_TYPES)
 def test_brief_no_unescaped_lt_cold_start(isolated_data_store, brief_type):
     """6 種 brief cold-start 輸出不該含未 escape 的 `< 數字`。"""
     msg = BriefGenerator(brief_type).generate()
     _assert_no_unescaped_lt(msg)
 
 
-def test_tw_eod_twstock_signals_escape_lt(isolated_data_store):
-    """tw_eod 的 twstock 加碼條件檢視段含 `(A 級需 < 40)` 文字 → 必須 escape 為 `&lt;`。
-
-    這是 2026/05/05 真實出包的位置(brief_generator.py line 484, 489)。
-    """
+def test_tw_close_twstock_signals_escape_lt(isolated_data_store):
+    """tw_close (舊 tw_eod) 的 twstock 加碼條件檢視段含 `(A 級需 < 40)` 文字 → 必須 escape。"""
     fake_sigs = [
         {
             "symbol": "00631L.TW",
             "name": "元大台灣 50 正 2",
             "price": 30.94,
             "pct_from_52w_high": -0.05,
-            "rsi14_weekly": 80.0,   # 80 >= 40 → 走 「還差」branch (line 489)
+            "rsi14_weekly": 80.0,
             "tier": None,
             "action": "觀望",
         },
@@ -652,25 +681,21 @@ def test_tw_eod_twstock_signals_escape_lt(isolated_data_store):
             "name": "台積電",
             "price": 1000.0,
             "pct_from_52w_high": -0.20,
-            "rsi14_weekly": 30.0,   # 30 < 40 → 走 「✓」branch (line 484)
+            "rsi14_weekly": 30.0,
             "tier": "A",
             "action": "預備子彈 25% 加碼",
         },
     ]
     with patch("src.alerts.brief_generator.scan_twstock_core",
                return_value=fake_sigs):
-        msg = BriefGenerator("tw_eod").generate()
-    # 兩條 branch 都要走過
+        msg = BriefGenerator("tw_close").generate()
     assert "週 RSI(14) 80" in msg
     assert "週 RSI(14) 30" in msg
-    # 不該有未 escape 的 `< 數字`
     _assert_no_unescaped_lt(msg)
-    # 應該看到 escape 後的 &lt;
     assert "&lt;" in msg
 
 
 def test_legitimate_html_tags_preserved(isolated_data_store):
-    """escape 後合法 <b>/</b>/<i>/</i> tag 仍存在(不該被誤殺)。"""
     msg = BriefGenerator("us_eod").generate()
     assert "<b>" in msg
     assert "</b>" in msg

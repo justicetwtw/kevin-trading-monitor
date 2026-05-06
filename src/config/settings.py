@@ -85,3 +85,16 @@ def is_us_market_hours() -> bool:
     market_open = now_et.replace(hour=9, minute=30, second=0)
     market_close = now_et.replace(hour=16, minute=0, second=0)
     return market_open <= now_et <= market_close
+
+
+def is_us_dst_active() -> bool:
+    """判斷美東當下是否為夏令時間(EDT, UTC-4)。
+
+    Sprint 2.5.9:給 market_brief workflow + run_market_brief 用,
+    決定要使用哪一組 cron 對照表。
+
+    冬令(EST, UTC-5)→ False
+    夏令(EDT, UTC-4)→ True
+    """
+    now_et = datetime.now(TIMEZONE_US_MARKET)
+    return now_et.dst().total_seconds() > 0

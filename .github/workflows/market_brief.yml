@@ -2,21 +2,37 @@ name: Market Brief
 
 on:
   schedule:
-    # us_eod 美股盤後
-    - cron: '30 0 * * 2-6'   # 主 (台北週二~週六 08:30)
-    - cron: '0 1 * * 2-6'    # 備 (台北 09:00)
-
-    # tw_eod 台股盤後
-    - cron: '30 5 * * 1-5'   # 主 (台北 13:30)
-    - cron: '0 6 * * 1-5'    # 備 (台北 14:00)
-
+    # ===== 夏令時間 (DST active, ~Mar - Nov) =====
+    # us_eod 美股收盤紀要 (silent)
+    - cron: '30 21 * * 1-5'   # 主 (台北 05:30 次日)
+    - cron: '0 22 * * 1-5'    # 備 (台北 06:00)
     # us_premarket 美股盤前
-    - cron: '0 13 * * 1-5'   # 主 (台北 21:00)
-    - cron: '30 13 * * 1-5'  # 備 (台北 21:30)
+    - cron: '0 9 * * 1-5'     # 主 (台北 17:00)
+    - cron: '30 9 * * 1-5'    # 備 (台北 17:30)
+    # us_open 美股開盤
+    - cron: '0 14 * * 1-5'    # 主 (台北 22:00)
+    - cron: '30 14 * * 1-5'   # 備 (台北 22:30)
+    # us_midday 美股盤中 (silent)
+    - cron: '0 18 * * 1-5'    # 主 (台北 02:00 次日)
+    - cron: '30 18 * * 1-5'   # 備 (台北 02:30)
 
-    # us_midday 美股盤中
-    - cron: '0 22 * * 2-6'   # 主 (台北 06:00)
-    - cron: '30 22 * * 2-6'  # 備 (台北 06:30)
+    # ===== 冬令時間 (Standard, ~Nov - Mar; 美股相關 +1h) =====
+    - cron: '30 22 * * 1-5'   # us_eod 主 (台北 06:30)
+    - cron: '0 23 * * 1-5'    # us_eod 備 (台北 07:00)
+    - cron: '0 10 * * 1-5'    # us_premarket 主 (台北 18:00)
+    - cron: '30 10 * * 1-5'   # us_premarket 備 (台北 18:30)
+    - cron: '0 15 * * 1-5'    # us_open 主 (台北 23:00)
+    - cron: '30 15 * * 1-5'   # us_open 備 (台北 23:30)
+    - cron: '0 19 * * 1-5'    # us_midday 主 (台北 03:00 次日)
+    - cron: '30 19 * * 1-5'   # us_midday 備 (台北 03:30)
+
+    # ===== 台北時間固定 (台股, 不受 DST 影響) =====
+    # tw_open 台股開盤前
+    - cron: '30 0 * * 1-5'    # 主 (台北 08:30)
+    - cron: '0 1 * * 1-5'     # 備 (台北 09:00)
+    # tw_close 台股收盤
+    - cron: '30 5 * * 1-5'    # 主 (台北 13:30)
+    - cron: '0 6 * * 1-5'     # 備 (台北 14:00)
   workflow_dispatch:
     inputs:
       brief_type:
@@ -26,8 +42,10 @@ on:
         type: choice
         options:
           - us_eod
-          - tw_eod
+          - tw_open
+          - tw_close
           - us_premarket
+          - us_open
           - us_midday
 
 concurrency:
@@ -49,33 +67,52 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Determine BRIEF_TYPE from cron / dispatch
+      - name: Determine BRIEF_TYPE + DST gate from cron / dispatch
         id: brief_type
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "brief_type=${{ github.event.inputs.brief_type }}" >> $GITHUB_OUTPUT
+            echo "skip=false" >> $GITHUB_OUTPUT
           else
             SCHEDULE="${{ github.event.schedule }}"
+            IS_DST=$(python -c "from src.config.settings import is_us_dst_active; print('true' if is_us_dst_active() else 'false')")
+            BT=""
+            REQUIRES_DST=""
             case "$SCHEDULE" in
-              "30 0 * * 2-6"|"0 1 * * 2-6")
-                echo "brief_type=us_eod" >> $GITHUB_OUTPUT
-                ;;
-              "30 5 * * 1-5"|"0 6 * * 1-5")
-                echo "brief_type=tw_eod" >> $GITHUB_OUTPUT
-                ;;
-              "0 13 * * 1-5"|"30 13 * * 1-5")
-                echo "brief_type=us_premarket" >> $GITHUB_OUTPUT
-                ;;
-              "0 22 * * 2-6"|"30 22 * * 2-6")
-                echo "brief_type=us_midday" >> $GITHUB_OUTPUT
-                ;;
+              # us_eod
+              "30 21 * * 1-5"|"0 22 * * 1-5") BT="us_eod"; REQUIRES_DST="true" ;;
+              "30 22 * * 1-5"|"0 23 * * 1-5") BT="us_eod"; REQUIRES_DST="false" ;;
+              # us_premarket
+              "0 9 * * 1-5"|"30 9 * * 1-5")   BT="us_premarket"; REQUIRES_DST="true" ;;
+              "0 10 * * 1-5"|"30 10 * * 1-5") BT="us_premarket"; REQUIRES_DST="false" ;;
+              # us_open
+              "0 14 * * 1-5"|"30 14 * * 1-5") BT="us_open"; REQUIRES_DST="true" ;;
+              "0 15 * * 1-5"|"30 15 * * 1-5") BT="us_open"; REQUIRES_DST="false" ;;
+              # us_midday
+              "0 18 * * 1-5"|"30 18 * * 1-5") BT="us_midday"; REQUIRES_DST="true" ;;
+              "0 19 * * 1-5"|"30 19 * * 1-5") BT="us_midday"; REQUIRES_DST="false" ;;
+              # tw_open / tw_close (no DST gate)
+              "30 0 * * 1-5"|"0 1 * * 1-5")   BT="tw_open"; REQUIRES_DST="any" ;;
+              "30 5 * * 1-5"|"0 6 * * 1-5")   BT="tw_close"; REQUIRES_DST="any" ;;
               *)
-                echo "Unknown schedule: $SCHEDULE, fallback us_eod"
+                echo "Unknown schedule: $SCHEDULE -> skip"
                 echo "brief_type=us_eod" >> $GITHUB_OUTPUT
+                echo "skip=true" >> $GITHUB_OUTPUT
+                exit 0
                 ;;
             esac
+            echo "brief_type=$BT" >> $GITHUB_OUTPUT
+            if [ "$REQUIRES_DST" = "any" ]; then
+              echo "skip=false" >> $GITHUB_OUTPUT
+            elif [ "$REQUIRES_DST" = "$IS_DST" ]; then
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "DST mismatch: cron requires_dst=$REQUIRES_DST, current=$IS_DST -> skip"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            fi
           fi
       - name: Run market brief
+        if: steps.brief_type.outputs.skip == 'false'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
