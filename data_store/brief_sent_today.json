@@ -6,6 +6,7 @@
     "us_eod": true
   },
   "2026-05-06": {
-    "us_midday": true
+    "us_midday": true,
+    "us_eod": true
   }
 }
