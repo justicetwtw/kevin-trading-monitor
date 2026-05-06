@@ -11,6 +11,7 @@
     "tw_close": true
   },
   "2026-05-07": {
-    "us_open": true
+    "us_open": true,
+    "us_midday": true
   }
 }
