@@ -10,7 +10,7 @@ from loguru import logger
 from src.config.thresholds import (
     SELL_PUT_WEIGHTS, SELL_PUT_VETO, IVR_THRESHOLDS,
 )
-from src.config.universe import SELL_PUT_WHITELIST
+from src.config.universe import SELL_PUT_WHITELIST, is_etf_symbol
 from src.data.earnings_calendar import is_earnings_within_days
 from src.data.iv_rank import calc_iv_rank, get_atm_iv
 from src.data.price_data import fetch_history, get_52w_high_low
@@ -59,8 +59,14 @@ def score(symbol: str, layer0_mod: int = 0, layer_f_mod: int = 0,
 
         ivr_data = calc_iv_rank(symbol) or {}
         ivr = ivr_data.get("ivr")
-        if ivr is not None and ivr < IVR_THRESHOLDS["min_for_short_premium"]:
-            veto_reasons.append(f"scorer_veto_ivr_{int(ivr)}_below_30")
+        # v4.1:IVR 閾值分流(個股 70 / ETF 30)
+        ivr_threshold = (
+            IVR_THRESHOLDS["min_for_short_premium_etf"]
+            if is_etf_symbol(symbol)
+            else IVR_THRESHOLDS["min_for_short_premium_stock"]
+        )
+        if ivr is not None and ivr < ivr_threshold:
+            veto_reasons.append(f"scorer_veto_ivr_{int(ivr)}_below_{int(ivr_threshold)}")
 
         # ---- 通用學習鎖 ----
         hard_fails = check_all_hard_rules(

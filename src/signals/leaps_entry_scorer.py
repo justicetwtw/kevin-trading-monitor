@@ -2,7 +2,7 @@
 
 排除單股 2x ETF(學習鎖 L3)。
 權重從 LEAPS_ENTRY_WEIGHTS 讀;Layer F 由呼叫方加總後傳入。
-DTE 從 LEAPS_SPEC["default_scan_dte"](540 = 18 個月)讀,不 hardcode。
+DTE 從 LEAPS_SPEC["default_scan_dte"](365 = 12 個月,v4.1)讀,不 hardcode。
 失敗冷啟動回 score=0,不拋例外。
 """
 
@@ -25,22 +25,9 @@ from src.signals.veto_checker import check_all_hard_rules
 from src.storage.state_manager import DATA_STORE_DIR
 
 
-UNIVERSE_THESIS_PATH = DATA_STORE_DIR / "universe_with_thesis.json"
-
-
-def get_value_thesis(symbol: str) -> str:
-    """讀 universe_with_thesis.json 取 value_thesis。預設 'fair_value'。"""
-    if not UNIVERSE_THESIS_PATH.exists():
-        return "fair_value"
-    try:
-        with open(UNIVERSE_THESIS_PATH, encoding="utf-8") as f:
-            data = json.load(f)
-        return data.get("tickers", {}).get(symbol, {}).get(
-            "value_thesis", {}
-        ).get("rating", "fair_value")
-    except Exception as e:
-        logger.warning(f"value_thesis read failed for {symbol}: {e}")
-        return "fair_value"
+# v4.1:get_value_thesis 已抽至 src/data/value_thesis.py(共用模組,避循環依賴)
+# 為向下相容,本 module 仍 re-export get_value_thesis(被 exit_rules 等多處 import)
+from src.data.value_thesis import get_value_thesis  # noqa: F401, E402
 
 
 def score(symbol: str, layer0_mod: int = 0, layer_f_mod: int = 0,
@@ -49,6 +36,7 @@ def score(symbol: str, layer0_mod: int = 0, layer_f_mod: int = 0,
     """單一標的 LEAPS 進場評分。"""
     try:
         # 學習鎖 L3:單股 2x ETF 直接擋(也由 veto_checker 擋,這裡早退)
+        # v4.1 註:LEAPS 對 underlying 個股開,不對 2x ETF 開,維持向下相容
         if symbol in ETF_LEVERAGED_SINGLE_STOCK:
             return build_scorer_result(
                 symbol, "leaps_entry", raw_score=0,

@@ -15,7 +15,7 @@ from src.data.fundamentals import detect_consecutive_eps_miss
 from src.data.price_data import fetch_history, get_52w_high_low
 from src.indicators.basic import get_rsi_latest, get_bbands_position, get_ma_position
 from src.management.current_positions import load_positions
-from src.signals.leaps_entry_scorer import get_value_thesis
+from src.data.value_thesis import get_value_thesis
 
 
 def _now_local() -> datetime:

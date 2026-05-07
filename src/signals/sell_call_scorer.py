@@ -7,9 +7,9 @@
 from loguru import logger
 
 from src.config.thresholds import (
-    SELL_CALL_WEIGHTS, SELL_CALL_VETO, IVR_THRESHOLDS, IVR_2X_ETF_THRESHOLD,
+    SELL_CALL_WEIGHTS, SELL_CALL_VETO, IVR_THRESHOLDS,
 )
-from src.config.universe import ETF_LEVERAGED_SINGLE_STOCK
+from src.config.universe import ETF_LEVERAGED_SINGLE_STOCK, is_etf_symbol
 from src.data.earnings_calendar import is_earnings_within_days
 from src.data.iv_rank import calc_iv_rank, get_atm_iv
 from src.data.price_data import fetch_history, get_52w_high_low
@@ -34,8 +34,14 @@ def score(symbol: str, layer0_mod: int = 0, context: dict | None = None) -> dict
                 veto_triggered=True, veto_reasons=["no_price_data"],
             )
 
-        is_2x_etf = symbol in ETF_LEVERAGED_SINGLE_STOCK
-        ivr_threshold = IVR_2X_ETF_THRESHOLD if is_2x_etf else IVR_THRESHOLDS["min_for_short_premium"]
+        # v4.1:IVR 閾值分流(個股 70 / ETF 30,2x ETF 歸 ETF)
+        # 注:單股 2x ETF 的 sell_call 已被 veto_checker.check_lock_2x_etf_no_short_call 早退,
+        # 此 IVR 判定對 2x ETF 是 dead code,但保留以保護其他 ETF 路徑。
+        ivr_threshold = (
+            IVR_THRESHOLDS["min_for_short_premium_etf"]
+            if is_etf_symbol(symbol)
+            else IVR_THRESHOLDS["min_for_short_premium_stock"]
+        )
 
         # ---- Scorer 內部 veto(訊號專屬,與通用學習鎖分開)----
         veto_reasons: list[str] = []

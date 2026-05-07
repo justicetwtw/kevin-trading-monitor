@@ -11,8 +11,9 @@
 
 from loguru import logger
 
-from src.config.thresholds import HARD_RULES
-from src.config.universe import ETF_LEVERAGED_SINGLE_STOCK
+from src.config.thresholds import HARD_RULES, EARNINGS_BLACKOUT_DAYS_BY_THESIS
+from src.data.value_thesis import get_value_thesis
+from src.config.universe import ETF_LEVERAGED_SINGLE_STOCK, is_etf_symbol
 from src.data.earnings_calendar import is_earnings_within_days
 from src.data.vix_structure import is_vix_consecutive_above
 from src.management.account_drawdown import get_current_drawdown
@@ -34,24 +35,53 @@ def check_lock_min_leaps_dte(signal_type: str, dte_days: int | None) -> tuple[bo
     return True, "ok"
 
 
-def check_lock_min_ivr_short_premium(signal_type: str, ivr: float | None) -> tuple[bool, str]:
-    """賣 CALL / 賣 PUT 必須 IVR >= 30(HARD_RULES.min_ivr_for_short_premium)。"""
+def check_lock_min_ivr_short_premium(
+    signal_type: str, ivr: float | None, symbol: str | None = None,
+) -> tuple[bool, str]:
+    """賣 CALL / 賣 PUT 必須 IVR 達標(v4.1:個股 70 / ETF 30)。
+
+    v4.1 學習鎖第 2 條分流:
+    - 個股(非 ETF):min_ivr_for_short_premium_stock = 70
+    - ETF / 2x ETF: min_ivr_for_short_premium_etf = 30
+
+    symbol 參數選填,缺省時 fallback 到 v4 遺留的 min_ivr_for_short_premium = 30
+    (向下相容)。
+    """
     if signal_type not in ("sell_call", "sell_put") or ivr is None:
         return True, "n/a"
-    min_ivr = HARD_RULES["min_ivr_for_short_premium"]
+    if symbol is None:
+        # v4 fallback(向下相容)
+        min_ivr = HARD_RULES["min_ivr_for_short_premium"]
+        asset_tag = "v4_legacy"
+    elif is_etf_symbol(symbol):
+        min_ivr = HARD_RULES["min_ivr_for_short_premium_etf"]
+        asset_tag = "etf"
+    else:
+        min_ivr = HARD_RULES["min_ivr_for_short_premium_stock"]
+        asset_tag = "stock"
     if ivr < min_ivr:
-        return False, f"v4_lock_ivr_{ivr:.0f}_below_{min_ivr}"
+        return False, f"v41_lock_ivr_{asset_tag}_{ivr:.0f}_below_{min_ivr}"
     return True, "ok"
 
 
 def check_lock_earnings_blackout(symbol: str, signal_type: str) -> tuple[bool, str]:
-    """財報前 N 天禁開新短倉(HARD_RULES.no_short_premium_within_earnings_days)。"""
+    """財報前 N 天禁開新短倉(v4.1:依 value_thesis 動態)。
+
+    v4.1 學習鎖第 3 條 × value_thesis 分流:
+    - deep_value / fair_value: 1 天前禁(激進吃 IV 高峰)
+    - expensive: 7 天前禁(保守,因可能拉回)
+    - review / exit: 全期間禁(365 天模擬永久)
+
+    fallback:thesis 讀失敗回 fair_value (1 天)。HARD_RULES["no_short_premium_within_earnings_days"]
+    保留為 v4 遺留(向下相容,目前不再用)。
+    """
     if signal_type not in ("sell_call", "sell_put"):
         return True, "n/a"
-    days = HARD_RULES["no_short_premium_within_earnings_days"]
+    thesis = get_value_thesis(symbol)
+    days = EARNINGS_BLACKOUT_DAYS_BY_THESIS.get(thesis, 1)
     try:
         if is_earnings_within_days(symbol, days):
-            return False, f"v4_lock_earnings_within_{days}_days"
+            return False, f"v41_lock_earnings_{thesis}_within_{days}_days"
     except Exception as e:
         logger.warning(f"earnings_blackout check failed (assume pass): {e}")
         return True, "earnings_check_failed_assume_ok"
@@ -83,13 +113,33 @@ def check_lock_tier_c_no_sell_put(symbol: str, signal_type: str) -> tuple[bool, 
 
 
 def check_lock_2x_etf_no_leaps(symbol: str, signal_type: str) -> tuple[bool, str]:
-    """單股 2x ETF 不開 LEAPS(HARD_RULES.no_long_position_for_2x_single_etf)。"""
+    """單股 2x ETF 不開 LEAPS(HARD_RULES.no_long_position_for_2x_single_etf)。
+
+    v4.1 註解:LEAPS 對 underlying 個股開,不對 2x ETF 開。此 check 維持原行為,
+    向下相容。v4.1 真正的反向意義(持現股 + 不賣 covered call)由
+    check_lock_2x_etf_no_short_call 實作。
+    """
     if signal_type != "leaps_entry":
         return True, "n/a"
     if not HARD_RULES.get("no_long_position_for_2x_single_etf", True):
         return True, "rule_disabled"
     if symbol in ETF_LEVERAGED_SINGLE_STOCK:
         return False, f"v4_lock_2x_etf_{symbol}_no_leaps"
+    return True, "ok"
+
+
+def check_lock_2x_etf_no_short_call(symbol: str, signal_type: str) -> tuple[bool, str]:
+    """單股 2x ETF 不賣 covered call(HARD_RULES.no_short_call_for_2x_single_etf)。
+
+    v4.1 學習鎖第 6 條反向後新增:單股 2x ETF 持現股波段操作 OK,但選擇權流動性差,
+    不適合賣 covered call。僅對 sell_call 訊號生效。
+    """
+    if signal_type != "sell_call":
+        return True, "n/a"
+    if not HARD_RULES.get("no_short_call_for_2x_single_etf", True):
+        return True, "rule_disabled"
+    if symbol in ETF_LEVERAGED_SINGLE_STOCK:
+        return False, f"v41_lock_2x_etf_{symbol}_no_short_call"
     return True, "ok"
 
 
@@ -212,11 +262,12 @@ def check_all_hard_rules(
     """
     checks = [
         check_lock_min_leaps_dte(signal_type, dte_days),
-        check_lock_min_ivr_short_premium(signal_type, ivr),
+        check_lock_min_ivr_short_premium(signal_type, ivr, symbol=symbol),
         check_lock_earnings_blackout(symbol, signal_type),
         check_lock_vix_consecutive(signal_type),
         check_lock_tier_c_no_sell_put(symbol, signal_type),
         check_lock_2x_etf_no_leaps(symbol, signal_type),
+        check_lock_2x_etf_no_short_call(symbol, signal_type),
         check_lock_no_naked_call(signal_type, symbol, context),
         check_lock_hedge_dte(signal_type, context),
         check_lock_drawdown(signal_type, context),

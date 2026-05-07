@@ -117,10 +117,14 @@ IVR_THRESHOLDS = {
     "high": 70,
     "medium": 50,
     "low": 30,
-    "min_for_short_premium": 30,  # 學習鎖第 2 條
+    # v4.1:賣方分流(個股嚴 / ETF 寬)
+    "min_for_short_premium_stock": 70,    # v4.1:個股 base IV 高,要拉到 IVR 70 才有 IV crush 空間
+    "min_for_short_premium_etf": 30,      # v4.1:ETF 業界標準
+    # v4 遺留(向下相容,deprecated_v41,2.6.x 跑完清理)
+    "min_for_short_premium": 30,
 }
 
-# 2x ETF 專用 IVR 門檻(更嚴)
+# 2x ETF 專用 IVR 門檻(deprecated_v41:2x ETF 改歸 ETF 用 30,本鍵保留向下相容)
 IVR_2X_ETF_THRESHOLD = 60
 
 # ============================================
@@ -250,15 +254,17 @@ LEAPS_MANAGEMENT_TRIGGERS = {
     "dte_roll_threshold_days": 270,       # < 9 個月評估 roll out
 }
 
-# LEAPS 規格
+# LEAPS 規格(v4.1)
 LEAPS_SPEC = {
-    "min_dte_days": 365,                  # ≥ 12 個月
-    "ideal_dte_days": (540, 720),         # 18-24 個月
-    "default_scan_dte": 540,              # scorer 掃描預設假設 DTE(理想範圍中點)
-    "delta_range": (0.55, 0.75),
-    "max_premium_per_position_usd": 20_000,
+    "min_dte_days": 365,                  # ≥ 12 個月(學習鎖第 1 條)
+    "ideal_dte_days": (365, 365),         # v4.1:12 個月常態,不分流 18-24 月
+    "default_scan_dte": 365,              # v4.1:scorer 掃描預設 12 個月
+    "delta_range": (0.85, 0.90),          # v4.1:深度 ITM,Delta 0.85-0.90
+    "stable_stock_delta": 0.85,           # v4.1:穩定上升股用 0.85(其他用 0.90)
+    "stable_stocks": ("TSM", "MSFT"),     # v4.1:穩定上升股清單(後續可加)
     "max_position_pct_of_account": 0.12,
     "forbidden_otm_delta": 0.40,          # Delta < 0.40 的 OTM LEAPS 禁區
+    # v4.1:max_premium_per_position_usd 已移除(單筆 premium 不限制)
 }
 
 # ============================================
@@ -363,16 +369,38 @@ SEASONAL_EXIT_RULES = {
 }
 
 # ============================================
+# v4.1:財報 × value_thesis 動態窗期
+# ============================================
+
+# 財報前 N 天禁開新短倉(sell_call / sell_put),依 value_thesis 動態:
+# - deep_value/fair_value:1 天前禁(只擋當天 + 前 1 天,激進吃 IV 高峰)
+# - expensive:7 天前禁(保守,因可能拉回)
+# - review/exit:全期間禁(用大數 365 模擬永久)
+EARNINGS_BLACKOUT_DAYS_BY_THESIS = {
+    "deep_value": 1,
+    "fair_value": 1,
+    "expensive": 7,
+    "review": 365,
+    "exit": 365,
+}
+
+# ============================================
 # 學習鎖(寫死的禁區)
 # ============================================
 
 HARD_RULES = {
     "min_long_call_dte_days": 365,                  # 第 1 條
-    "min_ivr_for_short_premium": 30,                # 第 2 條
+    "min_ivr_for_short_premium": 30,                # 第 2 條(deprecated_v41,向下相容)
+    "min_ivr_for_short_premium_stock": 70,          # 第 2 條 v4.1:個股嚴
+    "min_ivr_for_short_premium_etf": 30,            # 第 2 條 v4.1:ETF 寬
     "no_short_premium_within_earnings_days": 7,     # 第 3 條
     "no_long_premium_after_vix_high_days": 3,       # 第 4 條
     "tier_c_no_sell_put": ["PLTR", "TSLA"],         # 第 5 條
-    "no_long_position_for_2x_single_etf": True,     # 第 6 條
+    # 第 6 條(v4.1 反向):單股 2x ETF 只持現股波段操作,不賣 covered call
+    # - LEAPS 對 underlying 個股開,不對 2x ETF 開,維持擋(向下相容)
+    # - 新增 no_short_call_for_2x_single_etf 對應 v4.1 新規則
+    "no_long_position_for_2x_single_etf": True,     # 第 6 條 v4 遺留:擋 LEAPS for 2x ETF
+    "no_short_call_for_2x_single_etf": True,        # 第 6 條 v4.1 新增:不賣 covered call for 2x ETF(流動性差)
 
     # Batch 8 新增 — 從 management 讀資料的學習鎖
     "min_hedge_dte_days": 45,                       # L5: hedge DTE 下限
