@@ -54,7 +54,7 @@ runners/       ← GitHub Actions 進入點
 | 3 | 不在財報前 7 天建 short premium | `signals/veto_checker.py` |
 | 4 | 不在連 3 天 VIX > 30 時建 long premium | `signals/veto_checker.py` |
 | 5 | Tier C(PLTR/TSLA)不賣 PUT | `signals/sell_put_scorer.py` 白名單檢查 |
-| 6 | 單股 2x ETF 不長持現股 | 設計上不出 LEAPS 訊號給單股 2x ETF;`signals/leaps_entry_scorer.py` 過濾 |
+| 6 | 單股 2x ETF 持現股波段+不賣 covered call(v4.1 反向) | LEAPS 仍擋(不對 2x ETF 開);新增 `signals/veto_checker.check_lock_2x_etf_no_short_call` 擋 covered call |
 
 ---
 
