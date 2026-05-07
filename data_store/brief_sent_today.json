@@ -17,5 +17,8 @@
     "tw_open": true,
     "tw_close": true,
     "us_premarket": true
+  },
+  "2026-05-08": {
+    "us_open": true
   }
 }
