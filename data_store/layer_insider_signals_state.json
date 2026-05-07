@@ -16,7 +16,7 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:44.290810+00:00"
+      "fetched_at": "2026-05-07T23:42:12.431310+00:00"
     },
     "TSM": {
       "tier": "none",
@@ -34,97 +34,7 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:44.781647+00:00"
-    },
-    "MU": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "MU",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:45.279460+00:00"
-    },
-    "MSFT": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "MSFT",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:46.085281+00:00"
-    },
-    "GOOG": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "GOOG",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:46.533984+00:00"
-    },
-    "GOOGL": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "GOOGL",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:47.087758+00:00"
-    },
-    "META": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "META",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:47.871070+00:00"
+      "fetched_at": "2026-05-07T23:42:13.009394+00:00"
     },
     "AVGO": {
       "tier": "none",
@@ -142,7 +52,97 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:48.080030+00:00"
+      "fetched_at": "2026-05-07T23:42:13.281199+00:00"
+    },
+    "MU": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "MU",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:13.908183+00:00"
+    },
+    "MSFT": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "MSFT",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:14.973342+00:00"
+    },
+    "GOOG": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "GOOG",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:15.782732+00:00"
+    },
+    "GOOGL": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "GOOGL",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:16.397939+00:00"
+    },
+    "META": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "META",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:17.485463+00:00"
     },
     "AMZN": {
       "tier": "none",
@@ -160,7 +160,133 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:48.723542+00:00"
+      "fetched_at": "2026-05-07T23:42:18.488046+00:00"
+    },
+    "CAT": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CAT",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:19.807084+00:00"
+    },
+    "LMT": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "LMT",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:20.545898+00:00"
+    },
+    "RTX": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "RTX",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:21.109670+00:00"
+    },
+    "WMT": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "WMT",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:22.121087+00:00"
+    },
+    "COST": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "COST",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:22.769155+00:00"
+    },
+    "XOM": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "XOM",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:23.921388+00:00"
+    },
+    "CVX": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CVX",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:24.591929+00:00"
     },
     "AMD": {
       "tier": "none",
@@ -178,7 +304,7 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:49.527850+00:00"
+      "fetched_at": "2026-05-07T23:42:25.515152+00:00"
     },
     "ASML": {
       "tier": "none",
@@ -196,12 +322,12 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:49.742034+00:00"
+      "fetched_at": "2026-05-07T23:42:25.759770+00:00"
     },
-    "ORCL": {
+    "QCOM": {
       "tier": "none",
       "cluster_data": {
-        "symbol": "ORCL",
+        "symbol": "QCOM",
         "is_cluster": false,
         "tier": null,
         "n_insiders": 0,
@@ -214,7 +340,7 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:50.160579+00:00"
+      "fetched_at": "2026-05-07T23:42:27.138197+00:00"
     },
     "AAPL": {
       "tier": "none",
@@ -232,12 +358,12 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:50.674517+00:00"
+      "fetched_at": "2026-05-07T23:42:27.721221+00:00"
     },
-    "PLTR": {
+    "ORCL": {
       "tier": "none",
       "cluster_data": {
-        "symbol": "PLTR",
+        "symbol": "ORCL",
         "is_cluster": false,
         "tier": null,
         "n_insiders": 0,
@@ -250,97 +376,7 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:50.935453+00:00"
-    },
-    "TSLA": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "TSLA",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:51.367046+00:00"
-    },
-    "INTC": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "INTC",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:52.096908+00:00"
-    },
-    "CRM": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "CRM",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:53.480118+00:00"
-    },
-    "ADBE": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "ADBE",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:53.945296+00:00"
-    },
-    "CRWD": {
-      "tier": "none",
-      "cluster_data": {
-        "symbol": "CRWD",
-        "is_cluster": false,
-        "tier": null,
-        "n_insiders": 0,
-        "total_value_usd": 0,
-        "transactions": [],
-        "lookback_days": 30
-      },
-      "ceo_cfo_buys": [],
-      "modifiers": {
-        "leaps_entry": 0,
-        "sell_put": 0
-      },
-      "fetched_at": "2026-05-06T23:39:54.478243+00:00"
+      "fetched_at": "2026-05-07T23:42:28.285323+00:00"
     },
     "NOW": {
       "tier": "none",
@@ -358,12 +394,12 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:54.922553+00:00"
+      "fetched_at": "2026-05-07T23:42:28.880421+00:00"
     },
-    "SMCI": {
+    "CRM": {
       "tier": "none",
       "cluster_data": {
-        "symbol": "SMCI",
+        "symbol": "CRM",
         "is_cluster": false,
         "tier": null,
         "n_insiders": 0,
@@ -376,7 +412,349 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:55.496468+00:00"
+      "fetched_at": "2026-05-07T23:42:30.542327+00:00"
+    },
+    "CRWD": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CRWD",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:31.049994+00:00"
+    },
+    "ADBE": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "ADBE",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:31.656896+00:00"
+    },
+    "VRT": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "VRT",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:31.924725+00:00"
+    },
+    "AMAT": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "AMAT",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:32.495506+00:00"
+    },
+    "LRCX": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "LRCX",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:33.083138+00:00"
+    },
+    "KLAC": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "KLAC",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:33.978143+00:00"
+    },
+    "ANET": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "ANET",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:34.601509+00:00"
+    },
+    "APH": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "APH",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:35.178813+00:00"
+    },
+    "GLW": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "GLW",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:36.065244+00:00"
+    },
+    "SNPS": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "SNPS",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:36.741984+00:00"
+    },
+    "CEG": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CEG",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:37.042862+00:00"
+    },
+    "VST": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "VST",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:37.358848+00:00"
+    },
+    "ETN": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "ETN",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:37.902080+00:00"
+    },
+    "GEV": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "GEV",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:38.168740+00:00"
+    },
+    "NEE": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "NEE",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:38.953718+00:00"
+    },
+    "SO": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "SO",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:40.025611+00:00"
+    },
+    "VLO": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "VLO",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:40.591329+00:00"
+    },
+    "MELI": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "MELI",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:40.859050+00:00"
+    },
+    "INTC": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "INTC",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:41.711989+00:00"
     },
     "ARM": {
       "tier": "none",
@@ -394,7 +772,79 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:55.686589+00:00"
+      "fetched_at": "2026-05-07T23:42:41.953152+00:00"
+    },
+    "SMCI": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "SMCI",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:42.499396+00:00"
+    },
+    "MRVL": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "MRVL",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:42.765869+00:00"
+    },
+    "NBIS": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "NBIS",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:43.004720+00:00"
+    },
+    "WDC": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "WDC",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:43.825940+00:00"
     },
     "SNDK": {
       "tier": "none",
@@ -412,33 +862,647 @@
         "leaps_entry": 0,
         "sell_put": 0
       },
-      "fetched_at": "2026-05-06T23:39:55.889642+00:00"
+      "fetched_at": "2026-05-07T23:42:44.072387+00:00"
+    },
+    "STX": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "STX",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:44.637102+00:00"
+    },
+    "BESI": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "BESI",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:45.025761+00:00"
+    },
+    "DD": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "DD",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:45.572018+00:00"
+    },
+    "BE": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "BE",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:46.063005+00:00"
+    },
+    "CCJ": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CCJ",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:46.307036+00:00"
+    },
+    "MIR": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "MIR",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:46.558738+00:00"
+    },
+    "FLS": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "FLS",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:47.088853+00:00"
+    },
+    "FCX": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "FCX",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:47.635912+00:00"
+    },
+    "PLTR": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "PLTR",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:47.912050+00:00"
+    },
+    "TSLA": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "TSLA",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:48.423202+00:00"
+    },
+    "AVAV": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "AVAV",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:48.919265+00:00"
+    },
+    "KTOS": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "KTOS",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:49.465806+00:00"
+    },
+    "ONDS": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "ONDS",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:49.726647+00:00"
+    },
+    "CRDO": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CRDO",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:49.984657+00:00"
+    },
+    "SHLD": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "SHLD",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:51.137482+00:00"
+    },
+    "OKLO": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "OKLO",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:51.387824+00:00"
+    },
+    "LEU": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "LEU",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:51.909953+00:00"
+    },
+    "SMR": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "SMR",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:52.187802+00:00"
+    },
+    "NNE": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "NNE",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:52.439320+00:00"
+    },
+    "EOSE": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "EOSE",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:52.770767+00:00"
+    },
+    "ASTS": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "ASTS",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:53.053595+00:00"
+    },
+    "RKLB": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "RKLB",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:53.346822+00:00"
+    },
+    "SOFI": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "SOFI",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:53.594100+00:00"
+    },
+    "TMDX": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "TMDX",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:53.854027+00:00"
+    },
+    "CRWV": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "CRWV",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:54.091803+00:00"
+    },
+    "RBRK": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "RBRK",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:54.352289+00:00"
+    },
+    "MP": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "MP",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:54.611873+00:00"
+    },
+    "UEC": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "UEC",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:55.163489+00:00"
+    },
+    "USAR": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "USAR",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:55.399956+00:00"
+    },
+    "UUUU": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "UUUU",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:55.870574+00:00"
+    },
+    "UAMY": {
+      "tier": "none",
+      "cluster_data": {
+        "symbol": "UAMY",
+        "is_cluster": false,
+        "tier": null,
+        "n_insiders": 0,
+        "total_value_usd": 0,
+        "transactions": [],
+        "lookback_days": 30
+      },
+      "ceo_cfo_buys": [],
+      "modifiers": {
+        "leaps_entry": 0,
+        "sell_put": 0
+      },
+      "fetched_at": "2026-05-07T23:42:56.134470+00:00"
     }
   },
   "symbols": [
     "NVDA",
     "TSM",
+    "AVGO",
     "MU",
     "MSFT",
     "GOOG",
     "GOOGL",
     "META",
-    "AVGO",
     "AMZN",
+    "CAT",
+    "LMT",
+    "RTX",
+    "WMT",
+    "COST",
+    "XOM",
+    "CVX",
     "AMD",
     "ASML",
-    "ORCL",
+    "QCOM",
     "AAPL",
+    "ORCL",
+    "NOW",
+    "CRM",
+    "CRWD",
+    "ADBE",
+    "VRT",
+    "AMAT",
+    "LRCX",
+    "KLAC",
+    "ANET",
+    "APH",
+    "GLW",
+    "SNPS",
+    "CEG",
+    "VST",
+    "ETN",
+    "GEV",
+    "NEE",
+    "SO",
+    "VLO",
+    "MELI",
+    "INTC",
+    "ARM",
+    "SMCI",
+    "MRVL",
+    "NBIS",
+    "WDC",
+    "SNDK",
+    "STX",
+    "BESI",
+    "DD",
+    "BE",
+    "CCJ",
+    "MIR",
+    "FLS",
+    "FCX",
     "PLTR",
     "TSLA",
-    "INTC",
-    "CRM",
-    "ADBE",
-    "CRWD",
-    "NOW",
-    "SMCI",
-    "ARM",
-    "SNDK"
+    "AVAV",
+    "KTOS",
+    "ONDS",
+    "CRDO",
+    "SHLD",
+    "OKLO",
+    "LEU",
+    "SMR",
+    "NNE",
+    "EOSE",
+    "ASTS",
+    "RKLB",
+    "SOFI",
+    "TMDX",
+    "CRWV",
+    "RBRK",
+    "MP",
+    "UEC",
+    "USAR",
+    "UUUU",
+    "UAMY"
   ],
-  "fetched_at": "2026-05-06T23:39:55.889655+00:00"
+  "fetched_at": "2026-05-07T23:42:56.134480+00:00"
 }
