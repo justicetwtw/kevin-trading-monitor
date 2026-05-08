@@ -5,8 +5,10 @@
     "tags": []
   },
   "TMDX::leaps_entry": {
-    "last_sent": "2026-05-08T14:33:02.380741+00:00",
+    "last_sent": "2026-05-08T16:03:51.009687+00:00",
     "alert_level": "green",
-    "tags": []
+    "tags": [
+      "⚠Trump_Tier1"
+    ]
   }
 }
