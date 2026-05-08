@@ -3,5 +3,10 @@
     "last_sent": "2026-05-08T14:06:25.853248+00:00",
     "alert_level": "green",
     "tags": []
+  },
+  "TMDX::leaps_entry": {
+    "last_sent": "2026-05-08T14:33:02.380741+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
