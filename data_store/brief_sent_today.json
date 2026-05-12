@@ -35,6 +35,7 @@
   "2026-05-12": {
     "us_open": true,
     "us_midday": true,
-    "us_eod": true
+    "us_eod": true,
+    "tw_open": true
   }
 }
