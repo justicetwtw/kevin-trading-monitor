@@ -1,9 +1,4 @@
 {
-  "2026-05-06": {
-    "us_midday": true,
-    "us_eod": true,
-    "tw_close": true
-  },
   "2026-05-07": {
     "us_open": true,
     "us_midday": true,
@@ -44,5 +39,8 @@
     "tw_open": true,
     "tw_close": true,
     "us_premarket": true
+  },
+  "2026-05-14": {
+    "us_open": true
   }
 }
