@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-05-13T23:36:12.009105+00:00",
+  "scan_time": "2026-05-13T23:40:59.214334+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-05-13T23:36:13.745227+00:00"
+      "fetched_at": "2026-05-13T23:41:01.284366+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-05-13T19:36:13.745496-04:00"
+        "fetched_at": "2026-05-13T19:41:01.284650-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-13T23:36:14.789354+00:00"
+      "fetched_at": "2026-05-13T23:41:02.080870+00:00"
     },
     "distribution": {
       "spy": {
@@ -74,7 +74,7 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-05-13T23:36:15.010201+00:00"
+        "fetched_at": "2026-05-13T23:41:02.386156+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -107,7 +107,7 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-05-13T23:36:15.191448+00:00"
+        "fetched_at": "2026-05-13T23:41:02.703003+00:00"
       },
       "level": "pressure",
       "modifiers": {
@@ -115,7 +115,7 @@
         "sell_put": -5,
         "sell_call": 0
       },
-      "fetched_at": "2026-05-13T23:36:15.191733+00:00"
+      "fetched_at": "2026-05-13T23:41:02.703218+00:00"
     },
     "bubble": {
       "score": 0,
@@ -131,9 +131,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-05-13T19:36:16.023056-04:00"
+        "fetched_at": "2026-05-13T19:41:03.429127-04:00"
       },
-      "fetched_at": "2026-05-13T23:36:16.023111+00:00"
+      "fetched_at": "2026-05-13T23:41:03.429157+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -143,7 +143,7 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-05-13T23:36:17.155117+00:00"
+      "fetched_at": "2026-05-13T23:41:04.176950+00:00"
     },
     "vix_structure": {
       "snapshot": {
@@ -159,13 +159,13 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-05-13T23:36:17.255346+00:00"
+      "fetched_at": "2026-05-13T23:41:04.219061+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-13T23:36:21.754157+00:00"
+      "fetched_at": "2026-05-13T23:41:08.383119+00:00"
     }
   },
   "aggregate_modifiers": {
