@@ -42,6 +42,7 @@
   },
   "2026-05-15": {
     "us_open": true,
-    "us_midday": true
+    "us_midday": true,
+    "us_eod": true
   }
 }
