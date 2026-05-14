@@ -2,386 +2,386 @@
   "NVDA": {
     "symbol": "NVDA",
     "earnings_date": "2026-05-20",
-    "fetched_at": "2026-05-13T10:18:18.732734-04:00"
+    "fetched_at": "2026-05-14T09:56:14.218436-04:00"
   },
   "TSM": {
     "symbol": "TSM",
     "earnings_date": "2026-07-16",
-    "fetched_at": "2026-05-13T10:18:18.773302-04:00"
+    "fetched_at": "2026-05-14T09:56:14.277259-04:00"
   },
   "AVGO": {
     "symbol": "AVGO",
     "earnings_date": "2026-06-03",
-    "fetched_at": "2026-05-13T10:18:18.812337-04:00"
+    "fetched_at": "2026-05-14T09:56:14.323247-04:00"
   },
   "MU": {
     "symbol": "MU",
     "earnings_date": "2026-06-24",
-    "fetched_at": "2026-05-13T10:18:18.870157-04:00"
+    "fetched_at": "2026-05-14T09:56:14.395844-04:00"
   },
   "MSFT": {
     "symbol": "MSFT",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:18.908909-04:00"
+    "fetched_at": "2026-05-14T09:56:14.442679-04:00"
   },
   "GOOG": {
     "symbol": "GOOG",
     "earnings_date": "2026-07-23",
-    "fetched_at": "2026-05-13T10:18:18.947819-04:00"
+    "fetched_at": "2026-05-14T09:56:14.487790-04:00"
   },
   "GOOGL": {
     "symbol": "GOOGL",
     "earnings_date": "2026-07-23",
-    "fetched_at": "2026-05-13T10:18:18.985314-04:00"
+    "fetched_at": "2026-05-14T09:56:14.533919-04:00"
   },
   "META": {
     "symbol": "META",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:19.021957-04:00"
+    "fetched_at": "2026-05-14T09:56:14.581284-04:00"
   },
   "AMZN": {
     "symbol": "AMZN",
     "earnings_date": "2026-07-30",
-    "fetched_at": "2026-05-13T10:18:19.065457-04:00"
+    "fetched_at": "2026-05-14T09:56:14.627396-04:00"
   },
   "CAT": {
     "symbol": "CAT",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:19.115952-04:00"
+    "fetched_at": "2026-05-14T09:56:14.673113-04:00"
   },
   "LMT": {
     "symbol": "LMT",
     "earnings_date": "2026-07-21",
-    "fetched_at": "2026-05-13T10:18:19.216379-04:00"
+    "fetched_at": "2026-05-14T09:56:14.718174-04:00"
   },
   "RTX": {
     "symbol": "RTX",
     "earnings_date": "2026-07-21",
-    "fetched_at": "2026-05-13T10:18:19.254855-04:00"
+    "fetched_at": "2026-05-14T09:56:14.764494-04:00"
   },
   "WMT": {
     "symbol": "WMT",
     "earnings_date": "2026-05-21",
-    "fetched_at": "2026-05-13T10:18:19.292548-04:00"
+    "fetched_at": "2026-05-14T09:56:14.845058-04:00"
   },
   "COST": {
     "symbol": "COST",
     "earnings_date": "2026-05-28",
-    "fetched_at": "2026-05-13T10:18:19.335031-04:00"
+    "fetched_at": "2026-05-14T09:56:14.898021-04:00"
   },
   "XOM": {
     "symbol": "XOM",
     "earnings_date": "2026-07-31",
-    "fetched_at": "2026-05-13T10:18:19.372254-04:00"
+    "fetched_at": "2026-05-14T09:56:14.951845-04:00"
   },
   "CVX": {
     "symbol": "CVX",
     "earnings_date": "2026-07-31",
-    "fetched_at": "2026-05-13T10:18:19.413224-04:00"
+    "fetched_at": "2026-05-14T09:56:15.019425-04:00"
   },
   "AMD": {
     "symbol": "AMD",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:19.449717-04:00"
+    "fetched_at": "2026-05-14T09:56:15.065219-04:00"
   },
   "ASML": {
     "symbol": "ASML",
     "earnings_date": "2026-07-15",
-    "fetched_at": "2026-05-13T10:18:19.485827-04:00"
+    "fetched_at": "2026-05-14T09:56:15.112259-04:00"
   },
   "QCOM": {
     "symbol": "QCOM",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:19.569672-04:00"
+    "fetched_at": "2026-05-14T09:56:15.160138-04:00"
   },
   "AAPL": {
     "symbol": "AAPL",
     "earnings_date": "2026-07-30",
-    "fetched_at": "2026-05-13T10:18:19.605467-04:00"
+    "fetched_at": "2026-05-14T09:56:15.234647-04:00"
   },
   "ORCL": {
     "symbol": "ORCL",
     "earnings_date": "2026-06-10",
-    "fetched_at": "2026-05-13T10:18:19.644291-04:00"
+    "fetched_at": "2026-05-14T09:56:15.301310-04:00"
   },
   "NOW": {
     "symbol": "NOW",
     "earnings_date": "2026-07-22",
-    "fetched_at": "2026-05-13T10:18:19.684694-04:00"
+    "fetched_at": "2026-05-14T09:56:15.380062-04:00"
   },
   "CRM": {
     "symbol": "CRM",
     "earnings_date": "2026-05-27",
-    "fetched_at": "2026-05-13T10:18:19.721920-04:00"
+    "fetched_at": "2026-05-14T09:56:15.444419-04:00"
   },
   "CRWD": {
     "symbol": "CRWD",
     "earnings_date": "2026-06-03",
-    "fetched_at": "2026-05-13T10:18:19.759662-04:00"
+    "fetched_at": "2026-05-14T09:56:15.503416-04:00"
   },
   "ADBE": {
     "symbol": "ADBE",
     "earnings_date": "2026-06-11",
-    "fetched_at": "2026-05-13T10:18:19.796456-04:00"
+    "fetched_at": "2026-05-14T09:56:15.564268-04:00"
   },
   "VRT": {
     "symbol": "VRT",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:19.836339-04:00"
+    "fetched_at": "2026-05-14T09:56:15.624534-04:00"
   },
   "AMAT": {
     "symbol": "AMAT",
     "earnings_date": "2026-05-14",
-    "fetched_at": "2026-05-13T10:18:19.925581-04:00"
+    "fetched_at": "2026-05-14T09:56:15.687061-04:00"
   },
   "LRCX": {
     "symbol": "LRCX",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:19.976396-04:00"
+    "fetched_at": "2026-05-14T09:56:15.779620-04:00"
   },
   "KLAC": {
     "symbol": "KLAC",
     "earnings_date": "2026-07-30",
-    "fetched_at": "2026-05-13T10:18:20.015512-04:00"
+    "fetched_at": "2026-05-14T09:56:15.859285-04:00"
   },
   "ANET": {
     "symbol": "ANET",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:20.055032-04:00"
+    "fetched_at": "2026-05-14T09:56:15.922861-04:00"
   },
   "APH": {
     "symbol": "APH",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:20.094085-04:00"
+    "fetched_at": "2026-05-14T09:56:16.004546-04:00"
   },
   "GLW": {
     "symbol": "GLW",
     "earnings_date": "2026-07-28",
-    "fetched_at": "2026-05-13T10:18:20.129950-04:00"
+    "fetched_at": "2026-05-14T09:56:16.053775-04:00"
   },
   "SNPS": {
     "symbol": "SNPS",
     "earnings_date": "2026-05-27",
-    "fetched_at": "2026-05-13T10:18:20.166061-04:00"
+    "fetched_at": "2026-05-14T09:56:16.095822-04:00"
   },
   "CEG": {
     "symbol": "CEG",
     "earnings_date": "2026-08-10",
-    "fetched_at": "2026-05-13T10:18:20.207618-04:00"
+    "fetched_at": "2026-05-14T09:56:16.174084-04:00"
   },
   "VST": {
     "symbol": "VST",
     "earnings_date": "2026-08-06",
-    "fetched_at": "2026-05-13T10:18:20.244524-04:00"
+    "fetched_at": "2026-05-14T09:56:16.255583-04:00"
   },
   "ETN": {
     "symbol": "ETN",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:20.282275-04:00"
+    "fetched_at": "2026-05-14T09:56:16.307321-04:00"
   },
   "GEV": {
     "symbol": "GEV",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:20.318341-04:00"
+    "fetched_at": "2026-05-14T09:56:16.351845-04:00"
   },
   "NEE": {
     "symbol": "NEE",
     "earnings_date": "2026-07-22",
-    "fetched_at": "2026-05-13T10:18:20.355424-04:00"
+    "fetched_at": "2026-05-14T09:56:16.441779-04:00"
   },
   "SO": {
     "symbol": "SO",
     "earnings_date": "2026-07-30",
-    "fetched_at": "2026-05-13T10:18:20.392661-04:00"
+    "fetched_at": "2026-05-14T09:56:16.484052-04:00"
   },
   "VLO": {
     "symbol": "VLO",
     "earnings_date": "2026-07-23",
-    "fetched_at": "2026-05-13T10:18:20.487233-04:00"
+    "fetched_at": "2026-05-14T09:56:16.525584-04:00"
   },
   "MELI": {
     "symbol": "MELI",
     "earnings_date": "2026-08-05",
-    "fetched_at": "2026-05-13T10:18:20.523904-04:00"
+    "fetched_at": "2026-05-14T09:56:16.566017-04:00"
   },
   "INTC": {
     "symbol": "INTC",
     "earnings_date": "2026-07-23",
-    "fetched_at": "2026-05-13T10:18:20.576269-04:00"
+    "fetched_at": "2026-05-14T09:56:16.608938-04:00"
   },
   "ARM": {
     "symbol": "ARM",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:20.620061-04:00"
+    "fetched_at": "2026-05-14T09:56:16.650741-04:00"
   },
   "SMCI": {
     "symbol": "SMCI",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:20.661467-04:00"
+    "fetched_at": "2026-05-14T09:56:16.694758-04:00"
   },
   "MRVL": {
     "symbol": "MRVL",
     "earnings_date": "2026-05-27",
-    "fetched_at": "2026-05-13T10:18:20.713493-04:00"
+    "fetched_at": "2026-05-14T09:56:16.735635-04:00"
   },
   "NBIS": {
     "symbol": "NBIS",
-    "earnings_date": "2026-05-13",
-    "fetched_at": "2026-05-13T10:18:20.749859-04:00"
+    "earnings_date": "2026-08-06",
+    "fetched_at": "2026-05-14T09:56:16.783218-04:00"
   },
   "WDC": {
     "symbol": "WDC",
     "earnings_date": "2026-07-29",
-    "fetched_at": "2026-05-13T10:18:20.793275-04:00"
+    "fetched_at": "2026-05-14T09:56:16.828970-04:00"
   },
   "SNDK": {
     "symbol": "SNDK",
     "earnings_date": "2026-04-30",
-    "fetched_at": "2026-05-13T10:18:20.837539-04:00"
+    "fetched_at": "2026-05-14T09:56:16.906236-04:00"
   },
   "STX": {
     "symbol": "STX",
     "earnings_date": "2026-07-28",
-    "fetched_at": "2026-05-13T10:18:20.880587-04:00"
+    "fetched_at": "2026-05-14T09:56:16.987396-04:00"
   },
   "DD": {
     "symbol": "DD",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:21.059751-04:00"
+    "fetched_at": "2026-05-14T09:56:17.224129-04:00"
   },
   "BE": {
     "symbol": "BE",
     "earnings_date": "2026-04-28",
-    "fetched_at": "2026-05-13T10:18:21.097912-04:00"
+    "fetched_at": "2026-05-14T09:56:17.270123-04:00"
   },
   "CCJ": {
     "symbol": "CCJ",
     "earnings_date": "2026-07-31",
-    "fetched_at": "2026-05-13T10:18:21.136663-04:00"
+    "fetched_at": "2026-05-14T09:56:17.316144-04:00"
   },
   "MIR": {
     "symbol": "MIR",
     "earnings_date": "2026-07-28",
-    "fetched_at": "2026-05-13T10:18:21.175615-04:00"
+    "fetched_at": "2026-05-14T09:56:17.395604-04:00"
   },
   "FLS": {
     "symbol": "FLS",
     "earnings_date": "2026-07-28",
-    "fetched_at": "2026-05-13T10:18:21.218497-04:00"
+    "fetched_at": "2026-05-14T09:56:17.455516-04:00"
   },
   "FCX": {
     "symbol": "FCX",
     "earnings_date": "2026-07-22",
-    "fetched_at": "2026-05-13T10:18:21.258671-04:00"
+    "fetched_at": "2026-05-14T09:56:17.517599-04:00"
   },
   "PLTR": {
     "symbol": "PLTR",
     "earnings_date": "2026-08-03",
-    "fetched_at": "2026-05-13T10:18:21.295343-04:00"
+    "fetched_at": "2026-05-14T09:56:17.575329-04:00"
   },
   "TSLA": {
     "symbol": "TSLA",
     "earnings_date": "2026-07-22",
-    "fetched_at": "2026-05-13T10:18:21.333468-04:00"
+    "fetched_at": "2026-05-14T09:56:17.618688-04:00"
   },
   "AVAV": {
     "symbol": "AVAV",
     "earnings_date": "2026-06-23",
-    "fetched_at": "2026-05-13T10:18:21.370220-04:00"
+    "fetched_at": "2026-05-14T09:56:17.678338-04:00"
   },
   "KTOS": {
     "symbol": "KTOS",
     "earnings_date": "2026-08-06",
-    "fetched_at": "2026-05-13T10:18:21.424628-04:00"
+    "fetched_at": "2026-05-14T09:56:17.727551-04:00"
   },
   "ONDS": {
     "symbol": "ONDS",
     "earnings_date": "2026-05-14",
-    "fetched_at": "2026-05-13T10:18:21.476080-04:00"
+    "fetched_at": "2026-05-14T09:56:17.771002-04:00"
   },
   "CRDO": {
     "symbol": "CRDO",
     "earnings_date": "2026-06-01",
-    "fetched_at": "2026-05-13T10:18:21.514379-04:00"
+    "fetched_at": "2026-05-14T09:56:17.815225-04:00"
   },
   "OKLO": {
     "symbol": "OKLO",
     "earnings_date": "2026-08-10",
-    "fetched_at": "2026-05-13T10:18:21.688193-04:00"
+    "fetched_at": "2026-05-14T09:56:18.026806-04:00"
   },
   "LEU": {
     "symbol": "LEU",
     "earnings_date": "2026-08-04",
-    "fetched_at": "2026-05-13T10:18:21.778721-04:00"
+    "fetched_at": "2026-05-14T09:56:18.110492-04:00"
   },
   "SMR": {
     "symbol": "SMR",
     "earnings_date": "2026-08-06",
-    "fetched_at": "2026-05-13T10:18:21.825142-04:00"
+    "fetched_at": "2026-05-14T09:56:18.167925-04:00"
   },
   "NNE": {
     "symbol": "NNE",
     "earnings_date": "2026-05-14",
-    "fetched_at": "2026-05-13T10:18:21.865191-04:00"
+    "fetched_at": "2026-05-14T09:56:18.226731-04:00"
   },
   "EOSE": {
     "symbol": "EOSE",
-    "earnings_date": "2026-05-13",
-    "fetched_at": "2026-05-13T10:18:21.902817-04:00"
+    "earnings_date": "2026-07-29",
+    "fetched_at": "2026-05-14T09:56:18.326199-04:00"
   },
   "ASTS": {
     "symbol": "ASTS",
     "earnings_date": "2026-08-10",
-    "fetched_at": "2026-05-13T10:18:21.938470-04:00"
+    "fetched_at": "2026-05-14T09:56:18.387427-04:00"
   },
   "RKLB": {
     "symbol": "RKLB",
     "earnings_date": "2026-08-06",
-    "fetched_at": "2026-05-13T10:18:22.024670-04:00"
+    "fetched_at": "2026-05-14T09:56:18.445390-04:00"
   },
   "SOFI": {
     "symbol": "SOFI",
     "earnings_date": "2026-07-28",
-    "fetched_at": "2026-05-13T10:18:22.109548-04:00"
+    "fetched_at": "2026-05-14T09:56:18.508462-04:00"
   },
   "TMDX": {
     "symbol": "TMDX",
     "earnings_date": "2026-07-30",
-    "fetched_at": "2026-05-13T10:18:22.146672-04:00"
+    "fetched_at": "2026-05-14T09:56:18.566857-04:00"
   },
   "CRWV": {
     "symbol": "CRWV",
     "earnings_date": "2026-05-07",
-    "fetched_at": "2026-05-13T10:18:22.182337-04:00"
+    "fetched_at": "2026-05-14T09:56:18.626612-04:00"
   },
   "RBRK": {
     "symbol": "RBRK",
     "earnings_date": "2026-06-04",
-    "fetched_at": "2026-05-13T10:18:22.222319-04:00"
+    "fetched_at": "2026-05-14T09:56:18.689055-04:00"
   },
   "MP": {
     "symbol": "MP",
     "earnings_date": "2026-08-06",
-    "fetched_at": "2026-05-13T10:18:22.258389-04:00"
+    "fetched_at": "2026-05-14T09:56:18.745816-04:00"
   },
   "UEC": {
     "symbol": "UEC",
     "earnings_date": "2026-05-28",
-    "fetched_at": "2026-05-13T10:18:22.297633-04:00"
+    "fetched_at": "2026-05-14T09:56:18.803934-04:00"
   },
   "USAR": {
     "symbol": "USAR",
-    "earnings_date": "2026-05-13",
-    "fetched_at": "2026-05-13T10:18:22.334897-04:00"
+    "earnings_date": "2026-08-10",
+    "fetched_at": "2026-05-14T09:56:18.861634-04:00"
   },
   "UUUU": {
     "symbol": "UUUU",
     "earnings_date": "2026-08-06",
-    "fetched_at": "2026-05-13T10:18:22.375912-04:00"
+    "fetched_at": "2026-05-14T09:56:18.919857-04:00"
   },
   "UAMY": {
     "symbol": "UAMY",
     "earnings_date": "2026-05-14",
-    "fetched_at": "2026-05-13T10:18:22.413541-04:00"
+    "fetched_at": "2026-05-14T09:56:18.980358-04:00"
   }
 }
