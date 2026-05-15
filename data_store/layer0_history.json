@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-05-15T17:00:27.761583+00:00",
+  "scan_time": "2026-05-15T18:24:27.982901+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,19 +16,19 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 18.049999237060547,
-          "regime": "neutral"
+          "value": 17.989999771118164,
+          "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.0916035353212003,
+          "value": 0.09137922733028934,
           "regime": "neutral"
         }
       },
-      "risk_on_count": 2,
+      "risk_on_count": 3,
       "risk_off_count": 1,
-      "modifier": 5,
-      "regime": "neutral",
-      "fetched_at": "2026-05-15T17:00:31.614931+00:00"
+      "modifier": 10,
+      "regime": "risk_on",
+      "fetched_at": "2026-05-15T18:24:29.880319+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-05-15T13:00:31.615219-04:00"
+        "fetched_at": "2026-05-15T14:24:29.880611-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-15T17:00:32.538084+00:00"
+      "fetched_at": "2026-05-15T18:24:30.631973+00:00"
     },
     "distribution": {
       "spy": {
@@ -74,12 +74,12 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-05-15T17:00:32.871924+00:00"
+        "fetched_at": "2026-05-15T18:24:31.005642+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
         "lookback": 25,
-        "count": 4,
+        "count": 5,
         "days": [
           {
             "date": "2026-04-21",
@@ -104,10 +104,16 @@
             "drop_pct": -0.008481806809764016,
             "volume": 45873000,
             "prev_volume": 36019100
+          },
+          {
+            "date": "2026-05-15",
+            "drop_pct": -0.008196699765005441,
+            "volume": 35323871,
+            "prev_volume": 33209400
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-05-15T17:00:33.223430+00:00"
+        "fetched_at": "2026-05-15T18:24:31.349787+00:00"
       },
       "level": "pressure",
       "modifiers": {
@@ -115,7 +121,7 @@
         "sell_put": -5,
         "sell_call": 0
       },
-      "fetched_at": "2026-05-15T17:00:33.223723+00:00"
+      "fetched_at": "2026-05-15T18:24:31.350125+00:00"
     },
     "bubble": {
       "score": 0,
@@ -131,9 +137,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-05-15T13:00:34.063355-04:00"
+        "fetched_at": "2026-05-15T14:24:32.062599-04:00"
       },
-      "fetched_at": "2026-05-15T17:00:34.063399+00:00"
+      "fetched_at": "2026-05-15T18:24:32.062640+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -143,13 +149,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-05-15T17:00:35.246823+00:00"
+      "fetched_at": "2026-05-15T18:24:33.213639+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 18.049999237060547,
-        "vix9d": 15.850000381469727,
-        "vix3m": 21.229999542236328,
+        "vix": 17.989999771118164,
+        "vix9d": 15.6899995803833,
+        "vix3m": 21.219999313354492,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -159,19 +165,19 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-05-15T17:00:35.341308+00:00"
+      "fetched_at": "2026-05-15T18:24:33.258348+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-15T17:00:39.586655+00:00"
+      "fetched_at": "2026-05-15T18:24:37.475524+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": -1,
-    "sell_put": 0,
-    "leaps_entry": -5,
+    "sell_call": -3,
+    "sell_put": 5,
+    "leaps_entry": 0,
     "leaps_entry_veto": false
   }
 }
