@@ -6,13 +6,13 @@
   "snapshot": {
     "score": null,
     "indicators": {
-      "buffett_indicator": 2.3,
+      "buffett_indicator": 2.19,
       "shiller_cape": 41.66,
       "sp500_top10_concentration": null,
       "margin_debt_yoy": null
     },
     "n_available": 2,
-    "fetched_at": "2026-05-15T19:27:22.130922-04:00"
+    "fetched_at": "2026-05-18T12:18:04.091026-04:00"
   },
-  "fetched_at": "2026-05-15T23:27:22.130951+00:00"
+  "fetched_at": "2026-05-18T16:18:04.091065+00:00"
 }
