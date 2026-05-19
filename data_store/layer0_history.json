@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-05-19T18:16:13.336797+00:00",
+  "scan_time": "2026-05-19T20:10:40.445689+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,19 +16,19 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 17.93000030517578,
-          "regime": "risk_on"
+          "value": 18.209999084472656,
+          "regime": "neutral"
         },
         "copper_gold": {
-          "value": 0.09128088526452911,
+          "value": 0.09149009168696315,
           "regime": "neutral"
         }
       },
-      "risk_on_count": 3,
+      "risk_on_count": 2,
       "risk_off_count": 1,
-      "modifier": 10,
-      "regime": "risk_on",
-      "fetched_at": "2026-05-19T18:16:16.042436+00:00"
+      "modifier": 5,
+      "regime": "neutral",
+      "fetched_at": "2026-05-19T20:10:43.014162+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,17 +36,17 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-05-19T14:16:16.042682-04:00"
+        "fetched_at": "2026-05-19T16:10:43.014492-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-19T18:16:16.964196+00:00"
+      "fetched_at": "2026-05-19T20:10:44.293815+00:00"
     },
     "distribution": {
       "spy": {
         "symbol": "SPY",
         "lookback": 25,
-        "count": 5,
+        "count": 6,
         "days": [
           {
             "date": "2026-04-21",
@@ -77,10 +77,16 @@
             "drop_pct": -0.012029351892724574,
             "volume": 60410800,
             "prev_volume": 45307600
+          },
+          {
+            "date": "2026-05-19",
+            "drop_pct": -0.006593102221922548,
+            "volume": 47867172,
+            "prev_volume": 47843900
           }
         ],
-        "level": "pressure",
-        "fetched_at": "2026-05-19T18:16:17.273077+00:00"
+        "level": "distribution",
+        "fetched_at": "2026-05-19T20:10:44.616268+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -119,15 +125,15 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-05-19T18:16:17.605559+00:00"
+        "fetched_at": "2026-05-19T20:10:44.897574+00:00"
       },
-      "level": "pressure",
+      "level": "distribution",
       "modifiers": {
-        "leaps_entry": -10,
-        "sell_put": -5,
-        "sell_call": 0
+        "leaps_entry": -20,
+        "sell_put": -15,
+        "sell_call": 5
       },
-      "fetched_at": "2026-05-19T18:16:17.605826+00:00"
+      "fetched_at": "2026-05-19T20:10:44.897868+00:00"
     },
     "bubble": {
       "score": 0,
@@ -143,9 +149,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-05-19T14:16:18.317576-04:00"
+        "fetched_at": "2026-05-19T16:10:45.990743-04:00"
       },
-      "fetched_at": "2026-05-19T18:16:18.317614+00:00"
+      "fetched_at": "2026-05-19T20:10:45.990786+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -155,13 +161,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-05-19T18:16:19.237325+00:00"
+      "fetched_at": "2026-05-19T20:10:47.026143+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 17.93000030517578,
-        "vix9d": 16.59000015258789,
-        "vix3m": 21.0,
+        "vix": 18.209999084472656,
+        "vix9d": 16.84000015258789,
+        "vix3m": 21.190000534057617,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -171,19 +177,19 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-05-19T18:16:19.284778+00:00"
+      "fetched_at": "2026-05-19T20:10:47.154649+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-05-19T18:16:23.549060+00:00"
+      "fetched_at": "2026-05-19T20:10:51.550665+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": -3,
-    "sell_put": 5,
-    "leaps_entry": 0,
+    "sell_call": 3,
+    "sell_put": -10,
+    "leaps_entry": -15,
     "leaps_entry_veto": false
   }
 }
