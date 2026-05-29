@@ -5,8 +5,10 @@
     "tags": []
   },
   "WMT::sell_put": {
-    "last_sent": "2026-05-29T21:22:12.109341+00:00",
+    "last_sent": "2026-05-29T22:44:53.747317+00:00",
     "alert_level": "green",
-    "tags": []
+    "tags": [
+      "⚠Trump_Tier1"
+    ]
   }
 }
