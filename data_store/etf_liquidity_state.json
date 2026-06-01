@@ -1,0 +1,149 @@
+{
+  "last_updated": "2026-06-01",
+  "tickers": {
+    "QQQ": {
+      "oi": 545931,
+      "tier": "E"
+    },
+    "SPY": {
+      "oi": 777978,
+      "tier": "E"
+    },
+    "SMH": {
+      "oi": 1121366,
+      "tier": "E"
+    },
+    "SOXL": {
+      "oi": 235626,
+      "tier": "E"
+    },
+    "VOO": {
+      "oi": 21363,
+      "tier": "E"
+    },
+    "VTI": {
+      "oi": 30483,
+      "tier": "E"
+    },
+    "VT": {
+      "oi": 5848,
+      "tier": "F"
+    },
+    "EWY": {
+      "oi": 568091,
+      "tier": "E"
+    },
+    "USO": {
+      "oi": 125001,
+      "tier": "E"
+    },
+    "GLD": {
+      "oi": 116505,
+      "tier": "E"
+    },
+    "GDX": {
+      "oi": 665439,
+      "tier": "E"
+    },
+    "SLV": {
+      "oi": 257219,
+      "tier": "E"
+    },
+    "URA": {
+      "oi": 109000,
+      "tier": "E"
+    },
+    "QLD": {
+      "oi": 19368,
+      "tier": "E"
+    },
+    "SSO": {
+      "oi": 12985,
+      "tier": "E"
+    },
+    "KORU": {
+      "oi": 15458,
+      "tier": "E"
+    },
+    "NVDL": {
+      "oi": 66356,
+      "tier": "E"
+    },
+    "AMDL": {
+      "oi": 37055,
+      "tier": "E"
+    },
+    "GGLL": {
+      "oi": 27608,
+      "tier": "E"
+    },
+    "TSLL": {
+      "oi": 250787,
+      "tier": "E"
+    },
+    "TSLT": {
+      "oi": 2538,
+      "tier": "F"
+    },
+    "MSFU": {
+      "oi": 50127,
+      "tier": "E"
+    },
+    "METU": {
+      "oi": 14782,
+      "tier": "E"
+    },
+    "FBL": {
+      "oi": 10806,
+      "tier": "E"
+    },
+    "AVGX": {
+      "oi": 13599,
+      "tier": "E"
+    },
+    "AMZZ": {
+      "oi": 2525,
+      "tier": "F"
+    },
+    "TSMX": {
+      "oi": null,
+      "tier": "F"
+    },
+    "MUU": {
+      "oi": 5776,
+      "tier": "F"
+    },
+    "PPA": {
+      "oi": 661,
+      "tier": "F"
+    },
+    "UFO": {
+      "oi": 40990,
+      "tier": "E"
+    },
+    "URNM": {
+      "oi": 29990,
+      "tier": "E"
+    },
+    "COPX": {
+      "oi": 41987,
+      "tier": "E"
+    },
+    "REMX": {
+      "oi": 13793,
+      "tier": "E"
+    },
+    "SILJ": {
+      "oi": 107950,
+      "tier": "E"
+    },
+    "SIVR": {
+      "oi": 24554,
+      "tier": "E"
+    },
+    "CPER": {
+      "oi": 48274,
+      "tier": "E"
+    }
+  }
+}
