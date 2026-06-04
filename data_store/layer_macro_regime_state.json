@@ -17,7 +17,7 @@
       "regime": "risk_on"
     },
     "copper_gold": {
-      "value": 0.0968621438882346,
+      "value": 0.09660320617489933,
       "regime": "neutral"
     }
   },
@@ -25,5 +25,5 @@
   "risk_off_count": 1,
   "modifier": 10,
   "regime": "risk_on",
-  "fetched_at": "2026-06-04T18:33:16.241608+00:00"
+  "fetched_at": "2026-06-04T20:52:35.606019+00:00"
 }
