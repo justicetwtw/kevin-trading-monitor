@@ -30,12 +30,12 @@
       }
     ],
     "level": "pressure",
-    "fetched_at": "2026-06-04T23:42:35.238334+00:00"
+    "fetched_at": "2026-06-05T15:49:02.007921+00:00"
   },
   "qqq": {
     "symbol": "QQQ",
     "lookback": 25,
-    "count": 3,
+    "count": 4,
     "days": [
       {
         "date": "2026-05-12",
@@ -54,10 +54,16 @@
         "drop_pct": -0.002613315163043856,
         "volume": 40270200,
         "prev_volume": 30085200
+      },
+      {
+        "date": "2026-06-04",
+        "drop_pct": -0.00483739336316815,
+        "volume": 40782600,
+        "prev_volume": 40270200
       }
     ],
-    "level": "healthy",
-    "fetched_at": "2026-06-04T23:42:35.312770+00:00"
+    "level": "pressure",
+    "fetched_at": "2026-06-05T15:49:02.203364+00:00"
   },
   "level": "pressure",
   "modifiers": {
@@ -65,5 +71,5 @@
     "sell_put": -5,
     "sell_call": 0
   },
-  "fetched_at": "2026-06-04T23:42:35.312968+00:00"
+  "fetched_at": "2026-06-05T15:49:02.203620+00:00"
 }
