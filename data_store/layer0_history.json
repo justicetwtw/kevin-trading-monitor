@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-06-05T15:48:58.800201+00:00",
+  "scan_time": "2026-06-05T17:47:21.408527+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,19 +16,19 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 16.68000030517578,
-          "regime": "risk_on"
+          "value": 18.34000015258789,
+          "regime": "neutral"
         },
         "copper_gold": {
-          "value": 0.09613500726937459,
+          "value": 0.09600371363469362,
           "regime": "neutral"
         }
       },
-      "risk_on_count": 3,
+      "risk_on_count": 2,
       "risk_off_count": 1,
-      "modifier": 10,
-      "regime": "risk_on",
-      "fetched_at": "2026-06-05T15:49:00.918049+00:00"
+      "modifier": 5,
+      "regime": "neutral",
+      "fetched_at": "2026-06-05T17:47:23.373057+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-06-05T11:49:00.918277-04:00"
+        "fetched_at": "2026-06-05T13:47:23.373385-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-06-05T15:49:01.808979+00:00"
+      "fetched_at": "2026-06-05T17:47:24.162804+00:00"
     },
     "distribution": {
       "spy": {
@@ -74,12 +74,12 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-06-05T15:49:02.007921+00:00"
+        "fetched_at": "2026-06-05T17:47:24.346294+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
         "lookback": 25,
-        "count": 4,
+        "count": 5,
         "days": [
           {
             "date": "2026-05-12",
@@ -104,10 +104,16 @@
             "drop_pct": -0.00483739336316815,
             "volume": 40782600,
             "prev_volume": 40270200
+          },
+          {
+            "date": "2026-06-05",
+            "drop_pct": -0.03397196046794857,
+            "volume": 48747157,
+            "prev_volume": 40782600
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-06-05T15:49:02.203364+00:00"
+        "fetched_at": "2026-06-05T17:47:24.476691+00:00"
       },
       "level": "pressure",
       "modifiers": {
@@ -115,7 +121,7 @@
         "sell_put": -5,
         "sell_call": 0
       },
-      "fetched_at": "2026-06-05T15:49:02.203620+00:00"
+      "fetched_at": "2026-06-05T17:47:24.477040+00:00"
     },
     "bubble": {
       "score": 0,
@@ -131,9 +137,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-06-05T11:49:03.042463-04:00"
+        "fetched_at": "2026-06-05T13:47:25.293005-04:00"
       },
-      "fetched_at": "2026-06-05T15:49:03.042499+00:00"
+      "fetched_at": "2026-06-05T17:47:25.293044+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -143,13 +149,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-06-05T15:49:03.681162+00:00"
+      "fetched_at": "2026-06-05T17:47:25.755751+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 16.68000030517578,
-        "vix9d": 15.300000190734863,
-        "vix3m": 19.799999237060547,
+        "vix": 18.34000015258789,
+        "vix9d": 17.8700008392334,
+        "vix3m": 20.549999237060547,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -159,19 +165,19 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-06-05T15:49:03.733030+00:00"
+      "fetched_at": "2026-06-05T17:47:25.796250+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-06-05T15:49:07.951887+00:00"
+      "fetched_at": "2026-06-05T17:47:30.036645+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": -3,
-    "sell_put": 5,
-    "leaps_entry": 0,
+    "sell_call": -1,
+    "sell_put": 0,
+    "leaps_entry": -5,
     "leaps_entry_veto": false
   }
 }
