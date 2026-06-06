@@ -1,14 +1,7 @@
 {
   "Trump::news": {
-    "last_sent": "2026-06-05T20:58:58.050538+00:00",
+    "last_sent": "2026-06-06T21:31:53.918838+00:00",
     "alert_level": "green",
     "tags": []
-  },
-  "WMT::sell_put": {
-    "last_sent": "2026-05-29T22:44:53.747317+00:00",
-    "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1"
-    ]
   }
 }
