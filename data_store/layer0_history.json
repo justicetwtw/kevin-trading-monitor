@@ -1,14 +1,14 @@
 {
-  "scan_time": "2026-06-12T18:19:30.874023+00:00",
+  "scan_time": "2026-06-12T20:33:00.431151+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
         "yield_curve": {
-          "value": 41.99999999999999,
+          "value": 40.000000000000036,
           "regime": "risk_on"
         },
         "hy_oas": {
-          "value": 280.0,
+          "value": 278.0,
           "regime": "risk_on"
         },
         "dxy": {
@@ -16,19 +16,19 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 18.280000686645508,
-          "regime": "neutral"
+          "value": 17.68000030517578,
+          "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.10136135606639997,
+          "value": 0.10231799648874958,
           "regime": "neutral"
         }
       },
-      "risk_on_count": 2,
+      "risk_on_count": 3,
       "risk_off_count": 1,
-      "modifier": 5,
-      "regime": "neutral",
-      "fetched_at": "2026-06-12T18:19:33.732141+00:00"
+      "modifier": 10,
+      "regime": "risk_on",
+      "fetched_at": "2026-06-12T20:33:03.514218+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-06-12T14:19:33.732366-04:00"
+        "fetched_at": "2026-06-12T16:33:03.514523-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-06-12T18:19:34.804449+00:00"
+      "fetched_at": "2026-06-12T20:33:04.643750+00:00"
     },
     "distribution": {
       "spy": {
@@ -80,7 +80,7 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-06-12T18:19:34.969413+00:00"
+        "fetched_at": "2026-06-12T20:33:04.819174+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -125,7 +125,7 @@
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-06-12T18:19:35.200143+00:00"
+        "fetched_at": "2026-06-12T20:33:05.084597+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -133,7 +133,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-06-12T18:19:35.200407+00:00"
+      "fetched_at": "2026-06-12T20:33:05.084904+00:00"
     },
     "bubble": {
       "score": 0,
@@ -149,9 +149,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-06-12T14:19:36.072340-04:00"
+        "fetched_at": "2026-06-12T16:33:05.503332-04:00"
       },
-      "fetched_at": "2026-06-12T18:19:36.072372+00:00"
+      "fetched_at": "2026-06-12T20:33:05.503412+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -161,35 +161,35 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-06-12T18:19:36.958577+00:00"
+      "fetched_at": "2026-06-12T20:33:06.117912+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 18.280000686645508,
-        "vix9d": 18.389999389648438,
-        "vix3m": 20.829999923706055,
-        "vix9d_inverted": true,
+        "vix": 17.68000030517578,
+        "vix9d": 17.260000228881836,
+        "vix3m": 20.510000228881836,
+        "vix9d_inverted": false,
         "vix3m_inverted": false
       },
       "modifiers": {
-        "sell_put": 15,
-        "leaps_entry": 15,
+        "sell_put": 0,
+        "leaps_entry": 0,
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-06-12T18:19:37.091035+00:00"
+      "fetched_at": "2026-06-12T20:33:06.157994+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-06-12T18:19:41.574676+00:00"
+      "fetched_at": "2026-06-12T20:33:10.341916+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": 3,
-    "sell_put": 5,
-    "leaps_entry": 0,
+    "sell_call": 2,
+    "sell_put": -5,
+    "leaps_entry": -10,
     "leaps_entry_veto": false
   }
 }
