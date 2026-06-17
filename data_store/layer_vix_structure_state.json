@@ -1,16 +1,16 @@
 {
   "snapshot": {
-    "vix": 17.15999984741211,
-    "vix9d": 16.40999984741211,
-    "vix3m": 19.940000534057617,
-    "vix9d_inverted": false,
+    "vix": 18.440000534057617,
+    "vix9d": 18.6299991607666,
+    "vix3m": 20.6200008392334,
+    "vix9d_inverted": true,
     "vix3m_inverted": false
   },
   "modifiers": {
-    "sell_put": 0,
-    "leaps_entry": 0,
+    "sell_put": 15,
+    "leaps_entry": 15,
     "sell_call": 0
   },
   "leaps_entry_veto": false,
-  "fetched_at": "2026-06-17T19:11:29.596083+00:00"
+  "fetched_at": "2026-06-17T21:20:30.161163+00:00"
 }

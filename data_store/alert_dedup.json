@@ -4,13 +4,8 @@
     "alert_level": "green",
     "tags": []
   },
-  "GEV::sell_put": {
-    "last_sent": "2026-06-10T16:31:07.886584+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
   "ADBE::leaps_entry": {
-    "last_sent": "2026-06-12T16:13:45.031069+00:00",
+    "last_sent": "2026-06-17T21:22:17.757657+00:00",
     "alert_level": "green",
     "tags": []
   }
