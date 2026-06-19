@@ -28,5 +28,10 @@
     "last_sent": "2026-06-19T15:57:38.800536+00:00",
     "alert_level": "green",
     "tags": []
+  },
+  "CVX::sell_put": {
+    "last_sent": "2026-06-19T22:56:30.585325+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
