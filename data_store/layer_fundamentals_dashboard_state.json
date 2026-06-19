@@ -4,7 +4,7 @@
       "symbol": "NVDA",
       "pe_trailing": 32.26493,
       "pe_forward": 16.554375,
-      "peg": 0.64,
+      "peg": 0.65,
       "pb": 26.107807,
       "ps": 20.131376,
       "fcf_yield": 0.009079905823833603,
@@ -16,13 +16,13 @@
       "market_cap": 5103122644992,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:06:49.611030-04:00"
+      "fetched_at": "2026-06-19T19:34:11.809105-04:00"
     },
     "TSM": {
       "symbol": "TSM",
       "pe_trailing": 39.73517,
       "pe_forward": 23.510199,
-      "peg": 1.33,
+      "peg": 1.44,
       "pb": 70.689156,
       "ps": 0.58402276,
       "fcf_yield": 0.3000527454715183,
@@ -34,13 +34,13 @@
       "market_cap": 2396773416960,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:06:49.852653-04:00"
+      "fetched_at": "2026-06-19T19:34:11.988531-04:00"
     },
     "AVGO": {
       "symbol": "AVGO",
       "pe_trailing": 68.21725,
       "pe_forward": 21.257893,
-      "peg": 0.68,
+      "peg": 0.75,
       "pb": 22.319588,
       "ps": 25.932959,
       "fcf_yield": 0.013904866015304175,
@@ -52,13 +52,13 @@
       "market_cap": 1957030658048,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:06:50.130267-04:00"
+      "fetched_at": "2026-06-19T19:34:12.179862-04:00"
     },
     "MU": {
       "symbol": "MU",
       "pe_trailing": 53.41451,
       "pe_forward": 9.896083,
-      "peg": 0.32,
+      "peg": 0.36,
       "pb": 17.653221,
       "ps": 22.003803,
       "fcf_yield": 0.00226259887943938,
@@ -70,13 +70,13 @@
       "market_cap": 1278839095296,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:06:50.374291-04:00"
+      "fetched_at": "2026-06-19T19:34:12.361092-04:00"
     },
     "MSFT": {
       "symbol": "MSFT",
       "pe_trailing": 22.610249,
       "pe_forward": 19.611391,
-      "peg": 1.22,
+      "peg": 1.17,
       "pb": 6.802087,
       "ps": 8.855128,
       "fcf_yield": 0.013132249518539653,
@@ -88,13 +88,13 @@
       "market_cap": 2818348154880,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:06:50.625682-04:00"
+      "fetched_at": "2026-06-19T19:34:12.507590-04:00"
     },
     "GOOG": {
       "symbol": "GOOG",
       "pe_trailing": 28.05038,
       "pe_forward": 25.348362,
-      "peg": 1.46,
+      "peg": 1.45,
       "pb": 9.299489,
       "ps": 10.612967,
       "fcf_yield": 0.0062270328593669435,
@@ -106,13 +106,13 @@
       "market_cap": 4483957391360,
       "sector": "Communication Services",
       "industry": "Internet Content & Information",
-      "fetched_at": "2026-06-18T20:06:50.870226-04:00"
+      "fetched_at": "2026-06-19T19:34:12.691367-04:00"
     },
     "GOOGL": {
       "symbol": "GOOGL",
       "pe_trailing": 28.093893,
       "pe_forward": 25.415365,
-      "peg": 1.47,
+      "peg": 1.45,
       "pb": 9.313914,
       "ps": 10.629429,
       "fcf_yield": 0.006217388875719494,
@@ -124,13 +124,13 @@
       "market_cap": 4490912595968,
       "sector": "Communication Services",
       "industry": "Internet Content & Information",
-      "fetched_at": "2026-06-18T20:06:51.132677-04:00"
+      "fetched_at": "2026-06-19T19:34:12.883755-04:00"
     },
     "META": {
       "symbol": "META",
       "pe_trailing": 20.997452,
       "pe_forward": 15.925084,
-      "peg": 0.87,
+      "peg": 0.83,
       "pb": 6.0118937,
       "ps": 6.81619,
       "fcf_yield": 0.017443182331531443,
@@ -142,7 +142,7 @@
       "market_cap": 1465228591104,
       "sector": "Communication Services",
       "industry": "Internet Content & Information",
-      "fetched_at": "2026-06-18T20:06:51.386275-04:00"
+      "fetched_at": "2026-06-19T19:34:13.049985-04:00"
     },
     "AMZN": {
       "symbol": "AMZN",
@@ -160,13 +160,13 @@
       "market_cap": 2628929978368,
       "sector": "Consumer Cyclical",
       "industry": "Internet Retail",
-      "fetched_at": "2026-06-18T20:06:51.634098-04:00"
+      "fetched_at": "2026-06-19T19:34:13.198413-04:00"
     },
     "CAT": {
       "symbol": "CAT",
       "pe_trailing": 49.19261,
       "pe_forward": 32.75254,
-      "peg": 2.24,
+      "peg": 2.34,
       "pb": 24.334625,
       "ps": 6.4173665,
       "fcf_yield": 0.008317443724522953,
@@ -178,13 +178,13 @@
       "market_cap": 454060769280,
       "sector": "Industrials",
       "industry": "Farm & Heavy Construction Machinery",
-      "fetched_at": "2026-06-18T20:06:51.923718-04:00"
+      "fetched_at": "2026-06-19T19:34:13.356862-04:00"
     },
     "LMT": {
       "symbol": "LMT",
       "pe_trailing": 24.76733,
       "pe_forward": 15.922387,
-      "peg": 1.13,
+      "peg": 1.08,
       "pb": 15.692085,
       "ps": 1.5685362,
       "fcf_yield": 0.03384469975120777,
@@ -196,13 +196,13 @@
       "market_cap": 117806481408,
       "sector": "Industrials",
       "industry": "Aerospace & Defense",
-      "fetched_at": "2026-06-18T20:06:52.170089-04:00"
+      "fetched_at": "2026-06-19T19:34:13.506476-04:00"
     },
     "RTX": {
       "symbol": "RTX",
       "pe_trailing": 34.88722,
       "pe_forward": 24.485716,
-      "peg": 2.56,
+      "peg": 2.54,
       "pb": 3.771055,
       "ps": 2.7656982,
       "fcf_yield": 0.028939932442273875,
@@ -214,13 +214,13 @@
       "market_cap": 249944440832,
       "sector": "Industrials",
       "industry": "Aerospace & Defense",
-      "fetched_at": "2026-06-18T20:06:52.428697-04:00"
+      "fetched_at": "2026-06-19T19:34:13.663130-04:00"
     },
     "WMT": {
       "symbol": "WMT",
       "pe_trailing": 41.260563,
       "pe_forward": 35.638035,
-      "peg": 4.76,
+      "peg": 4.61,
       "pb": 9.37365,
       "ps": 1.2857041,
       "fcf_yield": 0.007358762866021756,
@@ -232,13 +232,13 @@
       "market_cap": 932527669248,
       "sector": "Consumer Defensive",
       "industry": "Discount Stores",
-      "fetched_at": "2026-06-18T20:06:52.670492-04:00"
+      "fetched_at": "2026-06-19T19:34:13.815842-04:00"
     },
     "COST": {
       "symbol": "COST",
       "pe_trailing": 47.980335,
       "pe_forward": 42.051796,
-      "peg": 4.82,
+      "peg": 4.64,
       "pb": 25.523098,
       "ps": 1.437216,
       "fcf_yield": 0.01648159554654333,
@@ -250,13 +250,13 @@
       "market_cap": 421947932672,
       "sector": "Consumer Defensive",
       "industry": "Discount Stores",
-      "fetched_at": "2026-06-18T20:06:52.922832-04:00"
+      "fetched_at": "2026-06-19T19:34:13.966931-04:00"
     },
     "XOM": {
       "symbol": "XOM",
       "pe_trailing": 23.200336,
       "pe_forward": 12.934332,
-      "peg": 1.18,
+      "peg": 1.14,
       "pb": 2.2202709,
       "ps": 1.7521508,
       "fcf_yield": 0.02036097808388477,
@@ -268,13 +268,13 @@
       "market_cap": 571215183872,
       "sector": "Energy",
       "industry": "Oil & Gas Integrated",
-      "fetched_at": "2026-06-18T20:06:53.200168-04:00"
+      "fetched_at": "2026-06-19T19:34:14.156792-04:00"
     },
     "CVX": {
       "symbol": "CVX",
       "pe_trailing": 30.196522,
       "pe_forward": 13.81663,
-      "peg": 0.73,
+      "peg": 0.7,
       "pb": 1.8688784,
       "ps": 1.8617483,
       "fcf_yield": 0.034055700490466564,
@@ -286,13 +286,13 @@
       "market_cap": 345801129984,
       "sector": "Energy",
       "industry": "Oil & Gas Integrated",
-      "fetched_at": "2026-06-18T20:06:53.487381-04:00"
+      "fetched_at": "2026-06-19T19:34:14.354654-04:00"
     },
     "AMD": {
       "symbol": "AMD",
       "pe_trailing": 179.72241,
       "pe_forward": 41.00965,
-      "peg": 1.22,
+      "peg": 1.29,
       "pb": 13.588135,
       "ps": 23.394987,
       "fcf_yield": 0.008186580106516699,
@@ -304,13 +304,13 @@
       "market_cap": 876235849728,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:06:53.735152-04:00"
+      "fetched_at": "2026-06-19T19:34:14.502833-04:00"
     },
     "ASML": {
       "symbol": "ASML",
       "pe_trailing": 64.45157,
       "pe_forward": 40.13463,
-      "peg": 2.65,
+      "peg": 2.83,
       "pb": 1714.7112,
       "ps": 22.074003,
       "fcf_yield": 0.011083650861676234,
@@ -322,13 +322,13 @@
       "market_cap": 743732805632,
       "sector": "Technology",
       "industry": "Semiconductor Equipment & Materials",
-      "fetched_at": "2026-06-18T20:06:53.997598-04:00"
+      "fetched_at": "2026-06-19T19:34:14.715280-04:00"
     },
     "QCOM": {
       "symbol": "QCOM",
       "pe_trailing": 24.339075,
       "pe_forward": 21.196833,
-      "peg": 0.91,
+      "peg": 0.96,
       "pb": 8.778244,
       "ps": 5.3571897,
       "fcf_yield": 0.04023844871697479,
@@ -340,13 +340,13 @@
       "market_cap": 238319943680,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:06:54.270250-04:00"
+      "fetched_at": "2026-06-19T19:34:14.895460-04:00"
     },
     "AAPL": {
       "symbol": "AAPL",
       "pe_trailing": 36.078693,
       "pe_forward": 31.058918,
-      "peg": 2.42,
+      "peg": 2.41,
       "pb": 41.04821,
       "ps": 9.695551,
       "fcf_yield": 0.02309600875314805,
@@ -358,13 +358,13 @@
       "market_cap": 4376979046400,
       "sector": "Technology",
       "industry": "Consumer Electronics",
-      "fetched_at": "2026-06-18T20:06:54.522248-04:00"
+      "fetched_at": "2026-06-19T19:34:15.042315-04:00"
     },
     "ORCL": {
       "symbol": "ORCL",
       "pe_trailing": 31.556505,
       "pe_forward": 16.888111,
-      "peg": 1.06,
+      "peg": 1.04,
       "pb": 15.797188,
       "ps": 7.8689156,
       "fcf_yield": -0.03837142829675639,
@@ -376,13 +376,13 @@
       "market_cap": 530026528768,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:06:54.873354-04:00"
+      "fetched_at": "2026-06-19T19:34:15.184717-04:00"
     },
     "NOW": {
       "symbol": "NOW",
       "pe_trailing": 56.57143,
       "pe_forward": 18.907074,
-      "peg": 0.98,
+      "peg": 0.92,
       "pb": 8.357369,
       "ps": 7.021169,
       "fcf_yield": 0.05211547365874105,
@@ -394,13 +394,13 @@
       "market_cap": 98015518720,
       "sector": "Technology",
       "industry": "Software - Application",
-      "fetched_at": "2026-06-18T20:06:55.122033-04:00"
+      "fetched_at": "2026-06-19T19:34:15.337378-04:00"
     },
     "CRM": {
       "symbol": "CRM",
       "pe_trailing": 17.56713,
       "pe_forward": 9.767983,
-      "peg": 0.77,
+      "peg": 0.72,
       "pb": 3.6310136,
       "ps": 2.9024215,
       "fcf_yield": 0.1331613764040686,
@@ -412,13 +412,13 @@
       "market_cap": 124307816448,
       "sector": "Technology",
       "industry": "Software - Application",
-      "fetched_at": "2026-06-18T20:06:55.419833-04:00"
+      "fetched_at": "2026-06-19T19:34:15.483151-04:00"
     },
     "CRWD": {
       "symbol": "CRWD",
       "pe_trailing": null,
       "pe_forward": 109.58058,
-      "peg": 5.53,
+      "peg": 5.57,
       "pb": 37.619335,
       "ps": 34.223484,
       "fcf_yield": 0.011049392806570017,
@@ -430,13 +430,13 @@
       "market_cap": 174341259264,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:06:55.677292-04:00"
+      "fetched_at": "2026-06-19T19:34:15.641382-04:00"
     },
     "ADBE": {
       "symbol": "ADBE",
       "pe_trailing": 11.164761,
       "pe_forward": 7.086649,
-      "peg": 0.57,
+      "peg": 0.53,
       "pb": 6.760661,
       "ps": 3.078661,
       "fcf_yield": 0.1188300833845579,
@@ -448,13 +448,13 @@
       "market_cap": 77576101888,
       "sector": "Technology",
       "industry": "Software - Application",
-      "fetched_at": "2026-06-18T20:06:55.965521-04:00"
+      "fetched_at": "2026-06-19T19:34:15.789086-04:00"
     },
     "VRT": {
       "symbol": "VRT",
       "pe_trailing": 83.6809,
       "pe_forward": 37.62792,
-      "peg": 1.5,
+      "peg": 1.67,
       "pb": 32.325535,
       "ps": 11.797723,
       "fcf_yield": 0.01535831679702431,
@@ -466,13 +466,13 @@
       "market_cap": 127927427072,
       "sector": "Industrials",
       "industry": "Electrical Equipment & Parts",
-      "fetched_at": "2026-06-18T20:06:56.238677-04:00"
+      "fetched_at": "2026-06-19T19:34:15.935325-04:00"
     },
     "AMAT": {
       "symbol": "AMAT",
       "pe_trailing": 58.05362,
       "pe_forward": 37.95211,
-      "peg": 1.89,
+      "peg": 2.05,
       "pb": 20.492462,
       "ps": 16.88121,
       "fcf_yield": 0.006205350084745587,
@@ -484,13 +484,13 @@
       "market_cap": 489960275968,
       "sector": "Technology",
       "industry": "Semiconductor Equipment & Materials",
-      "fetched_at": "2026-06-18T20:06:56.498083-04:00"
+      "fetched_at": "2026-06-19T19:34:16.086523-04:00"
     },
     "LRCX": {
       "symbol": "LRCX",
       "pe_trailing": 73.681816,
       "pe_forward": 48.775043,
-      "peg": 2.14,
+      "peg": 2.26,
       "pb": 45.964085,
       "ps": 22.43915,
       "fcf_yield": 0.008945823787379917,
@@ -502,13 +502,13 @@
       "market_cap": 486522159104,
       "sector": "Technology",
       "industry": "Semiconductor Equipment & Materials",
-      "fetched_at": "2026-06-18T20:06:56.763642-04:00"
+      "fetched_at": "2026-06-19T19:34:16.234373-04:00"
     },
     "KLAC": {
       "symbol": "KLAC",
       "pe_trailing": 73.32204,
       "pe_forward": 51.415127,
-      "peg": 2.45,
+      "peg": 2.68,
       "pb": 58.184265,
       "ps": 25.888796,
       "fcf_yield": 0.008524197464635817,
@@ -520,13 +520,13 @@
       "market_cap": 339056787456,
       "sector": "Technology",
       "industry": "Semiconductor Equipment & Materials",
-      "fetched_at": "2026-06-18T20:06:57.013679-04:00"
+      "fetched_at": "2026-06-19T19:34:16.432111-04:00"
     },
     "ANET": {
       "symbol": "ANET",
       "pe_trailing": 58.30584,
       "pe_forward": 38.131092,
-      "peg": 2.16,
+      "peg": 2.18,
       "pb": 15.840724,
       "ps": 22.002623,
       "fcf_yield": 0.020418324258517227,
@@ -538,13 +538,13 @@
       "market_cap": 213643264000,
       "sector": "Technology",
       "industry": "Computer Hardware",
-      "fetched_at": "2026-06-18T20:06:57.263372-04:00"
+      "fetched_at": "2026-06-19T19:34:16.606875-04:00"
     },
     "APH": {
       "symbol": "APH",
       "pe_trailing": 47.114944,
       "pe_forward": 28.835789,
-      "peg": 1.36,
+      "peg": 1.4,
       "pb": 14.420405,
       "ps": 7.7868595,
       "fcf_yield": 0.017667632681972644,
@@ -556,13 +556,13 @@
       "market_cap": 201709256704,
       "sector": "Technology",
       "industry": "Electronic Components",
-      "fetched_at": "2026-06-18T20:06:57.511162-04:00"
+      "fetched_at": "2026-06-19T19:34:16.754747-04:00"
     },
     "GLW": {
       "symbol": "GLW",
       "pe_trailing": 98.94416,
       "pe_forward": 46.554615,
-      "peg": 1.39,
+      "peg": 1.53,
       "pb": 14.967365,
       "ps": 10.278508,
       "fcf_yield": 0.003648165870445166,
@@ -574,13 +574,13 @@
       "market_cap": 167755530240,
       "sector": "Technology",
       "industry": "Electronic Components",
-      "fetched_at": "2026-06-18T20:06:57.785016-04:00"
+      "fetched_at": "2026-06-19T19:34:16.904155-04:00"
     },
     "SNPS": {
       "symbol": "SNPS",
       "pe_trailing": 104.71495,
       "pe_forward": 26.408781,
-      "peg": 2.84,
+      "peg": 2.89,
       "pb": 2.8612258,
       "ps": 10.049191,
       "fcf_yield": 0.04057473320814076,
@@ -592,7 +592,7 @@
       "market_cap": 87220748288,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:06:58.037003-04:00"
+      "fetched_at": "2026-06-19T19:34:17.052468-04:00"
     },
     "CEG": {
       "symbol": "CEG",
@@ -610,13 +610,13 @@
       "market_cap": 97867374592,
       "sector": "Utilities",
       "industry": "Utilities - Independent Power Producers",
-      "fetched_at": "2026-06-18T20:06:58.303414-04:00"
+      "fetched_at": "2026-06-19T19:34:17.192089-04:00"
     },
     "VST": {
       "symbol": "VST",
       "pe_trailing": 27.382942,
       "pe_forward": 14.903638,
-      "peg": 0.47,
+      "peg": 0.48,
       "pb": 21.120857,
       "ps": 2.8394768,
       "fcf_yield": 0.008636907459927344,
@@ -628,13 +628,13 @@
       "market_cap": 55213629440,
       "sector": "Utilities",
       "industry": "Utilities - Independent Power Producers",
-      "fetched_at": "2026-06-18T20:06:58.550814-04:00"
+      "fetched_at": "2026-06-19T19:34:17.410861-04:00"
     },
     "ETN": {
       "symbol": "ETN",
       "pe_trailing": 41.22874,
       "pe_forward": 26.827286,
-      "peg": 3.08,
+      "peg": 3.19,
       "pb": 8.304521,
       "ps": 5.7419987,
       "fcf_yield": 0.016159534850090956,
@@ -646,13 +646,13 @@
       "market_cap": 163773284352,
       "sector": "Industrials",
       "industry": "Specialty Industrial Machinery",
-      "fetched_at": "2026-06-18T20:06:58.798282-04:00"
+      "fetched_at": "2026-06-19T19:34:17.591213-04:00"
     },
     "GEV": {
       "symbol": "GEV",
       "pe_trailing": 32.457737,
       "pe_forward": 45.273685,
-      "peg": 1.7,
+      "peg": 1.92,
       "pb": 21.419638,
       "ps": 7.5735016,
       "fcf_yield": 0.031238826217421727,
@@ -664,13 +664,13 @@
       "market_cap": 298206625792,
       "sector": "Industrials",
       "industry": "Specialty Industrial Machinery",
-      "fetched_at": "2026-06-18T20:06:59.054516-04:00"
+      "fetched_at": "2026-06-19T19:34:17.749686-04:00"
     },
     "NEE": {
       "symbol": "NEE",
       "pe_trailing": 22.017767,
       "pe_forward": 19.725279,
-      "peg": 1.9,
+      "peg": 1.91,
       "pb": 3.2759335,
       "ps": 6.492725,
       "fcf_yield": -0.10199389641979621,
@@ -682,13 +682,13 @@
       "market_cap": 180926267392,
       "sector": "Utilities",
       "industry": "Utilities - Regulated Electric",
-      "fetched_at": "2026-06-18T20:06:59.360364-04:00"
+      "fetched_at": "2026-06-19T19:34:17.918253-04:00"
     },
     "SO": {
       "symbol": "SO",
       "pe_trailing": 23.808182,
       "pe_forward": 18.932121,
-      "peg": 2.68,
+      "peg": 2.65,
       "pb": 2.8269055,
       "ps": 3.4777284,
       "fcf_yield": -0.03764039492544719,
@@ -700,7 +700,7 @@
       "market_cap": 104940453888,
       "sector": "Utilities",
       "industry": "Utilities - Regulated Electric",
-      "fetched_at": "2026-06-18T20:06:59.616730-04:00"
+      "fetched_at": "2026-06-19T19:34:18.066446-04:00"
     },
     "VLO": {
       "symbol": "VLO",
@@ -718,13 +718,13 @@
       "market_cap": 70165217280,
       "sector": "Energy",
       "industry": "Oil & Gas Refining & Marketing",
-      "fetched_at": "2026-06-18T20:06:59.908918-04:00"
+      "fetched_at": "2026-06-19T19:34:18.217138-04:00"
     },
     "MELI": {
       "symbol": "MELI",
       "pe_trailing": 43.22363,
       "pe_forward": 27.965384,
-      "peg": 1.03,
+      "peg": 1.01,
       "pb": 11.38549,
       "ps": 2.6065936,
       "fcf_yield": -0.04951445805569621,
@@ -736,7 +736,7 @@
       "market_cap": 82897502208,
       "sector": "Consumer Cyclical",
       "industry": "Internet Retail",
-      "fetched_at": "2026-06-18T20:07:00.157594-04:00"
+      "fetched_at": "2026-06-19T19:34:18.365628-04:00"
     },
     "INTC": {
       "symbol": "INTC",
@@ -754,13 +754,13 @@
       "market_cap": 673433780224,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:07:00.406310-04:00"
+      "fetched_at": "2026-06-19T19:34:18.515475-04:00"
     },
     "ARM": {
       "symbol": "ARM",
       "pe_trailing": 529.4699,
       "pe_forward": 143.24922,
-      "peg": 3.44,
+      "peg": 3.82,
       "pb": 56.43508,
       "ps": 95.402016,
       "fcf_yield": 0.001598924776884027,
@@ -772,7 +772,7 @@
       "market_cap": 469377908736,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:07:00.723179-04:00"
+      "fetched_at": "2026-06-19T19:34:18.751050-04:00"
     },
     "SMCI": {
       "symbol": "SMCI",
@@ -790,13 +790,13 @@
       "market_cap": 18439491584,
       "sector": "Technology",
       "industry": "Computer Hardware",
-      "fetched_at": "2026-06-18T20:07:01.019189-04:00"
+      "fetched_at": "2026-06-19T19:34:19.167816-04:00"
     },
     "MRVL": {
       "symbol": "MRVL",
       "pe_trailing": 107.09654,
       "pe_forward": 50.315666,
-      "peg": 1.57,
+      "peg": 1.76,
       "pb": 14.928859,
       "ps": 31.16809,
       "fcf_yield": 0.008353841824102788,
@@ -808,7 +808,7 @@
       "market_cap": 271695364096,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:07:01.271181-04:00"
+      "fetched_at": "2026-06-19T19:34:19.314654-04:00"
     },
     "NBIS": {
       "symbol": "NBIS",
@@ -826,13 +826,13 @@
       "market_cap": 72790073344,
       "sector": "Communication Services",
       "industry": "Internet Content & Information",
-      "fetched_at": "2026-06-18T20:07:01.516798-04:00"
+      "fetched_at": "2026-06-19T19:34:19.464466-04:00"
     },
     "WDC": {
       "symbol": "WDC",
       "pe_trailing": 44.7112,
       "pe_forward": 41.333405,
-      "peg": 0.61,
+      "peg": 0.66,
       "pb": 35.679176,
       "ps": 21.84021,
       "fcf_yield": 0.00806727066700622,
@@ -844,7 +844,7 @@
       "market_cap": 257212153856,
       "sector": "Technology",
       "industry": "Computer Hardware",
-      "fetched_at": "2026-06-18T20:07:01.771217-04:00"
+      "fetched_at": "2026-06-19T19:34:19.649005-04:00"
     },
     "SNDK": {
       "symbol": "SNDK",
@@ -862,13 +862,13 @@
       "market_cap": 323539107840,
       "sector": "Technology",
       "industry": "Computer Hardware",
-      "fetched_at": "2026-06-18T20:07:02.038572-04:00"
+      "fetched_at": "2026-06-19T19:34:19.887875-04:00"
     },
     "STX": {
       "symbol": "STX",
       "pe_trailing": 101.73288,
       "pe_forward": 39.507538,
-      "peg": 0.71,
+      "peg": 0.74,
       "pb": 219.30942,
       "ps": 21.992897,
       "fcf_yield": 0.006648996848569628,
@@ -880,7 +880,7 @@
       "market_cap": 242141790208,
       "sector": "Technology",
       "industry": "Computer Hardware",
-      "fetched_at": "2026-06-18T20:07:02.294712-04:00"
+      "fetched_at": "2026-06-19T19:34:20.033430-04:00"
     },
     "BESI": {
       "symbol": "BESI",
@@ -898,7 +898,7 @@
       "market_cap": null,
       "sector": null,
       "industry": null,
-      "fetched_at": "2026-06-18T20:07:02.542329-04:00"
+      "fetched_at": "2026-06-19T19:34:20.173676-04:00"
     },
     "DD": {
       "symbol": "DD",
@@ -916,13 +916,13 @@
       "market_cap": 19325327360,
       "sector": "Basic Materials",
       "industry": "Specialty Chemicals",
-      "fetched_at": "2026-06-18T20:07:02.780780-04:00"
+      "fetched_at": "2026-06-19T19:34:20.322673-04:00"
     },
     "BE": {
       "symbol": "BE",
       "pe_trailing": null,
       "pe_forward": 75.66367,
-      "peg": 1.49,
+      "peg": 1.75,
       "pb": 101.452805,
       "ps": 38.20147,
       "fcf_yield": 0.0028380864872772672,
@@ -934,7 +934,7 @@
       "market_cap": 93556432896,
       "sector": "Industrials",
       "industry": "Electrical Equipment & Parts",
-      "fetched_at": "2026-06-18T20:07:03.043401-04:00"
+      "fetched_at": "2026-06-19T19:34:20.479215-04:00"
     },
     "CCJ": {
       "symbol": "CCJ",
@@ -952,7 +952,7 @@
       "market_cap": 46379909120,
       "sector": "Energy",
       "industry": "Uranium",
-      "fetched_at": "2026-06-18T20:07:03.293130-04:00"
+      "fetched_at": "2026-06-19T19:34:20.628581-04:00"
     },
     "MIR": {
       "symbol": "MIR",
@@ -970,13 +970,13 @@
       "market_cap": 4553042944,
       "sector": "Industrials",
       "industry": "Specialty Industrial Machinery",
-      "fetched_at": "2026-06-18T20:07:03.550483-04:00"
+      "fetched_at": "2026-06-19T19:34:20.787566-04:00"
     },
     "FLS": {
       "symbol": "FLS",
       "pe_trailing": 30.036764,
       "pe_forward": 17.707592,
-      "peg": 1.98,
+      "peg": 2.01,
       "pb": 4.7113776,
       "ps": 2.2441146,
       "fcf_yield": 0.04410038382960337,
@@ -988,13 +988,13 @@
       "market_cap": 10441833472,
       "sector": "Industrials",
       "industry": "Specialty Industrial Machinery",
-      "fetched_at": "2026-06-18T20:07:03.825430-04:00"
+      "fetched_at": "2026-06-19T19:34:20.959807-04:00"
     },
     "FCX": {
       "symbol": "FCX",
       "pe_trailing": 36.338623,
       "pe_forward": 17.631506,
-      "peg": 4.72,
+      "peg": 4.62,
       "pb": 5.0600457,
       "ps": 3.736861,
       "fcf_yield": 0.01731841517621931,
@@ -1006,13 +1006,13 @@
       "market_cap": 98731606016,
       "sector": "Basic Materials",
       "industry": "Copper",
-      "fetched_at": "2026-06-18T20:07:04.076940-04:00"
+      "fetched_at": "2026-06-19T19:34:21.135667-04:00"
     },
     "PLTR": {
       "symbol": "PLTR",
       "pe_trailing": 144.34831,
       "pe_forward": 61.754333,
-      "peg": 1.91,
+      "peg": 1.84,
       "pb": 36.44539,
       "ps": 58.95337,
       "fcf_yield": 0.005691869467761335,
@@ -1024,13 +1024,13 @@
       "market_cap": 307982663680,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:07:04.344449-04:00"
+      "fetched_at": "2026-06-19T19:34:21.280567-04:00"
     },
     "TSLA": {
       "symbol": "TSLA",
       "pe_trailing": 367.422,
       "pe_forward": 160.1992,
-      "peg": 5.78,
+      "peg": 5.72,
       "pb": 18.28972,
       "ps": 15.367238,
       "fcf_yield": 0.0034917196595384992,
@@ -1042,7 +1042,7 @@
       "market_cap": 1504129843200,
       "sector": "Consumer Cyclical",
       "industry": "Auto Manufacturers",
-      "fetched_at": "2026-06-18T20:07:04.594931-04:00"
+      "fetched_at": "2026-06-19T19:34:21.458753-04:00"
     },
     "AVAV": {
       "symbol": "AVAV",
@@ -1060,7 +1060,7 @@
       "market_cap": 8583126528,
       "sector": "Industrials",
       "industry": "Aerospace & Defense",
-      "fetched_at": "2026-06-18T20:07:04.884352-04:00"
+      "fetched_at": "2026-06-19T19:34:21.625220-04:00"
     },
     "KTOS": {
       "symbol": "KTOS",
@@ -1078,7 +1078,7 @@
       "market_cap": 10165457920,
       "sector": "Industrials",
       "industry": "Aerospace & Defense",
-      "fetched_at": "2026-06-18T20:07:05.162124-04:00"
+      "fetched_at": "2026-06-19T19:34:21.769830-04:00"
     },
     "ONDS": {
       "symbol": "ONDS",
@@ -1096,7 +1096,7 @@
       "market_cap": 4794428928,
       "sector": "Technology",
       "industry": "Communication Equipment",
-      "fetched_at": "2026-06-18T20:07:05.436792-04:00"
+      "fetched_at": "2026-06-19T19:34:21.921552-04:00"
     },
     "CRDO": {
       "symbol": "CRDO",
@@ -1114,7 +1114,7 @@
       "market_cap": 50690285568,
       "sector": "Technology",
       "industry": "Semiconductors",
-      "fetched_at": "2026-06-18T20:07:05.690395-04:00"
+      "fetched_at": "2026-06-19T19:34:22.110469-04:00"
     },
     "SHLD": {
       "symbol": "SHLD",
@@ -1132,7 +1132,7 @@
       "market_cap": null,
       "sector": null,
       "industry": null,
-      "fetched_at": "2026-06-18T20:07:05.936222-04:00"
+      "fetched_at": "2026-06-19T19:34:22.260478-04:00"
     },
     "OKLO": {
       "symbol": "OKLO",
@@ -1150,7 +1150,7 @@
       "market_cap": 10643028992,
       "sector": "Utilities",
       "industry": "Utilities - Independent Power Producers",
-      "fetched_at": "2026-06-18T20:07:06.228612-04:00"
+      "fetched_at": "2026-06-19T19:34:22.420618-04:00"
     },
     "LEU": {
       "symbol": "LEU",
@@ -1168,7 +1168,7 @@
       "market_cap": 3765176064,
       "sector": "Energy",
       "industry": "Uranium",
-      "fetched_at": "2026-06-18T20:07:06.555941-04:00"
+      "fetched_at": "2026-06-19T19:34:22.601583-04:00"
     },
     "SMR": {
       "symbol": "SMR",
@@ -1186,7 +1186,7 @@
       "market_cap": 4063281920,
       "sector": "Industrials",
       "industry": "Specialty Industrial Machinery",
-      "fetched_at": "2026-06-18T20:07:06.800451-04:00"
+      "fetched_at": "2026-06-19T19:34:22.756198-04:00"
     },
     "NNE": {
       "symbol": "NNE",
@@ -1204,7 +1204,7 @@
       "market_cap": 1470358016,
       "sector": "Industrials",
       "industry": "Specialty Industrial Machinery",
-      "fetched_at": "2026-06-18T20:07:07.059098-04:00"
+      "fetched_at": "2026-06-19T19:34:22.926868-04:00"
     },
     "EOSE": {
       "symbol": "EOSE",
@@ -1222,7 +1222,7 @@
       "market_cap": 2597282304,
       "sector": "Industrials",
       "industry": "Electrical Equipment & Parts",
-      "fetched_at": "2026-06-18T20:07:07.328337-04:00"
+      "fetched_at": "2026-06-19T19:34:23.078632-04:00"
     },
     "ASTS": {
       "symbol": "ASTS",
@@ -1240,7 +1240,7 @@
       "market_cap": 31306129408,
       "sector": "Technology",
       "industry": "Communication Equipment",
-      "fetched_at": "2026-06-18T20:07:07.580416-04:00"
+      "fetched_at": "2026-06-19T19:34:23.270630-04:00"
     },
     "RKLB": {
       "symbol": "RKLB",
@@ -1258,13 +1258,13 @@
       "market_cap": 67005562880,
       "sector": "Industrials",
       "industry": "Aerospace & Defense",
-      "fetched_at": "2026-06-18T20:07:07.879527-04:00"
+      "fetched_at": "2026-06-19T19:34:23.421991-04:00"
     },
     "SOFI": {
       "symbol": "SOFI",
       "pe_trailing": 39.8,
       "pe_forward": 21.935358,
-      "peg": 0.83,
+      "peg": 0.84,
       "pb": 2.1227925,
       "ps": 5.8780413,
       "fcf_yield": null,
@@ -1276,7 +1276,7 @@
       "market_cap": 22973894656,
       "sector": "Financial Services",
       "industry": "Credit Services",
-      "fetched_at": "2026-06-18T20:07:08.198481-04:00"
+      "fetched_at": "2026-06-19T19:34:23.572812-04:00"
     },
     "TMDX": {
       "symbol": "TMDX",
@@ -1294,7 +1294,7 @@
       "market_cap": 2723054336,
       "sector": "Healthcare",
       "industry": "Medical Devices",
-      "fetched_at": "2026-06-18T20:07:08.470084-04:00"
+      "fetched_at": "2026-06-19T19:34:23.723602-04:00"
     },
     "CRWV": {
       "symbol": "CRWV",
@@ -1312,7 +1312,7 @@
       "market_cap": 64350023680,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:07:08.715719-04:00"
+      "fetched_at": "2026-06-19T19:34:23.913705-04:00"
     },
     "RBRK": {
       "symbol": "RBRK",
@@ -1330,7 +1330,7 @@
       "market_cap": 14453281792,
       "sector": "Technology",
       "industry": "Software - Infrastructure",
-      "fetched_at": "2026-06-18T20:07:08.992191-04:00"
+      "fetched_at": "2026-06-19T19:34:24.124339-04:00"
     },
     "MP": {
       "symbol": "MP",
@@ -1348,7 +1348,7 @@
       "market_cap": 10837991424,
       "sector": "Basic Materials",
       "industry": "Other Industrial Metals & Mining",
-      "fetched_at": "2026-06-18T20:07:09.243448-04:00"
+      "fetched_at": "2026-06-19T19:34:24.270870-04:00"
     },
     "UEC": {
       "symbol": "UEC",
@@ -1366,7 +1366,7 @@
       "market_cap": 5943416832,
       "sector": "Energy",
       "industry": "Uranium",
-      "fetched_at": "2026-06-18T20:07:09.491151-04:00"
+      "fetched_at": "2026-06-19T19:34:24.431044-04:00"
     },
     "USAR": {
       "symbol": "USAR",
@@ -1384,7 +1384,7 @@
       "market_cap": 6028403200,
       "sector": "Basic Materials",
       "industry": "Other Industrial Metals & Mining",
-      "fetched_at": "2026-06-18T20:07:09.739405-04:00"
+      "fetched_at": "2026-06-19T19:34:24.576678-04:00"
     },
     "UUUU": {
       "symbol": "UUUU",
@@ -1402,7 +1402,7 @@
       "market_cap": 4137797632,
       "sector": "Energy",
       "industry": "Uranium",
-      "fetched_at": "2026-06-18T20:07:09.987393-04:00"
+      "fetched_at": "2026-06-19T19:34:24.758641-04:00"
     },
     "UAMY": {
       "symbol": "UAMY",
@@ -1420,7 +1420,7 @@
       "market_cap": 1163257088,
       "sector": "Basic Materials",
       "industry": "Other Industrial Metals & Mining",
-      "fetched_at": "2026-06-18T20:07:10.233167-04:00"
+      "fetched_at": "2026-06-19T19:34:24.908074-04:00"
     }
   },
   "symbols": [
@@ -1504,5 +1504,5 @@
     "UUUU",
     "UAMY"
   ],
-  "fetched_at": "2026-06-19T00:07:10.233301+00:00"
+  "fetched_at": "2026-06-19T23:34:24.908196+00:00"
 }
