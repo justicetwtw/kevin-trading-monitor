@@ -33,5 +33,10 @@
     "last_sent": "2026-06-19T22:56:30.585325+00:00",
     "alert_level": "green",
     "tags": []
+  },
+  "LMT::sell_put": {
+    "last_sent": "2026-06-22T22:21:35.166359+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
