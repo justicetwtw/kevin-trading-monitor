@@ -13,15 +13,16 @@
 # 共識 / 摘要參數
 # ============================================
 
-# 每日持股快照保留天數(支援短/長窗比對)
-HOLDINGS_HISTORY_DAYS = 90
-
 # 權重變動 ≥ 此百分點(pp)才算一次「加/減碼」動作
 MIN_WEIGHT_DELTA_PP = 0.3
 
 # 共識窗格(天)
 SHORT_WINDOW_DAYS = 7
 LONG_WINDOW_DAYS = 30
+
+# 每日持股快照保留天數:每日抓不需囤太多,但必須 ≥ 長窗才算得出 30 日共識,
+# 多 15 天緩衝吸收週末/假日/漏跑(基準日挑「≤ today-N」最近的快照)。
+HOLDINGS_HISTORY_DAYS = LONG_WINDOW_DAYS + 15  # = 45
 
 # 摘要榜:各方向(加碼/減碼)各取前 N 名
 DIGEST_TOP_N = 15
