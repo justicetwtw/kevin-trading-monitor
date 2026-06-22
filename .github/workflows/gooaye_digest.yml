@@ -1,0 +1,36 @@
+name: Gooaye Digest
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # 每 30 分輪詢(dedup 讓過度輪詢無害;多數 run 是 no-op)
+  workflow_dispatch:          # 允許手動觸發測試
+
+concurrency:
+  group: gooaye-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run gooaye digest
+        env:
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL:       ${{ secrets.GEMINI_MODEL }}
+          GMAIL_SENDER:       ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_RECIPIENT:    ${{ secrets.EMAIL_RECIPIENT }}
+        run: python -m src.runners.run_gooaye_digest
+      - if: always()
+        uses: ./.github/actions/commit-state   # 比照既有 state commit 慣例(pull/rebase 防 push race)
