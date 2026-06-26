@@ -1,7 +1,7 @@
 {
   "indicators": {
     "yield_curve": {
-      "value": 29.999999999999982,
+      "value": 31.00000000000005,
       "regime": "risk_on"
     },
     "hy_oas": {
@@ -13,11 +13,11 @@
       "regime": "risk_off"
     },
     "vix": {
-      "value": 18.979999542236328,
+      "value": 18.40999984741211,
       "regime": "neutral"
     },
     "copper_gold": {
-      "value": 0.09986866087877767,
+      "value": 0.09991168092285063,
       "regime": "neutral"
     }
   },
@@ -25,5 +25,5 @@
   "risk_off_count": 1,
   "modifier": 5,
   "regime": "neutral",
-  "fetched_at": "2026-06-26T19:03:24.857799+00:00"
+  "fetched_at": "2026-06-26T22:02:54.190876+00:00"
 }
