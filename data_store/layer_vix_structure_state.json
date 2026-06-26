@@ -1,7 +1,7 @@
 {
   "snapshot": {
-    "vix": 18.889999389648438,
-    "vix9d": 17.549999237060547,
+    "vix": 18.979999542236328,
+    "vix9d": 17.65999984741211,
     "vix3m": 20.389999389648438,
     "vix9d_inverted": false,
     "vix3m_inverted": false
@@ -12,5 +12,5 @@
     "sell_call": 0
   },
   "leaps_entry_veto": false,
-  "fetched_at": "2026-06-26T17:13:13.904433+00:00"
+  "fetched_at": "2026-06-26T19:03:27.615817+00:00"
 }
