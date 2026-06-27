@@ -1,31 +1,11 @@
 {
   "Trump::news": {
-    "last_sent": "2026-06-26T01:30:29.075850+00:00",
+    "last_sent": "2026-06-27T04:29:07.166517+00:00",
     "alert_level": "green",
     "tags": []
   },
   "ADBE::leaps_entry": {
     "last_sent": "2026-06-23T15:45:44.316806+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "XOM::leaps_entry": {
-    "last_sent": "2026-06-19T15:57:35.948904+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "CVX::leaps_entry": {
-    "last_sent": "2026-06-19T15:57:36.918348+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "MSFT::leaps_entry": {
-    "last_sent": "2026-06-19T15:57:38.800536+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "CVX::sell_put": {
-    "last_sent": "2026-06-19T22:56:30.585325+00:00",
     "alert_level": "green",
     "tags": []
   },
