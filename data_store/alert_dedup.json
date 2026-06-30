@@ -1,16 +1,11 @@
 {
   "Trump::news": {
-    "last_sent": "2026-06-29T06:21:30.344814+00:00",
+    "last_sent": "2026-06-30T08:43:45.328174+00:00",
     "alert_level": "green",
     "tags": []
   },
   "ADBE::leaps_entry": {
     "last_sent": "2026-06-23T15:45:44.316806+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "LMT::sell_put": {
-    "last_sent": "2026-06-22T22:21:35.166359+00:00",
     "alert_level": "green",
     "tags": []
   }
