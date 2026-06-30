@@ -20,6 +20,7 @@
 2. **零維護**:設置完成後幾乎不需動手
 3. **佛系操作**:5-15 分鐘延遲符合長線策略
 4. **最終決策權在你**:系統提供訊號,你下單
+5. **Repo 是 single source of truth**:專案上下文、watchlist、workflow 與模型升級方向先寫入 repo,避免只靠聊天記憶
 
 ## 快速開始
 
@@ -35,6 +36,7 @@
 
 ## 文件
 
+- [投資專案上下文 v4.2](docs/investment_context_v4_2.md) - single source of truth / watchlist / workflow / 模型升級方向
 - [策略架構 v4](docs/strategy_v4.md) - 完整策略邏輯
 - [系統架構](docs/architecture.md) - 技術架構
 - [設置教學](docs/setup_guide.md) - 一次性設置
