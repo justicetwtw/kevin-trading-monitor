@@ -4,7 +4,7 @@
 
 ## 是什麼
 
-一套基於完整投資策略架構 v4 的自動化監測系統,GitHub Actions 24/7 雲端運作,Telegram 推播訊號:
+一套基於完整投資策略架構 v5 的自動化監測系統,GitHub Actions 24/7 雲端運作,Telegram 推播訊號:
 
 - 🔥 **三大核心訊號**:賣 CALL / 賣 PUT(Wheel)/ LEAPS 進場
 - 📊 **Layer 0 宏觀層**:7 子模組(Macro/Breadth/Distribution/Bubble/P-C/VIX 結構/AAII)
@@ -21,6 +21,7 @@
 3. **佛系操作**:5-15 分鐘延遲符合長線策略
 4. **最終決策權在你**:系統提供訊號,你下單
 5. **Repo 是 single source of truth**:專案上下文、watchlist、workflow 與模型升級方向先寫入 repo,避免只靠聊天記憶
+6. **指標降級、模型分層**:RSI/MACD/KD 等傳統指標只作輔助 timing filter;核心決策以 regime、fundamental catalyst、momentum、options flow、risk engine 為主
 
 ## 快速開始
 
@@ -37,7 +38,7 @@
 ## 文件
 
 - [投資專案上下文 v4.2](docs/investment_context_v4_2.md) - single source of truth / watchlist / workflow / 模型升級方向
-- [策略架構 v4](docs/strategy_v4.md) - 完整策略邏輯
+- [策略總架構 v5](docs/strategy_v4.md) - 投資哲學、regime、fundamental catalyst、momentum、options flow、risk engine、LEAPS 曝險與退出規則
 - [系統架構](docs/architecture.md) - 技術架構
 - [設置教學](docs/setup_guide.md) - 一次性設置
 - [Telegram Bot 設置](docs/telegram_bot_setup.md)
