@@ -23,6 +23,9 @@ pyarrow>=14.0.0
 # Telegram
 python-telegram-bot>=20.0
 
+# Gooaye Podcast Digest (gooaye-digest) — Gemini 音檔轉錄 + 摘要
+google-genai>=1.0.0              # 新版統一 SDK(from google import genai),非舊版 google-generativeai
+
 # Twstock(台股)
 twstock>=1.3.0                   # 台股報價套件(yfinance 替補)
 
