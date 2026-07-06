@@ -1,0 +1,493 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T19:12:52.978842+08:00",
+  "source_files": [
+    "iv_history.json",
+    "layer_put_call_state.json",
+    "layer_vix_structure_state.json"
+  ],
+  "data": {
+    "rows": [
+      {
+        "symbol": "NVDA",
+        "ivr": 43.9,
+        "ivp": 61.9,
+        "current_iv": 0.4036,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "TSM",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.5498,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "AVGO",
+        "ivr": 32.4,
+        "ivp": 40.5,
+        "current_iv": 0.499,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "MU",
+        "ivr": 83.8,
+        "ivp": 66.7,
+        "current_iv": 1.0062,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "MSFT",
+        "ivr": 85.7,
+        "ivp": 85.7,
+        "current_iv": 0.4267,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "GOOG",
+        "ivr": 100.0,
+        "ivp": 95.2,
+        "current_iv": 0.4222,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "GOOGL",
+        "ivr": 82.3,
+        "ivp": 88.1,
+        "current_iv": 0.4033,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "META",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.467,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "AMZN",
+        "ivr": 97.5,
+        "ivp": 95.2,
+        "current_iv": 0.433,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "CAT",
+        "ivr": 94.0,
+        "ivp": 95.2,
+        "current_iv": 0.5147,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "LMT",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.4552,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "RTX",
+        "ivr": 51.0,
+        "ivp": 71.1,
+        "current_iv": 0.3423,
+        "samples": 38,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "WMT",
+        "ivr": 49.2,
+        "ivp": 69.0,
+        "current_iv": 0.2961,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "COST",
+        "ivr": 35.2,
+        "ivp": 45.2,
+        "current_iv": 0.2451,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "XOM",
+        "ivr": 21.2,
+        "ivp": 31.0,
+        "current_iv": 0.3087,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "CVX",
+        "ivr": 39.7,
+        "ivp": 35.7,
+        "current_iv": 0.2891,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "AMD",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.815,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "ASML",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.6646,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "QCOM",
+        "ivr": 39.0,
+        "ivp": 21.4,
+        "current_iv": 0.7089,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "AAPL",
+        "ivr": 68.4,
+        "ivp": 90.5,
+        "current_iv": 0.2991,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "ORCL",
+        "ivr": 18.3,
+        "ivp": 38.1,
+        "current_iv": 0.571,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "NOW",
+        "ivr": 82.6,
+        "ivp": 95.2,
+        "current_iv": 0.6989,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "CRM",
+        "ivr": 34.6,
+        "ivp": 54.8,
+        "current_iv": 0.4774,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "CRWD",
+        "ivr": 0.0,
+        "ivp": 0.0,
+        "current_iv": 0.25,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "ADBE",
+        "ivr": 22.8,
+        "ivp": 31.0,
+        "current_iv": 0.4602,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "VRT",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.7915,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "AMAT",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.8701,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "LRCX",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.9157,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "KLAC",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.9521,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "ANET",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.6915,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "APH",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.5888,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "GLW",
+        "ivr": 99.8,
+        "ivp": 95.2,
+        "current_iv": 0.9701,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "SNPS",
+        "ivr": 48.0,
+        "ivp": 66.7,
+        "current_iv": 0.5289,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "CEG",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.5542,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "VST",
+        "ivr": 92.3,
+        "ivp": 92.9,
+        "current_iv": 0.5408,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "ETN",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.5144,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "GEV",
+        "ivr": 100.0,
+        "ivp": 97.6,
+        "current_iv": 0.7053,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "NEE",
+        "ivr": 62.3,
+        "ivp": 61.9,
+        "current_iv": 0.2946,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "SO",
+        "ivr": 41.8,
+        "ivp": 85.3,
+        "current_iv": 0.2723,
+        "samples": 34,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "VLO",
+        "ivr": 50.3,
+        "ivp": 73.8,
+        "current_iv": 0.4593,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      },
+      {
+        "symbol": "MELI",
+        "ivr": 95.0,
+        "ivp": 95.2,
+        "current_iv": 0.529,
+        "samples": 42,
+        "put_skew": null,
+        "oi_concentration": null,
+        "unusual_activity": null,
+        "status": "ok"
+      }
+    ],
+    "market": {
+      "put_call": {
+        "pcr": null,
+        "regime": "cold_start",
+        "modifiers": {
+          "sell_put": 0,
+          "sell_call": 0,
+          "leaps_entry": 0
+        },
+        "fetched_at": "2026-07-03T23:33:09.686576+00:00"
+      },
+      "vix_structure": {
+        "snapshot": {
+          "vix": 15.8100004196167,
+          "vix9d": 16.799999237060547,
+          "vix3m": 20.1299991607666,
+          "vix9d_inverted": true,
+          "vix3m_inverted": false
+        },
+        "modifiers": {
+          "sell_put": 15,
+          "leaps_entry": 15,
+          "sell_call": 0
+        },
+        "leaps_entry_veto": false,
+        "fetched_at": "2026-07-03T23:33:09.837487+00:00"
+      }
+    },
+    "paid_data_note": "put_skew / oi_concentration / unusual_activity 需付費 options 資料,見 docs/data_api_evaluation.md(ORATS 優先候選)"
+  }
+}

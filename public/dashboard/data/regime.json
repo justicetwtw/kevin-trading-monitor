@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T19:12:51.581383+08:00",
+  "source_files": [
+    "layer_macro_regime_state.json",
+    "layer0_history.json"
+  ],
+  "data": {
+    "regime": "risk_on",
+    "modifier": 10,
+    "indicators": {
+      "yield_curve": {
+        "value": 31.00000000000005,
+        "regime": "risk_on"
+      },
+      "hy_oas": {
+        "value": 275.0,
+        "regime": "risk_on"
+      },
+      "dxy": {
+        "value": 120.8866,
+        "regime": "risk_off"
+      },
+      "vix": {
+        "value": 15.8100004196167,
+        "regime": "risk_on"
+      },
+      "copper_gold": {
+        "value": 0.0986168789411039,
+        "regime": "neutral"
+      }
+    },
+    "risk_on_count": 3,
+    "risk_off_count": 1,
+    "layer0_scan_time": "2026-07-03T23:33:04.440308+00:00",
+    "submodules": {
+      "macro_regime": {
+        "regime": "risk_on",
+        "modifier": 10,
+        "fetched_at": "2026-07-03T23:33:06.481824+00:00"
+      },
+      "breadth": {
+        "regime": "cold_start",
+        "modifier": 0,
+        "fetched_at": "2026-07-03T23:33:07.874733+00:00"
+      },
+      "distribution": {
+        "regime": null,
+        "modifier": null,
+        "fetched_at": "2026-07-03T23:33:08.146977+00:00"
+      },
+      "bubble": {
+        "regime": null,
+        "modifier": 0,
+        "fetched_at": "2026-07-03T23:33:08.818685+00:00"
+      },
+      "put_call": {
+        "regime": "cold_start",
+        "modifier": null,
+        "fetched_at": "2026-07-03T23:33:09.686576+00:00"
+      },
+      "vix_structure": {
+        "regime": null,
+        "modifier": null,
+        "fetched_at": "2026-07-03T23:33:09.837487+00:00"
+      },
+      "aaii": {
+        "regime": "cold_start",
+        "modifier": 0,
+        "fetched_at": "2026-07-03T23:33:14.175651+00:00"
+      }
+    },
+    "taiwan_geopolitical": {
+      "level": null,
+      "status": "not_implemented_phase_1"
+    }
+  }
+}

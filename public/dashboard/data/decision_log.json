@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T19:12:52.979267+08:00",
+  "source_files": [
+    "decision_log.json"
+  ],
+  "data": {
+    "entries": [],
+    "template": {
+      "date": "YYYY-MM-DD",
+      "symbol": "MU",
+      "action": "add | trim | exit | hedge | no_trade",
+      "thesis": "進場/調整理由",
+      "invalidation": "失效條件",
+      "result": null,
+      "followed_rules": null,
+      "review_notes": null
+    },
+    "note": "由 Kevin 手動維護 data_store/decision_log.json;dashboard 原樣呈現"
+  }
+}

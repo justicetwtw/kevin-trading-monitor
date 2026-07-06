@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kevin Smart Alpha Hybrid Dashboard</title>
+<style>
+:root {
+  --bg: #0f1420;
+  --panel: #171e2e;
+  --border: #2a3550;
+  --text: #dbe4f5;
+  --muted: #8494b3;
+  --accent: #5aa9ff;
+  --risk-on: #3ecf8e;
+  --neutral: #e8c257;
+  --risk-off: #f06a6a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+header {
+  padding: 1.2rem 1.5rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+header h1 { margin: 0 0 0.2rem; font-size: 1.3rem; }
+header .meta { color: var(--muted); font-size: 0.8rem; }
+nav { padding: 0.6rem 1.5rem; border-bottom: 1px solid var(--border); }
+nav a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-right: 1rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+main { padding: 1rem 1.5rem 3rem; max-width: 1200px; }
+section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+}
+section h2 { margin: 0 0 0.6rem; font-size: 1.05rem; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+th, td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+th { color: var(--muted); font-weight: 600; }
+.badge {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+.badge.risk_on { background: rgba(62,207,142,.15); color: var(--risk-on); }
+.badge.neutral { background: rgba(232,194,87,.15); color: var(--neutral); }
+.badge.risk_off { background: rgba(240,106,106,.15); color: var(--risk-off); }
+.muted { color: var(--muted); }
+.disclaimer {
+  font-size: 0.78rem;
+  color: var(--muted);
+  border-left: 3px solid var(--accent);
+  padding-left: 0.6rem;
+  margin: 0.5rem 0;
+}
+.placeholder { color: var(--muted); font-style: italic; }
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Kevin Smart Alpha Hybrid Dashboard</h1>
+  <div class="meta">generated_at: 2026-07-06T19:12:51.581383+08:00 ・ repo 是 single source of truth ・ 決策輔助,不自動下單</div>
+</header>
+<nav>
+  <a href="#regime">Regime</a>
+  <a href="#watchlist">Watchlist Scores</a>
+  <a href="#options">Options / Flow</a>
+  <a href="#leaps">LEAPS Exposure</a>
+  <a href="#events">Event Monitor</a>
+  <a href="#taiwan">Taiwan / Geo Risk</a>
+  <a href="#backtest">Backtest / EV</a>
+  <a href="#decisions">Decision Log</a>
+</nav>
+<main>
+<section id="regime"><h2>1. Regime Overview <span class="badge risk_on">risk_on</span></h2><p>Layer 0 modifier: <strong>10</strong><span class="muted">(scan: 2026-07-03T23:33:04.440308+00:00)</span></p><div class="table-wrap"><table><thead><tr><th>指標</th><th>值</th><th>Regime</th></tr></thead><tbody><tr><td>yield_curve</td><td>31</td><td>risk_on</td></tr><tr><td>hy_oas</td><td>275</td><td>risk_on</td></tr><tr><td>dxy</td><td>120.887</td><td>risk_off</td></tr><tr><td>vix</td><td>15.81</td><td>risk_on</td></tr><tr><td>copper_gold</td><td>0.0986169</td><td>neutral</td></tr></tbody></table></div><h2 class="muted">子模組</h2><div class="table-wrap"><table><thead><tr><th>子模組</th><th>Regime</th><th>Modifier</th></tr></thead><tbody><tr><td>macro_regime</td><td>risk_on</td><td>10</td></tr><tr><td>breadth</td><td>cold_start</td><td>0</td></tr><tr><td>distribution</td><td>—</td><td>—</td></tr><tr><td>bubble</td><td>—</td><td>0</td></tr><tr><td>put_call</td><td>cold_start</td><td>—</td></tr><tr><td>vix_structure</td><td>—</td><td>—</td></tr><tr><td>aaii</td><td>cold_start</td><td>0</td></tr></tbody></table></div></section>
+<section id="watchlist"><h2>2. Watchlist Score Table</h2><p class="disclaimer">決策輔助,不是自動下單訊號;最終交易決策由 Kevin 做出。Repo 是 single source of truth。 「—」= 資料未接(不用假設值補分);total 只在五 pillar 齊備時計算。</p><div class="table-wrap"><table><thead><tr><th>Symbol</th><th>Tier</th><th>Fund/催化 (35)</th><th>Trend/動能 (20)</th><th>Options/Flow (20)</th><th>估值 (10)</th><th>Risk/宏觀/地緣 (15)</th><th>Total (100)</th><th>Coverage</th><th>行動區間</th></tr></thead><tbody><tr><td>NVDA</td><td>A</td><td>35</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>TSM</td><td>A</td><td>35</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>AVGO</td><td>A</td><td>35</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>MU</td><td>A</td><td>35</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>MSFT</td><td>A</td><td>27</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>GOOG</td><td>A</td><td>30</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>GOOGL</td><td>A</td><td>30</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>META</td><td>A</td><td>35</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>AMZN</td><td>A</td><td>30</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>CAT</td><td>A</td><td>22</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>LMT</td><td>A</td><td>10</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>RTX</td><td>A</td><td>17</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>WMT</td><td>A</td><td>17</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>COST</td><td>A</td><td>22</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>XOM</td><td>A</td><td>10</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>CVX</td><td>A</td><td>12</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>AMD</td><td>B</td><td>35</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>ASML</td><td>B</td><td>27</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>QCOM</td><td>B</td><td>19</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>AAPL</td><td>B</td><td>24</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>ORCL</td><td>B</td><td>27</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>NOW</td><td>B</td><td>24</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>CRM</td><td>B</td><td>30</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>CRWD</td><td>B</td><td>24</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>ADBE</td><td>B</td><td>24</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>VRT</td><td>B</td><td>32</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>AMAT</td><td>B</td><td>24</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>LRCX</td><td>B</td><td>24</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>KLAC</td><td>B</td><td>27</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>ANET</td><td>B</td><td>32</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>APH</td><td>B</td><td>29</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>GLW</td><td>B</td><td>27</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>SNPS</td><td>B</td><td>25</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>CEG</td><td>B</td><td>30</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>VST</td><td>B</td><td>26</td><td>—</td><td>—</td><td>9</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>ETN</td><td>B</td><td>17</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>GEV</td><td>B</td><td>25</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>NEE</td><td>B</td><td>25</td><td>—</td><td>—</td><td>5</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>SO</td><td>B</td><td>12</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>VLO</td><td>B</td><td>14</td><td>—</td><td>—</td><td>2</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr><tr><td>MELI</td><td>B</td><td>22</td><td>—</td><td>—</td><td>7</td><td>12</td><td>—</td><td>0.6</td><td>—</td></tr></tbody></table></div></section>
+<section id="options"><h2>3. Options / Flow Dashboard</h2><div class="table-wrap"><table><thead><tr><th>Symbol</th><th>IVR</th><th>IVP</th><th>IV</th><th>樣本數</th><th>Put Skew</th><th>狀態</th></tr></thead><tbody><tr><td>NVDA</td><td>43.9</td><td>61.9</td><td>0.4036</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>TSM</td><td>100</td><td>97.6</td><td>0.5498</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>AVGO</td><td>32.4</td><td>40.5</td><td>0.499</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>MU</td><td>83.8</td><td>66.7</td><td>1.0062</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>MSFT</td><td>85.7</td><td>85.7</td><td>0.4267</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>GOOG</td><td>100</td><td>95.2</td><td>0.4222</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>GOOGL</td><td>82.3</td><td>88.1</td><td>0.4033</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>META</td><td>100</td><td>97.6</td><td>0.467</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>AMZN</td><td>97.5</td><td>95.2</td><td>0.433</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>CAT</td><td>94</td><td>95.2</td><td>0.5147</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>LMT</td><td>100</td><td>97.6</td><td>0.4552</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>RTX</td><td>51</td><td>71.1</td><td>0.3423</td><td>38</td><td>—</td><td>ok</td></tr><tr><td>WMT</td><td>49.2</td><td>69</td><td>0.2961</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>COST</td><td>35.2</td><td>45.2</td><td>0.2451</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>XOM</td><td>21.2</td><td>31</td><td>0.3087</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>CVX</td><td>39.7</td><td>35.7</td><td>0.2891</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>AMD</td><td>100</td><td>97.6</td><td>0.815</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>ASML</td><td>100</td><td>97.6</td><td>0.6646</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>QCOM</td><td>39</td><td>21.4</td><td>0.7089</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>AAPL</td><td>68.4</td><td>90.5</td><td>0.2991</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>ORCL</td><td>18.3</td><td>38.1</td><td>0.571</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>NOW</td><td>82.6</td><td>95.2</td><td>0.6989</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>CRM</td><td>34.6</td><td>54.8</td><td>0.4774</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>CRWD</td><td>0</td><td>0</td><td>0.25</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>ADBE</td><td>22.8</td><td>31</td><td>0.4602</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>VRT</td><td>100</td><td>97.6</td><td>0.7915</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>AMAT</td><td>100</td><td>97.6</td><td>0.8701</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>LRCX</td><td>100</td><td>97.6</td><td>0.9157</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>KLAC</td><td>100</td><td>97.6</td><td>0.9521</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>ANET</td><td>100</td><td>97.6</td><td>0.6915</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>APH</td><td>100</td><td>97.6</td><td>0.5888</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>GLW</td><td>99.8</td><td>95.2</td><td>0.9701</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>SNPS</td><td>48</td><td>66.7</td><td>0.5289</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>CEG</td><td>100</td><td>97.6</td><td>0.5542</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>VST</td><td>92.3</td><td>92.9</td><td>0.5408</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>ETN</td><td>100</td><td>97.6</td><td>0.5144</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>GEV</td><td>100</td><td>97.6</td><td>0.7053</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>NEE</td><td>62.3</td><td>61.9</td><td>0.2946</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>SO</td><td>41.8</td><td>85.3</td><td>0.2723</td><td>34</td><td>—</td><td>ok</td></tr><tr><td>VLO</td><td>50.3</td><td>73.8</td><td>0.4593</td><td>42</td><td>—</td><td>ok</td></tr><tr><td>MELI</td><td>95</td><td>95.2</td><td>0.529</td><td>42</td><td>—</td><td>ok</td></tr></tbody></table></div><p class="muted">put_skew / oi_concentration / unusual_activity 需付費 options 資料,見 docs/data_api_evaluation.md(ORATS 優先候選)</p></section>
+<section id="leaps"><h2>4. LEAPS Exposure Dashboard</h2><p class="placeholder">（無資料）</p><p class="muted">部位數 0 ・ 名目成本 0 ・ delta/theta/vega 待接 live pricing(Phase 1.1)・ Roll 警示門檻 DTE &lt; 270 天</p></section>
+<section id="events"><h2>5. Event Monitor</h2><h2 class="muted">近期訊號(dashboard 保存全部;Telegram 只推 P0/P1)</h2><p class="placeholder">（無資料）</p><h2 class="muted">財報日曆</h2><div class="table-wrap"><table><thead><tr><th>Symbol</th><th>財報日</th></tr></thead><tbody><tr><td>BE</td><td>2026-04-28</td></tr><tr><td>CRWV</td><td>2026-05-07</td></tr><tr><td>SNPS</td><td>2026-05-27</td></tr><tr><td>CRDO</td><td>2026-06-01</td></tr><tr><td>RBRK</td><td>2026-06-04</td></tr><tr><td>UEC</td><td>2026-06-09</td></tr><tr><td>ASML</td><td>2026-07-15</td></tr><tr><td>TSM</td><td>2026-07-16</td></tr><tr><td>NOW</td><td>2026-07-22</td></tr><tr><td>GEV</td><td>2026-07-22</td></tr><tr><td>NEE</td><td>2026-07-22</td></tr><tr><td>FCX</td><td>2026-07-22</td></tr><tr><td>TSLA</td><td>2026-07-22</td></tr><tr><td>GOOG</td><td>2026-07-23</td></tr><tr><td>GOOGL</td><td>2026-07-23</td></tr><tr><td>LMT</td><td>2026-07-23</td></tr><tr><td>RTX</td><td>2026-07-23</td></tr><tr><td>INTC</td><td>2026-07-23</td></tr><tr><td>KLAC</td><td>2026-07-28</td></tr><tr><td>GLW</td><td>2026-07-28</td></tr><tr><td>STX</td><td>2026-07-28</td></tr><tr><td>MIR</td><td>2026-07-28</td></tr><tr><td>FLS</td><td>2026-07-28</td></tr><tr><td>MSFT</td><td>2026-07-29</td></tr><tr><td>META</td><td>2026-07-29</td></tr><tr><td>QCOM</td><td>2026-07-29</td></tr><tr><td>VRT</td><td>2026-07-29</td></tr><tr><td>LRCX</td><td>2026-07-29</td></tr><tr><td>APH</td><td>2026-07-29</td></tr><tr><td>ARM</td><td>2026-07-29</td></tr></tbody></table></div></section>
+<section id="taiwan"><h2>6. Taiwan / Geopolitical Risk</h2><p>台海風險分級(1–10):<strong>—</strong> <span class="muted">(not_implemented_phase_1)</span></p><p class="placeholder">Phase 2 接結構化資料源前不填分級;分級規則見 docs/strategy_v4.md §9(直接影響 sizing)。</p></section>
+<section id="backtest"><h2>7. Backtest / EV Tracker</h2><p class="placeholder">Phase 3(vectorbt)接入後填充:EV、最大回撤、持倉時間、資金效率、vs buy-and-hold / momentum baseline。</p></section>
+<section id="decisions"><h2>8. Decision Log / Review Loop</h2><p class="placeholder">（無資料）</p><p class="muted">由 Kevin 手動維護 data_store/decision_log.json;dashboard 原樣呈現</p></section>
+</main>
+</body>
+</html>
