@@ -1,16 +1,8 @@
 {
   "Trump::news": {
-    "last_sent": "2026-07-08T16:47:23.058695+00:00",
+    "last_sent": "2026-07-09T18:23:44.867509+00:00",
     "alert_level": "green",
     "tags": []
-  },
-  "CEG::sell_put": {
-    "last_sent": "2026-07-01T17:34:44.930930+00:00",
-    "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1",
-      "⚠Trump_Fed"
-    ]
   },
   "QCOM::leaps_entry": {
     "last_sent": "2026-07-03T18:03:36.481593+00:00",
