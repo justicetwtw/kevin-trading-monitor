@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T18:04:30.283388+08:00",
+  "generated_at": "2026-07-10T09:07:46.478598+08:00",
   "source_files": [
     "layer_fundamentals_dashboard_state.json",
     "layer_macro_regime_state.json",
@@ -45,7 +45,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=53.2 ivp=73.3 samples=45"
+          "ivr=38.8 ivp=52.2 samples=46"
         ]
       },
       {
@@ -83,7 +83,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=94.8 ivp=93.3 samples=45"
+          "ivr=87.4 ivp=87.0 samples=46"
         ]
       },
       {
@@ -121,7 +121,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=46.9 ivp=62.2 samples=45"
+          "ivr=41.1 ivp=50.0 samples=46"
         ]
       },
       {
@@ -159,7 +159,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=66.9 ivp=35.6 samples=45"
+          "ivr=66.9 ivp=34.8 samples=46"
         ]
       },
       {
@@ -197,7 +197,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=84.3 ivp=80.0 samples=45"
+          "ivr=85.8 ivp=82.6 samples=46"
         ]
       },
       {
@@ -235,7 +235,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=73.3 ivp=73.3 samples=45"
+          "ivr=79.1 ivp=76.1 samples=46"
         ]
       },
       {
@@ -273,7 +273,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=76.6 ivp=77.8 samples=45"
+          "ivr=73.3 ivp=73.9 samples=46"
         ]
       },
       {
@@ -311,7 +311,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=96.0 ivp=95.6 samples=45"
+          "ivr=100.0 ivp=97.8 samples=46"
         ]
       },
       {
@@ -349,7 +349,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=90.2 ivp=80.0 samples=45"
+          "ivr=100.0 ivp=97.8 samples=46"
         ]
       },
       {
@@ -387,7 +387,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=99.3 ivp=95.6 samples=45"
+          "ivr=97.9 ivp=91.3 samples=46"
         ]
       },
       {
@@ -425,7 +425,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=40.2 ivp=60.0 samples=45"
+          "ivr=53.8 ivp=76.1 samples=46"
         ]
       },
       {
@@ -463,7 +463,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=59.2 ivp=73.2 samples=41"
+          "ivr=48.7 ivp=64.3 samples=42"
         ]
       },
       {
@@ -501,7 +501,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=14.6 ivp=17.8 samples=45"
+          "ivr=15.1 ivp=21.7 samples=46"
         ]
       },
       {
@@ -539,7 +539,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=52.6 ivp=62.2 samples=45"
+          "ivr=5.5 ivp=6.5 samples=46"
         ]
       },
       {
@@ -577,7 +577,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=100.0 ivp=97.8 samples=45"
+          "ivr=38.6 ivp=65.2 samples=46"
         ]
       },
       {
@@ -615,7 +615,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=54.1 ivp=66.7 samples=45"
+          "ivr=34.5 ivp=17.4 samples=46"
         ]
       },
       {
@@ -653,7 +653,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=87.6 ivp=91.1 samples=45"
+          "ivr=88.1 ivp=91.3 samples=46"
         ]
       },
       {
@@ -691,7 +691,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=84.5 ivp=84.4 samples=45"
+          "ivr=84.6 ivp=84.8 samples=46"
         ]
       },
       {
@@ -729,7 +729,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=52.0 ivp=40.0 samples=45"
+          "ivr=43.8 ivp=28.3 samples=46"
         ]
       },
       {
@@ -767,7 +767,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=46.4 ivp=73.3 samples=45"
+          "ivr=64.8 ivp=84.8 samples=46"
         ]
       },
       {
@@ -805,7 +805,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=27.9 ivp=40.0 samples=45"
+          "ivr=20.0 ivp=39.1 samples=46"
         ]
       },
       {
@@ -843,7 +843,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=87.6 ivp=95.6 samples=45"
+          "ivr=82.2 ivp=89.1 samples=46"
         ]
       },
       {
@@ -881,7 +881,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=11.0 ivp=17.8 samples=45"
+          "ivr=0.0 ivp=0.0 samples=46"
         ]
       },
       {
@@ -919,7 +919,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=70.3 ivp=80.0 samples=45"
+          "ivr=68.5 ivp=67.4 samples=46"
         ]
       },
       {
@@ -957,7 +957,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=29.8 ivp=35.6 samples=45"
+          "ivr=8.3 ivp=8.7 samples=46"
         ]
       },
       {
@@ -995,7 +995,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=80.5 ivp=95.6 samples=45"
+          "ivr=84.9 ivp=95.7 samples=46"
         ]
       },
       {
@@ -1033,7 +1033,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=100.0 ivp=97.8 samples=45"
+          "ivr=100.0 ivp=97.8 samples=46"
         ]
       },
       {
@@ -1071,7 +1071,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=100.0 ivp=97.8 samples=45"
+          "ivr=100.0 ivp=97.8 samples=46"
         ]
       },
       {
@@ -1109,7 +1109,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=95.5 ivp=88.9 samples=45"
+          "ivr=98.5 ivp=93.5 samples=46"
         ]
       },
       {
@@ -1147,7 +1147,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=100.0 ivp=97.8 samples=45"
+          "ivr=95.9 ivp=95.7 samples=46"
         ]
       },
       {
@@ -1185,7 +1185,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=91.0 ivp=88.9 samples=45"
+          "ivr=92.7 ivp=89.1 samples=46"
         ]
       },
       {
@@ -1223,7 +1223,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=78.2 ivp=82.2 samples=45"
+          "ivr=73.1 ivp=80.4 samples=46"
         ]
       },
       {
@@ -1261,7 +1261,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=28.3 ivp=29.5 samples=44"
+          "ivr=44.6 ivp=64.4 samples=45"
         ]
       },
       {
@@ -1299,7 +1299,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=71.4 ivp=82.2 samples=45"
+          "ivr=71.5 ivp=82.6 samples=46"
         ]
       },
       {
@@ -1337,7 +1337,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=80.1 ivp=93.3 samples=45"
+          "ivr=79.7 ivp=91.3 samples=46"
         ]
       },
       {
@@ -1375,7 +1375,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=93.5 ivp=91.1 samples=45"
+          "ivr=89.1 ivp=89.1 samples=46"
         ]
       },
       {
@@ -1413,7 +1413,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=75.2 ivp=88.9 samples=45"
+          "ivr=56.7 ivp=82.6 samples=46"
         ]
       },
       {
@@ -1451,7 +1451,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=64.5 ivp=66.7 samples=45"
+          "ivr=57.7 ivp=47.8 samples=46"
         ]
       },
       {
@@ -1489,7 +1489,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=47.1 ivp=88.9 samples=36"
+          "ivr=59.9 ivp=94.6 samples=37"
         ]
       },
       {
@@ -1527,7 +1527,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=85.0 ivp=91.1 samples=45"
+          "ivr=51.4 ivp=73.9 samples=46"
         ]
       },
       {
@@ -1565,7 +1565,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=87.6 ivp=84.4 samples=45"
+          "ivr=86.1 ivp=82.6 samples=46"
         ]
       }
     ]

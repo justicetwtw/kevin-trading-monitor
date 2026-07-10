@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T18:04:30.364705+08:00",
+  "generated_at": "2026-07-10T09:07:46.562658+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -37,6 +37,14 @@
         "earnings_date": "2026-07-16"
       },
       {
+        "symbol": "GOOG",
+        "earnings_date": "2026-07-22"
+      },
+      {
+        "symbol": "GOOGL",
+        "earnings_date": "2026-07-22"
+      },
+      {
         "symbol": "NOW",
         "earnings_date": "2026-07-22"
       },
@@ -51,14 +59,6 @@
       {
         "symbol": "TSLA",
         "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "GOOG",
-        "earnings_date": "2026-07-23"
-      },
-      {
-        "symbol": "GOOGL",
-        "earnings_date": "2026-07-23"
       },
       {
         "symbol": "LMT",
