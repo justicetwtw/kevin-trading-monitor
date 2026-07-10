@@ -1,16 +1,6 @@
 {
   "Trump::news": {
-    "last_sent": "2026-07-09T18:23:44.867509+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "QCOM::leaps_entry": {
-    "last_sent": "2026-07-03T18:03:36.481593+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "AVGO::leaps_entry": {
-    "last_sent": "2026-07-03T15:03:39.366479+00:00",
+    "last_sent": "2026-07-10T18:42:51.992761+00:00",
     "alert_level": "green",
     "tags": []
   }
