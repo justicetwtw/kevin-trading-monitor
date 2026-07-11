@@ -1,15 +1,15 @@
 {
-  "2026-06-20": {
+  "2026-07-04": {
     "us_open": true,
     "us_midday": true,
     "us_eod": true
   },
-  "2026-06-22": {
+  "2026-07-06": {
     "tw_open": true,
     "tw_close": true,
     "us_premarket": true
   },
-  "2026-06-23": {
+  "2026-07-07": {
     "us_open": true,
     "us_midday": true,
     "us_eod": true,
@@ -17,7 +17,7 @@
     "tw_close": true,
     "us_premarket": true
   },
-  "2026-06-24": {
+  "2026-07-08": {
     "us_open": true,
     "us_midday": true,
     "us_eod": true,
@@ -25,7 +25,7 @@
     "tw_close": true,
     "us_premarket": true
   },
-  "2026-06-25": {
+  "2026-07-09": {
     "us_open": true,
     "us_midday": true,
     "us_eod": true,
@@ -33,7 +33,7 @@
     "tw_close": true,
     "us_premarket": true
   },
-  "2026-06-26": {
+  "2026-07-10": {
     "us_open": true,
     "us_midday": true,
     "us_eod": true,
@@ -41,7 +41,7 @@
     "tw_close": true,
     "us_premarket": true
   },
-  "2026-06-27": {
+  "2026-07-11": {
     "us_open": true,
     "us_midday": true,
     "us_eod": true

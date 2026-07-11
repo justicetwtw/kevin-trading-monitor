@@ -1,0 +1,1573 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-11T08:55:35.387096+08:00",
+  "source_files": [
+    "layer_fundamentals_dashboard_state.json",
+    "layer_macro_regime_state.json",
+    "iv_history.json"
+  ],
+  "data": {
+    "disclaimer": "決策輔助,不是自動下單訊號;最終交易決策由 Kevin 做出。Repo 是 single source of truth。",
+    "regime": "risk_on",
+    "rows": [
+      {
+        "symbol": "NVDA",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 35.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=30.1 ivp=42.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "TSM",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 35.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=81.2 ivp=72.3 samples=47"
+        ]
+      },
+      {
+        "symbol": "AVGO",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 35.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=41.3 ivp=51.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "MU",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 35.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=53.1 ivp=25.5 samples=47"
+        ]
+      },
+      {
+        "symbol": "MSFT",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 27.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=86.6 ivp=83.0 samples=47"
+        ]
+      },
+      {
+        "symbol": "GOOG",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 30.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=79.2 ivp=76.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "GOOGL",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 30.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=76.6 ivp=78.7 samples=47"
+        ]
+      },
+      {
+        "symbol": "META",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 35.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=100.0 ivp=97.9 samples=47"
+        ]
+      },
+      {
+        "symbol": "AMZN",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 30.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=87.9 ivp=87.2 samples=47"
+        ]
+      },
+      {
+        "symbol": "CAT",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 22.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=100.0 ivp=97.9 samples=47"
+        ]
+      },
+      {
+        "symbol": "LMT",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 10.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=42.8 ivp=59.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "RTX",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 17.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=44.5 ivp=53.5 samples=43"
+        ]
+      },
+      {
+        "symbol": "WMT",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 17.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=9.2 ivp=10.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "COST",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 22.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=0.0 ivp=0.0 samples=47"
+        ]
+      },
+      {
+        "symbol": "XOM",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 10.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=36.7 ivp=57.4 samples=47"
+        ]
+      },
+      {
+        "symbol": "CVX",
+        "tier": "A",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 12.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=33.3 ivp=17.0 samples=47"
+        ]
+      },
+      {
+        "symbol": "AMD",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 35.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=75.0 ivp=83.0 samples=47"
+        ]
+      },
+      {
+        "symbol": "ASML",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 27.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=70.1 ivp=76.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "QCOM",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 19.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=33.2 ivp=10.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "AAPL",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 24.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=45.4 ivp=70.2 samples=47"
+        ]
+      },
+      {
+        "symbol": "ORCL",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 27.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=22.2 ivp=40.4 samples=47"
+        ]
+      },
+      {
+        "symbol": "NOW",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 24.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=82.1 ivp=87.2 samples=47"
+        ]
+      },
+      {
+        "symbol": "CRM",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 30.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=0.0 ivp=0.0 samples=47"
+        ]
+      },
+      {
+        "symbol": "CRWD",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 24.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=69.7 ivp=76.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "ADBE",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 24.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=15.6 ivp=25.5 samples=47"
+        ]
+      },
+      {
+        "symbol": "VRT",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 32.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=68.4 ivp=85.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "AMAT",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 24.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=92.1 ivp=91.5 samples=47"
+        ]
+      },
+      {
+        "symbol": "LRCX",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 24.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=85.3 ivp=85.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "KLAC",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 27.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=93.7 ivp=85.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "ANET",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 32.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=91.6 ivp=93.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "APH",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 29.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=83.2 ivp=85.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "GLW",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 27.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=70.4 ivp=76.6 samples=47"
+        ]
+      },
+      {
+        "symbol": "SNPS",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 25.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=53.2 ivp=76.1 samples=46"
+        ]
+      },
+      {
+        "symbol": "CEG",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 30.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=75.4 ivp=85.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "VST",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 26.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 9,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=70.5 ivp=89.4 samples=47"
+        ]
+      },
+      {
+        "symbol": "ETN",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 17.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=90.7 ivp=89.4 samples=47"
+        ]
+      },
+      {
+        "symbol": "GEV",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 25.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=62.4 ivp=83.0 samples=47"
+        ]
+      },
+      {
+        "symbol": "NEE",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 25.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 5,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=29.4 ivp=19.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "SO",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 12.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=90.8 ivp=94.7 samples=38"
+        ]
+      },
+      {
+        "symbol": "VLO",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 14.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 2,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=43.8 ivp=51.1 samples=47"
+        ]
+      },
+      {
+        "symbol": "MELI",
+        "tier": "B",
+        "pillars": {
+          "fundamental_catalyst": {
+            "score": 22.0,
+            "max": 35,
+            "status": "heuristic_v0"
+          },
+          "trend_momentum": {
+            "score": null,
+            "max": 20,
+            "status": "planned_phase_1_1"
+          },
+          "options_flow": {
+            "score": null,
+            "max": 20,
+            "status": "display_only_phase_1"
+          },
+          "valuation_expectation": {
+            "score": 7,
+            "max": 10,
+            "status": "heuristic_v0"
+          },
+          "risk_macro_geopolitical": {
+            "score": 12,
+            "max": 15,
+            "status": "heuristic_v0_macro_only"
+          }
+        },
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "not_a_trade_signal": true,
+        "notes": [
+          "ivr=84.6 ivp=80.9 samples=47"
+        ]
+      }
+    ]
+  }
+}

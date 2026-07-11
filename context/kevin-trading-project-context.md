@@ -39,7 +39,7 @@
 |---|---|
 | 語言 / 執行 | Python（CI 用 3.11）；純後端、無前端 |
 | 程式入口 | `python -m src.runners.run_*`（GitHub Actions 觸發）|
-| 排程 | 17 個 workflow（`.github/workflows/`，見 `contexts/github-actions.md`）|
+| 排程 | 20 個 workflow（`.github/workflows/`，見 `contexts/github-actions.md`）|
 | 推播 | Telegram HTTP API（`src/alerts/telegram_bot.py`，多 chat_id）|
 | 狀態 | `data_store/*.json`（`commit-state` 自動 commit，訊息帶 `[skip ci]`）|
 | 套件 | `requirements.txt` + `pyproject.toml` |

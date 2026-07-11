@@ -78,5 +78,5 @@ src/storage/state_manager.py → data_store/*.json（commit-state 自動 commit�
 
 ## 6. 重要事實校正（避免被舊文件誤導）
 
-- README / `PHASE_2_STRATEGY_AND_DATA.md` 提到「13 個 workflow / 13 runner」是**階段 2 當時的規格**；**實際現況是 17 個 workflow**（見 `contexts/github-actions.md`）。文件未必同步更新時，**以 `.github/workflows/` 與 `src/runners/` 實際檔案為準**。
+- README / `PHASE_2_STRATEGY_AND_DATA.md` 提到「13 個 workflow / 13 runner」是**階段 2 當時的規格**；**實際現況是 20 個 workflow**（見 `contexts/github-actions.md`）。文件未必同步更新時，**以 `.github/workflows/` 與 `src/runners/` 實際檔案為準**。
 - `settings.py` 的 `VERSION = "0.1.0"` 是**程式包版本**；handoffs 與規格中的「v4 / v4.1」是**策略 / sprint 版本**，兩者不同層次，別混。

@@ -11,7 +11,7 @@
 - 多數 workflow 末端呼叫 `commit-state` 複合 action，把 `data_store/` 變動 commit + push（見 §4）。
 - cron 註解中的「台北時間」= UTC+8。
 
-## 2. 17 個 Workflow 對照表
+## 2. 20 個 Workflow 對照表
 
 | Workflow (name) | 檔案 | cron (UTC) | Runner | Secrets |
 |---|---|---|---|---|
@@ -32,8 +32,11 @@
 | TSMC Monthly Revenue | `tsmc_revenue.yml` | `0 8 10 * *`（每月 10 號）| `run_tsmc_revenue` | TELEGRAM_* |
 | Taiwan Stock Signal Scan | `twstock_signal.yml` | `30 6 * * 1-5`（台北 14:30）| `run_twstock_signal` | TELEGRAM_* |
 | Health Check | `health_check.yml` | `0 9 * * 1`（週一）| `run_health_check` | TELEGRAM_* |
+| Active ETF Consensus Digest | `active_etf_digest.yml` | `0 10 * * 1-5` | `run_active_etf_digest` | GMAIL_SENDER, GMAIL_APP_PASSWORD, EMAIL_RECIPIENT |
+| Dashboard Build | `dashboard_build.yml` | `30 23 * * 1-5` + `30 6 * * 1-5`（台北 07:30 / 14:30）| `run_dashboard_build` | —（無）|
+| Gooaye Digest | `gooaye_digest.yml` | `*/30 * * * *`（每 30 分輪詢，dedup 使多數 run no-op）| `run_gooaye_digest` | GEMINI_API_KEY, GEMINI_MODEL, GMAIL_*, EMAIL_RECIPIENT |
 
-> `TELEGRAM_*` = `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`。
+> `TELEGRAM_*` = `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`；`GMAIL_*` = `GMAIL_SENDER` + `GMAIL_APP_PASSWORD`。
 > 註：`health_check.yml` 與 `brief_sanity.yml` **不**呼叫 `commit-state`（不產生 state 變動）。
 
 ## 3. Market Brief 的 DST 排程（特別複雜）

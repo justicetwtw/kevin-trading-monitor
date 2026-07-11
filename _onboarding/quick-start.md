@@ -24,7 +24,7 @@
 | 投資策略現況（含 P0 缺口警示） | [`contexts/strategy.md`](contexts/strategy.md) |
 | 資料從哪來、哪些要金鑰 | [`contexts/data-sources.md`](contexts/data-sources.md) |
 | 推播怎麼去重 / 排優先級 | [`contexts/alerts.md`](contexts/alerts.md) |
-| 17 個排程 workflow + secrets | [`contexts/github-actions.md`](contexts/github-actions.md) |
+| 排程 workflow 對照 + secrets | [`contexts/github-actions.md`](contexts/github-actions.md) |
 | 專案總覽（是什麼、給誰） | [`../context/kevin-trading-project-context.md`](../context/kevin-trading-project-context.md) |
 
 ## 紅線速記（細節見 AGENTS.md §4）

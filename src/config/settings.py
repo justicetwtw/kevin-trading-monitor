@@ -39,6 +39,24 @@ FRED_API_KEY = os.getenv("FRED_API_KEY", "")
 SEC_EDGAR_USER_AGENT = os.getenv("SEC_EDGAR_USER_AGENT", "")
 
 # ============================================
+# 股癌 Podcast Digest(gooaye-digest,獨立功能,從 GitHub Secrets 讀取)
+# ============================================
+# 缺值不 raise:gooaye pipeline 自行 try/except + log,單集失敗不阻塞交易監控。
+
+# Gemini API(音檔→逐字稿 / 逐字稿→摘要)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+# 模型 ID:gemini-2.5-flash 為已查證免費層、支援音訊輸入的安全預設;
+# 免費層若釋出更新音訊模型(如 gemini-3-flash)只需改 GEMINI_MODEL secret,不動程式。
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
+# Gmail SMTP 寄信(摘要 HTML 內文 + 逐字稿 .md 附檔)
+GMAIL_SENDER = os.getenv("GMAIL_SENDER", "")
+# 16 碼 app password;貼上時可能含空格,使用端一律去空格。
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+# 收件人(支援逗號分隔多收件,沿用 TELEGRAM_CHAT_ID 慣例;v1 預設只寄 Kevin)
+EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT", "")
+
+# ============================================
 # Position Mode 三模式切換
 # ============================================
 
