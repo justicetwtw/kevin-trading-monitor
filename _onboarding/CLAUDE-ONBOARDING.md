@@ -1,3 +1,7 @@
+> ⚠️ **已被取代（保留作歷史參考）**：本檔是 Claude 單一視角的舊版。
+> LLM 中立的最新版請見 [`AI-ONBOARDING.md`](AI-ONBOARDING.md) 與 [`../AGENTS.md`](../AGENTS.md)，新內容以那兩份為準。
+> 兩者衝突時，以 `AI-ONBOARDING.md` / `AGENTS.md` 為準。
+
 # 給 Claude 的介紹:GitHub-as-source-of-truth Workflow
 
 ## 為什麼有這套設計
