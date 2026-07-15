@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-14T16:36:23.886563+08:00",
+  "generated_at": "2026-07-15T08:12:36.225935+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -129,10 +129,6 @@
         "earnings_date": "2026-07-29"
       },
       {
-        "symbol": "WDC",
-        "earnings_date": "2026-07-29"
-      },
-      {
         "symbol": "EOSE",
         "earnings_date": "2026-07-29"
       },
@@ -206,6 +202,10 @@
       },
       {
         "symbol": "MELI",
+        "earnings_date": "2026-08-05"
+      },
+      {
+        "symbol": "WDC",
         "earnings_date": "2026-08-05"
       },
       {
