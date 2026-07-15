@@ -42,6 +42,7 @@
     "us_open": true
   },
   "2026-07-16": {
-    "us_open": true
+    "us_open": true,
+    "us_midday": true
   }
 }
