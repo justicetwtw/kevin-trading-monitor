@@ -50,7 +50,7 @@ def test_mission_control_build_smoke(tmp_path):
         "Needs attention",
         "Theme map",
         "Capital allocation queue",
-        "Portfolio and exposure",
+        "Portfolio workflow health",
         "Symbol thesis tracker",
     ):
         assert text in html
