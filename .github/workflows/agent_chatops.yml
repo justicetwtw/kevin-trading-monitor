@@ -72,9 +72,9 @@ jobs:
           command=''
           target=''
           supplied=''
-          if [[ "$COMMENT_BODY" =~ ^/agent-fix-complete[[:space:]]+([0-9a-fA-F]{7,40})$ ]]; then
+          if [[ "$COMMENT_BODY" =~ ^/agent-fix-complete[[:space:]]+([0-9a-fA-F]{40})$ ]]; then
             command='agent-fix-complete'; target='agent:review'; supplied="${BASH_REMATCH[1],,}"
-          elif [[ "$COMMENT_BODY" =~ ^/agent-review-pass[[:space:]]+([0-9a-fA-F]{7,40})$ ]]; then
+          elif [[ "$COMMENT_BODY" =~ ^/agent-review-pass[[:space:]]+([0-9a-fA-F]{40})$ ]]; then
             command='agent-review-pass'; target='needs-kevin'; supplied="${BASH_REMATCH[1],,}"
           else
             exit 0
@@ -84,9 +84,10 @@ jobs:
           head=$(jq -r '.head.sha' <<<"$pr" | tr '[:upper:]' '[:lower:]')
           state=$(jq -r '.state' <<<"$pr")
           [ "$state" = open ] || { echo "PR not open"; exit 1; }
-          case "$head" in "$supplied"*) ;; *)
+          if [ "$supplied" != "$head" ]; then
             gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ \`/$command\` 被拒絕：指定 SHA \`$supplied\` 不是 current remote HEAD \`$head\`。"
-            exit 1;; esac
+            exit 1
+          fi
 
           if [ "$command" = agent-review-pass ]; then
             set +e
@@ -99,9 +100,9 @@ jobs:
             fi
             jq -e 'any(.[]; .workflow == "CI" and .bucket == "pass")' <<<"$checks" >/dev/null || {
               gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ 找不到已通過的 \`CI\` workflow；未改變狀態。"; exit 1; }
-            blocking=$(jq -c '[.[] | select((.workflow // "") != "" and .bucket != "pass" and .bucket != "skipping")]' <<<"$checks")
+            blocking=$(jq -c '[.[] | select(.bucket != "pass" and .bucket != "skipping")]' <<<"$checks")
             [ "$blocking" = '[]' ] || {
-              gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ Actions 仍有 pending/failed/cancelled：\`$blocking\`"; exit 1; }
+              gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ Checks 仍有 pending/failed/cancelled：\`$blocking\`"; exit 1; }
           fi
 
           gh label create 'agent:review' --repo "$GH_REPO" --color 1D76DB --description '等待獨立 reviewer 複審' --force >/dev/null
