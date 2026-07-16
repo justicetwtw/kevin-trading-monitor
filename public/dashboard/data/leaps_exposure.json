@@ -1,18 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-16T08:54:34.847306+08:00",
+  "generated_at": "2026-07-16T16:41:22.534951+08:00",
   "source_files": [
-    "positions.json"
+    "position_snapshot.json"
   ],
   "data": {
     "positions": [],
-    "totals": {
-      "position_count": 0,
-      "total_contracts": 0,
-      "total_premium_at_cost": 0,
-      "total_delta_exposure": null,
-      "status": "greeks_require_live_pricing_phase_1_1"
-    },
-    "roll_warning_dte_days": 270
+    "status": "redacted_private_positions",
+    "privacy": "exact LEAPS exposure is delivered only by private Telegram"
   }
 }

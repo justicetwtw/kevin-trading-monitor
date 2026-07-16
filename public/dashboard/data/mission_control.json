@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-16T16:41:22.715693+08:00",
+  "source_files": [
+    "position_snapshot.json",
+    "drawdown_history.json",
+    "trump_monitor_health.json",
+    "thesis_tracker.json",
+    "capital_allocation.json",
+    "layer_macro_regime_state.json",
+    "layer_fundamentals_dashboard_state.json",
+    "iv_history.json"
+  ],
+  "data": {
+    "summary": {
+      "regime": "risk_on",
+      "regime_modifier": 10,
+      "position_configured": false,
+      "position_count": 0,
+      "position_source": null,
+      "position_workflow_status": null,
+      "trump_monitor_status": "healthy",
+      "trump_monitor_source": "cnn_historical_archive",
+      "trump_monitor_checked_at": "2026-07-16T06:32:43.113056+00:00",
+      "estimated_account_value": null,
+      "snapshot_at": null,
+      "snapshot_age_hours": null,
+      "tracked_theme_count": 2,
+      "tracked_thesis_count": 3,
+      "allocation_candidate_count": 4,
+      "needs_attention_count": 5
+    },
+    "attention": [
+      {
+        "severity": "P1",
+        "category": "configuration",
+        "symbol": null,
+        "title": "Cloud position monitoring has no valid private position input",
+        "detail": "Create POSITIONS_JSON and POSITION_STATE_KEY in GitHub Actions secrets, then manually run Position Management Check."
+      },
+      {
+        "severity": "P1",
+        "category": "source_health",
+        "symbol": null,
+        "title": "Trump monitor health is stale",
+        "detail": "Last verified check is approximately 2.1 hours old."
+      },
+      {
+        "severity": "P1",
+        "category": "system_health",
+        "symbol": null,
+        "title": "Position workflow has not published a safe health snapshot",
+        "detail": "The daily workflow should commit only aggregate counts, generic error codes and timestamps."
+      },
+      {
+        "severity": "P1",
+        "category": "thesis",
+        "symbol": "SNDK",
+        "title": "Thesis needs review",
+        "detail": "More direct NAND-cycle exposure than MU; upside and late-cycle oversupply risk should not be inferred from HBM or DRAM data."
+      },
+      {
+        "severity": "P2",
+        "category": "source_health",
+        "symbol": null,
+        "title": "Trump monitor is using a fresh CNN mirror, not the official API",
+        "detail": "The official Truth Social public API is currently unavailable from the runner (HTTPStatusError). The mirror is accepted only while its newest timestamp is fresh."
+      }
+    ],
+    "account": {
+      "mode": null,
+      "position_source": null,
+      "workflow_status": null,
+      "error_codes": [],
+      "configured": false,
+      "position_count": 0,
+      "total_estimated_value": null,
+      "n_long_options": null,
+      "n_short_options": null,
+      "snapshot_at": null,
+      "drawdown_pct": null,
+      "drawdown_alert_level": null,
+      "drawdown_key_source": null,
+      "privacy": "private_detail_not_published",
+      "positions": []
+    },
+    "trump_monitor": {
+      "status": "healthy",
+      "source": "cnn_historical_archive",
+      "latest_post_at": "2026-07-16T04:56:45.523000+00:00",
+      "checked_at": "2026-07-16T06:32:43.113056+00:00",
+      "health_age_hours": 2.1,
+      "attempts": [
+        {
+          "status": "unavailable",
+          "source": "truth_social_official_api",
+          "latest_post_at": null,
+          "raw_count": 0,
+          "returned_count": 0,
+          "source_limit": 1000,
+          "error": "HTTPStatusError"
+        },
+        {
+          "source": "cnn_historical_archive",
+          "raw_count": 34709,
+          "returned_count": 1000,
+          "source_limit": 1000,
+          "status": "healthy",
+          "latest_post_at": "2026-07-16T04:56:45.523000+00:00",
+          "error": null
+        }
+      ],
+      "source_raw_count": 34709,
+      "source_returned_count": 1000,
+      "source_limit": 1000,
+      "capture_started_at": "2026-07-15T06:32:32.760175+00:00",
+      "initial_backfill_hours": 24,
+      "eligible_count": 24,
+      "new_count": 24,
+      "delivered_count": 24,
+      "delivery_status": "delivered_all",
+      "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
+      "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
+      "content_published_here": false
+    },
+    "themes": [
+      {
+        "id": "memory_cycle",
+        "name": "Memory cycle",
+        "status": "active",
+        "summary": "HBM, commodity DRAM and NAND must be evaluated separately; one blended memory label hides materially different supply-demand and late-cycle risks.",
+        "subthemes": [
+          {
+            "id": "hbm",
+            "name": "HBM",
+            "status": "structural_tightness_watch",
+            "symbols": [
+              "MU",
+              "NVDA",
+              "TSM",
+              "AVGO"
+            ],
+            "monitor": "AI accelerator demand, capacity qualification, packaging constraints, content per system and customer attempts to reduce memory content."
+          },
+          {
+            "id": "commodity_dram",
+            "name": "Commodity DRAM",
+            "status": "cycle_tightness_watch",
+            "symbols": [
+              "MU"
+            ],
+            "monitor": "Pricing, supply discipline, node transitions, inventory and whether capacity additions arrive faster than demand."
+          },
+          {
+            "id": "nand",
+            "name": "NAND",
+            "status": "late_cycle_risk_watch",
+            "symbols": [
+              "SNDK",
+              "WDC",
+              "MU",
+              "STX"
+            ],
+            "monitor": "Consumer demand, capacity returns, pricing discipline and whether NAND supply loosens earlier than HBM or DRAM."
+          }
+        ],
+        "invalidation": [
+          "HBM qualification or packaging constraints ease materially faster than demand grows.",
+          "Commodity DRAM pricing and inventory reverse while suppliers accelerate capacity.",
+          "AI infrastructure demand weakens enough to reduce memory content growth."
+        ],
+        "next_review": "2026-07-31"
+      },
+      {
+        "id": "ai_capex",
+        "name": "AI capex and infrastructure",
+        "status": "active",
+        "summary": "NVDA, MU, AVGO, MRVL and LITE can move together when the market reprices AI infrastructure spending; symbol-level signals must include shared capex-sentiment risk.",
+        "subthemes": [
+          {
+            "id": "compute",
+            "name": "Compute and accelerators",
+            "status": "active",
+            "symbols": [
+              "NVDA",
+              "AVGO"
+            ]
+          },
+          {
+            "id": "memory_interconnect",
+            "name": "Memory and interconnect",
+            "status": "active",
+            "symbols": [
+              "MU",
+              "MRVL",
+              "LITE"
+            ]
+          }
+        ],
+        "invalidation": [
+          "Hyperscaler capex guidance weakens broadly rather than shifting between vendors.",
+          "Options-market fear and credit stress confirm that a price decline is structural rather than positioning noise."
+        ],
+        "next_review": "2026-07-31"
+      }
+    ],
+    "theses": [
+      {
+        "symbol": "MU",
+        "theme": "memory_cycle",
+        "status": "active",
+        "summary": "Mixed HBM, DRAM and NAND exposure; monitor each component separately instead of extrapolating one memory datapoint to the whole company.",
+        "catalysts": [
+          "HBM qualification, capacity and content growth",
+          "DRAM contract pricing and inventory",
+          "AI server demand and customer memory configurations"
+        ],
+        "invalidation": [
+          "HBM or DRAM supply-demand turns decisively before earnings expectations adjust.",
+          "AI capex weakness becomes broad and persistent.",
+          "Management guidance or margins deteriorate beyond a normal memory-cycle fluctuation."
+        ],
+        "next_review": "2026-07-31"
+      },
+      {
+        "symbol": "NVDA",
+        "theme": "ai_capex",
+        "status": "active",
+        "summary": "Core AI-capex barometer; evaluate price weakness together with put skew, volatility demand, support and shared infrastructure sentiment.",
+        "catalysts": [
+          "Platform shipment and customer capex updates",
+          "Next-generation system configuration and memory content",
+          "Options fear versus orderly positioning"
+        ],
+        "invalidation": [
+          "Broad hyperscaler capex cuts persist.",
+          "Put skew and volatility rise with a confirmed break of support and earnings expectations."
+        ],
+        "next_review": "2026-07-31"
+      },
+      {
+        "symbol": "SNDK",
+        "theme": "memory_cycle",
+        "status": "watch",
+        "summary": "More direct NAND-cycle exposure than MU; upside and late-cycle oversupply risk should not be inferred from HBM or DRAM data.",
+        "catalysts": [
+          "NAND pricing and supply discipline",
+          "Enterprise and consumer storage demand",
+          "Capacity restarts and inventory"
+        ],
+        "invalidation": [
+          "NAND supply returns faster than end demand.",
+          "Pricing weakens while inventories rebuild."
+        ],
+        "next_review": "2026-07-31"
+      }
+    ],
+    "allocation_queue": [
+      {
+        "manual_rank": 1,
+        "symbol": "MU",
+        "theme": "memory_cycle",
+        "subtheme": "HBM + commodity DRAM + NAND mix",
+        "status": "active_monitor",
+        "preferred_instrument": "stock_or_deep_itm_leaps",
+        "reason": "Highest-conviction memory-cycle proxy in recent discussions, but the three memory businesses must be monitored separately.",
+        "trigger": "Manual review of valuation, earnings expectations, price structure and whether options-market fear confirms or rejects the move.",
+        "invalidation": "HBM/DRAM supply-demand or AI-capex assumptions deteriorate materially.",
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "ivr": 61.6,
+        "ivp": 34.0,
+        "options_status": "ok",
+        "not_a_trade_signal": true
+      },
+      {
+        "manual_rank": 2,
+        "symbol": "NVDA",
+        "theme": "ai_capex",
+        "subtheme": "compute",
+        "status": "active_monitor",
+        "preferred_instrument": "stock_or_defined_risk_options",
+        "reason": "Core AI-capex barometer and correlation anchor for the wider infrastructure basket.",
+        "trigger": "Review price support together with volatility demand, put skew and earnings expectations rather than price alone.",
+        "invalidation": "Broad, persistent capex cuts or a confirmed options-fear and earnings breakdown.",
+        "total_score": null,
+        "coverage": 0.6,
+        "action_band": null,
+        "ivr": 38.2,
+        "ivp": 50.0,
+        "options_status": "ok",
+        "not_a_trade_signal": true
+      },
+      {
+        "manual_rank": 3,
+        "symbol": "SNDK",
+        "theme": "memory_cycle",
+        "subtheme": "NAND",
+        "status": "late_cycle_risk_watch",
+        "preferred_instrument": "wait_or_tactical_only",
+        "reason": "Direct NAND beta can diverge from HBM and DRAM; opportunity and oversupply risk must be evaluated independently.",
+        "trigger": "Require NAND pricing, inventory and capacity discipline to remain supportive.",
+        "invalidation": "Capacity returns faster than demand and NAND pricing weakens.",
+        "total_score": null,
+        "coverage": null,
+        "action_band": null,
+        "ivr": null,
+        "ivp": null,
+        "options_status": "not_in_dashboard_universe",
+        "not_a_trade_signal": true
+      },
+      {
+        "manual_rank": 4,
+        "symbol": "LITE",
+        "theme": "ai_capex",
+        "subtheme": "optical interconnect",
+        "status": "coverage_gap",
+        "preferred_instrument": "manual_review",
+        "reason": "Recently traded AI-infrastructure name; it should be tracked as part of the correlated capex basket.",
+        "trigger": "Add complete fundamentals, price and options coverage before relying on monitor scores.",
+        "invalidation": "AI optical demand or company execution deteriorates.",
+        "total_score": null,
+        "coverage": null,
+        "action_band": null,
+        "ivr": null,
+        "ivp": null,
+        "options_status": "not_in_dashboard_universe",
+        "not_a_trade_signal": true
+      }
+    ],
+    "disclaimer": "Decision support only. Public dashboard state intentionally excludes exact holdings, strikes, costs and account value. It never creates an order or substitutes for Kevin's judgment."
+  }
+}
