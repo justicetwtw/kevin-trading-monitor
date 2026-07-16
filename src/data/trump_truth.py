@@ -6,7 +6,9 @@ the mirror contains years of history, only its newest bounded activity set is
 returned to the monitor; the runner separately establishes a capture-start
 checkpoint so first activation cannot flood Telegram with historical posts.
 
-Classification is metadata only. No keyword filter removes a post.
+Classification is metadata only. No keyword or missing-text filter removes a
+post. Media-only or link-only activities are retained with their ID, timestamp,
+URL and media metadata.
 """
 
 from __future__ import annotations
@@ -258,11 +260,12 @@ def _source_result(
         for item in selected
         if isinstance(item, dict)
     ]
+    # A post does not need text to be real. Retain media-only, link-only and
+    # otherwise textless activities as long as ID and timestamp are valid.
     normalized = [
         item
         for item in normalized
         if item["id"]
-        and item["text"]
         and _parse_timestamp(item.get("created_at")) is not None
     ]
     normalized.sort(
