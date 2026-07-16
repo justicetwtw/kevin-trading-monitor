@@ -133,11 +133,10 @@ def _analyze_and_send_private_risk(
 
 
 def _send_private_risk_brief(snapshot: dict) -> bool:
-    """Compatibility wrapper that records only aggregate in-process metadata.
+    """Compatibility wrapper retaining metadata only for the current process.
 
-    Existing callers/tests use the boolean interface. The runner retrieves the
-    attached decision-risk result immediately after the call; no private detail
-    is persisted on the function attribute.
+    The attached result may contain private detail temporarily. It is never
+    logged or written directly; public state is created by the redaction helper.
     """
     sent, decision_risk = _analyze_and_send_private_risk(snapshot)
     _send_private_risk_brief.last_decision_risk = decision_risk
@@ -220,12 +219,8 @@ def main() -> int:
             errors.append("drawdown_update_failed")
             logger.error("drawdown_update_failed (details redacted)")
     elif configured:
-        # Never update drawdown from a partial portfolio valuation.
         errors.append("account_value_unavailable")
 
-    # Reset per-run metadata before calling the compatibility wrapper. A test or
-    # downstream caller may monkeypatch the wrapper; that must not reuse stale
-    # decision-risk state from an earlier process invocation.
     try:
         _send_private_risk_brief.last_decision_risk = {}
     except (AttributeError, TypeError):
@@ -243,6 +238,8 @@ def main() -> int:
         errors.append("private_brief_failed")
     if int(decision_risk.get("missing_thesis_id_count", 0) or 0) > 0:
         errors.append("position_thesis_id_missing")
+    if int(decision_risk.get("invalid_thesis_id_count", 0) or 0) > 0:
+        errors.append("position_thesis_id_invalid")
     if int(decision_risk.get("unmapped_symbol_count", 0) or 0) > 0:
         errors.append("position_correlation_basket_unmapped")
 
