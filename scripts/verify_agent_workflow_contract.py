@@ -46,7 +46,9 @@ REQUIRED = {
         '[ "$supplied" != "$head" ]',
         "verify_agent_routing_report.py",
         "agent-routing-report:v1",
-        "contents/scripts/verify_agent_routing_report.py?ref=$head",
+        "defaultBranchRef",
+        "contents/scripts/verify_agent_routing_report.py?ref=$default_branch",
+        "--paginate --slurp",
     ],
     "scripts/verify_agent_routing_report.py": [
         "agent-routing-report:v1",
@@ -73,6 +75,7 @@ FORBIDDEN_CHATOPS_PATTERNS = [
     "anthropics/claude-code-action",
     "ANTHROPIC_API_KEY",
     "OPENAI_API_KEY",
+    "contents/scripts/verify_agent_routing_report.py?ref=$head",
 ]
 
 FORBIDDEN_AI_WORKFLOW_PATTERNS = [
