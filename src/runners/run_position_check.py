@@ -1,9 +1,8 @@
-"""Daily private position management check.
+"""Daily private position management and decision-risk check.
 
 Exact positions and account values exist only in memory. Public repository state
-contains redacted health metadata, encrypted drawdown values, opaque alert keys
-and generic error codes only. A silent private Telegram risk brief is sent after
-each configured EOD run.
+contains redacted health metadata, encrypted drawdown values, opaque alert keys,
+generic error codes and non-identifying aggregate decision-risk ratios only.
 """
 
 import logging
@@ -19,6 +18,11 @@ from src.management.account_drawdown import update_account_value
 from src.management.current_positions import get_account_snapshot
 from src.management.hedge_dte_tracker import scan_all_hedges
 from src.management.leaps_pnl_tracker import scan_all_leaps
+from src.management.portfolio_decision_risk import (
+    analyze_portfolio_decision_risk,
+    format_private_decision_risk,
+    public_decision_risk_state,
+)
 from src.management.portfolio_risk_summary import (
     analyze_private_portfolio,
     format_private_portfolio_brief,
@@ -73,6 +77,7 @@ def _public_snapshot(
     snapshot: dict,
     workflow_status: str = "healthy",
     error_codes: list[str] | None = None,
+    decision_risk: dict | None = None,
 ) -> dict:
     """Return aggregate state safe to commit in a public repository."""
     stocks = snapshot.get("stocks") or []
@@ -93,25 +98,34 @@ def _public_snapshot(
         "status": "configured" if configured else "empty",
         "workflow_status": workflow_status,
         "error_codes": sorted(set(error_codes or [])),
+        "decision_risk": public_decision_risk_state(decision_risk or {}),
         "privacy": "redacted_public_state",
     }
 
 
-def _send_private_risk_brief(snapshot: dict) -> bool:
+def _analyze_and_send_private_risk(
+    snapshot: dict,
+) -> tuple[bool, dict]:
+    """Return delivery status plus an in-memory private decision-risk result."""
     if not (snapshot.get("stocks") or snapshot.get("options")):
-        return False
+        return False, {}
     try:
         summary = analyze_private_portfolio(snapshot)
-        message = format_private_portfolio_brief(summary)
-        return send_telegram(
+        decision_risk = analyze_portfolio_decision_risk(summary, snapshot)
+        message = (
+            format_private_portfolio_brief(summary)
+            + format_private_decision_risk(decision_risk)
+        )
+        sent = send_telegram(
             message,
             parse_mode="HTML",
             disable_notification=True,
             sensitive=True,
         )
+        return sent, decision_risk
     except Exception:
-        logger.error("private portfolio brief failed (details redacted)")
-        return False
+        logger.error("private portfolio decision-risk brief failed (details redacted)")
+        return False, {}
 
 
 def _scan_safely(scanner, error_code: str, errors: list[str]) -> list:
@@ -190,12 +204,21 @@ def main() -> int:
         # Never update drawdown from a partial portfolio valuation.
         errors.append("account_value_unavailable")
 
-    brief_sent = _send_private_risk_brief(snapshot)
+    brief_sent, decision_risk = _analyze_and_send_private_risk(snapshot)
     if configured and not brief_sent:
         errors.append("private_brief_failed")
+    if int(decision_risk.get("missing_thesis_id_count", 0) or 0) > 0:
+        errors.append("position_thesis_id_missing")
+    if int(decision_risk.get("unmapped_symbol_count", 0) or 0) > 0:
+        errors.append("position_correlation_basket_unmapped")
 
     workflow_status = "healthy" if not errors else "degraded"
-    public = _public_snapshot(snapshot, workflow_status, errors)
+    public = _public_snapshot(
+        snapshot,
+        workflow_status,
+        errors,
+        decision_risk,
+    )
     if not write_json("position_snapshot.json", public):
         errors.append("public_snapshot_write_failed")
         workflow_status = "failed"
