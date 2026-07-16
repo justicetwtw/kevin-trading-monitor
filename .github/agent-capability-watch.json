@@ -48,6 +48,16 @@
       "approved_sha256": ""
     },
     {
+      "id": "openai-chatgpt-release-notes",
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+      "approved_sha256": ""
+    },
+    {
+      "id": "openai-gpt-5-6-chatgpt",
+      "url": "https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt",
+      "approved_sha256": ""
+    },
+    {
       "id": "anthropic-subagents",
       "url": "https://code.claude.com/docs/en/sub-agents",
       "approved_sha256": ""
