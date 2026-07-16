@@ -1,3 +1,5 @@
+import pytest
+
 from src.management import portfolio_decision_risk as risk
 from src.runners import run_position_check
 
@@ -67,7 +69,7 @@ def _snapshot(with_thesis=True):
 
 def _summary():
     return {
-        "gross_delta_notional": 130000,
+        "gross_delta_notional": 140000,
         "rows": [
             {
                 "kind": "stock",
@@ -104,7 +106,7 @@ def test_private_decision_risk_maps_overlapping_baskets_and_rolls(monkeypatch):
     assert "memory_cycle" in baskets
     assert "hbm" in baskets
     assert "nand" in baskets
-    assert result["hedge_coverage_ratio"] == 0.1
+    assert result["hedge_coverage_ratio"] == pytest.approx(10000 / 130000)
     assert result["roll_window_counts"] == {
         "dte_le_90": 1,
         "dte_le_180": 1,
@@ -129,8 +131,14 @@ def test_missing_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
     monkeypatch.setattr(run_position_check, "scan_all_leaps", lambda: [])
     monkeypatch.setattr(run_position_check, "scan_all_shorts", lambda: [])
     monkeypatch.setattr(run_position_check, "scan_all_hedges", lambda: [])
-    monkeypatch.setattr(run_position_check, "get_account_snapshot", lambda: _snapshot(False))
-    monkeypatch.setattr(run_position_check, "update_account_value", lambda value: {"alert_level": "normal"})
+    monkeypatch.setattr(
+        run_position_check, "get_account_snapshot", lambda: _snapshot(False)
+    )
+    monkeypatch.setattr(
+        run_position_check,
+        "update_account_value",
+        lambda value: {"alert_level": "normal"},
+    )
     monkeypatch.setattr(
         run_position_check,
         "_analyze_and_send_private_risk",
