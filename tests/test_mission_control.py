@@ -71,6 +71,11 @@ def test_position_runner_persists_redacted_snapshot_and_uses_correct_total(
     monkeypatch.setattr(
         run_position_check, "route_alert", lambda alert: False
     )
+    monkeypatch.setattr(
+        run_position_check,
+        "_send_private_risk_brief",
+        lambda snapshot: False,
+    )
 
     snapshot = {
         "mode": "mode_1",
