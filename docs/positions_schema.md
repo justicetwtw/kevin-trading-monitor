@@ -1,18 +1,27 @@
-# positions.json 規格
+# Private positions schema
 
-放在 `data_store/positions.json`(該目錄已 gitignore)。**不要把真實部位 commit 到 git**。
+> This repository is public. **Never commit real holdings, strikes, costs or account value.**
 
-## 三模式(由環境變數 `POSITION_MODE` 控制)
+## Runtime source priority
 
-| Mode | 行為 | 適用情境 |
-|------|------|---------|
-| `mode_1` | 必填。positions.json 為空 → `logger.warning` 一次 + Telegram 推一次 + 寫 `data_store/mode1_warned.flag` 防重複,系統繼續以空部位運行 | 你重視部位準確性,不容許忘記更新 |
-| `mode_2` | 選填(**預設**)。空部位 → 靜默,系統照跑 | 你想觀察訊號,部位資料只在 LEAPS PnL / Short Delta / Hedge DTE / Drawdown 觸發時才需要 |
-| `mode_3` | 不填。完全不讀檔,所有 management getter 直接回 `[]`、snapshot `total_estimated_value=None` | 純訊號模式,不關心部位管理 |
+1. `POSITIONS_JSON` — encrypted GitHub Actions repository secret used by cloud position checks.
+2. `data_store/positions.json` — local-development fallback only.
 
-> 改 mode 後想重置 mode_1 警告 → 刪 `data_store/mode1_warned.flag` 即可。
+When `POSITIONS_JSON` exists but is malformed, the loader fails closed to an empty portfolio. It does not fall back to the public example file.
 
-## Schema
+## Modes
+
+`POSITION_MODE` controls whether position data is required:
+
+| Mode | Behavior | Use case |
+|---|---|---|
+| `mode_1` | Required. Empty/invalid private input triggers one warning and the system continues with an empty portfolio. | Production position monitoring |
+| `mode_2` | Optional; empty input is allowed. | Signal observation with occasional local position checks |
+| `mode_3` | Disabled; position getters return empty state and account value is `None`. | Pure signal mode |
+
+The scheduled `position_check.yml` workflow uses `mode_1` and reads `POSITIONS_JSON` only at runtime.
+
+## JSON schema
 
 ```json
 {
@@ -21,6 +30,7 @@
       "symbol": "NVDA",
       "shares": 100,
       "avg_cost": 480.50,
+      "thesis_id": "ai_capex",
       "_example": false
     }
   ],
@@ -33,69 +43,64 @@
       "expiry": "2027-01-15",
       "contracts": 1,
       "cost_per_contract": 4250.0,
+      "thesis_id": "ai_capex",
       "_example": false
     }
   ]
 }
 ```
 
-### 欄位說明
+### `stocks[]`
 
-**stocks[]**
-- `symbol`(必填)— 股票代號,大寫,例:`NVDA` / `2330.TW`
-- `shares`(必填)— 股數
-- `avg_cost`(選填)— 平均成本(目前未用,Phase 3 會用)
-- `_example`(選填,bool)— `true` 視為範本不算真實部位,留作填表參考
+- `symbol` — required, non-empty ticker string.
+- `shares` — required numeric quantity, zero or greater.
+- `avg_cost` — optional numeric average cost.
+- `thesis_id` — recommended link to `data_store/thesis_tracker.json`.
+- `_example` — optional boolean; `true` is ignored.
 
-**options[]**
-- `symbol`(必填)— 標的代號
-- `type`(必填)— 必為 `long_call` / `long_put` / `short_call` / `short_put` 之一
-- `strike`(必填,float)— 履約價
-- `expiry`(必填,字串)— 到期日 `YYYY-MM-DD`
-- `contracts`(選填,預設 1)— 口數
-- `cost_per_contract`(LEAPS 必填,float)— **整口成本(per contract)**,單位 USD,等於 `成交價 × 100`
-  - 例:成交 `$42.50/share` × 1 口 = `cost_per_contract: 4250.0`
-- `id`(建議填)— 唯一識別字串,觸發提醒時方便對照
-- `_example`(選填,bool)— 同上
+### `options[]`
 
-## 對沖認定(`hedge_dte_tracker` 用)
+- `symbol` — required underlying ticker.
+- `type` — one of `long_call`, `long_put`, `short_call`, `short_put`.
+- `strike` — required positive number.
+- `expiry` — required `YYYY-MM-DD` date.
+- `contracts` — optional positive integer, default `1`.
+- `cost_per_contract` — numeric **whole-contract cost in USD** (`premium per share × 100`). Required for LEAPS PnL monitoring.
+- `id` — recommended stable identifier.
+- `thesis_id` — recommended thesis link.
+- `_example` — optional boolean; `true` is ignored.
 
-被視為「對沖部位」的條件(滿足任一即是):
-- `symbol` 屬於 `ETF_HEDGE = ["QQQ", "SPY", "SMH", "SOXL"]` 的任何 long option
-- 任何 `type == "long_put"`(個股保險型 put 也算)
+## Public-state boundary
 
-## 範本(複製貼上即可,記得改 `_example: false`)
+During a position workflow run, exact positions and estimated account value exist only in memory. The committed `data_store/position_snapshot.json` may contain only:
 
-```json
-{
-  "stocks": [
-    {
-      "symbol": "NVDA",
-      "shares": 0,
-      "avg_cost": 0,
-      "_example": true
-    }
-  ],
-  "options": [
-    {
-      "id": "EXAMPLE_LEAPS",
-      "symbol": "NVDA",
-      "type": "long_call",
-      "strike": 0,
-      "expiry": "2027-01-15",
-      "contracts": 1,
-      "cost_per_contract": 0,
-      "_example": true
-    },
-    {
-      "id": "EXAMPLE_SHORT",
-      "symbol": "NVDA",
-      "type": "short_call",
-      "strike": 0,
-      "expiry": "2026-06-19",
-      "contracts": 1,
-      "_example": true
-    }
-  ]
-}
-```
+- mode and source type
+- configured/empty status
+- aggregate position count
+- long/short option counts
+- snapshot timestamp
+- privacy marker
+
+It must never contain symbols, shares, strikes, expiries, costs, PnL or account value.
+
+## Updating the GitHub secret
+
+Open repository **Settings → Secrets and variables → Actions → New repository secret** and set:
+
+- Name: `POSITIONS_JSON`
+- Value: the complete valid JSON object shown above, with real values and no comments.
+
+After updating, manually run **Position Management Check** once. Confirm the public health snapshot says `configured` without exposing any position details.
+
+## Local development
+
+For local-only testing, copy the same JSON to `data_store/positions.json`. Keep the file untracked and verify it is ignored before entering real data.
+
+To reset the one-time `mode_1` warning locally, delete `data_store/mode1_warned.flag`.
+
+## Hedge recognition
+
+`hedge_dte_tracker` treats either condition as a hedge:
+
+- a long option on an `ETF_HEDGE` symbol such as `QQQ`, `SPY`, `SMH` or `SOXL`
+- any `long_put`
