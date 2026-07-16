@@ -8,7 +8,7 @@
 - ChatGPT account-level **Ultra** is kept enabled by default when available for high-leverage orchestration and difficult reasoning. This is not a promise of zero cost, not the Work composer effort control, and not a requirement to fan out every task.
 - Implementation owner is selected per task from authenticated available workers based on remaining quota, task fit, tools, delivery path and failure mode.
 - Lower-cost subagents are preferred only for independent, bounded, verifiable support work where they are expected to save cost, latency or main-thread context.
-- A sequential or shared-file-heavy task may correctly use no subagents.
+- A sequential or shared-file-heavy task may correctly use no subagents; the routing report records this explicitly as `subagents_used=false` plus an evidence-backed reason.
 - Independent review must be done by a non-owner; use a different provider／model family when practical, but never at the cost of an unverified delivery path.
 
 ## Evidence posture
