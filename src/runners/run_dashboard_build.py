@@ -1,17 +1,19 @@
-"""GitHub Actions entrypoint: build Trading Monitor v2 Mission Control.
+"""GitHub Actions entrypoint: build Trading Mission Control plus decision layer.
 
-Purely reads data_store/, does not call external APIs, needs no secret and does
-not send Telegram messages. Output remains public/dashboard/ for the existing
-Pages/deploy path.
+The build reads public-safe state only, calls no external APIs, needs no secret and
+sends no Telegram message. Exact positions/account values remain excluded.
 """
 
 from loguru import logger
 
+from src.dashboard.build_decision_layer import build_decision_layer
 from src.dashboard.build_mission_control import DEFAULT_OUTPUT, build_all
 
 
 def main() -> None:
     payloads = build_all(DEFAULT_OUTPUT)
+    decision = build_decision_layer(DEFAULT_OUTPUT)
+    payloads["decision_engine"] = decision
     logger.info(
         "mission control build done: "
         + ", ".join(f"{key}" for key in payloads)
