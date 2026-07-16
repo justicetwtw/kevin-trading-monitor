@@ -1,7 +1,7 @@
 # Taiwan-first market clock and Trump Truth Social monitoring
 
 Date: 2026-07-16  
-Status: implemented in PR #7; live Truth source must pass CI probe
+Status: implemented in PR #7; live source path verified from GitHub Actions
 
 ## 1. Canonical market times
 
@@ -71,13 +71,7 @@ The cron covers a wide UTC range, but the runner's authoritative gate remains 09
 
 ## 3. Why the old Trump monitor was not real monitoring
 
-The previous primary source was:
-
-```text
-https://ix.cnn.io/data/truth-social/truth_archive.json
-```
-
-On 2026-07-15 the repository's `trump_seen_posts.json` was populated with posts dated January 2023. Because the JSON was non-empty, the code never attempted the official Truth Social fallback.
+The previous primary source was a broad CNN Truth Social archive. The repository's `trump_seen_posts.json` was populated on 2026-07-15 with January 2023 rows, proving the old pipeline did not correctly isolate current activity. Because the archive JSON was non-empty, the code did not attempt the official Truth Social fallback.
 
 The old pipeline also contained:
 
@@ -88,7 +82,33 @@ if tier == "tier3":
 
 and the runner sent only Tier 1 / Tier 2 posts. This contradicted the requirement to capture posts even when they appear unrelated to stocks. War, policy, diplomacy, regulation or sentiment can be relevant without matching a predefined market keyword.
 
-## 4. New Trump monitoring contract
+## 4. Actual source availability on 2026-07-16
+
+A blocking source probe was run from a GitHub-hosted Actions runner, without exposing post text.
+
+Result:
+
+```json
+{
+  "status": "healthy",
+  "source": "cnn_historical_archive",
+  "latest_post_at": "2026-07-15T22:54:07.591000+00:00",
+  "raw_count": 28037,
+  "official_api_status": "unavailable",
+  "official_api_error": "HTTPStatusError"
+}
+```
+
+Converted to Taipei, the newest mirrored activity was **2026-07-16 06:54**.
+
+The honest conclusion is:
+
+- The official Truth Social public API is **not currently reachable from the GitHub runner**.
+- The CNN archive endpoint is currently updating and can serve as a fresh mirror.
+- The system is not allowed to call that mirror healthy merely because it is non-empty; the newest timestamp must remain within 48 hours.
+- Mission Control exposes that the current source is a mirror and the official API attempt failed.
+
+## 5. New Trump monitoring contract
 
 ### Source priority
 
@@ -98,9 +118,24 @@ and the runner sent only Tier 1 / Tier 2 posts. This contradicted the requiremen
 
 The configured official account ID remains a fallback if account lookup fails.
 
+### Bounded source window and cold start
+
+The fresh CNN mirror returned about 28,037 historical rows. Processing that entire archive on every five-minute run would be wasteful, and treating it all as new would flood Telegram.
+
+The monitor therefore:
+
+- sorts activities by timestamp
+- retains only the latest 1,000 source rows per poll
+- establishes a capture checkpoint on first activation
+- backfills only the previous 24 hours on first activation
+- reuses the checkpoint on later runs so temporary workflow downtime is recovered
+- excludes timestamp-invalid rows and reports their count in health state
+
+This means **all activity from activation onward** is captured, while 2023–2026 historical rows are not falsely delivered as new.
+
 ### All-post capture
 
-Every unseen activity is normalized and retained:
+Every unseen activity after the capture checkpoint is normalized and retained:
 
 - original posts
 - replies
@@ -118,14 +153,16 @@ All new posts are delivered to Telegram.
 - Tier 1 / Tier 2 chunks use a normal notification.
 - Tier 3-only chunks are silent but still delivered.
 - Long posts are split into multiple Telegram messages without truncating the text.
+- Plain-text Telegram mode is used so arbitrary post text is not interpreted as HTML.
 - Posts are marked seen only after their delivery chunk succeeds, so a failed chunk is retried.
 
 ### State
 
 - `trump_posts_archive.json`: rolling, deduplicated archive of captured posts.
-- `trump_seen_posts.json`: delivered IDs.
-- `trump_monitor_health.json`: source status, attempts, latest post time, counts, delivery status and policy.
+- `trump_seen_posts.json`: successfully delivered IDs.
+- `trump_monitor_health.json`: source status, attempts, latest post time, source counts, checkpoint, delivery status and policies.
 - `layer_trump_classifier_state.json`: all newly classified posts, including Tier 3.
+- Mission Control: current source, official/mirror attempts, freshness, counts and capture policy, with no post text.
 
 ### Failure behavior
 
@@ -134,17 +171,18 @@ If there is no current source:
 - runner exits non-zero
 - workflow is visibly red
 - `trump_monitor_health.json` says `unavailable`
+- Mission Control raises a P0 source-health item
 - Telegram receives a throttled source-unavailable warning
-- no empty/stale response is called healthy
+- no empty or stale response is called healthy
 
-## 5. Live-source proof
+## 6. Continuous live-source proof
 
 Mock tests are not proof of external availability. PR CI includes a blocking `trump-source-probe` job that runs from a GitHub-hosted runner and writes only:
 
 - source status
 - source name
 - latest post timestamp
-- fetched count
+- bounded fetched count
 - source attempts and error types
 
-It never writes post content. PR #7 should not be treated as proving Truth Social access until this live job is green. If it is red, the correct conclusion is that the current GitHub-hosted architecture cannot access a reliable live source and another source or runtime is required.
+It never writes post content. If this job becomes red, the correct conclusion is that the current GitHub-hosted architecture cannot access a reliable fresh source; the PR/workflow must not claim otherwise.
