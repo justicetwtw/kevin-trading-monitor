@@ -1,12 +1,12 @@
 # Trading Monitor v2 — Thesis-first Mission Control
 
 Date: 2026-07-16  
-Status: P0 foundation  
+Status: P0 Mission Control + P1 private-position runtime foundation  
 Epic: #6
 
 ## Why v1 felt useless
 
-The existing system runs many scheduled jobs, but the dashboard is mostly a passive state dump. It does not lead with the questions that matter:
+The old system ran many scheduled jobs, but the user-facing result was mostly a passive state dump. It did not lead with the questions that matter:
 
 1. What needs attention now?
 2. Which position or thesis changed?
@@ -14,14 +14,14 @@ The existing system runs many scheduled jobs, but the dashboard is mostly a pass
 4. Which instrument lens is appropriate: stock, deep-ITM LEAPS, defined-risk options, leveraged ETF, or wait?
 5. What would invalidate the thesis?
 
-The old dashboard also contained many explicit Phase 1 placeholders. That was honest, but a screen dominated by `null` fields still had little practical value.
+Many dashboard fields were also explicit Phase 1 placeholders. Honest `null` values are preferable to fabricated data, but a screen dominated by placeholders still has little practical value.
 
 ## Product definition
 
 Trading Monitor v2 is a **Personal Capital Allocation / Thesis Monitor**.
 
 - Telegram: urgent P0/P1 exceptions and scheduled briefs.
-- Dashboard: complete review state, including non-urgent context.
+- Dashboard: complete public review state and non-urgent context.
 - TradingView: charting and visual technical analysis.
 - GitHub repo: source of truth for strategy, theses, configuration and review history.
 - No automated orders.
@@ -32,7 +32,7 @@ The first screen must be useful within 30 seconds:
 
 - market regime
 - needs-attention queue
-- position workflow health
+- private position-workflow health
 - tracked themes and subthemes
 - capital-allocation attention order
 - symbol theses, catalysts, invalidation and review dates
@@ -44,7 +44,7 @@ Normal states are secondary. Exceptions appear first.
 
 ### Memory is not one bucket
 
-The monitor must preserve three separate subthemes:
+The monitor preserves separate subthemes for:
 
 - HBM
 - commodity DRAM
@@ -54,7 +54,7 @@ A datapoint about one category must not automatically change the thesis for the 
 
 ### AI-capex correlation
 
-NVDA, MU, AVGO, MRVL and LITE can share a market-level AI-capex factor. Symbol-level monitoring must therefore include correlated basket risk rather than assuming every move is company-specific.
+NVDA, MU, AVGO, MRVL and LITE can share a market-level AI-capex factor. Symbol-level monitoring must include correlated basket risk rather than assuming every move is company-specific.
 
 ### Options-market fear
 
@@ -68,72 +68,77 @@ Price weakness alone is insufficient. The desired state includes:
 
 Fields that require paid data remain explicit `null` until a provider is approved and connected. No synthetic placeholder score is allowed.
 
-## P0 implementation
+## Implemented foundation
 
-### Mission Control payload
+### Mission Control payload and UI
 
-`src/storage/mission_control_store.py` joins:
+`src/storage/mission_control_store.py` joins regime state, existing watchlist scores, IVR/IVP state, thesis tracking, capital-allocation context and redacted position-workflow health.
 
-- regime state
-- existing watchlist scores
-- IVR/IVP state
-- thesis tracker
-- capital-allocation queue
-- redacted position-workflow health
-
-### Mission Control UI
-
-`src/dashboard/build_mission_control.py` replaces the old dashboard entrypoint while preserving legacy JSON payloads under `public/dashboard/data/`.
-
-The new page leads with:
+`src/dashboard/build_mission_control.py` replaces the dashboard entrypoint while preserving existing JSON contracts. The page leads with:
 
 1. summary cards
 2. needs-attention queue
 3. theme map
 4. capital-allocation queue
-5. portfolio workflow status
+5. portfolio workflow health
 6. thesis tracker
-7. supporting options and event context
+7. compact options/event context
 
-### Position-monitor bug fix
+### Structured thesis context
 
-The previous runner read `snapshot["total_value"]`, but `get_account_snapshot()` returns `total_estimated_value`. Drawdown tracking therefore never received the account total. P0 fixes the field mismatch.
+- `data_store/thesis_tracker.json` consolidates the June–July 2026 memory and AI-capex discussion into reviewable theme and symbol objects.
+- `data_store/capital_allocation.json` stores a manual attention order. It is not an automatic buy ranking and never creates an order.
 
-### Public-repo privacy boundary
+### Secure private position input
 
-This repository is public. Exact holdings, strikes, costs and account value must not be committed.
+The scheduled position workflow reads real holdings only from the encrypted GitHub Actions secret `POSITIONS_JSON`.
 
-`run_position_check` now commits only a redacted health snapshot containing:
+- Secret input has priority over the local file.
+- Schema is validated before use.
+- A present but malformed secret fails closed to an empty portfolio.
+- It never falls back to the public example file.
+- Exact positions remain in process memory.
+- The committed position snapshot contains aggregate health metadata only.
+
+The required schema and update procedure are documented in `docs/positions_schema.md` and `docs/github_secrets_setup.md`.
+
+### Public-state privacy boundary
+
+This repository is public. Exact holdings, strikes, costs, PnL and account values must not be committed.
+
+The position workflow therefore persists only:
 
 - configured / empty status
+- input source type
 - aggregate position count
 - long/short option counts
 - timestamp
 - privacy marker
 
-The real in-memory account snapshot is still used for drawdown logic during the workflow run, but exact details are not persisted to Git.
+Position-alert dedup and quota records use HMAC-derived opaque keys instead of `symbol::kind`.
 
-## Structured repo context
+Account peak/current values are Fernet-encrypted using `POSITION_STATE_KEY`. Public drawdown state exposes percentage, alert level, action and timestamp, but not account amounts.
 
-`data_store/thesis_tracker.json` consolidates the June–July 2026 discussion into reviewable theme and symbol objects.
+### Position-monitor correctness fixes
 
-`data_store/capital_allocation.json` stores a manual attention order. It is not an automatic ranking and never creates an order. Live dashboard fields are joined when available; missing coverage remains visible.
+1. `run_position_check.py` previously read `snapshot["total_value"]`, while the snapshot returns `total_estimated_value`; drawdown updates therefore never ran.
+2. `leaps_pnl_tracker.py` compared Black–Scholes premium per share with `cost_per_contract` (premium ×100), producing approximately -99% false losses. Both sides now use per-contract USD.
+3. The stale v4 test expected a stock short-premium threshold of IVR 30. The actual v4.1 rule is stock 70 / ETF 30; the test now matches the implemented strategy rule.
+
+## Activation requirement
+
+The code path is complete, but production position monitoring remains intentionally unconfigured until the repository owner creates:
+
+- `POSITIONS_JSON`
+- `POSITION_STATE_KEY`
+
+No agent should receive or paste their actual values. The owner sets them directly in GitHub repository Actions secrets and manually runs **Position Management Check** once to validate the redacted state.
 
 ## Remaining work
 
-### P1 — secure private position input
-
-The public repo cannot hold real positions. A secure runtime input is required before cloud LEAPS, short-delta, hedge and drawdown checks can be trusted. The implementation must:
-
-- keep the secret out of Git and generated dashboard files
-- validate schema before use
-- fail closed on malformed input
-- expose only redacted workflow health publicly
-- document rotation and update steps
-
 ### P1 — thesis-linked portfolio risk
 
-- map each private position to `thesis_id`
+- enforce `thesis_id` linkage for every private holding
 - compute delta-equivalent exposure and concentration
 - track theta, vega, DTE and roll windows
 - compare correlated AI-capex exposure across symbols
