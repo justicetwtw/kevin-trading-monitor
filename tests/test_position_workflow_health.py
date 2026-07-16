@@ -23,11 +23,6 @@ def test_mode1_missing_private_positions_fails_with_safe_error_code(monkeypatch)
             "snapshot_at": "2026-07-16T00:00:00+00:00",
         },
     )
-    monkeypatch.setattr(
-        run_position_check,
-        "_send_private_risk_brief",
-        lambda snapshot: False,
-    )
     writes = {}
     monkeypatch.setattr(
         run_position_check,
@@ -39,6 +34,7 @@ def test_mode1_missing_private_positions_fails_with_safe_error_code(monkeypatch)
     public = writes["position_snapshot.json"]
     assert public["workflow_status"] == "degraded"
     assert public["error_codes"] == ["private_positions_missing_or_invalid"]
+    assert public["decision_risk"]["privacy"] == "aggregate_decision_risk_only"
     assert "stocks" not in public
     assert "options" not in public
 
@@ -72,6 +68,10 @@ def test_mission_control_surfaces_safe_position_error_codes(monkeypatch):
                 "snapshot_at": "2026-07-16T00:00:00+00:00",
                 "workflow_status": "degraded",
                 "error_codes": ["private_brief_failed"],
+                "decision_risk": {
+                    "missing_thesis_id_count": 0,
+                    "privacy": "aggregate_decision_risk_only",
+                },
                 "privacy": "redacted_public_state",
             },
             "drawdown_history.json": {
