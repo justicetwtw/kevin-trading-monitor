@@ -30,10 +30,10 @@ def _post(
     }
 
 
-def _healthy_result(posts):
+def _healthy_result(posts, source="truth_social_official_api"):
     return {
         "status": "healthy",
-        "source": "truth_social_official_api",
+        "source": source,
         "latest_post_at": posts[-1]["created_at"] if posts else None,
         "posts": posts,
         "attempts": [],
@@ -122,7 +122,9 @@ def test_huge_mirror_returns_only_latest_bounded_set(monkeypatch):
     assert result["returned_count"] == trump_truth.SOURCE_POST_LIMIT
     assert len(result["posts"]) == trump_truth.SOURCE_POST_LIMIT
     assert result["posts"][0]["id"] == "0"
-    assert result["posts"][-1]["id"] == str(trump_truth.SOURCE_POST_LIMIT - 1)
+    assert result["posts"][-1]["id"] == str(
+        trump_truth.SOURCE_POST_LIMIT - 1
+    )
 
 
 def test_retruth_text_and_activity_are_preserved():
@@ -157,7 +159,7 @@ def test_tier3_is_built_for_delivery_not_filtered():
     assert "Happy birthday message" in chunks[0]["message"]
     assert "TIER3" in chunks[0]["message"]
     assert chunks[0]["audible"] is False
-    assert chunks[0]["posts"] == [post]
+    assert chunks[0]["mark_posts"] == [post]
 
 
 def test_tier1_and_tier3_both_delivered_in_same_poll(monkeypatch):
@@ -201,6 +203,7 @@ def test_tier1_and_tier3_both_delivered_in_same_poll(monkeypatch):
     assert state["delivery_status"] == "delivered_all"
     assert state["capture_policy"].startswith("all_posts")
     assert state["eligible_count"] == 2
+    assert state["source_completeness_verified"] is True
 
 
 def test_first_activation_backfills_24h_but_not_years_of_history(monkeypatch):
@@ -295,9 +298,10 @@ def test_source_unavailable_is_explicit_failure(monkeypatch):
     assert health["status"] == "unavailable"
     assert health["delivery_status"] == "source_unavailable"
     assert health["eligible_count"] == 0
+    assert health["source_completeness_verified"] is False
 
 
-def test_long_post_is_split_without_truncating_content():
+def test_long_post_is_split_without_truncating_content_or_early_seen():
     text = "政策內容 " * 1200
     post = _post("long-1", text)
     chunks = run_trump_monitor.build_delivery_chunks([post])
@@ -310,3 +314,35 @@ def test_long_post_is_split_without_truncating_content():
         <= run_trump_monitor.MAX_TELEGRAM_CHARS + 20
         for chunk in chunks
     )
+    assert all(chunk["mark_posts"] == [] for chunk in chunks[:-1])
+    assert chunks[-1]["mark_posts"] == [post]
+
+
+def test_failed_middle_of_long_post_does_not_mark_seen(monkeypatch):
+    post = _post("long-fail", "內容 " * 3000)
+    result = _healthy_result([post])
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "fetch_recent_posts_with_health",
+        lambda: result,
+    )
+    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda value: value)
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    marked = []
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "mark_posts_seen",
+        lambda value: marked.extend(value),
+    )
+    calls = {"count": 0}
+
+    def _send(*args, **kwargs):
+        calls["count"] += 1
+        return calls["count"] == 1
+
+    monkeypatch.setattr(run_trump_monitor, "send_telegram", _send)
+    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
+    monkeypatch.setattr(run_trump_monitor, "write_json", lambda *a, **k: True)
+
+    assert run_trump_monitor.main() == 1
+    assert marked == []
