@@ -1,31 +1,62 @@
-# GitHub Secrets 設置教學
+# GitHub Actions secrets setup
 
-## 1. 進入 Repo Settings
+## 1. Open repository settings
 
-1. 開你的 GitHub repo 頁面
-2. 點 Settings(右上角)
-3. 左側選 Secrets and variables → Actions
+1. Open the GitHub repository.
+2. Select **Settings**.
+3. Select **Secrets and variables → Actions**.
 
-## 2. 新增 Secrets
+## 2. Required notification secrets
 
-點 "New repository secret" 兩次,各加入:
+Create these repository secrets:
 
-| Name | Value |
+| Name | Purpose |
 |---|---|
-| `TELEGRAM_BOT_TOKEN` | 你的 Bot token(類似 `1234567890:AAEhBP...`) |
-| `TELEGRAM_CHAT_ID` | 你的 Chat ID(類似 `123456789`) |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token used for alerts |
+| `TELEGRAM_CHAT_ID` | One or more destination chat IDs |
 
-## 3. 驗證
+## 3. Private position monitoring
 
-到 Actions 頁面 → Health Check → Run workflow,手動觸發。
-30-60 秒後,Telegram 應收到 System Online 訊息。
+Create one additional repository secret:
 
-## 安全注意
+| Name | Purpose |
+|---|---|
+| `POSITIONS_JSON` | Complete private holdings JSON used only during the Position Management Check workflow |
 
-- ❌ 不要把 token 直接寫進程式碼
-- ❌ 不要 commit `.env` 檔
-- ✅ 一律走 GitHub Secrets
+The value must follow `docs/positions_schema.md`. Paste the complete JSON object as the secret value. Do not base64-encode it and do not commit it to the repository.
 
-## 後續(可選)
+Security behavior:
 
-之後階段如果加入其他 API key(例如 FRED API key 等),都用同一方式新增 Secret。
+- `position_check.yml` injects the value only into the position-check process.
+- The loader validates the schema before use.
+- A malformed secret fails closed to an empty portfolio and never falls back to the public example file.
+- Exact holdings and account value stay in memory.
+- Only a redacted health snapshot is committed.
+
+## 4. Other currently used secrets
+
+Depending on enabled workflows, the repository also uses:
+
+- `FRED_API_KEY`
+- `SEC_EDGAR_USER_AGENT`
+- `GMAIL_SENDER`
+- `GMAIL_APP_PASSWORD`
+- `EMAIL_RECIPIENT`
+- `GEMINI_API_KEY`
+- optional `GEMINI_MODEL`
+
+Only add secrets for workflows that are actually enabled.
+
+## 5. Validation
+
+1. Run **Health Check** and confirm the System Online Telegram message.
+2. Run **Position Management Check** manually.
+3. Confirm `data_store/position_snapshot.json` reports `configured: true` and `privacy: redacted_public_state`.
+4. Confirm the committed file contains no symbols, strikes, costs, PnL or account value.
+
+## Safety rules
+
+- Never write secret values in code, issues, PR comments, logs or committed documentation.
+- Never commit a `.env` file.
+- Never paste real positions into `data_store/positions.json` in the public repository.
+- Rotate a secret immediately if it is exposed.
