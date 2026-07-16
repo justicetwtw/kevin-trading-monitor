@@ -2,7 +2,9 @@ name: Position Management Check
 
 on:
   schedule:
-    - cron: '0 22 * * 1-5'  # 美股收盤後 22:00 UTC
+    # 22:00 UTC = Taipei 06:00: 2 hours after the U.S. daylight-time
+    # close or 1 hour after the standard-time close.
+    - cron: '0 22 * * 1-5'
   workflow_dispatch:
 
 concurrency:
