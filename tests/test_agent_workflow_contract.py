@@ -45,7 +45,7 @@ def test_short_sha_prefix_gate_is_forbidden(tmp_path: Path):
     )
     errors = verify(tmp_path)
     assert any("{7,40}" in error for error in errors)
-    assert any("prefix" not in error or "case" in error for error in errors)
+    assert any('case "$head"' in error for error in errors)
 
 
 def test_claude_secret_must_not_enter_preflight_shell(tmp_path: Path):
