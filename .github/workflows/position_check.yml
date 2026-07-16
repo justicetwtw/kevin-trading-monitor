@@ -30,6 +30,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           POSITION_MODE: mode_1
           POSITIONS_JSON: ${{ secrets.POSITIONS_JSON }}
+          POSITION_STATE_KEY: ${{ secrets.POSITION_STATE_KEY }}
         run: python -m src.runners.run_position_check
       - if: always()
         uses: ./.github/actions/commit-state
