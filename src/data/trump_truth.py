@@ -1,136 +1,370 @@
-"""Trump Truth Social 抓取(R2 風險:來源不穩,雙源都失敗回空 list 不阻塞)
+"""Donald Trump Truth Social ingestion with explicit source health.
 
-主來源:CNN JSON 鏡像(穩定且不需 auth)
-備援:Truth Social 公開 API
-寫入:data_store/trump_seen_posts.json(去重 + 限長 2000)
+The old implementation treated a non-empty CNN archive as a live feed. In July
+2026 that archive returned January 2023 posts, so the official Truth Social API
+was never attempted. This module now:
 
-分類:呼叫 src.config.keywords.classify_post() 把貼文分 tier1/tier2/tier3
+1. Tries the official public Truth Social account/status endpoints first.
+2. Validates recency before calling any source healthy.
+3. Treats the CNN JSON as a historical archive unless it is demonstrably fresh.
+4. Normalizes original posts, replies and re-truths without keyword filtering.
+5. Exposes explicit `healthy` / `stale` / `unavailable` health metadata.
+
+If no current source works, callers must report that condition. Returning an
+empty list is not allowed to masquerade as successful monitoring.
 """
 
-from datetime import datetime
-from typing import Optional
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
+from typing import Any
 
 import httpx
+from dateutil.parser import isoparse
 from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from src.config.keywords import classify_post, get_matched_keywords
 from src.config.rss_sources import TRUMP_TRUTH_SOURCES
-from src.config.settings import TIMEZONE_US_MARKET
 from src.storage.state_manager import read_json, write_json
 
 SEEN_POSTS_FILE = "trump_seen_posts.json"
-MAX_SEEN = 2000
+ARCHIVE_FILE = "trump_posts_archive.json"
+MAX_SEEN = 10000
+MAX_ARCHIVE = 5000
+LIVE_MAX_AGE = timedelta(days=7)
+MIRROR_MAX_AGE = timedelta(hours=48)
+HTTP_TIMEOUT = 20.0
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
-def fetch_from_cnn_mirror() -> list:
-    """主來源:CNN 鏡像"""
-    url = TRUMP_TRUTH_SOURCES["primary_cnn_mirror"]
+class TrumpSourceError(RuntimeError):
+    """A live source could not provide a valid current response."""
+
+
+@retry(
+    retry=retry_if_exception_type((httpx.HTTPError, ValueError, TrumpSourceError)),
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=6),
+    reraise=True,
+)
+def _get_json(url: str, params: dict[str, Any] | None = None) -> Any:
+    with httpx.Client(timeout=HTTP_TIMEOUT, follow_redirects=True) as client:
+        response = client.get(
+            url,
+            params=params,
+            headers={
+                "User-Agent": "kevin-trading-monitor/1.0 public-feed-check",
+                "Accept": "application/json",
+            },
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+def fetch_truth_account_id() -> str:
+    """Resolve the account ID, falling back to the configured known ID."""
+    configured = str(TRUMP_TRUTH_SOURCES["configured_account_id"])
     try:
-        with httpx.Client(timeout=15.0, follow_redirects=True) as client:
-            r = client.get(url, headers={"User-Agent": "Mozilla/5.0"})
-            r.raise_for_status()
-            data = r.json()
-            if isinstance(data, list):
-                return data
-            return data.get("posts", []) if isinstance(data, dict) else []
-    except Exception as e:
-        logger.warning(f"CNN mirror failed: {e}")
-        return []
+        payload = _get_json(TRUMP_TRUTH_SOURCES["truth_account_lookup"])
+        account_id = str(payload.get("id") or "") if isinstance(payload, dict) else ""
+        return account_id or configured
+    except Exception as exc:
+        logger.warning(f"Truth account lookup failed; using configured ID: {exc}")
+        return configured
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
-def fetch_from_truth_api() -> list:
-    """備援:Truth Social 公開 API"""
-    url = TRUMP_TRUTH_SOURCES["fallback_truth_api"]
+def fetch_from_truth_api() -> list[dict[str, Any]]:
+    """Fetch current activity from the official public account statuses API."""
+    account_id = fetch_truth_account_id()
+    url = TRUMP_TRUTH_SOURCES["truth_statuses_template"].format(
+        account_id=account_id
+    )
+    payload = _get_json(
+        url,
+        params={
+            "limit": 40,
+            "exclude_replies": "false",
+            "exclude_reblogs": "false",
+        },
+    )
+    if not isinstance(payload, list):
+        raise TrumpSourceError("Truth statuses response is not a list")
+    return [item for item in payload if isinstance(item, dict)]
+
+
+def fetch_from_cnn_mirror() -> list[dict[str, Any]]:
+    """Fetch the CNN archive for health comparison; it is not assumed live."""
+    payload = _get_json(TRUMP_TRUTH_SOURCES["cnn_historical_archive"])
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if isinstance(payload, dict):
+        posts = payload.get("posts", [])
+        return [item for item in posts if isinstance(item, dict)]
+    raise TrumpSourceError("CNN archive response has unsupported shape")
+
+
+def _strip_html(value: Any) -> str:
+    text = str(value or "")
+    if not text:
+        return ""
     try:
-        with httpx.Client(timeout=15.0, follow_redirects=True) as client:
-            r = client.get(
-                url,
-                headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
-            )
-            r.raise_for_status()
-            j = r.json()
-            return j if isinstance(j, list) else []
-    except Exception as e:
-        logger.warning(f"Truth API failed: {e}")
-        return []
+        from selectolax.parser import HTMLParser
+
+        return HTMLParser(text).text(separator="\n", strip=True)
+    except Exception:
+        return text
 
 
-def fetch_recent_posts() -> list:
-    """主備雙源。雙源都失敗 → 回 [],log warning,不阻塞下游 runner。"""
+def extract_text(post: dict[str, Any]) -> str:
+    """Extract complete visible text, including nested re-truth content."""
+    reblog = post.get("reblog")
+    if isinstance(reblog, dict):
+        nested = extract_text(reblog)
+        outer = _strip_html(post.get("content"))
+        return "\n".join(part for part in (outer, nested) if part).strip()
+
+    for key in ("content", "text", "body", "message"):
+        value = post.get(key)
+        if value:
+            return _strip_html(value).strip()
+    return ""
+
+
+def _created_at(post: dict[str, Any]) -> str:
+    value = post.get("created_at") or post.get("timestamp") or post.get("date")
+    return str(value or "")
+
+
+def _parse_timestamp(value: Any) -> datetime | None:
+    if not value:
+        return None
     try:
-        posts = fetch_from_cnn_mirror()
-    except Exception as e:
-        logger.warning(f"CNN mirror retries exhausted: {e}")
-        posts = []
-    if not posts:
-        logger.info("CNN mirror empty, trying Truth API")
-        try:
-            posts = fetch_from_truth_api()
-        except Exception as e:
-            logger.warning(f"Truth API retries exhausted: {e}")
-            posts = []
-    if not posts:
-        logger.warning("Trump posts: BOTH sources failed/empty (non-blocking)")
-    return posts
+        parsed = isoparse(str(value))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except (TypeError, ValueError, OverflowError):
+        return None
 
 
-def filter_new_posts(posts: list) -> list:
-    """過濾掉已處理的貼文。seen 字典 limit 2000 條,超過丟最舊。"""
-    seen = read_json(SEEN_POSTS_FILE, default={})
-    if not isinstance(seen, dict):
-        seen = {}
-
-    new_posts = []
-    now_iso = datetime.now(TIMEZONE_US_MARKET).isoformat()
-    for p in posts:
-        pid = str(p.get("id") or p.get("post_id") or "")
-        if not pid or pid in seen:
-            continue
-        new_posts.append(p)
-        seen[pid] = {
-            "seen_at": now_iso,
-            "created_at": p.get("created_at", ""),
-        }
-
-    if len(seen) > MAX_SEEN:
-        sorted_items = sorted(seen.items(), key=lambda x: x[1].get("seen_at", ""))
-        seen = dict(sorted_items[-MAX_SEEN:])
-
-    write_json(SEEN_POSTS_FILE, seen)
-    return new_posts
-
-
-def extract_text(post: dict) -> str:
-    """從不同來源結構中拉出純文字內容。"""
-    if "content" in post:
-        # Truth Social API 的 content 是 HTML
-        try:
-            from selectolax.parser import HTMLParser
-            return HTMLParser(post["content"]).text(strip=True)
-        except Exception:
-            return post["content"]
-    return post.get("text", "") or post.get("body", "")
-
-
-def classify_and_enrich(post: dict) -> dict:
-    """把貼文加上 tier 分類 + matched_keywords,供下游 layers/trump_classifier.py 用"""
+def normalize_post(post: dict[str, Any], source: str) -> dict[str, Any]:
+    """Normalize one Truth activity without deciding whether it matters."""
+    reblog = post.get("reblog") if isinstance(post.get("reblog"), dict) else None
+    payload = reblog or post
+    post_id = str(post.get("id") or post.get("post_id") or payload.get("id") or "")
     text = extract_text(post)
-    tier = classify_post(text)
-    matched = get_matched_keywords(text)
+    created_at = _created_at(post) or _created_at(payload)
+    url = str(
+        post.get("url")
+        or payload.get("url")
+        or (
+            f"https://truthsocial.com/@realDonaldTrump/{post_id}"
+            if post_id
+            else TRUMP_TRUTH_SOURCES["truth_profile"]
+        )
+    )
+    account = payload.get("account") if isinstance(payload.get("account"), dict) else {}
+    media = payload.get("media_attachments")
+    media_count = len(media) if isinstance(media, list) else 0
+    activity_type = "retruth" if reblog else ("reply" if post.get("in_reply_to_id") else "post")
+
     return {
-        "post": post,
+        "id": post_id,
+        "created_at": created_at,
+        "url": url,
         "text": text,
-        "tier": tier,
-        "matched_keywords": matched,
-        "classified_at": datetime.now(TIMEZONE_US_MARKET).isoformat(),
+        "activity_type": activity_type,
+        "source": source,
+        "original_account": account.get("acct") or account.get("username"),
+        "media_count": media_count,
+        "tier": classify_post(text),
+        "matched_keywords": get_matched_keywords(text),
+        "captured_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
-def fetch_and_classify_new() -> list:
-    """完整流程:抓取 → 去重 → 分類。供 runner 直接呼叫。"""
-    posts = fetch_recent_posts()
-    new_posts = filter_new_posts(posts)
-    return [classify_and_enrich(p) for p in new_posts]
+def _latest_post_at(posts: list[dict[str, Any]]) -> datetime | None:
+    values = [
+        _parse_timestamp(post.get("created_at"))
+        for post in posts
+    ]
+    valid = [value for value in values if value is not None]
+    return max(valid) if valid else None
+
+
+def _source_result(
+    *,
+    source: str,
+    raw_posts: list[dict[str, Any]],
+    max_age: timedelta,
+) -> dict[str, Any]:
+    normalized = [
+        normalize_post(item, source)
+        for item in raw_posts
+        if isinstance(item, dict)
+    ]
+    normalized = [item for item in normalized if item["id"] and item["text"]]
+    latest = _latest_post_at(normalized)
+    now = datetime.now(timezone.utc)
+
+    if not normalized:
+        return {
+            "status": "unavailable",
+            "source": source,
+            "posts": [],
+            "latest_post_at": None,
+            "error": "source_returned_no_usable_posts",
+        }
+    if latest is None:
+        return {
+            "status": "stale",
+            "source": source,
+            "posts": [],
+            "latest_post_at": None,
+            "error": "source_posts_missing_timestamps",
+        }
+    if now - latest > max_age:
+        return {
+            "status": "stale",
+            "source": source,
+            "posts": [],
+            "latest_post_at": latest.isoformat(),
+            "error": "latest_post_too_old_for_live_monitor",
+        }
+    return {
+        "status": "healthy",
+        "source": source,
+        "posts": normalized,
+        "latest_post_at": latest.isoformat(),
+        "error": None,
+    }
+
+
+def fetch_recent_posts_with_health() -> dict[str, Any]:
+    """Return current posts plus transparent source-attempt metadata."""
+    attempts: list[dict[str, Any]] = []
+
+    try:
+        official = _source_result(
+            source="truth_social_official_api",
+            raw_posts=fetch_from_truth_api(),
+            max_age=LIVE_MAX_AGE,
+        )
+    except Exception as exc:
+        official = {
+            "status": "unavailable",
+            "source": "truth_social_official_api",
+            "posts": [],
+            "latest_post_at": None,
+            "error": type(exc).__name__,
+        }
+    attempts.append({key: value for key, value in official.items() if key != "posts"})
+    if official["status"] == "healthy":
+        return {**official, "attempts": attempts}
+
+    try:
+        mirror = _source_result(
+            source="cnn_historical_archive",
+            raw_posts=fetch_from_cnn_mirror(),
+            max_age=MIRROR_MAX_AGE,
+        )
+    except Exception as exc:
+        mirror = {
+            "status": "unavailable",
+            "source": "cnn_historical_archive",
+            "posts": [],
+            "latest_post_at": None,
+            "error": type(exc).__name__,
+        }
+    attempts.append({key: value for key, value in mirror.items() if key != "posts"})
+    if mirror["status"] == "healthy":
+        return {**mirror, "attempts": attempts, "fallback": True}
+
+    return {
+        "status": "unavailable",
+        "source": None,
+        "posts": [],
+        "latest_post_at": None,
+        "error": "no_current_trump_source_available",
+        "attempts": attempts,
+    }
+
+
+def fetch_recent_posts() -> list[dict[str, Any]]:
+    """Compatibility wrapper; use fetch_recent_posts_with_health in runners."""
+    return fetch_recent_posts_with_health().get("posts", [])
+
+
+def load_seen_ids() -> set[str]:
+    seen = read_json(SEEN_POSTS_FILE, default={})
+    if not isinstance(seen, dict):
+        return set()
+    return {str(key) for key in seen}
+
+
+def get_unseen_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen = load_seen_ids()
+    return [post for post in posts if str(post.get("id") or "") not in seen]
+
+
+def mark_posts_seen(posts: list[dict[str, Any]]) -> None:
+    seen = read_json(SEEN_POSTS_FILE, default={})
+    if not isinstance(seen, dict):
+        seen = {}
+    now = datetime.now(timezone.utc).isoformat()
+    for post in posts:
+        post_id = str(post.get("id") or "")
+        if not post_id:
+            continue
+        seen[post_id] = {
+            "seen_at": now,
+            "created_at": post.get("created_at"),
+            "source": post.get("source"),
+        }
+    if len(seen) > MAX_SEEN:
+        ordered = sorted(
+            seen.items(),
+            key=lambda item: str(item[1].get("seen_at") or ""),
+        )
+        seen = dict(ordered[-MAX_SEEN:])
+    write_json(SEEN_POSTS_FILE, seen)
+
+
+def filter_new_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Legacy helper: return unseen posts and mark them immediately."""
+    new_posts = get_unseen_posts(posts)
+    mark_posts_seen(new_posts)
+    return new_posts
+
+
+def archive_posts(posts: list[dict[str, Any]]) -> int:
+    """Store every captured post in a rolling public archive, deduplicated by ID."""
+    archive = read_json(ARCHIVE_FILE, default={})
+    if not isinstance(archive, dict):
+        archive = {}
+    before = len(archive)
+    for post in posts:
+        post_id = str(post.get("id") or "")
+        if post_id:
+            archive[post_id] = post
+    if len(archive) > MAX_ARCHIVE:
+        ordered = sorted(
+            archive.items(),
+            key=lambda item: str(item[1].get("created_at") or item[1].get("captured_at") or ""),
+        )
+        archive = dict(ordered[-MAX_ARCHIVE:])
+    write_json(ARCHIVE_FILE, archive)
+    return len(archive) - before
+
+
+def classify_and_enrich(post: dict[str, Any]) -> dict[str, Any]:
+    """Compatibility helper that never drops Tier 3 posts."""
+    if "tier" in post and "text" in post:
+        return post
+    return normalize_post(post, "unknown")
+
+
+def fetch_and_classify_new() -> list[dict[str, Any]]:
+    result = fetch_recent_posts_with_health()
+    posts = get_unseen_posts(result.get("posts", []))
+    return [classify_and_enrich(post) for post in posts]
