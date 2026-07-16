@@ -10,15 +10,17 @@ on:
       - '.github/agent-capability-watch.json'
       - '.github/workflows/agent_capability_watch.yml'
       - '.github/workflows/agent_chatops.yml'
-      - '.github/workflows/claude_review.yml'
       - 'scripts/agent_capability_watch.py'
       - 'scripts/verify_agent_workflow_contract.py'
+      - 'scripts/verify_agent_routing_report.py'
       - 'tests/test_agent_capability_watch.py'
       - 'tests/test_agent_workflow_contract.py'
+      - 'tests/test_agent_routing_report.py'
       - 'AGENTS.md'
       - 'CLAUDE.md'
       - 'docs/agent-team-workflow.md'
       - 'docs/agent-workflow-official-basis.md'
+      - 'docs/agent-runtime-preferences-2026-07.md'
 
 permissions:
   contents: read
@@ -43,9 +45,13 @@ jobs:
       - name: Verify durable workflow contract
         id: contract
         run: python scripts/verify_agent_workflow_contract.py
-      - name: Test watcher and verifier
+      - name: Test watcher and routing contracts
         id: tests
-        run: python -m pytest -q tests/test_agent_capability_watch.py tests/test_agent_workflow_contract.py
+        run: >-
+          python -m pytest -q
+          tests/test_agent_capability_watch.py
+          tests/test_agent_workflow_contract.py
+          tests/test_agent_routing_report.py
       - name: Audit local contract only on pull requests
         if: github.event_name == 'pull_request'
         id: offline
