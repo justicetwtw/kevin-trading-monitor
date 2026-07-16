@@ -1,11 +1,11 @@
 import json
 
 from scripts.verify_agent_routing_report import (
-    END,
-    START,
+    MAX_REPORT_BYTES,
     extract_report,
     find_valid_trusted_report,
     validate_report,
+    validate_report_comment,
 )
 
 
@@ -14,45 +14,35 @@ HEAD = "a" * 40
 
 def _report(**overrides):
     value = {
-        "schema_version": "agent-routing-report:v1",
-        "head_sha": HEAD,
+        "schema": "agent-routing-report:v1",
+        "head": HEAD,
         "generated_at": "2026-07-16T18:00:00+08:00",
-        "implementation_owner": {
+        "owner": {
             "role": "implementation_owner",
             "provider": "openai",
-            "surface": "chatgpt",
+            "surface": "chatgpt-connected-github",
             "session_mode": "conversation_orchestrator_direct",
-            "assigned_at": "2026-07-16T17:00:00+08:00",
             "assignment_basis": [
                 "authenticated delivery path available",
                 "task fit and remaining quota were adequate",
             ],
         },
         "subagents_used": False,
-        "subagents_not_used_reason": "The work was sequential and shared-file heavy.",
+        "no_delegation_reason": "The work was sequential and shared-file heavy.",
         "delegations": [],
         "escalation_or_fallback": {"occurred": False, "reason": "none"},
-        "usage_evidence": {
+        "usage_metrics": {
             "status": "unavailable",
             "source": "The current product surface exposes no per-task token/credit/latency export.",
-            "metrics": {},
         },
         "lead_reverification": {
             "performed": True,
-            "summary": "Reviewed the final diff and matched it to deterministic tests.",
+            "notes": "Reviewed the final diff and matched it to deterministic tests.",
         },
         "tests": [
-            {
-                "name": "pytest",
-                "status": "pass",
-                "evidence": "GitHub Actions CI run 123",
-            }
+            {"command": "python -m pytest -q", "result": "pass"}
         ],
-        "ci": {
-            "status": "pass",
-            "source": "GitHub Actions",
-            "evidence": "CI run 123 at exact HEAD",
-        },
+        "ci": {"status": "pass", "source": "GitHub Actions run 123"},
         "independent_reviewer": {
             "provider": "anthropic",
             "surface": "authenticated_fable_task",
@@ -64,10 +54,16 @@ def _report(**overrides):
     return value
 
 
+def _body(report, marker_head=HEAD):
+    return (
+        f"<!-- agent-routing-report:v1 head={marker_head} -->\n"
+        f"```json\n{json.dumps(report)}\n```"
+    )
+
+
 def _comment(report, *, association="OWNER", user_type="User"):
-    body = f"{START}\n```json\n{json.dumps(report)}\n```\n{END}"
     return {
-        "body": body,
+        "body": _body(report),
         "author_association": association,
         "user": {"login": "kevin", "type": user_type},
     }
@@ -75,65 +71,97 @@ def _comment(report, *, association="OWNER", user_type="User"):
 
 def test_valid_report_passes():
     assert validate_report(_report(), HEAD) == []
+    assert validate_report_comment(_body(_report()), HEAD) == []
 
 
-def test_report_must_bind_exact_current_head():
-    errors = validate_report(_report(head_sha="b" * 40), HEAD)
+def test_report_must_bind_exact_current_head_and_marker():
+    errors = validate_report(_report(head="b" * 40), HEAD)
     assert any("current remote HEAD" in error for error in errors)
+    marker_errors = validate_report_comment(_body(_report(), marker_head="b" * 40), HEAD)
+    assert any("marker head" in error for error in marker_errors)
 
 
 def test_no_subagents_requires_reason_and_empty_delegations():
-    report = _report(subagents_not_used_reason="")
-    errors = validate_report(report, HEAD)
-    assert "subagents_not_used_reason is required when subagents_used is false" in errors
+    report = _report(no_delegation_reason="")
+    assert (
+        "no_delegation_reason is required when subagents_used is false"
+        in validate_report(report, HEAD)
+    )
 
 
 def test_subagent_delegation_requires_reverification_and_evidence():
     report = _report(
         subagents_used=True,
-        subagents_not_used_reason=None,
+        no_delegation_reason=None,
         delegations=[
             {
                 "purpose": "Read-only source audit",
-                "read_write_ownership": "read-only; no branch writes",
-                "relative_model_tier": "lower",
+                "ownership": "read_only",
+                "model_tier": "lower",
                 "outcome": "completed",
-                "deterministic_evidence": ["source table checked"],
+                "evidence": "source table checked",
             }
         ],
-        lead_reverification={"performed": False, "summary": "not checked"},
+        lead_reverification={"performed": False, "notes": "not checked"},
     )
     errors = validate_report(report, HEAD)
     assert any("must be true when subagents were used" in error for error in errors)
 
 
-def test_unavailable_usage_cannot_contain_invented_metrics():
+def test_delegation_write_ownership_cannot_fork():
     report = _report(
-        usage_evidence={
+        subagents_used=True,
+        no_delegation_reason=None,
+        delegations=[
+            {
+                "purpose": "Parallel implementation",
+                "ownership": "parallel_branch_owner",
+                "model_tier": "peer",
+                "outcome": "completed",
+                "evidence": "none",
+            }
+        ],
+    )
+    assert any("ownership is invalid" in error for error in validate_report(report, HEAD))
+
+
+def test_unavailable_usage_must_omit_metrics():
+    report = _report(
+        usage_metrics={
             "status": "unavailable",
             "source": "no product export",
             "metrics": {"tokens": 12345},
         }
     )
-    assert any("must be empty" in error for error in validate_report(report, HEAD))
+    assert any("must be omitted" in error for error in validate_report(report, HEAD))
 
 
-def test_forbidden_reasoning_or_secret_keys_fail():
+def test_forbidden_reasoning_secret_keys_and_values_fail():
     report = _report()
     report["chain_of_thought"] = "hidden"
+    report["notes"] = "Bearer abcdefghijklmnopqrstuvwxyz123456"
     errors = validate_report(report, HEAD)
-    assert any("forbidden" in error for error in errors)
+    assert any("forbidden_chain_of_thought_key" in error for error in errors)
+    assert any("secret_like_value_bearer_token" in error for error in errors)
 
 
-def test_extracts_fenced_json():
+def test_report_size_is_bounded():
     report = _report()
-    body = f"prefix\n{START}\n```json\n{json.dumps(report)}\n```\n{END}\nsuffix"
-    assert extract_report(body) == report
+    report["notes"] = "x" * MAX_REPORT_BYTES
+    assert any("exceeds" in error for error in validate_report(report, HEAD))
+
+
+def test_extracts_marker_and_fenced_json():
+    report = _report()
+    marker_head, parsed, error = extract_report(_body(report))
+    assert marker_head == HEAD
+    assert parsed == report
+    assert error is None
 
 
 def test_newest_trusted_valid_comment_wins():
     comments = [
-        _comment(_report(head_sha="b" * 40)),
+        _comment(_report(head="b" * 40)),
         _comment(_report()),
     ]
     report, diagnostics = find_valid_trusted_report(comments, HEAD)
@@ -152,5 +180,19 @@ def test_bot_or_untrusted_comment_is_not_evidence():
 
 
 def test_fix_complete_requires_passing_ci_in_report():
-    report = _report(ci={"status": "pending", "source": "GitHub Actions", "evidence": "run 1"})
-    assert "ci.status must be pass before /agent-fix-complete" in validate_report(report, HEAD)
+    report = _report(ci={"status": "pending", "source": "GitHub Actions"})
+    assert "ci.status must be pass before /agent-fix-complete" in validate_report(
+        report, HEAD
+    )
+
+
+def test_reviewer_must_not_be_owner():
+    report = _report(
+        independent_reviewer={
+            "provider": "openai",
+            "surface": "same_session",
+            "status": "pending",
+            "same_as_owner": True,
+        }
+    )
+    assert any("same_as_owner must be false" in error for error in validate_report(report, HEAD))
