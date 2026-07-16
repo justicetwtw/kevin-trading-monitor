@@ -1,8 +1,8 @@
 """部位管理檢查 (每日 EOD cron: LEAPS PnL / Short Delta / Hedge DTE / Drawdown)。
 
-`get_account_snapshot()` 會打 yfinance 取股價，只在 EOD 跑。每次執行都把
-快照寫入 `data_store/position_snapshot.json`，供 Mission Control 與資料新鮮度
-檢查使用。
+`get_account_snapshot()` 會打 yfinance 取股價，只在 EOD 跑。每次執行只把
+**去識別化摘要**寫入 `data_store/position_snapshot.json`，避免公開 repo 洩漏
+真實持倉、履約價、成本或帳戶金額。
 """
 
 from loguru import logger
@@ -34,6 +34,23 @@ def _route_with_kind(alerts, kind: str) -> int:
     return pushed
 
 
+def _public_snapshot(snapshot: dict) -> dict:
+    """Return state that is safe to commit in a public repository."""
+    stocks = snapshot.get("stocks") or []
+    options = snapshot.get("options") or []
+    configured = bool(stocks or options)
+    return {
+        "mode": snapshot.get("mode"),
+        "configured": configured,
+        "position_count": len(stocks) + len(options),
+        "n_long_options": int(snapshot.get("n_long_options", 0) or 0),
+        "n_short_options": int(snapshot.get("n_short_options", 0) or 0),
+        "snapshot_at": snapshot.get("snapshot_at"),
+        "status": "configured" if configured else "empty",
+        "privacy": "redacted_public_state",
+    }
+
+
 def main() -> None:
     logger.info("=== run_position_check start ===")
     try:
@@ -60,8 +77,8 @@ def main() -> None:
 
         try:
             snapshot = get_account_snapshot() or {}
-            if not write_json("position_snapshot.json", snapshot):
-                logger.error("position_check: failed to persist position_snapshot.json")
+            if not write_json("position_snapshot.json", _public_snapshot(snapshot)):
+                logger.error("position_check: failed to persist redacted position_snapshot.json")
 
             # get_account_snapshot() returns `total_estimated_value`. The old
             # runner used `total_value`, so drawdown tracking silently never ran.
