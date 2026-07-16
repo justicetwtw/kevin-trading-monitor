@@ -20,13 +20,16 @@ def build_from_store() -> dict[str, Any]:
     thesis = read_json("thesis_tracker.json", default={})
     market = read_json("decision_market_context.json", default={})
     decision_log = read_json("decision_log.json", default=[])
+    position_snapshot = read_json("position_snapshot.json", default={})
     if not isinstance(allocation, dict):
         allocation = {}
     if not isinstance(thesis, dict):
         thesis = {}
     if not isinstance(market, dict):
         market = {}
-    return build_decision_payload(
+    if not isinstance(position_snapshot, dict):
+        position_snapshot = {}
+    payload = build_decision_payload(
         allocation_doc=allocation,
         thesis_doc=thesis,
         watchlist_payload=dashboard_store.build_watchlist_scores(),
@@ -34,6 +37,18 @@ def build_from_store() -> dict[str, Any]:
         market_context_doc=market,
         decision_log=decision_log,
     )
+    public_risk = position_snapshot.get("decision_risk")
+    payload["portfolio_decision_risk"] = (
+        public_risk if isinstance(public_risk, dict) else {}
+    )
+    payload["market_context_health"] = {
+        "status": market.get("status"),
+        "generated_at": market.get("generated_at"),
+        "unavailable_count": market.get("unavailable_count"),
+        "partial_count": market.get("partial_count"),
+        "contract": market.get("contract"),
+    }
+    return payload
 
 
 def _e(value: Any) -> str:
@@ -49,7 +64,12 @@ def _e(value: Any) -> str:
 
 
 def _badge(value: Any) -> str:
-    slug = str(value or "unknown").lower().replace("_", "-").replace(" ", "-")
+    slug = (
+        str(value or "unknown")
+        .lower()
+        .replace("_", "-")
+        .replace(" ", "-")
+    )
     return f'<span class="badge {html.escape(slug)}">{_e(value)}</span>'
 
 
@@ -72,50 +92,109 @@ def render_section(payload: dict[str, Any]) -> str:
             f'<td><strong>{_e(row.get("symbol"))}</strong></td>'
             f'<td>{_badge(row.get("company_thesis_status"))}</td>'
             f'<td>{_badge(row.get("security_readiness"))}</td>'
-            f'<td>{_e(row.get("decision_posture"))}<br><span class="muted">{_e(row.get("decision_reason"))}</span></td>'
-            f'<td>{_e(market.get("current_price"))}<br><span class="muted">{_e(market.get("as_of"))} · {_e(market.get("source"))}</span></td>'
-            f'<td>{_e(market.get("return_1m"))} / {_e(market.get("return_3m"))} / {_e(market.get("return_6m"))}</td>'
-            f'<td>{_e(scenario.get("expected_return_pct"))}<br><span class="muted">D/U {_e(scenario.get("downside_upside_ratio"))}</span></td>'
-            f'<td>{_e(row.get("screen_score"))}<br><span class="muted">coverage {_e(row.get("screen_coverage"))}</span></td>'
+            f'<td>{_e(row.get("decision_posture"))}<br>'
+            f'<span class="muted">{_e(row.get("decision_reason"))}</span></td>'
+            f'<td>{_e(market.get("current_price"))}<br>'
+            f'<span class="muted">{_e(market.get("as_of"))} · '
+            f'{_e(market.get("source"))}</span></td>'
+            f'<td>{_e(market.get("return_1m"))} / '
+            f'{_e(market.get("return_3m"))} / '
+            f'{_e(market.get("return_6m"))}</td>'
+            f'<td>{_e(scenario.get("expected_return_pct"))}<br>'
+            f'<span class="muted">D/U '
+            f'{_e(scenario.get("downside_upside_ratio"))}</span></td>'
+            f'<td>{_e(row.get("screen_score"))}<br>'
+            f'<span class="muted">coverage '
+            f'{_e(row.get("screen_coverage"))}</span></td>'
             f'<td>{_e(row.get("correlation_baskets"))}</td>'
             f'<td>{_e(row.get("missing_inputs"))}</td>'
             "</tr>"
         )
     table = (
         '<div class="table-wrap"><table><thead><tr>'
-        '<th>Manual</th><th>Symbol</th><th>Company thesis</th><th>Security readiness</th>'
-        '<th>Posture / reason</th><th>Current / as-of</th><th>1M / 3M / 6M</th>'
-        '<th>Scenario EV / skew</th><th>Screen</th><th>Correlation baskets</th><th>Blocking gaps</th>'
+        '<th>Manual</th><th>Symbol</th><th>Company thesis</th>'
+        '<th>Security readiness</th><th>Posture / reason</th>'
+        '<th>Current / as-of</th><th>1M / 3M / 6M</th>'
+        '<th>Scenario EV / skew</th><th>Screen</th>'
+        '<th>Correlation baskets</th><th>Blocking gaps</th>'
         "</tr></thead><tbody>"
-        + ("".join(body_rows) if body_rows else '<tr><td colspan="11">No decision candidates.</td></tr>')
+        + (
+            "".join(body_rows)
+            if body_rows
+            else '<tr><td colspan="11">No decision candidates.</td></tr>'
+        )
         + "</tbody></table></div>"
     )
     baskets = payload.get("correlation_baskets") or []
     basket_html = "".join(
         f'<div class="subtheme"><strong>{_e(item.get("basket"))}</strong> · '
-        f'{_e(item.get("candidate_count"))} candidates<div class="muted">{_e(item.get("symbols"))}</div></div>'
+        f'{_e(item.get("candidate_count"))} candidates'
+        f'<div class="muted">{_e(item.get("symbols"))}</div></div>'
         for item in baskets
     ) or '<div class="empty">No correlation baskets configured.</div>'
+
+    health = payload.get("market_context_health") or {}
+    market_health = (
+        '<div class="account-strip">'
+        f'<span>Market context <strong>{_badge(health.get("status"))}</strong></span>'
+        f'<span>Generated <strong>{_e(health.get("generated_at"))}</strong></span>'
+        f'<span>Unavailable <strong>{_e(health.get("unavailable_count"))}</strong></span>'
+        f'<span>Partial <strong>{_e(health.get("partial_count"))}</strong></span>'
+        f'<span>Contract <strong>{_e(health.get("contract"))}</strong></span>'
+        "</div>"
+    )
+
+    private_risk = payload.get("portfolio_decision_risk") or {}
+    rolls = private_risk.get("roll_window_counts") or {}
+    portfolio_health = (
+        '<div class="account-strip">'
+        f'<span>Thesis ID gaps <strong>'
+        f'{_e(private_risk.get("missing_thesis_id_count"))}</strong></span>'
+        f'<span>Unmapped positions <strong>'
+        f'{_e(private_risk.get("unmapped_symbol_count"))}</strong></span>'
+        f'<span>Max basket gross weight <strong>'
+        f'{_e(private_risk.get("max_basket_gross_weight"))}</strong></span>'
+        f'<span>Protective Δ coverage <strong>'
+        f'{_e(private_risk.get("hedge_coverage_ratio"))}</strong></span>'
+        f'<span>Roll ≤90/180/270d <strong>'
+        f'{_e(rolls.get("dte_le_90"))}/'
+        f'{_e(rolls.get("dte_le_180"))}/'
+        f'{_e(rolls.get("dte_le_270"))}</strong></span>'
+        f'<span>Flags <strong>{_e(private_risk.get("review_flags"))}</strong></span>'
+        "</div>"
+    )
+
     log = payload.get("decision_log") or {}
     calibration = (
         '<div class="account-strip">'
         f'<span>Decisions <strong>{_e(log.get("decision_count"))}</strong></span>'
         f'<span>Resolved <strong>{_e(log.get("resolved_count"))}</strong></span>'
-        f'<span>Calibrated forecasts <strong>{_e(log.get("calibrated_forecast_count"))}</strong></span>'
+        f'<span>Calibrated forecasts <strong>'
+        f'{_e(log.get("calibrated_forecast_count"))}</strong></span>'
         f'<span>Brier score <strong>{_e(log.get("brier_score"))}</strong></span>'
         f'<span>Status <strong>{_badge(log.get("status"))}</strong></span>'
         "</div>"
     )
     return (
         START
-        + '<section id="decision"><div class="section-head"><h2>Decision readiness & scenario skew</h2>'
-        '<p>Company thesis, security readiness and action posture are separate. Missing valuation/evidence remains a blocker.</p></div>'
-        f'<div class="cards">{cards}</div>{table}'
-        '<h3>Correlated research baskets</h3>'
-        f'<div class="theme-card">{basket_html}</div>'
-        '<h3>Decision calibration</h3>'
-        f'{calibration}<div class="privacy-note">Append-only decision history. Fewer than 10 resolved probability forecasts is explicitly insufficient for calibration. No automatic orders.</div>'
-        "</section>"
+        + '<section id="decision"><div class="section-head">'
+        '<h2>Decision readiness & scenario skew</h2>'
+        '<p>Company thesis, security readiness and action posture are separate. '
+        'Missing valuation/evidence remains a blocker.</p></div>'
+        + market_health
+        + f'<div class="cards">{cards}</div>{table}'
+        + '<h3>Correlated research baskets</h3>'
+        + f'<div class="theme-card">{basket_html}</div>'
+        + '<h3>Private portfolio decision-risk health</h3>'
+        + portfolio_health
+        + '<div class="privacy-note">Only aggregate counts/ratios are public; '
+        'symbols, basket names, contracts and account values remain private.</div>'
+        + '<h3>Decision calibration</h3>'
+        + calibration
+        + '<div class="privacy-note">Append-only decision history. Fewer than '
+        '10 resolved probability forecasts is explicitly insufficient for '
+        'calibration. No automatic orders.</div>'
+        + "</section>"
         + END
     )
 
