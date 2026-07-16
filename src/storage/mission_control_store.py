@@ -2,6 +2,7 @@
 
 This module reads only public-safe state. Exact holdings, contracts, costs and
 account values are never loaded into or emitted by the public dashboard.
+Trump monitoring exposes source/health/count metadata but never post text.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from src.storage.state_manager import read_json
 
 SCHEMA_VERSION = 1
 SNAPSHOT_STALE_HOURS = 72
+TRUMP_HEALTH_STALE_HOURS = 1
 
 
 def _envelope(data: dict[str, Any], source_files: list[str]) -> dict[str, Any]:
@@ -74,9 +76,133 @@ def _attention(
     }
 
 
+def _trump_attention(
+    trump_health: dict[str, Any],
+) -> list[dict[str, Any]]:
+    queue: list[dict[str, Any]] = []
+    if not trump_health:
+        return [
+            _attention(
+                "P1",
+                "source_health",
+                "Trump monitor has no health state",
+                (
+                    "The workflow has not proved that a current source is "
+                    "reachable. Do not assume Trump posts are being captured."
+                ),
+            )
+        ]
+
+    status = str(trump_health.get("status") or "unknown")
+    source = trump_health.get("source")
+    delivery = str(trump_health.get("delivery_status") or "unknown")
+    checked_at = trump_health.get("checked_at")
+    age = _snapshot_age_hours(checked_at)
+    attempts = trump_health.get("attempts") or []
+
+    if status != "healthy":
+        queue.append(
+            _attention(
+                "P0",
+                "source_health",
+                "Trump monitor has no usable current source",
+                (
+                    f"status={status}; delivery={delivery}. The workflow must "
+                    "remain red instead of treating an empty response as normal."
+                ),
+            )
+        )
+    if not checked_at:
+        queue.append(
+            _attention(
+                "P1",
+                "source_health",
+                "Trump monitor has never published a check timestamp",
+                "Source availability cannot be verified.",
+            )
+        )
+    elif age is None:
+        queue.append(
+            _attention(
+                "P1",
+                "source_health",
+                "Trump monitor check timestamp is invalid",
+                f"checked_at={checked_at!r}",
+            )
+        )
+    elif age > TRUMP_HEALTH_STALE_HOURS:
+        queue.append(
+            _attention(
+                "P1",
+                "source_health",
+                "Trump monitor health is stale",
+                f"Last verified check is approximately {age:g} hours old.",
+            )
+        )
+
+    official_attempt = next(
+        (
+            item
+            for item in attempts
+            if isinstance(item, dict)
+            and item.get("source") == "truth_social_official_api"
+        ),
+        {},
+    )
+    if (
+        status == "healthy"
+        and source == "cnn_historical_archive"
+        and official_attempt.get("status") != "healthy"
+    ):
+        queue.append(
+            _attention(
+                "P2",
+                "source_health",
+                "Trump monitor is using a fresh CNN mirror, not the official API",
+                (
+                    "The official Truth Social public API is currently unavailable "
+                    f"from the runner ({official_attempt.get('error') or 'unknown'}). "
+                    "The mirror is accepted only while its newest timestamp is fresh."
+                ),
+            )
+        )
+
+    capture_policy = str(trump_health.get("capture_policy") or "")
+    keyword_policy = str(trump_health.get("keyword_policy") or "")
+    if not capture_policy.startswith("all_posts"):
+        queue.append(
+            _attention(
+                "P0",
+                "configuration",
+                "Trump monitor is not configured for all-post capture",
+                f"capture_policy={capture_policy or 'missing'}",
+            )
+        )
+    if "metadata" not in keyword_policy:
+        queue.append(
+            _attention(
+                "P0",
+                "configuration",
+                "Trump keywords may still be acting as a content filter",
+                f"keyword_policy={keyword_policy or 'missing'}",
+            )
+        )
+    if delivery in {"delivery_failed_partial", "source_unavailable"}:
+        queue.append(
+            _attention(
+                "P0",
+                "delivery",
+                "Trump post delivery is incomplete",
+                f"delivery_status={delivery}",
+            )
+        )
+    return queue
+
+
 def _build_attention_queue(
     snapshot: dict[str, Any],
     drawdown_state: dict[str, Any],
+    trump_health: dict[str, Any],
     theses: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     queue: list[dict[str, Any]] = []
@@ -183,6 +309,8 @@ def _build_attention_queue(
                 )
             )
 
+    queue.extend(_trump_attention(trump_health))
+
     today = datetime.now(TIMEZONE_USER).date()
     for thesis in theses:
         symbol = thesis.get("symbol")
@@ -243,6 +371,7 @@ def build_mission_control_payload() -> dict[str, Any]:
     """Build the dashboard first-screen decision-support payload."""
     snapshot = read_json("position_snapshot.json", default={})
     drawdown_state = read_json("drawdown_history.json", default={})
+    trump_health = read_json("trump_monitor_health.json", default={})
     thesis_doc = read_json("thesis_tracker.json", default={})
     allocation_doc = read_json("capital_allocation.json", default={})
 
@@ -250,6 +379,8 @@ def build_mission_control_payload() -> dict[str, Any]:
         snapshot = {}
     if not isinstance(drawdown_state, dict):
         drawdown_state = {}
+    if not isinstance(trump_health, dict):
+        trump_health = {}
 
     themes = thesis_doc.get("themes", []) if isinstance(thesis_doc, dict) else []
     theses = thesis_doc.get("symbols", []) if isinstance(thesis_doc, dict) else []
@@ -322,7 +453,12 @@ def build_mission_control_payload() -> dict[str, Any]:
     if not isinstance(position_count, int):
         position_count = 0
 
-    attention = _build_attention_queue(snapshot, drawdown_state, theses)
+    attention = _build_attention_queue(
+        snapshot,
+        drawdown_state,
+        trump_health,
+        theses,
+    )
     regime = regime_payload.get("data", {})
 
     summary = {
@@ -332,6 +468,9 @@ def build_mission_control_payload() -> dict[str, Any]:
         "position_count": position_count,
         "position_source": snapshot.get("position_source"),
         "position_workflow_status": snapshot.get("workflow_status"),
+        "trump_monitor_status": trump_health.get("status"),
+        "trump_monitor_source": trump_health.get("source"),
+        "trump_monitor_checked_at": trump_health.get("checked_at"),
         "estimated_account_value": None,
         "snapshot_at": snapshot.get("snapshot_at"),
         "snapshot_age_hours": _snapshot_age_hours(snapshot.get("snapshot_at")),
@@ -363,6 +502,32 @@ def build_mission_control_payload() -> dict[str, Any]:
             ),
             "positions": [],
         },
+        "trump_monitor": {
+            "status": trump_health.get("status"),
+            "source": trump_health.get("source"),
+            "latest_post_at": trump_health.get("latest_post_at"),
+            "checked_at": trump_health.get("checked_at"),
+            "health_age_hours": _snapshot_age_hours(
+                trump_health.get("checked_at")
+            ),
+            "attempts": list(trump_health.get("attempts") or []),
+            "source_raw_count": trump_health.get("source_raw_count"),
+            "source_returned_count": trump_health.get(
+                "source_returned_count"
+            ),
+            "source_limit": trump_health.get("source_limit"),
+            "capture_started_at": trump_health.get("capture_started_at"),
+            "initial_backfill_hours": trump_health.get(
+                "initial_backfill_hours"
+            ),
+            "eligible_count": trump_health.get("eligible_count"),
+            "new_count": trump_health.get("new_count"),
+            "delivered_count": trump_health.get("delivered_count"),
+            "delivery_status": trump_health.get("delivery_status"),
+            "capture_policy": trump_health.get("capture_policy"),
+            "keyword_policy": trump_health.get("keyword_policy"),
+            "content_published_here": False,
+        },
         "themes": themes,
         "theses": theses,
         "allocation_queue": allocation_rows,
@@ -377,6 +542,7 @@ def build_mission_control_payload() -> dict[str, Any]:
         [
             "position_snapshot.json",
             "drawdown_history.json",
+            "trump_monitor_health.json",
             "thesis_tracker.json",
             "capital_allocation.json",
             "layer_macro_regime_state.json",
