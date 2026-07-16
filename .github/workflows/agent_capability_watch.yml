@@ -1,0 +1,110 @@
+name: Agent Capability Watch
+
+on:
+  schedule:
+    - cron: '17 10 * * 1,4'
+      timezone: 'Asia/Taipei'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/agent-capability-watch.json'
+      - '.github/workflows/agent_capability_watch.yml'
+      - '.github/workflows/agent_chatops.yml'
+      - '.github/workflows/claude_review.yml'
+      - 'scripts/agent_capability_watch.py'
+      - 'scripts/verify_agent_workflow_contract.py'
+      - 'tests/test_agent_capability_watch.py'
+      - 'tests/test_agent_workflow_contract.py'
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'docs/agent-team-workflow.md'
+      - 'docs/agent-workflow-official-basis.md'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: agent-capability-watch
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify durable workflow contract
+        id: contract
+        continue-on-error: true
+        run: python scripts/verify_agent_workflow_contract.py
+      - name: Test watcher and verifier
+        id: tests
+        continue-on-error: true
+        run: python -m pytest -q tests/test_agent_capability_watch.py tests/test_agent_workflow_contract.py
+      - name: Audit local contract only on pull requests
+        if: github.event_name == 'pull_request'
+        id: offline
+        continue-on-error: true
+        run: python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline --report "$RUNNER_TEMP/report.json" --markdown "$RUNNER_TEMP/report.md"
+      - name: Audit current official sources
+        if: github.event_name != 'pull_request'
+        id: online
+        continue-on-error: true
+        run: python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --report "$RUNNER_TEMP/report.json" --markdown "$RUNNER_TEMP/report.md"
+      - name: Open or update Kevin review issue
+        if: always() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          REPORT_JSON: ${{ runner.temp }}/report.json
+          REPORT_MD: ${{ runner.temp }}/report.md
+          CONTRACT_OUTCOME: ${{ steps.contract.outcome }}
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+          ONLINE_OUTCOME: ${{ steps.online.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh label create agent-capability-watch --repo "$GH_REPO" --color 8250DF --description 'Official agent docs or local workflow contract require review' --force >/dev/null
+          gh label create needs-kevin --repo "$GH_REPO" --color D93F0B --description 'Requires Kevin decision or approval' --force >/dev/null
+          issue=$(gh issue list --repo "$GH_REPO" --state open --label agent-capability-watch --limit 1 --json number --jq '.[0].number // empty')
+          if [ ! -s "$REPORT_JSON" ] || [ ! -s "$REPORT_MD" ]; then
+            printf '# Agent capability watcher failed\n\n- Contract: **%s**\n- Tests: **%s**\n- Online audit: **%s**\n\nWatcher failure prevents a clean result; investigate before accepting any capability change.\n' "$CONTRACT_OUTCOME" "$TEST_OUTCOME" "$ONLINE_OUTCOME" > "$REPORT_MD"
+            status=needs_review
+            fingerprint="watcher-failed-${GITHUB_SHA}"
+          else
+            status=$(jq -r '.overall_status' "$REPORT_JSON")
+            fingerprint=$(jq -r '.fingerprint' "$REPORT_JSON")
+          fi
+          if [ "$CONTRACT_OUTCOME" != success ] || [ "$TEST_OUTCOME" != success ] || [ "$ONLINE_OUTCOME" != success ]; then
+            status=needs_review
+          fi
+          if [ "$status" = ok ]; then
+            if [ -n "$issue" ]; then
+              gh issue comment "$issue" --repo "$GH_REPO" --body "Official sources、30-day期限與 local workflow contract 已重新對齊；fingerprint \`$fingerprint\`。"
+              gh issue close "$issue" --repo "$GH_REPO" --reason completed
+            fi
+            exit 0
+          fi
+          marker="<!-- agent-capability-watch:fingerprint=$fingerprint -->"
+          if [ -z "$issue" ]; then
+            gh issue create --repo "$GH_REPO" --title 'Agent capability review required' --body-file "$REPORT_MD" --label agent-capability-watch --label needs-kevin --assignee "$OWNER"
+          else
+            body=$(gh issue view "$issue" --repo "$GH_REPO" --json body --jq '.body')
+            if ! grep -Fq "$marker" <<<"$body"; then
+              gh issue edit "$issue" --repo "$GH_REPO" --body-file "$REPORT_MD" --add-label needs-kevin --add-assignee "$OWNER"
+              gh issue comment "$issue" --repo "$GH_REPO" --body "New capability/workflow fingerprint: \`$fingerprint\`. Re-read official docs and update through a Draft PR; do not auto-accept baseline."
+            fi
+          fi
+      - name: Enforce watcher reliability on PR
+        if: always() && github.event_name == 'pull_request'
+        env:
+          CONTRACT_OUTCOME: ${{ steps.contract.outcome }}
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+          OFFLINE_OUTCOME: ${{ steps.offline.outcome }}
+        run: |
+          [ "$CONTRACT_OUTCOME" = success ] && [ "$TEST_OUTCOME" = success ] && [ "$OFFLINE_OUTCOME" = success ]
