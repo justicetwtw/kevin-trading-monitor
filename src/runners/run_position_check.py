@@ -1,12 +1,13 @@
 """Daily private position management check.
 
 Exact positions and account values exist only in memory. Public repository state
-contains redacted health metadata, encrypted drawdown values and opaque alert
-keys only. A silent private Telegram risk brief is sent after each configured
-EOD run.
+contains redacted health metadata, encrypted drawdown values, opaque alert keys
+and generic error codes only. A silent private Telegram risk brief is sent after
+each configured EOD run.
 """
 
 import logging
+import sys
 
 from loguru import logger
 
@@ -38,12 +39,7 @@ def _enable_private_log_guard() -> None:
 
 
 def _position_alert_level(alert: dict, kind: str) -> str:
-    """Position exceptions must be routable P1, not silent P2.
-
-    The previous default was `yellow`; `alert_router` intentionally does not push
-    P2/P3, so valid LEAPS/short-delta/hedge alerts were discarded. Position
-    exceptions now map to P1 (`green`/`orange`). Drawdown has its own P0 logic.
-    """
+    """Position exceptions must be routable P1, not silent P2."""
     explicit = alert.get("alert_level")
     if explicit:
         return str(explicit)
@@ -52,8 +48,9 @@ def _position_alert_level(alert: dict, kind: str) -> str:
     return "green"
 
 
-def _route_with_kind(alerts, kind: str) -> int:
+def _route_with_kind(alerts, kind: str) -> tuple[int, int]:
     pushed = 0
+    failures = 0
     for alert in alerts or []:
         try:
             merged = {
@@ -67,11 +64,16 @@ def _route_with_kind(alerts, kind: str) -> int:
             if route_alert(merged):
                 pushed += 1
         except Exception:
+            failures += 1
             logger.error(f"{kind} private alert processing failed (details redacted)")
-    return pushed
+    return pushed, failures
 
 
-def _public_snapshot(snapshot: dict) -> dict:
+def _public_snapshot(
+    snapshot: dict,
+    workflow_status: str = "healthy",
+    error_codes: list[str] | None = None,
+) -> dict:
     """Return aggregate state safe to commit in a public repository."""
     stocks = snapshot.get("stocks") or []
     options = snapshot.get("options") or []
@@ -85,6 +87,8 @@ def _public_snapshot(snapshot: dict) -> dict:
         "n_short_options": int(snapshot.get("n_short_options", 0) or 0),
         "snapshot_at": snapshot.get("snapshot_at"),
         "status": "configured" if configured else "empty",
+        "workflow_status": workflow_status,
+        "error_codes": sorted(set(error_codes or [])),
         "privacy": "redacted_public_state",
     }
 
@@ -106,82 +110,99 @@ def _send_private_risk_brief(snapshot: dict) -> bool:
         return False
 
 
-def main() -> None:
+def _scan_safely(scanner, error_code: str, errors: list[str]) -> list:
+    try:
+        return scanner() or []
+    except Exception:
+        errors.append(error_code)
+        logger.error(f"{error_code} (details redacted)")
+        return []
+
+
+def main() -> int:
+    """Run the check and return non-zero when private monitoring is degraded."""
     _enable_private_log_guard()
     logger.info("=== run_position_check start (private details redacted) ===")
+    errors: list[str] = []
+    pushed = 0
+
+    leaps_alerts = _scan_safely(
+        scan_all_leaps, "leaps_scan_failed", errors
+    )
+    short_alerts = _scan_safely(
+        scan_all_shorts, "short_delta_scan_failed", errors
+    )
+    hedge_alerts = _scan_safely(
+        scan_all_hedges, "hedge_scan_failed", errors
+    )
+
+    for alerts, kind in (
+        (leaps_alerts, "leaps_pnl"),
+        (short_alerts, "short_delta"),
+        (hedge_alerts, "hedge_dte"),
+    ):
+        sent, failed = _route_with_kind(alerts, kind)
+        pushed += sent
+        if failed:
+            errors.append(f"{kind}_alert_processing_failed")
+
+    snapshot: dict = {}
     try:
-        try:
-            leaps_alerts = scan_all_leaps() or []
-        except Exception:
-            logger.error("scan_all_leaps failed (details redacted)")
-            leaps_alerts = []
-        try:
-            short_alerts = scan_all_shorts() or []
-        except Exception:
-            logger.error("scan_all_shorts failed (details redacted)")
-            short_alerts = []
-        try:
-            hedge_alerts = scan_all_hedges() or []
-        except Exception:
-            logger.error("scan_all_hedges failed (details redacted)")
-            hedge_alerts = []
-
-        pushed = 0
-        pushed += _route_with_kind(leaps_alerts, "leaps_pnl")
-        pushed += _route_with_kind(short_alerts, "short_delta")
-        pushed += _route_with_kind(hedge_alerts, "hedge_dte")
-
-        snapshot: dict = {}
-        try:
-            snapshot = get_account_snapshot() or {}
-            if not write_json(
-                "position_snapshot.json", _public_snapshot(snapshot)
-            ):
-                logger.error(
-                    "position_check: failed to persist redacted position snapshot"
-                )
-
-            # `get_account_snapshot` returns `total_estimated_value`. The old
-            # runner used `total_value`, so drawdown tracking never ran.
-            total = snapshot.get("total_estimated_value")
-            if isinstance(total, (int, float)) and total > 0:
-                drawdown = update_account_value(total) or {}
-                if (
-                    drawdown.get("alert_level")
-                    and drawdown["alert_level"] != "normal"
-                ):
-                    pct = drawdown.get("drawdown_pct")
-                    pct_str = (
-                        f"{pct * 100:.1f}%" if pct is not None else "n/a"
-                    )
-                    drawdown_alert = {
-                        "kind": "drawdown",
-                        "level": drawdown.get("alert_level"),
-                        "alert_level": "green",
-                        "sensitive": True,
-                        "dedup_key": "private-position::account-drawdown",
-                        "message": (
-                            f"回撤 {pct_str} — {drawdown.get('action', '')}"
-                        ),
-                    }
-                    if route_alert(drawdown_alert):
-                        pushed += 1
-            else:
-                logger.info(
-                    "position_check: no positive total_estimated_value "
-                    "(mode_3 / no positions)"
-                )
-        except Exception:
-            logger.error("drawdown/snapshot check failed (details redacted)")
-
-        brief_sent = _send_private_risk_brief(snapshot)
-        logger.info(
-            f"=== run_position_check done ({pushed} alerts, "
-            f"private_brief_sent={brief_sent}) ==="
-        )
+        snapshot = get_account_snapshot() or {}
     except Exception:
-        logger.error("run_position_check crashed (details redacted)")
+        errors.append("snapshot_failed")
+        logger.error("snapshot_failed (details redacted)")
+
+    configured = bool(snapshot.get("stocks") or snapshot.get("options"))
+    if snapshot.get("mode") == "mode_1" and not configured:
+        errors.append("private_positions_missing_or_invalid")
+
+    total = snapshot.get("total_estimated_value")
+    if isinstance(total, (int, float)) and total > 0:
+        try:
+            drawdown = update_account_value(total) or {}
+            if (
+                drawdown.get("alert_level")
+                and drawdown["alert_level"] != "normal"
+            ):
+                pct = drawdown.get("drawdown_pct")
+                pct_str = f"{pct * 100:.1f}%" if pct is not None else "n/a"
+                drawdown_alert = {
+                    "kind": "drawdown",
+                    "level": drawdown.get("alert_level"),
+                    "alert_level": "green",
+                    "sensitive": True,
+                    "dedup_key": "private-position::account-drawdown",
+                    "message": (
+                        f"回撤 {pct_str} — {drawdown.get('action', '')}"
+                    ),
+                }
+                if route_alert(drawdown_alert):
+                    pushed += 1
+        except Exception:
+            errors.append("drawdown_update_failed")
+            logger.error("drawdown_update_failed (details redacted)")
+    elif configured:
+        # Positions exist but no positive account estimate means price/IV coverage
+        # was insufficient for cross-day drawdown monitoring.
+        errors.append("account_value_unavailable")
+
+    brief_sent = _send_private_risk_brief(snapshot)
+    if configured and not brief_sent:
+        errors.append("private_brief_failed")
+
+    workflow_status = "healthy" if not errors else "degraded"
+    public = _public_snapshot(snapshot, workflow_status, errors)
+    if not write_json("position_snapshot.json", public):
+        errors.append("public_snapshot_write_failed")
+        workflow_status = "failed"
+
+    logger.info(
+        f"=== run_position_check done ({pushed} alerts, "
+        f"private_brief_sent={brief_sent}, status={workflow_status}) ==="
+    )
+    return 0 if not errors else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
