@@ -42,3 +42,29 @@ jobs:
           path: pytest.log
           if-no-files-found: error
           retention-days: 7
+
+  trump-source-probe:
+    # This is deliberately blocking: mocked tests are not evidence that the
+    # live Truth Social source is reachable from a GitHub-hosted runner.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install minimal project dependencies
+        run: |
+          python -m pip install --upgrade pip --quiet
+          pip install --quiet -r requirements.txt
+      - name: Probe current Trump source without post content
+        run: python -m src.runners.run_trump_source_probe
+      - name: Upload source health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trump-source-probe
+          path: trump_source_probe.json
+          if-no-files-found: error
+          retention-days: 7
