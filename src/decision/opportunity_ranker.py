@@ -20,6 +20,8 @@ READINESS_ORDER = {
 
 THESIS_BROKEN = {"broken", "invalidated", "retired"}
 THESIS_WATCH = {"watch", "at_risk", "impaired", "changed"}
+MAX_SCENARIO_MARKET_DATE_GAP_DAYS = 3
+MAX_SCENARIO_MARKET_PRICE_DRIFT = 0.05
 
 
 def _number(value: Any) -> float | None:
@@ -73,19 +75,25 @@ def validate_scenario(scenario: Any) -> tuple[dict[str, Any] | None, list[str]]:
             errors.append(f"scenario_case_{index}_price_invalid")
             continue
         probability_sum += probability
-        normalized.append({"name": name, "probability": probability, "price": terminal})
+        normalized.append(
+            {"name": name, "probability": probability, "price": terminal}
+        )
 
     if abs(probability_sum - 1.0) > 0.0001:
         errors.append("scenario_probabilities_must_sum_to_one")
     if errors or current is None or current <= 0 or as_of is None:
         return None, sorted(set(errors))
 
-    expected_price = sum(item["probability"] * item["price"] for item in normalized)
+    expected_price = sum(
+        item["probability"] * item["price"] for item in normalized
+    )
     returns = [(item["price"] / current) - 1 for item in normalized]
     expected_return = (expected_price / current) - 1
     downside = min(returns)
     upside = max(returns)
-    downside_upside = abs(downside) / upside if downside < 0 < upside else None
+    downside_upside = (
+        abs(downside) / upside if downside < 0 < upside else None
+    )
     return {
         "current_price": current,
         "as_of": as_of.isoformat(),
@@ -95,13 +103,21 @@ def validate_scenario(scenario: Any) -> tuple[dict[str, Any] | None, list[str]]:
         "expected_return_pct": round(expected_return, 6),
         "downside_return_pct": round(downside, 6),
         "upside_return_pct": round(upside, 6),
-        "downside_upside_ratio": round(downside_upside, 4) if downside_upside is not None else None,
-        "probability_origin": scenario.get("probability_origin") or "analyst_assumption_unapproved",
-        "approval_status": scenario.get("approval_status") or "draft_for_kevin_confirmation",
+        "downside_upside_ratio": (
+            round(downside_upside, 4)
+            if downside_upside is not None
+            else None
+        ),
+        "probability_origin": scenario.get("probability_origin")
+        or "analyst_assumption_unapproved",
+        "approval_status": scenario.get("approval_status")
+        or "draft_for_kevin_confirmation",
     }, []
 
 
-def _market_context_quality(context: dict[str, Any]) -> tuple[str, list[str]]:
+def _market_context_quality(
+    context: dict[str, Any],
+) -> tuple[str, list[str]]:
     missing = []
     as_of = _date(context.get("as_of"))
     price = _number(context.get("current_price"))
@@ -112,6 +128,37 @@ def _market_context_quality(context: dict[str, Any]) -> tuple[str, list[str]]:
     if context.get("status") not in {"healthy", "partial"}:
         missing.append("market_context_unhealthy")
     return ("usable" if not missing else "insufficient"), missing
+
+
+def _scenario_market_anchor_errors(
+    scenario: dict[str, Any] | None,
+    context: dict[str, Any],
+) -> list[str]:
+    """Reject scenario math anchored to a materially different market snapshot."""
+    if scenario is None:
+        return []
+    errors: list[str] = []
+    scenario_price = _number(scenario.get("current_price"))
+    market_price = _number(context.get("current_price"))
+    scenario_date = _date(scenario.get("as_of"))
+    market_date = _date(context.get("as_of"))
+    if (
+        scenario_price is not None
+        and scenario_price > 0
+        and market_price is not None
+        and market_price > 0
+        and abs((scenario_price / market_price) - 1)
+        > MAX_SCENARIO_MARKET_PRICE_DRIFT
+    ):
+        errors.append("scenario_price_anchor_stale")
+    if (
+        scenario_date is not None
+        and market_date is not None
+        and abs((scenario_date - market_date).days)
+        > MAX_SCENARIO_MARKET_DATE_GAP_DAYS
+    ):
+        errors.append("scenario_market_asof_mismatch")
+    return errors
 
 
 def assess_candidate(
@@ -129,16 +176,22 @@ def assess_candidate(
     watchlist = watchlist or {}
     options = options or {}
     market_context = market_context or {}
-    inputs = candidate.get("decision_inputs") if isinstance(candidate.get("decision_inputs"), dict) else {}
+    inputs = (
+        candidate.get("decision_inputs")
+        if isinstance(candidate.get("decision_inputs"), dict)
+        else {}
+    )
 
     thesis_status = str(thesis.get("status") or "missing")
     coverage = _number(watchlist.get("coverage"))
     screen_score = _number(watchlist.get("total_score"))
     scenario, scenario_errors = validate_scenario(inputs.get("scenario"))
     market_quality, market_errors = _market_context_quality(market_context)
+    anchor_errors = _scenario_market_anchor_errors(scenario, market_context)
     missing: list[str] = []
     missing.extend(scenario_errors)
     missing.extend(market_errors)
+    missing.extend(anchor_errors)
     if not thesis:
         missing.append("symbol_thesis_missing")
     if not thesis.get("invalidation"):
@@ -152,10 +205,18 @@ def assess_candidate(
     if screen_score is None:
         missing.append("complete_screen_score_missing")
 
-    evidence = inputs.get("evidence") if isinstance(inputs.get("evidence"), dict) else {}
+    evidence = (
+        inputs.get("evidence")
+        if isinstance(inputs.get("evidence"), dict)
+        else {}
+    )
     evidence_quality = str(evidence.get("quality") or "unrated")
     evidence_as_of = _date(evidence.get("as_of"))
-    evidence_sources = evidence.get("sources") if isinstance(evidence.get("sources"), list) else []
+    evidence_sources = (
+        evidence.get("sources")
+        if isinstance(evidence.get("sources"), list)
+        else []
+    )
     if evidence_quality not in {"high", "medium"}:
         missing.append("evidence_quality_not_reviewable")
     if evidence_as_of is None:
@@ -163,7 +224,11 @@ def assess_candidate(
     if not evidence_sources:
         missing.append("evidence_sources_missing")
 
-    catalyst = inputs.get("next_catalyst") if isinstance(inputs.get("next_catalyst"), dict) else {}
+    catalyst = (
+        inputs.get("next_catalyst")
+        if isinstance(inputs.get("next_catalyst"), dict)
+        else {}
+    )
     catalyst_date = _date(catalyst.get("date"))
     if catalyst_date is None:
         missing.append("dated_catalyst_missing")
@@ -171,10 +236,14 @@ def assess_candidate(
         missing.append("catalyst_source_missing")
 
     correlation_baskets = [
-        str(item) for item in (inputs.get("correlation_baskets") or []) if item
+        str(item)
+        for item in (inputs.get("correlation_baskets") or [])
+        if item
     ]
     instrument_lenses = [
-        str(item) for item in (inputs.get("instrument_lenses") or []) if item
+        str(item)
+        for item in (inputs.get("instrument_lenses") or [])
+        if item
     ]
     if not correlation_baskets:
         missing.append("correlation_baskets_missing")
@@ -184,11 +253,17 @@ def assess_candidate(
     if thesis_status in THESIS_BROKEN:
         readiness = "re_underwrite"
         posture = "re_underwrite"
-        reason = "company thesis is broken/invalidated; security ranking is suspended"
-    elif scenario is None or market_quality != "usable":
+        reason = (
+            "company thesis is broken/invalidated; "
+            "security ranking is suspended"
+        )
+    elif scenario is None or market_quality != "usable" or anchor_errors:
         readiness = "not_decision_grade"
         posture = "wait_for_proof"
-        reason = "current price/source/as-of and a valid probability scenario are required"
+        reason = (
+            "a current source/as-of, valid probability scenario and "
+            "market-consistent price anchor are required"
+        )
     elif any(
         item in missing
         for item in {
@@ -203,7 +278,10 @@ def assess_candidate(
     ):
         readiness = "screen_grade"
         posture = "wait_for_proof"
-        reason = "scenario math exists, but evidence/screen/catalyst coverage is incomplete"
+        reason = (
+            "scenario math exists, but evidence/screen/catalyst "
+            "coverage is incomplete"
+        )
     else:
         readiness = "review_ready"
         expected = scenario.get("expected_return_pct") if scenario else None
@@ -216,10 +294,16 @@ def assess_candidate(
             reason = "credible downside exceeds modeled upside"
         elif thesis_status in THESIS_WATCH:
             posture = "re_underwrite"
-            reason = "company thesis is on watch/impaired even though security inputs are complete"
+            reason = (
+                "company thesis is on watch/impaired even though "
+                "security inputs are complete"
+            )
         else:
             posture = "eligible_for_capital_review"
-            reason = "inputs are sufficient for Kevin to review, not an automatic trade instruction"
+            reason = (
+                "inputs are sufficient for Kevin to review, "
+                "not an automatic trade instruction"
+            )
 
     return {
         "symbol": symbol,
@@ -240,13 +324,17 @@ def assess_candidate(
             "return_1m": market_context.get("return_1m"),
             "return_3m": market_context.get("return_3m"),
             "return_6m": market_context.get("return_6m"),
-            "pct_from_52w_high": market_context.get("pct_from_52w_high"),
+            "pct_from_52w_high": market_context.get(
+                "pct_from_52w_high"
+            ),
             "realized_vol_20d": market_context.get("realized_vol_20d"),
             "source": market_context.get("source"),
         },
         "scenario": scenario,
         "evidence_quality": evidence_quality,
-        "evidence_as_of": evidence_as_of.isoformat() if evidence_as_of else None,
+        "evidence_as_of": (
+            evidence_as_of.isoformat() if evidence_as_of else None
+        ),
         "evidence_sources": evidence_sources,
         "next_catalyst": {
             "date": catalyst_date.isoformat() if catalyst_date else None,
@@ -260,7 +348,8 @@ def assess_candidate(
         "ivp": options.get("ivp"),
         "regime": regime,
         "missing_inputs": sorted(set(missing)),
-        "threshold_origin": inputs.get("threshold_origin") or "draft_for_kevin_confirmation",
+        "threshold_origin": inputs.get("threshold_origin")
+        or "draft_for_kevin_confirmation",
         "not_a_trade_signal": True,
     }
 
@@ -275,16 +364,24 @@ def rank_opportunities(
     regime: str | None,
 ) -> list[dict[str, Any]]:
     thesis_by_symbol = {
-        str(item.get("symbol")): item for item in theses if isinstance(item, dict)
+        str(item.get("symbol")): item
+        for item in theses
+        if isinstance(item, dict)
     }
     watch_by_symbol = {
-        str(item.get("symbol")): item for item in watchlist_rows if isinstance(item, dict)
+        str(item.get("symbol")): item
+        for item in watchlist_rows
+        if isinstance(item, dict)
     }
     option_by_symbol = {
-        str(item.get("symbol")): item for item in option_rows if isinstance(item, dict)
+        str(item.get("symbol")): item
+        for item in option_rows
+        if isinstance(item, dict)
     }
     market_by_symbol = {
-        str(item.get("symbol")): item for item in market_rows if isinstance(item, dict)
+        str(item.get("symbol")): item
+        for item in market_rows
+        if isinstance(item, dict)
     }
     rows = [
         assess_candidate(
@@ -292,7 +389,9 @@ def rank_opportunities(
             thesis=thesis_by_symbol.get(str(candidate.get("symbol"))),
             watchlist=watch_by_symbol.get(str(candidate.get("symbol"))),
             options=option_by_symbol.get(str(candidate.get("symbol"))),
-            market_context=market_by_symbol.get(str(candidate.get("symbol"))),
+            market_context=market_by_symbol.get(
+                str(candidate.get("symbol"))
+            ),
             regime=regime,
         )
         for candidate in candidates
@@ -302,8 +401,16 @@ def rank_opportunities(
     def sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
         scenario = row.get("scenario") or {}
         expected = scenario.get("expected_return_pct")
-        expected_sort = -float(expected) if isinstance(expected, (int, float)) else float("inf")
-        manual = row.get("manual_rank") if isinstance(row.get("manual_rank"), int) else 9999
+        expected_sort = (
+            -float(expected)
+            if isinstance(expected, (int, float))
+            else float("inf")
+        )
+        manual = (
+            row.get("manual_rank")
+            if isinstance(row.get("manual_rank"), int)
+            else 9999
+        )
         return (
             READINESS_ORDER.get(str(row.get("security_readiness")), 9),
             expected_sort,
@@ -315,17 +422,26 @@ def rank_opportunities(
 
 
 def summarize_decision_log(log: Any) -> dict[str, Any]:
-    rows = [item for item in (log or []) if isinstance(item, dict)] if isinstance(log, list) else []
+    rows = (
+        [item for item in (log or []) if isinstance(item, dict)]
+        if isinstance(log, list)
+        else []
+    )
     resolved = [item for item in rows if item.get("outcome") is not None]
     forecasts = [
-        item for item in resolved
+        item
+        for item in resolved
         if _number(item.get("forecast_probability")) is not None
         and isinstance(item.get("outcome"), bool)
     ]
     brier = None
     if forecasts:
         brier = sum(
-            (float(item["forecast_probability"]) - (1.0 if item["outcome"] else 0.0)) ** 2
+            (
+                float(item["forecast_probability"])
+                - (1.0 if item["outcome"] else 0.0)
+            )
+            ** 2
             for item in forecasts
         ) / len(forecasts)
     return {
@@ -333,7 +449,11 @@ def summarize_decision_log(log: Any) -> dict[str, Any]:
         "resolved_count": len(resolved),
         "calibrated_forecast_count": len(forecasts),
         "brier_score": round(brier, 6) if brier is not None else None,
-        "status": "insufficient_history" if len(forecasts) < 10 else "calibration_available",
+        "status": (
+            "insufficient_history"
+            if len(forecasts) < 10
+            else "calibration_available"
+        ),
         "append_only": True,
     }
 
@@ -351,8 +471,12 @@ def build_decision_payload(
     rows = rank_opportunities(
         list(allocation_doc.get("candidates") or []),
         theses=list(thesis_doc.get("symbols") or []),
-        watchlist_rows=list(watchlist_payload.get("data", {}).get("rows") or []),
-        option_rows=list(options_payload.get("data", {}).get("rows") or []),
+        watchlist_rows=list(
+            watchlist_payload.get("data", {}).get("rows") or []
+        ),
+        option_rows=list(
+            options_payload.get("data", {}).get("rows") or []
+        ),
         market_rows=list(market_context_doc.get("rows") or []),
         regime=regime,
     )
@@ -360,22 +484,31 @@ def build_decision_payload(
     basket_members: dict[str, list[str]] = {}
     for row in rows:
         readiness = str(row.get("security_readiness"))
-        readiness_counts[readiness] = readiness_counts.get(readiness, 0) + 1
+        readiness_counts[readiness] = (
+            readiness_counts.get(readiness, 0) + 1
+        )
         for basket in row.get("correlation_baskets") or []:
-            basket_members.setdefault(str(basket), []).append(str(row.get("symbol")))
+            basket_members.setdefault(str(basket), []).append(
+                str(row.get("symbol"))
+            )
     return {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "readiness_counts": readiness_counts,
         "rows": rows,
         "correlation_baskets": [
-            {"basket": basket, "symbols": sorted(set(symbols)), "candidate_count": len(set(symbols))}
+            {
+                "basket": basket,
+                "symbols": sorted(set(symbols)),
+                "candidate_count": len(set(symbols)),
+            }
             for basket, symbols in sorted(basket_members.items())
         ],
         "decision_log": summarize_decision_log(decision_log),
         "model_contract": {
             "company_security_action_separated": True,
             "scenario_probabilities_sum_to_one": True,
+            "scenario_market_anchor_required": True,
             "missing_data_never_neutral_filled": True,
             "score_is_screen_not_trade_instruction": True,
             "automatic_orders": False,
