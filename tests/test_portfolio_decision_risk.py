@@ -120,10 +120,15 @@ def test_public_state_cannot_reveal_symbols_or_basket_names(monkeypatch):
     private = risk.analyze_portfolio_decision_risk(_summary(), _snapshot())
     public = risk.public_decision_risk_state(private)
     serialized = str(public)
-    assert "MU" not in serialized
-    assert "NVDA" not in serialized
-    assert "ai_capex" not in serialized
-    assert "memory_cycle" not in serialized
+    for private_value in (
+        "MU",
+        "NVDA",
+        "QQQ",
+        "ai_capex",
+        "memory_cycle",
+        "portfolio_hedge",
+    ):
+        assert private_value not in serialized
     assert public["privacy"] == "aggregate_decision_risk_only"
 
 
@@ -162,4 +167,13 @@ def test_missing_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
     public = writes["position_snapshot.json"]
     assert "position_thesis_id_missing" in public["error_codes"]
     assert public["decision_risk"]["missing_thesis_id_count"] == 3
-    assert "symbol" not in str(public["decision_risk"]).lower()
+    serialized = str(public["decision_risk"])
+    for private_value in (
+        "MU",
+        "NVDA",
+        "QQQ",
+        "ai_capex",
+        "memory_cycle",
+        "portfolio_hedge",
+    ):
+        assert private_value not in serialized
