@@ -1,0 +1,113 @@
+name: Agent ChatOps
+
+# Thin deterministic dispatcher: no checkout, no tests, no AI inference, no merge/deploy.
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  agent-status:
+    if: >
+      github.event.comment.user.type != 'Bot' &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR') &&
+      (github.event.comment.body == '/agent-status' ||
+       startsWith(github.event.comment.body, '/agent-status '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Reply with read-only status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          prs=$(gh pr list --repo "$GH_REPO" --state open --json number,title,headRefName,headRefOid,labels \
+            --jq '.[] | "- #\(.number) \(.title) — `\(.headRefName)` `\(.headRefOid)` — labels: \([.labels[].name] | join(", "))"')
+          [ -n "$prs" ] || prs='（無 open PR）'
+          printf '## agent-status（read-only）\n\n%s\n\n> 觸發者 @%s；本 workflow 未 checkout、未呼叫 AI、未 merge/deploy。\n> Run: %s\n' \
+            "$prs" "$ACTOR" "$RUN_URL" > /tmp/body.md
+          gh issue comment "$ISSUE_NUM" --repo "$GH_REPO" --body-file /tmp/body.md
+
+  review-handoff:
+    if: >
+      github.event.issue.pull_request != null &&
+      github.event.comment.user.type != 'Bot' &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR') &&
+      (startsWith(github.event.comment.body, '/agent-fix-complete ') ||
+       startsWith(github.event.comment.body, '/agent-review-pass '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    concurrency:
+      group: agent-review-handoff-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      checks: read
+    steps:
+      - name: Validate exact SHA and checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.issue.number }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_USER: ${{ github.event.comment.user.login }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          command=''
+          target=''
+          supplied=''
+          if [[ "$COMMENT_BODY" =~ ^/agent-fix-complete[[:space:]]+([0-9a-fA-F]{7,40})$ ]]; then
+            command='agent-fix-complete'; target='agent:review'; supplied="${BASH_REMATCH[1],,}"
+          elif [[ "$COMMENT_BODY" =~ ^/agent-review-pass[[:space:]]+([0-9a-fA-F]{7,40})$ ]]; then
+            command='agent-review-pass'; target='needs-kevin'; supplied="${BASH_REMATCH[1],,}"
+          else
+            exit 0
+          fi
+
+          pr=$(gh api "repos/$GH_REPO/pulls/$PR_NUM")
+          head=$(jq -r '.head.sha' <<<"$pr" | tr '[:upper:]' '[:lower:]')
+          state=$(jq -r '.state' <<<"$pr")
+          [ "$state" = open ] || { echo "PR not open"; exit 1; }
+          case "$head" in "$supplied"*) ;; *)
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ \`/$command\` 被拒絕：指定 SHA \`$supplied\` 不是 current remote HEAD \`$head\`。"
+            exit 1;; esac
+
+          if [ "$command" = agent-review-pass ]; then
+            set +e
+            checks=$(gh pr checks "$PR_NUM" --repo "$GH_REPO" --json name,bucket,workflow 2>&1)
+            rc=$?
+            set -e
+            if [ "$rc" -ne 0 ] && [ "$rc" -ne 8 ]; then
+              gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ 無法讀取 checks；未改變狀態。"
+              exit 1
+            fi
+            jq -e 'any(.[]; .workflow == "CI" and .bucket == "pass")' <<<"$checks" >/dev/null || {
+              gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ 找不到已通過的 \`CI\` workflow；未改變狀態。"; exit 1; }
+            blocking=$(jq -c '[.[] | select((.workflow // "") != "" and .bucket != "pass" and .bucket != "skipping")]' <<<"$checks")
+            [ "$blocking" = '[]' ] || {
+              gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ Actions 仍有 pending/failed/cancelled：\`$blocking\`"; exit 1; }
+          fi
+
+          gh label create 'agent:review' --repo "$GH_REPO" --color 1D76DB --description '等待獨立 reviewer 複審' --force >/dev/null
+          gh label create 'agent:blocked' --repo "$GH_REPO" --color D93F0B --description 'Agent 流程需要人類介入' --force >/dev/null
+          gh label create 'needs-kevin' --repo "$GH_REPO" --color 5319E7 --description 'Review gate 完成，等待 Kevin 最終決策' --force >/dev/null
+          gh issue edit "$PR_NUM" --repo "$GH_REPO" --remove-label 'agent:review' --remove-label 'agent:blocked' --remove-label 'needs-kevin' 2>/dev/null || true
+          gh issue edit "$PR_NUM" --repo "$GH_REPO" --add-label "$target"
+          marker="<!-- agent-handoff:v1 command=$command head=$head -->"
+          gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "## Agent handoff state\n\n- Remote HEAD: \`$head\`\n- State: \`$target\`\n- Actor: @$COMMENT_USER\n- Gate: exact SHA + repo CI; **not merge authorization**.\n\n$marker\n\nRun: $RUN_URL"
