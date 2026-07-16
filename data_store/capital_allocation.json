@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "last_updated": "2026-07-16",
-  "note": "Manual priority is an attention order, not an automatic buy ranking. Live score fields are joined by the dashboard when available.",
+  "note": "Manual priority is research attention order, not an automatic buy ranking. Decision readiness remains not_decision_grade until current price/as-of, source-backed scenarios and valid probabilities are supplied.",
   "candidates": [
     {
       "manual_rank": 1,
@@ -12,7 +12,36 @@
       "preferred_instrument": "stock_or_deep_itm_leaps",
       "reason": "Highest-conviction memory-cycle proxy in recent discussions, but the three memory businesses must be monitored separately.",
       "trigger": "Manual review of valuation, earnings expectations, price structure and whether options-market fear confirms or rejects the move.",
-      "invalidation": "HBM/DRAM supply-demand or AI-capex assumptions deteriorate materially."
+      "invalidation": "HBM/DRAM supply-demand or AI-capex assumptions deteriorate materially.",
+      "decision_inputs": {
+        "evidence": {
+          "quality": "medium",
+          "as_of": "2026-07-16",
+          "sources": [
+            "Kevin house view consolidated in thesis_tracker.json",
+            "public monitor fundamentals/regime/options state"
+          ]
+        },
+        "next_catalyst": {
+          "date": "2026-07-31",
+          "label": "Scheduled thesis and scenario refresh",
+          "source": "thesis_tracker.json next_review"
+        },
+        "scenario": null,
+        "correlation_baskets": [
+          "ai_capex",
+          "memory_cycle",
+          "hbm",
+          "commodity_dram",
+          "nand"
+        ],
+        "instrument_lenses": [
+          "stock",
+          "deep_itm_leaps",
+          "defined_risk_options"
+        ],
+        "threshold_origin": "draft_for_kevin_confirmation"
+      }
     },
     {
       "manual_rank": 2,
@@ -23,7 +52,32 @@
       "preferred_instrument": "stock_or_defined_risk_options",
       "reason": "Core AI-capex barometer and correlation anchor for the wider infrastructure basket.",
       "trigger": "Review price support together with volatility demand, put skew and earnings expectations rather than price alone.",
-      "invalidation": "Broad, persistent capex cuts or a confirmed options-fear and earnings breakdown."
+      "invalidation": "Broad, persistent capex cuts or a confirmed options-fear and earnings breakdown.",
+      "decision_inputs": {
+        "evidence": {
+          "quality": "medium",
+          "as_of": "2026-07-16",
+          "sources": [
+            "Kevin house view consolidated in thesis_tracker.json",
+            "public monitor fundamentals/regime/options state"
+          ]
+        },
+        "next_catalyst": {
+          "date": "2026-07-31",
+          "label": "Scheduled thesis and scenario refresh",
+          "source": "thesis_tracker.json next_review"
+        },
+        "scenario": null,
+        "correlation_baskets": [
+          "ai_capex",
+          "compute"
+        ],
+        "instrument_lenses": [
+          "stock",
+          "defined_risk_options"
+        ],
+        "threshold_origin": "draft_for_kevin_confirmation"
+      }
     },
     {
       "manual_rank": 3,
@@ -34,7 +88,33 @@
       "preferred_instrument": "wait_or_tactical_only",
       "reason": "Direct NAND beta can diverge from HBM and DRAM; opportunity and oversupply risk must be evaluated independently.",
       "trigger": "Require NAND pricing, inventory and capacity discipline to remain supportive.",
-      "invalidation": "Capacity returns faster than demand and NAND pricing weakens."
+      "invalidation": "Capacity returns faster than demand and NAND pricing weakens.",
+      "decision_inputs": {
+        "evidence": {
+          "quality": "medium",
+          "as_of": "2026-07-16",
+          "sources": [
+            "Kevin house view consolidated in thesis_tracker.json",
+            "public monitor fundamentals/regime/options state"
+          ]
+        },
+        "next_catalyst": {
+          "date": "2026-07-31",
+          "label": "Scheduled NAND thesis and scenario refresh",
+          "source": "thesis_tracker.json next_review"
+        },
+        "scenario": null,
+        "correlation_baskets": [
+          "memory_cycle",
+          "nand"
+        ],
+        "instrument_lenses": [
+          "wait_for_proof",
+          "stock",
+          "defined_risk_options"
+        ],
+        "threshold_origin": "draft_for_kevin_confirmation"
+      }
     },
     {
       "manual_rank": 4,
@@ -45,7 +125,32 @@
       "preferred_instrument": "manual_review",
       "reason": "Recently traded AI-infrastructure name; it should be tracked as part of the correlated capex basket.",
       "trigger": "Add complete fundamentals, price and options coverage before relying on monitor scores.",
-      "invalidation": "AI optical demand or company execution deteriorates."
+      "invalidation": "AI optical demand or company execution deteriorates.",
+      "decision_inputs": {
+        "evidence": {
+          "quality": "low",
+          "as_of": "2026-07-16",
+          "sources": [
+            "Kevin watchlist context",
+            "public monitor state with known coverage gap"
+          ]
+        },
+        "next_catalyst": {
+          "date": "2026-07-31",
+          "label": "Coverage-gap review",
+          "source": "capital_allocation.json manual review gate"
+        },
+        "scenario": null,
+        "correlation_baskets": [
+          "ai_capex",
+          "optical_interconnect"
+        ],
+        "instrument_lenses": [
+          "wait_for_proof",
+          "manual_review"
+        ],
+        "threshold_origin": "draft_for_kevin_confirmation"
+      }
     }
   ]
 }
