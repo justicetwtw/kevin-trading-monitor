@@ -74,11 +74,12 @@ def test_position_runner_persists_redacted_snapshot_and_uses_correct_total(
     monkeypatch.setattr(
         run_position_check,
         "_send_private_risk_brief",
-        lambda snapshot: False,
+        lambda snapshot: True,
     )
 
     snapshot = {
         "mode": "mode_1",
+        "position_source": "actions_secret",
         "stocks": [{"symbol": "PRIVATE", "shares": 10}],
         "options": [
             {
@@ -111,12 +112,14 @@ def test_position_runner_persists_redacted_snapshot_and_uses_correct_total(
         lambda total: totals.append(total) or {"alert_level": "normal"},
     )
 
-    run_position_check.main()
+    assert run_position_check.main() == 0
 
     public = writes["position_snapshot.json"]
     assert public["configured"] is True
     assert public["position_count"] == 2
     assert public["n_long_options"] == 1
+    assert public["workflow_status"] == "healthy"
+    assert public["error_codes"] == []
     assert public["privacy"] == "redacted_public_state"
     assert "stocks" not in public
     assert "options" not in public
