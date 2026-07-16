@@ -1,4 +1,4 @@
-"""Telegram sensitive-message logging regression tests."""
+"""Telegram sensitive logging and plain-text payload regression tests."""
 
 from src.alerts import telegram_bot
 
@@ -9,6 +9,8 @@ class _Response:
 
 
 class _Client:
+    payloads = []
+
     def __init__(self, *args, **kwargs):
         pass
 
@@ -19,13 +21,19 @@ class _Client:
         return False
 
     async def post(self, url, json):
+        self.payloads.append(json)
         return _Response()
 
 
 def test_sensitive_telegram_message_is_redacted_from_logs(monkeypatch):
+    _Client.payloads = []
     monkeypatch.setattr(telegram_bot.httpx, "AsyncClient", _Client)
     logged = []
-    monkeypatch.setattr(telegram_bot.logger, "info", lambda message: logged.append(message))
+    monkeypatch.setattr(
+        telegram_bot.logger,
+        "info",
+        lambda message: logged.append(message),
+    )
     notifier = telegram_bot.TelegramNotifier(
         token="token",
         chat_ids=["123"],
@@ -45,9 +53,14 @@ def test_sensitive_telegram_message_is_redacted_from_logs(monkeypatch):
 
 
 def test_nonsensitive_telegram_message_keeps_preview(monkeypatch):
+    _Client.payloads = []
     monkeypatch.setattr(telegram_bot.httpx, "AsyncClient", _Client)
     logged = []
-    monkeypatch.setattr(telegram_bot.logger, "info", lambda message: logged.append(message))
+    monkeypatch.setattr(
+        telegram_bot.logger,
+        "info",
+        lambda message: logged.append(message),
+    )
     notifier = telegram_bot.TelegramNotifier(
         token="token",
         chat_ids=["123"],
@@ -57,3 +70,24 @@ def test_nonsensitive_telegram_message_keeps_preview(monkeypatch):
 
     assert ok is True
     assert "public market brief" in "\n".join(logged)
+    assert _Client.payloads[0]["parse_mode"] == "HTML"
+
+
+def test_plain_text_message_omits_parse_mode(monkeypatch):
+    _Client.payloads = []
+    monkeypatch.setattr(telegram_bot.httpx, "AsyncClient", _Client)
+    notifier = telegram_bot.TelegramNotifier(
+        token="token",
+        chat_ids=["123"],
+    )
+
+    ok = notifier.send_message(
+        "Literal <tag> & arbitrary Truth Social text",
+        parse_mode=None,
+    )
+
+    assert ok is True
+    assert "parse_mode" not in _Client.payloads[0]
+    assert _Client.payloads[0]["text"] == (
+        "Literal <tag> & arbitrary Truth Social text"
+    )
