@@ -48,7 +48,8 @@ REQUIRED = {
         "agent-routing-report:v1",
         "defaultBranchRef",
         "contents/scripts/verify_agent_routing_report.py?ref=$default_branch",
-        "--paginate --slurp",
+        "gh api --paginate",
+        "jq -s 'add'",
     ],
     "scripts/verify_agent_routing_report.py": [
         "agent-routing-report:v1",
