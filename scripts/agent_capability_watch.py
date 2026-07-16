@@ -23,7 +23,7 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / ".github" / "agent-capability-watch.json"
-USER_AGENT = "kevin-trading-monitor-agent-capability-watch/1.0"
+USER_AGENT = "kevin-trading-monitor-agent-capability-watch/1.1"
 
 
 @dataclass(frozen=True)
@@ -49,7 +49,12 @@ def normalize_html(value: str) -> str:
         )
         if match:
             text = match.group(1)
-    text = re.sub(r"<(br|/p|/div|/section|/article|/li|/h[1-6]|/tr)>", "\n", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"<(br|/p|/div|/section|/article|/li|/h[1-6]|/tr)>",
+        "\n",
+        text,
+        flags=re.IGNORECASE,
+    )
     text = re.sub(r"<[^>]+>", " ", text)
     text = html.unescape(text).replace("\r", "")
     text = re.sub(r"[\t\f\v ]+", " ", text)
@@ -63,16 +68,25 @@ def sha256(value: str) -> str:
 
 def _host_allowed(host: str, suffixes: list[str]) -> bool:
     host = host.lower()
-    return any(host == suffix.lower() or host.endswith(f".{suffix.lower()}") for suffix in suffixes)
+    return any(
+        host == suffix.lower() or host.endswith(f".{suffix.lower()}")
+        for suffix in suffixes
+    )
 
 
-def evaluate_source(source: dict[str, Any], fetched: Fetched, config: dict[str, Any]) -> dict[str, Any]:
+def evaluate_source(
+    source: dict[str, Any], fetched: Fetched, config: dict[str, Any]
+) -> dict[str, Any]:
     normalized = normalize_html(fetched.body)
     observed = sha256(normalized)
     host = (urlparse(fetched.final_url).hostname or "").lower()
     validation = config.get("fetch_validation") or {}
     allowed = list(validation.get("allowed_host_suffixes") or [])
-    minimum = int(source.get("min_normalized_chars") or validation.get("min_normalized_chars") or 500)
+    minimum = int(
+        source.get("min_normalized_chars")
+        or validation.get("min_normalized_chars")
+        or 500
+    )
     status = "ok"
     error = None
     if allowed and not _host_allowed(host, allowed):
@@ -101,10 +115,17 @@ def evaluate_source(source: dict[str, Any], fetched: Fetched, config: dict[str, 
 def fetch_text(url: str, timeout: int = 30) -> Fetched:
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "text/html,text/plain;q=0.9,*/*;q=0.8"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,text/plain;q=0.9,*/*;q=0.8",
+        },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - allowlisted by config
-        body = response.read().decode(response.headers.get_content_charset() or "utf-8", errors="replace")
+    with urllib.request.urlopen(  # noqa: S310 - URLs are allowlisted by config
+        request, timeout=timeout
+    ) as response:
+        body = response.read().decode(
+            response.headers.get_content_charset() or "utf-8", errors="replace"
+        )
         return Fetched(
             body=body,
             final_url=response.geturl(),
@@ -112,25 +133,64 @@ def fetch_text(url: str, timeout: int = 30) -> Fetched:
         )
 
 
-def audit_local(config: dict[str, Any], root: Path = ROOT) -> list[dict[str, str]]:
+def audit_local(
+    config: dict[str, Any], root: Path = ROOT
+) -> list[dict[str, str]]:
     findings: list[dict[str, str]] = []
     for relative in config.get("required_local_files") or []:
         path = root / str(relative)
         if not path.exists():
-            findings.append({"severity": "BLOCK", "code": "missing_local_file", "path": str(relative)})
-    agents = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").exists() else ""
+            findings.append(
+                {
+                    "severity": "BLOCK",
+                    "code": "missing_local_file",
+                    "path": str(relative),
+                }
+            )
+    agents = (
+        (root / "AGENTS.md").read_text(encoding="utf-8")
+        if (root / "AGENTS.md").exists()
+        else ""
+    )
     required_phrases = [
         "current remote HEAD",
+        "quota",
+        "authenticated delivery path",
+        "agent-routing-report:v1",
         "CHANGES_REQUIRED",
+        "BLOCKED_DELIVERY",
         "needs-kevin",
         "not_decision_grade",
         "Kevin",
     ]
     for phrase in required_phrases:
         if phrase not in agents:
-            findings.append({"severity": "BLOCK", "code": "missing_agent_contract", "path": "AGENTS.md", "detail": phrase})
-    if len((root / "CLAUDE.md").read_bytes()) > 3000 if (root / "CLAUDE.md").exists() else False:
-        findings.append({"severity": "WARN", "code": "claude_wrapper_too_large", "path": "CLAUDE.md"})
+            findings.append(
+                {
+                    "severity": "BLOCK",
+                    "code": "missing_agent_contract",
+                    "path": "AGENTS.md",
+                    "detail": phrase,
+                }
+            )
+    if (root / "CLAUDE.md").exists() and len(
+        (root / "CLAUDE.md").read_bytes()
+    ) > 3000:
+        findings.append(
+            {
+                "severity": "WARN",
+                "code": "claude_wrapper_too_large",
+                "path": "CLAUDE.md",
+            }
+        )
+    if (root / ".github/workflows/claude_review.yml").exists():
+        findings.append(
+            {
+                "severity": "BLOCK",
+                "code": "repo_ai_inference_workflow_present",
+                "path": ".github/workflows/claude_review.yml",
+            }
+        )
     return findings
 
 
@@ -142,14 +202,18 @@ def days_since(value: str, today: date | None = None) -> int:
         return 10**9
 
 
-def build_report(config: dict[str, Any], *, offline: bool, root: Path = ROOT) -> dict[str, Any]:
+def build_report(
+    config: dict[str, Any], *, offline: bool, root: Path = ROOT
+) -> dict[str, Any]:
     local_findings = audit_local(config, root)
     sources: list[dict[str, Any]] = []
     if not offline:
         for source in config.get("sources") or []:
             try:
-                sources.append(evaluate_source(source, fetch_text(str(source["url"])), config))
-            except Exception as exc:  # network failures must be visible, not empty success
+                sources.append(
+                    evaluate_source(source, fetch_text(str(source["url"])), config)
+                )
+            except Exception as exc:  # failures must be visible, not empty success
                 sources.append(
                     {
                         "id": source.get("id"),
@@ -158,7 +222,9 @@ def build_report(config: dict[str, Any], *, offline: bool, root: Path = ROOT) ->
                         "error": type(exc).__name__,
                     }
                 )
-    overdue = days_since(str(config.get("last_verified") or "")) >= int(config.get("review_interval_days") or 30)
+    overdue = days_since(str(config.get("last_verified") or "")) >= int(
+        config.get("review_interval_days") or 30
+    )
     source_review = any(item.get("status") != "ok" for item in sources)
     blocked = any(item.get("severity") == "BLOCK" for item in local_findings)
     if blocked:
@@ -167,9 +233,14 @@ def build_report(config: dict[str, Any], *, offline: bool, root: Path = ROOT) ->
         overall = "needs_review"
     else:
         overall = "ok"
-    fingerprint = sha256(json.dumps({"local": local_findings, "sources": sources, "overdue": overdue}, sort_keys=True))
+    fingerprint = sha256(
+        json.dumps(
+            {"local": local_findings, "sources": sources, "overdue": overdue},
+            sort_keys=True,
+        )
+    )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "offline": offline,
         "overall_status": overall,
@@ -178,7 +249,7 @@ def build_report(config: dict[str, Any], *, offline: bool, root: Path = ROOT) ->
         "fingerprint": fingerprint,
         "local_findings": local_findings,
         "sources": sources,
-        "policy": "human_review_only_no_auto_baseline_or_adoption",
+        "policy": "human_review_only_no_auto_baseline_routing_or_adoption",
     }
 
 
@@ -192,17 +263,28 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Review overdue: `{report.get('review_overdue')}`",
         f"- Fingerprint: `{report['fingerprint']}`",
         "",
-        "Watcher 只提出人工審核需求；不自動接受 baseline、修改 routing、安裝 extension、merge 或 deploy。",
+        (
+            "Watcher 只提出人工審核需求；不自動接受 baseline、修改 routing、"
+            "安裝 extension、呼叫模型、merge 或 deploy。"
+        ),
         "",
     ]
     if report.get("local_findings"):
-        lines += ["## Local contract findings", ""] + [f"- `{item}`" for item in report["local_findings"]] + [""]
+        lines += ["## Local contract findings", ""] + [
+            f"- `{item}`" for item in report["local_findings"]
+        ] + [""]
     if report.get("sources"):
         lines += ["## Official source observations", ""] + [
-            f"- **{item.get('id')}**: `{item.get('status')}`; sha256 `{item.get('sha256', 'n/a')}`; {item.get('url')}"
+            (
+                f"- **{item.get('id')}**: `{item.get('status')}`; "
+                f"sha256 `{item.get('sha256', 'n/a')}`; {item.get('url')}"
+            )
             for item in report["sources"]
         ]
-    lines += ["", f"<!-- agent-capability-watch:fingerprint={report['fingerprint']} -->"]
+    lines += [
+        "",
+        f"<!-- agent-capability-watch:fingerprint={report['fingerprint']} -->",
+    ]
     return "\n".join(lines)
 
 
@@ -221,7 +303,9 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(output)
     if args.markdown:
-        Path(args.markdown).write_text(render_markdown(report), encoding="utf-8")
+        Path(args.markdown).write_text(
+            render_markdown(report), encoding="utf-8"
+        )
     return 0 if report["overall_status"] == "ok" else 1
 
 
