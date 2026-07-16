@@ -1,7 +1,8 @@
 """Trading Monitor v2 Mission Control payload.
 
-This module turns the existing state files into a thesis-first, position-aware
-summary. It does not call external APIs and never generates an order.
+This module turns existing state files into a thesis-first, position-aware
+summary. It does not call external APIs, publish private holdings or generate
+orders.
 """
 
 from __future__ import annotations
@@ -29,7 +30,10 @@ def _envelope(data: dict[str, Any], source_files: list[str]) -> dict[str, Any]:
 def _real(items: Any) -> list[dict[str, Any]]:
     if not isinstance(items, list):
         return []
-    return [item for item in items if isinstance(item, dict) and not item.get("_example")]
+    return [
+        item for item in items
+        if isinstance(item, dict) and not item.get("_example")
+    ]
 
 
 def _parse_date(value: Any) -> date | None:
@@ -46,7 +50,9 @@ def _snapshot_age_hours(snapshot_at: Any) -> float | None:
         return None
     try:
         value = datetime.fromisoformat(snapshot_at.replace("Z", "+00:00"))
-        now = datetime.now(value.tzinfo or TIMEZONE_USER)
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=TIMEZONE_USER)
+        now = datetime.now(value.tzinfo)
         return round((now - value).total_seconds() / 3600, 1)
     except (TypeError, ValueError):
         return None
@@ -68,45 +74,34 @@ def _attention(
     }
 
 
-def _position_rows(positions: dict[str, Any]) -> list[dict[str, Any]]:
+def _local_position_rows(positions: dict[str, Any]) -> list[dict[str, Any]]:
+    """Read local-only positions for completeness checks, never for publishing."""
     rows: list[dict[str, Any]] = []
     for stock in _real(positions.get("stocks")):
-        rows.append({
-            "kind": "stock",
-            "symbol": stock.get("symbol"),
-            "quantity": stock.get("shares"),
-            "strike": None,
-            "expiry": None,
-            "cost_basis": stock.get("cost_basis"),
-            "thesis_id": stock.get("thesis_id"),
-        })
+        rows.append({"kind": "stock", "symbol": stock.get("symbol")})
     for option in _real(positions.get("options")):
-        rows.append({
-            "kind": option.get("type", "option"),
-            "symbol": option.get("symbol"),
-            "quantity": option.get("contracts"),
-            "strike": option.get("strike"),
-            "expiry": option.get("expiry"),
-            "cost_basis": option.get("cost_per_contract"),
-            "thesis_id": option.get("thesis_id"),
-        })
+        rows.append({"kind": option.get("type", "option"), "symbol": option.get("symbol")})
     return rows
 
 
 def _build_attention_queue(
-    positions: list[dict[str, Any]],
+    configured: bool,
     snapshot: dict[str, Any],
     theses: list[dict[str, Any]],
     leaps_payload: dict[str, Any],
 ) -> list[dict[str, Any]]:
     queue: list[dict[str, Any]] = []
 
-    if not positions:
+    if not configured:
         queue.append(_attention(
             "P1",
             "configuration",
-            "No real positions are configured",
-            "data_store/positions.json still contains only examples, so position risk and allocation cannot reflect the real account.",
+            "Cloud position monitoring has no private position input",
+            (
+                "The public repository intentionally cannot contain real holdings. "
+                "Until a secure runtime input is configured, LEAPS, short-delta and "
+                "drawdown checks can only see the example file."
+            ),
         ))
 
     if not theses:
@@ -114,7 +109,10 @@ def _build_attention_queue(
             "P1",
             "configuration",
             "No symbol-level thesis is tracked",
-            "Every real holding and allocation candidate should link to a thesis, catalyst, invalidation condition, and review date.",
+            (
+                "Every real holding and allocation candidate should link to a thesis, "
+                "catalyst, invalidation condition and review date."
+            ),
         ))
 
     snapshot_at = snapshot.get("snapshot_at")
@@ -123,8 +121,11 @@ def _build_attention_queue(
         queue.append(_attention(
             "P1",
             "system_health",
-            "Position snapshot has never been persisted",
-            "The daily position workflow must write data_store/position_snapshot.json before drawdown and dashboard health can work.",
+            "Position workflow has not published a safe health snapshot",
+            (
+                "The daily workflow should commit only a redacted health record; exact "
+                "symbols, strikes, costs and account value must remain private."
+            ),
         ))
     elif age is None:
         queue.append(_attention(
@@ -137,17 +138,22 @@ def _build_attention_queue(
         queue.append(_attention(
             "P1",
             "system_health",
-            "Position snapshot is stale",
-            f"Last snapshot is approximately {age:g} hours old.",
+            "Position workflow health snapshot is stale",
+            f"Last safe snapshot is approximately {age:g} hours old.",
         ))
 
+    # This can surface roll warnings during a local/private build. Public Pages
+    # normally has no real positions and therefore publishes no contract detail.
     for row in leaps_payload.get("data", {}).get("positions", []):
         if row.get("roll_warning"):
             queue.append(_attention(
                 "P1",
                 "position",
                 "LEAPS roll-review window reached",
-                f"{row.get('symbol')} {row.get('strike')} {row.get('expiry')} has {row.get('dte')} DTE.",
+                (
+                    f"{row.get('symbol')} {row.get('strike')} {row.get('expiry')} "
+                    f"has {row.get('dte')} DTE."
+                ),
                 row.get("symbol"),
             ))
 
@@ -183,7 +189,13 @@ def _build_attention_queue(
             ))
 
     severity_order = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
-    return sorted(queue, key=lambda item: (severity_order.get(item["severity"], 9), item["category"]))
+    return sorted(
+        queue,
+        key=lambda item: (
+            severity_order.get(item["severity"], 9),
+            item["category"],
+        ),
+    )
 
 
 def build_mission_control_payload() -> dict[str, Any]:
@@ -193,10 +205,16 @@ def build_mission_control_payload() -> dict[str, Any]:
     thesis_doc = read_json("thesis_tracker.json", default={})
     allocation_doc = read_json("capital_allocation.json", default={})
 
-    positions = _position_rows(positions_doc if isinstance(positions_doc, dict) else {})
+    local_positions = _local_position_rows(
+        positions_doc if isinstance(positions_doc, dict) else {}
+    )
     themes = thesis_doc.get("themes", []) if isinstance(thesis_doc, dict) else []
     theses = thesis_doc.get("symbols", []) if isinstance(thesis_doc, dict) else []
-    candidates = allocation_doc.get("candidates", []) if isinstance(allocation_doc, dict) else []
+    candidates = (
+        allocation_doc.get("candidates", [])
+        if isinstance(allocation_doc, dict)
+        else []
+    )
     themes = _real(themes)
     theses = _real(theses)
     candidates = _real(candidates)
@@ -237,24 +255,36 @@ def build_mission_control_payload() -> dict[str, Any]:
             "action_band": score.get("action_band"),
             "ivr": option_state.get("ivr"),
             "ivp": option_state.get("ivp"),
-            "options_status": option_state.get("status", "not_in_dashboard_universe"),
+            "options_status": option_state.get(
+                "status", "not_in_dashboard_universe"
+            ),
             "not_a_trade_signal": True,
         })
 
     allocation_rows.sort(key=lambda row: (
         row.get("manual_rank") is None,
-        row.get("manual_rank") if isinstance(row.get("manual_rank"), int) else 9999,
+        row.get("manual_rank")
+        if isinstance(row.get("manual_rank"), int)
+        else 9999,
         row.get("symbol") or "",
     ))
 
-    attention = _build_attention_queue(positions, snapshot, theses, leaps_payload)
+    configured = bool(snapshot.get("configured")) or bool(local_positions)
+    position_count = snapshot.get("position_count")
+    if not isinstance(position_count, int):
+        position_count = len(local_positions)
+
+    attention = _build_attention_queue(
+        configured, snapshot, theses, leaps_payload
+    )
     regime = regime_payload.get("data", {})
 
     summary = {
         "regime": regime.get("regime"),
         "regime_modifier": regime.get("modifier"),
-        "position_count": len(positions),
-        "estimated_account_value": snapshot.get("total_estimated_value"),
+        "position_configured": configured,
+        "position_count": position_count,
+        "estimated_account_value": None,
         "snapshot_at": snapshot.get("snapshot_at"),
         "snapshot_age_hours": _snapshot_age_hours(snapshot.get("snapshot_at")),
         "tracked_theme_count": len(themes),
@@ -268,18 +298,22 @@ def build_mission_control_payload() -> dict[str, Any]:
         "attention": attention,
         "account": {
             "mode": snapshot.get("mode"),
-            "total_estimated_value": snapshot.get("total_estimated_value"),
+            "configured": configured,
+            "position_count": position_count,
+            "total_estimated_value": None,
             "n_long_options": snapshot.get("n_long_options"),
             "n_short_options": snapshot.get("n_short_options"),
             "snapshot_at": snapshot.get("snapshot_at"),
-            "positions": positions,
+            "privacy": snapshot.get("privacy", "private_detail_not_published"),
+            "positions": [],
         },
         "themes": themes,
         "theses": theses,
         "allocation_queue": allocation_rows,
         "disclaimer": (
-            "Decision support only. This page organizes holdings, theses, catalysts, "
-            "risk and opportunity states; it never creates an order or substitutes for Kevin's judgment."
+            "Decision support only. Public dashboard state intentionally excludes "
+            "exact holdings, strikes, costs and account value. It never creates an "
+            "order or substitutes for Kevin's judgment."
         ),
     }
     return _envelope(data, [
