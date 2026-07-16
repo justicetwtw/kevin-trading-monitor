@@ -37,6 +37,21 @@ def _enable_private_log_guard() -> None:
         logging.getLogger(name).setLevel(logging.CRITICAL)
 
 
+def _position_alert_level(alert: dict, kind: str) -> str:
+    """Position exceptions must be routable P1, not silent P2.
+
+    The previous default was `yellow`; `alert_router` intentionally does not push
+    P2/P3, so valid LEAPS/short-delta/hedge alerts were discarded. Position
+    exceptions now map to P1 (`green`/`orange`). Drawdown has its own P0 logic.
+    """
+    explicit = alert.get("alert_level")
+    if explicit:
+        return str(explicit)
+    if kind == "leaps_pnl" and alert.get("level") in {"+100", "-40"}:
+        return "orange"
+    return "green"
+
+
 def _route_with_kind(alerts, kind: str) -> int:
     pushed = 0
     for alert in alerts or []:
@@ -44,7 +59,7 @@ def _route_with_kind(alerts, kind: str) -> int:
             merged = {
                 **alert,
                 "kind": kind,
-                "alert_level": alert.get("alert_level", "yellow"),
+                "alert_level": _position_alert_level(alert, kind),
                 "sensitive": True,
             }
             merged["dedup_key"] = private_alert_dedup_key(merged, kind)
