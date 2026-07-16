@@ -11,36 +11,52 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = {
     "AGENTS.md": [
         "current remote HEAD",
+        "quota",
+        "authenticated delivery path",
+        "agent-routing-report:v1",
         "CHANGES_REQUIRED",
-        "BLOCKED",
+        "BLOCKED_DELIVERY",
         "needs-kevin",
         "not_decision_grade",
-        "Kevin",
         "只有 Kevin 對該 PR 明確說可 merge 後才可合併",
+        "不持有 OpenAI／Anthropic API key",
     ],
     "CLAUDE.md": ["@AGENTS.md", "Independent review"],
     "docs/agent-team-workflow.md": [
         "40-character",
+        "quota／availability",
+        "agent-routing-report:v1",
+        "subagents_used=false",
         "@codex review",
-        "@claude review",
+        "BLOCKED_DELIVERY",
         "Review pass",
         "Kevin",
+    ],
+    "docs/agent-runtime-preferences-2026-07.md": [
+        "Dated operator preference",
+        "Ultra",
+        "subagents_used=false",
+        "Re-evaluation triggers",
     ],
     ".github/workflows/agent_chatops.yml": [
         "/agent-review-pass",
         "current remote HEAD",
         "not merge authorization",
         "([0-9a-fA-F]{40})",
-        "[ \"$supplied\" != \"$head\" ]",
+        '[ "$supplied" != "$head" ]',
+        "verify_agent_routing_report.py",
+        "agent-routing-report:v1",
+        "contents/scripts/verify_agent_routing_report.py?ref=$head",
     ],
-    ".github/workflows/claude_review.yml": [
-        "anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342",
-        "ANTHROPIC_API_KEY",
-        "author_association",
-        "40-character",
-        "Review only",
-        "--allowedTools \"Read,Glob,Grep\"",
-        "HAS_ANTHROPIC_KEY",
+    "scripts/verify_agent_routing_report.py": [
+        "agent-routing-report:v1",
+        "head_sha",
+        "subagents_used",
+        "relative_model_tier",
+        "usage_evidence",
+        "lead_reverification",
+        "ci.status must be pass",
+        "TRUSTED_ASSOCIATIONS",
     ],
 }
 
@@ -50,20 +66,21 @@ FORBIDDEN_ROOT_PATTERNS = [
     "ignore previous instructions",
 ]
 
-FORBIDDEN_WORKFLOW_PATTERNS = {
-    ".github/workflows/agent_chatops.yml": [
-        "{7,40}",
-        'case "$head" in "$supplied"*',
-    ],
-    ".github/workflows/claude_review.yml": [
-        "ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}",
-        "anthropics/claude-code-action@v1",
-        '--allowedTools "Bash',
-        "contents: write",
-        "actions: write",
-        "deployments: write",
-    ],
-}
+FORBIDDEN_CHATOPS_PATTERNS = [
+    "{7,40}",
+    'case "$head" in "$supplied"*',
+    "actions/checkout",
+    "anthropics/claude-code-action",
+    "ANTHROPIC_API_KEY",
+    "OPENAI_API_KEY",
+]
+
+FORBIDDEN_AI_WORKFLOW_PATTERNS = [
+    "anthropics/claude-code-action",
+    "openai/codex-action",
+    "ANTHROPIC_API_KEY",
+    "OPENAI_API_KEY",
+]
 
 
 def verify(root: Path = ROOT) -> list[str]:
@@ -78,29 +95,37 @@ def verify(root: Path = ROOT) -> list[str]:
         loaded[relative] = text
         for phrase in phrases:
             if phrase.lower() not in text.lower():
-                errors.append(
-                    f"{relative}: missing contract phrase {phrase!r}"
-                )
+                errors.append(f"{relative}: missing contract phrase {phrase!r}")
 
-    for relative, patterns in FORBIDDEN_WORKFLOW_PATTERNS.items():
-        text = loaded.get(relative)
-        if text is None:
-            path = root / relative
-            text = path.read_text(encoding="utf-8") if path.exists() else ""
-        for pattern in patterns:
-            if pattern.lower() in text.lower():
-                errors.append(
-                    f"{relative}: forbidden workflow pattern {pattern!r}"
-                )
-
-    agents = (
-        (root / "AGENTS.md").read_text(encoding="utf-8")
-        if (root / "AGENTS.md").exists()
-        else ""
-    )
+    agents = loaded.get("AGENTS.md", "")
     for pattern in FORBIDDEN_ROOT_PATTERNS:
         if pattern.lower() in agents.lower():
             errors.append(f"AGENTS.md: forbidden pattern {pattern!r}")
+
+    chatops = loaded.get(".github/workflows/agent_chatops.yml", "")
+    for pattern in FORBIDDEN_CHATOPS_PATTERNS:
+        if pattern.lower() in chatops.lower():
+            errors.append(
+                f".github/workflows/agent_chatops.yml: forbidden pattern {pattern!r}"
+            )
+
+    claude_workflow = root / ".github" / "workflows" / "claude_review.yml"
+    if claude_workflow.exists():
+        errors.append(
+            ".github/workflows/claude_review.yml must not exist; use authenticated "
+            "worker task surfaces rather than repo AI inference Actions"
+        )
+
+    workflows_dir = root / ".github" / "workflows"
+    if workflows_dir.exists():
+        for path in workflows_dir.glob("*.y*ml"):
+            text = path.read_text(encoding="utf-8")
+            for pattern in FORBIDDEN_AI_WORKFLOW_PATTERNS:
+                if pattern.lower() in text.lower():
+                    errors.append(
+                        f"{path.relative_to(root)}: forbidden AI inference/secret "
+                        f"pattern {pattern!r}"
+                    )
 
     claude = root / "CLAUDE.md"
     if claude.exists() and claude.stat().st_size > 3000:
