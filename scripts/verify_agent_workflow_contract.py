@@ -53,13 +53,17 @@ REQUIRED = {
     ],
     "scripts/verify_agent_routing_report.py": [
         "agent-routing-report:v1",
-        "head_sha",
+        "MAX_REPORT_BYTES",
+        "MARKER_PATTERN",
         "subagents_used",
-        "relative_model_tier",
-        "usage_evidence",
+        "no_delegation_reason",
+        "DELEGATION_OWNERSHIP",
+        "model_tier",
+        "usage_metrics",
         "lead_reverification",
         "ci.status must be pass",
         "TRUSTED_ASSOCIATIONS",
+        "SECRET_VALUE_PATTERNS",
     ],
 }
 
