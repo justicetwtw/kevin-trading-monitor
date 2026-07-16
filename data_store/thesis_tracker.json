@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "last_updated": "2026-07-16",
-  "source": "Kevin discussions consolidated through 2026-07-16",
+  "source": "Kevin discussions consolidated through 2026-07-16; portfolio_hedge is a risk-control thesis, not alpha attribution.",
   "themes": [
     {
       "id": "memory_cycle",
@@ -60,6 +60,27 @@
       "invalidation": [
         "Hyperscaler capex guidance weakens broadly rather than shifting between vendors.",
         "Options-market fear and credit stress confirm that a price decline is structural rather than positioning noise."
+      ],
+      "next_review": "2026-07-31"
+    },
+    {
+      "id": "portfolio_hedge",
+      "name": "Portfolio hedge",
+      "status": "active",
+      "summary": "A hedge is held to reduce an identified unwanted factor or tail risk while preserving intended alpha. Recognition as a put or ETF hedge does not prove economic effectiveness.",
+      "subthemes": [
+        {
+          "id": "broad_market_hedge",
+          "name": "Broad-market and semiconductor hedge instruments",
+          "status": "manual_effectiveness_review",
+          "symbols": ["QQQ", "SPY", "SMH", "SOXL"],
+          "monitor": "Delta offset, basis risk versus the actual portfolio, expiry mismatch, convexity, liquidity, carry and whether the hedge still targets the intended risk."
+        }
+      ],
+      "invalidation": [
+        "The hedge no longer offsets the intended risk factor or creates larger unintended exposure.",
+        "Expiry, liquidity, carry or basis risk makes the protection economically ineffective.",
+        "The underlying portfolio thesis or risk budget changes enough that the original hedge objective is obsolete."
       ],
       "next_review": "2026-07-31"
     }
