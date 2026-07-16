@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Validate a trusted, SHA-bound ``agent-routing-report:v1``.
 
-The report normally lives in a top-level PR comment so its ``head_sha`` can bind
-to the already-pushed remote HEAD without creating a self-changing commit loop.
-This verifier is deterministic: it performs no model inference and reads no
-secrets.
+The schema intentionally matches the current canonical workflow in
+``jin-yi-yang-bot``. This verifier is deterministic: it performs no model
+inference, reads no secret and treats the routing report as process/cost evidence
+that supplements — never replaces — code, tests, CI and remote HEAD.
 """
 
 from __future__ import annotations
@@ -17,27 +17,32 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-START = "<!-- agent-routing-report:v1 -->"
-END = "<!-- /agent-routing-report:v1 -->"
 SCHEMA = "agent-routing-report:v1"
+MAX_REPORT_BYTES = 16_384
 TRUSTED_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 MODEL_TIERS = {"lower", "peer", "higher", "inherit", "unknown"}
-DELEGATION_OUTCOMES = {"completed", "partial", "blocked", "cancelled"}
-CI_STATUSES = {"pass", "pending", "failed", "blocked", "unavailable"}
-USAGE_STATUSES = {"available", "unavailable"}
-FORBIDDEN_KEYS = {
-    "chain_of_thought",
-    "chain-of-thought",
-    "reasoning_trace",
-    "hidden_reasoning",
-    "secret",
-    "secrets",
-    "raw_credential",
-    "raw_credentials",
-    "private_prompt",
-    "full_prompt",
-    "complete_prompt",
-}
+DELEGATION_OWNERSHIP = {"read_only", "write_reintegrated_by_owner"}
+TEST_RESULTS = {"pass", "fail", "not_run"}
+CI_STATUSES = {"pass", "pending", "fail", "not_applicable"}
+USAGE_STATUSES = {"reported", "unavailable"}
+HEAD_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+MARKER_PATTERN = re.compile(
+    r"<!--\s*agent-routing-report:v1\s+head=([0-9a-fA-F]{40})\s*-->"
+)
+FORBIDDEN_KEY_PATTERNS = (
+    ("forbidden_chain_of_thought_key", re.compile(r"chain[_-]?of[_-]?thought|reasoning[_-]?trace|^cot$", re.I)),
+    ("forbidden_prompt_dump_key", re.compile(r"(?:system|full|raw|private)[_-]?prompt", re.I)),
+    ("forbidden_credential_key", re.compile(r"api[_-]?key|credential|password|(?:^|[_-])secret(?:$|[_-])", re.I)),
+)
+SECRET_VALUE_PATTERNS = (
+    ("openai_style_key", re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b")),
+    ("github_token", re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}\b")),
+    ("github_pat", re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b")),
+    ("aws_access_key", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
+    ("private_key_block", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
+    ("slack_token", re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b")),
+    ("bearer_token", re.compile(r"\bBearer\s+[A-Za-z0-9._-]{24,}\b")),
+)
 
 
 def _nonempty(value: Any) -> bool:
@@ -45,47 +50,64 @@ def _nonempty(value: Any) -> bool:
 
 
 def _is_sha(value: Any) -> bool:
-    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{40}", value) is not None
+    return isinstance(value, str) and HEAD_PATTERN.fullmatch(value) is not None
 
 
-def _walk_keys(value: Any) -> list[str]:
-    keys: list[str] = []
+def _scan_forbidden(value: Any, path: str, errors: list[str]) -> None:
     if isinstance(value, dict):
-        for key, item in value.items():
-            keys.append(str(key).lower())
-            keys.extend(_walk_keys(item))
+        for key, child in value.items():
+            key_text = str(key)
+            for code, pattern in FORBIDDEN_KEY_PATTERNS:
+                if pattern.search(key_text):
+                    errors.append(f"{code} at {path}.{key_text}")
+            _scan_forbidden(child, f"{path}.{key_text}", errors)
     elif isinstance(value, list):
-        for item in value:
-            keys.extend(_walk_keys(item))
-    return keys
+        for index, child in enumerate(value):
+            _scan_forbidden(child, f"{path}[{index}]", errors)
+    elif isinstance(value, str):
+        for code, pattern in SECRET_VALUE_PATTERNS:
+            if pattern.search(value):
+                errors.append(f"secret_like_value_{code} at {path}")
 
 
-def extract_report(body: str) -> dict[str, Any] | None:
-    """Extract the first routing-report JSON object from one comment body."""
-    if START not in body or END not in body:
+def extract_report(body: str) -> tuple[str, dict[str, Any] | None, str | None] | None:
+    """Return marker head, report and parse error from one PR comment."""
+    if not isinstance(body, str):
         return None
-    fragment = body.split(START, 1)[1].split(END, 1)[0].strip()
-    fence = re.fullmatch(r"```(?:json)?\s*([\s\S]*?)\s*```", fragment)
-    if fence:
-        fragment = fence.group(1).strip()
+    marker = MARKER_PATTERN.search(body)
+    if marker is None:
+        return None
+    marker_head = marker.group(1).lower()
+    fence = re.search(r"```json\s*\n([\s\S]*?)\n```", body)
+    if fence is None:
+        return marker_head, None, "missing_json_fence"
     try:
-        parsed = json.loads(fragment)
+        parsed = json.loads(fence.group(1))
     except json.JSONDecodeError:
-        return None
-    return parsed if isinstance(parsed, dict) else None
+        return marker_head, None, "invalid_json"
+    if not isinstance(parsed, dict):
+        return marker_head, None, "report_not_object"
+    return marker_head, parsed, None
 
 
 def validate_report(report: Any, expected_head: str) -> list[str]:
     errors: list[str] = []
     if not isinstance(report, dict):
         return ["report must be a JSON object"]
-    if report.get("schema_version") != SCHEMA:
-        errors.append(f"schema_version must be {SCHEMA!r}")
-    head = report.get("head_sha")
+
+    serialized = json.dumps(report, ensure_ascii=False, separators=(",", ":"))
+    if len(serialized.encode("utf-8")) > MAX_REPORT_BYTES:
+        errors.append(f"report exceeds {MAX_REPORT_BYTES} bytes")
+
+    if report.get("schema") != SCHEMA:
+        errors.append(f"schema must be {SCHEMA!r}")
+    head = report.get("head")
     if not _is_sha(head):
-        errors.append("head_sha must be a lowercase 40-character SHA")
+        errors.append("head must be a lowercase 40-character SHA")
     elif head != expected_head:
-        errors.append(f"head_sha {head!r} does not equal current remote HEAD {expected_head!r}")
+        errors.append(
+            f"head {head!r} does not equal current remote HEAD {expected_head!r}"
+        )
 
     generated_at = report.get("generated_at")
     if not _nonempty(generated_at):
@@ -96,18 +118,24 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
         except ValueError:
             errors.append("generated_at must be ISO-8601")
 
-    owner = report.get("implementation_owner")
+    owner = report.get("owner")
     if not isinstance(owner, dict):
-        errors.append("implementation_owner must be an object")
+        errors.append("owner must be an object")
     else:
         if owner.get("role") != "implementation_owner":
-            errors.append("implementation_owner.role must be 'implementation_owner'")
-        for field in ("provider", "surface", "session_mode", "assigned_at"):
+            errors.append("owner.role must be 'implementation_owner'")
+        for field in ("provider", "session_mode"):
             if not _nonempty(owner.get(field)):
-                errors.append(f"implementation_owner.{field} is required")
+                errors.append(f"owner.{field} is required")
+        if "surface" in owner and not _nonempty(owner.get("surface")):
+            errors.append("owner.surface must be non-empty when supplied")
         basis = owner.get("assignment_basis")
-        if not isinstance(basis, list) or not basis or not all(_nonempty(item) for item in basis):
-            errors.append("implementation_owner.assignment_basis must be a non-empty string list")
+        if basis is not None and (
+            not isinstance(basis, list)
+            or not basis
+            or not all(_nonempty(item) for item in basis)
+        ):
+            errors.append("owner.assignment_basis must be a non-empty string list")
 
     subagents_used = report.get("subagents_used")
     delegations = report.get("delegations")
@@ -119,8 +147,10 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
     if subagents_used is False:
         if delegations:
             errors.append("delegations must be empty when subagents_used is false")
-        if not _nonempty(report.get("subagents_not_used_reason")):
-            errors.append("subagents_not_used_reason is required when subagents_used is false")
+        if not _nonempty(report.get("no_delegation_reason")):
+            errors.append(
+                "no_delegation_reason is required when subagents_used is false"
+            )
     elif subagents_used is True and not delegations:
         errors.append("at least one delegation is required when subagents_used is true")
 
@@ -129,39 +159,46 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
         if not isinstance(delegation, dict):
             errors.append(f"{prefix} must be an object")
             continue
-        for field in ("purpose", "read_write_ownership"):
-            if not _nonempty(delegation.get(field)):
-                errors.append(f"{prefix}.{field} is required")
-        if delegation.get("relative_model_tier") not in MODEL_TIERS:
-            errors.append(f"{prefix}.relative_model_tier is invalid")
-        if delegation.get("outcome") not in DELEGATION_OUTCOMES:
-            errors.append(f"{prefix}.outcome is invalid")
-        evidence = delegation.get("deterministic_evidence")
-        if not isinstance(evidence, list) or not all(_nonempty(item) for item in evidence):
-            errors.append(f"{prefix}.deterministic_evidence must be a string list")
+        if not _nonempty(delegation.get("purpose")):
+            errors.append(f"{prefix}.purpose is required")
+        if delegation.get("ownership") not in DELEGATION_OWNERSHIP:
+            errors.append(f"{prefix}.ownership is invalid")
+        if delegation.get("model_tier") not in MODEL_TIERS:
+            errors.append(f"{prefix}.model_tier is invalid")
+        if not _nonempty(delegation.get("outcome")):
+            errors.append(f"{prefix}.outcome is required")
+        if not _nonempty(delegation.get("evidence")):
+            errors.append(f"{prefix}.evidence is required")
 
     fallback = report.get("escalation_or_fallback")
-    if not isinstance(fallback, dict) or not isinstance(fallback.get("occurred"), bool):
+    if not isinstance(fallback, dict) or not isinstance(
+        fallback.get("occurred"), bool
+    ):
         errors.append("escalation_or_fallback.occurred must be boolean")
     elif fallback.get("occurred") and not _nonempty(fallback.get("reason")):
-        errors.append("escalation_or_fallback.reason is required when occurred is true")
+        errors.append(
+            "escalation_or_fallback.reason is required when occurred is true"
+        )
 
-    usage = report.get("usage_evidence")
-    if not isinstance(usage, dict):
-        errors.append("usage_evidence must be an object")
+    usage = report.get("usage_metrics")
+    if not isinstance(usage, dict) or usage.get("status") not in USAGE_STATUSES:
+        errors.append("usage_metrics.status must be reported or unavailable")
     else:
         status = usage.get("status")
-        if status not in USAGE_STATUSES:
-            errors.append("usage_evidence.status must be available or unavailable")
         if not _nonempty(usage.get("source")):
-            errors.append("usage_evidence.source is required")
+            errors.append("usage_metrics.source is required")
+        metrics_present = "metrics" in usage
         metrics = usage.get("metrics")
-        if not isinstance(metrics, dict):
-            errors.append("usage_evidence.metrics must be an object")
-        elif status == "unavailable" and metrics:
-            errors.append("usage_evidence.metrics must be empty when status is unavailable")
-        elif status == "available" and not metrics:
-            errors.append("usage_evidence.metrics must be non-empty when status is available")
+        if status == "reported" and (
+            not isinstance(metrics, dict) or not metrics
+        ):
+            errors.append(
+                "usage_metrics.metrics must be non-empty when status is reported"
+            )
+        if status == "unavailable" and metrics_present:
+            errors.append(
+                "usage_metrics.metrics must be omitted when status is unavailable"
+            )
 
     reverification = report.get("lead_reverification")
     if not isinstance(reverification, dict):
@@ -169,34 +206,32 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
     else:
         if not isinstance(reverification.get("performed"), bool):
             errors.append("lead_reverification.performed must be boolean")
-        if not _nonempty(reverification.get("summary")):
-            errors.append("lead_reverification.summary is required")
+        if not _nonempty(reverification.get("notes")):
+            errors.append("lead_reverification.notes is required")
         if subagents_used and reverification.get("performed") is not True:
-            errors.append("lead_reverification.performed must be true when subagents were used")
+            errors.append(
+                "lead_reverification.performed must be true when subagents were used"
+            )
 
     tests = report.get("tests")
     if not isinstance(tests, list) or not tests:
         errors.append("tests must be a non-empty array")
     else:
         for index, item in enumerate(tests):
+            prefix = f"tests[{index}]"
             if not isinstance(item, dict):
-                errors.append(f"tests[{index}] must be an object")
+                errors.append(f"{prefix} must be an object")
                 continue
-            if not _nonempty(item.get("name")) or item.get("status") not in {"pass", "fail", "skipped"}:
-                errors.append(f"tests[{index}] requires name and valid status")
-            if not _nonempty(item.get("evidence")):
-                errors.append(f"tests[{index}].evidence is required")
+            if not _nonempty(item.get("command")):
+                errors.append(f"{prefix}.command is required")
+            if item.get("result") not in TEST_RESULTS:
+                errors.append(f"{prefix}.result is invalid")
 
     ci = report.get("ci")
-    if not isinstance(ci, dict):
-        errors.append("ci must be an object")
-    else:
-        if ci.get("status") not in CI_STATUSES:
-            errors.append("ci.status is invalid")
-        if ci.get("status") != "pass":
-            errors.append("ci.status must be pass before /agent-fix-complete")
-        if not _nonempty(ci.get("source")) or not _nonempty(ci.get("evidence")):
-            errors.append("ci.source and ci.evidence are required")
+    if not isinstance(ci, dict) or ci.get("status") not in CI_STATUSES:
+        errors.append("ci.status is invalid")
+    elif ci.get("status") != "pass":
+        errors.append("ci.status must be pass before /agent-fix-complete")
 
     reviewer = report.get("independent_reviewer")
     if reviewer is not None:
@@ -209,14 +244,30 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
                 if not _nonempty(reviewer.get(field)):
                     errors.append(f"independent_reviewer.{field} is required")
 
-    forbidden = sorted(set(_walk_keys(report)) & FORBIDDEN_KEYS)
-    if forbidden:
-        errors.append("forbidden sensitive/reasoning keys present: " + ", ".join(forbidden))
+    _scan_forbidden(report, "$", errors)
     return errors
 
 
-def find_valid_trusted_report(comments: Any, expected_head: str) -> tuple[dict[str, Any] | None, list[str]]:
-    """Return the newest schema-valid report posted by a trusted human actor."""
+def validate_report_comment(body: str, expected_head: str) -> list[str]:
+    extracted = extract_report(body)
+    if extracted is None:
+        return ["missing agent-routing-report:v1 head=<sha> marker"]
+    marker_head, report, parse_error = extracted
+    if parse_error:
+        return [parse_error]
+    assert report is not None
+    errors = validate_report(report, expected_head)
+    if report.get("head") != marker_head:
+        errors.append(
+            f"marker head {marker_head!r} does not equal report head {report.get('head')!r}"
+        )
+    return errors
+
+
+def find_valid_trusted_report(
+    comments: Any, expected_head: str
+) -> tuple[dict[str, Any] | None, list[str]]:
+    """Return newest schema-valid report posted by a trusted human actor."""
     if not isinstance(comments, list):
         return None, ["comments payload must be an array"]
     diagnostics: list[str] = []
@@ -224,22 +275,23 @@ def find_valid_trusted_report(comments: Any, expected_head: str) -> tuple[dict[s
         if not isinstance(comment, dict):
             continue
         body = str(comment.get("body") or "")
-        if START not in body:
+        if "agent-routing-report:v1" not in body:
             continue
         association = str(comment.get("author_association") or "").upper()
-        user_type = str((comment.get("user") or {}).get("type") or "")
-        login = str((comment.get("user") or {}).get("login") or "unknown")
+        user = comment.get("user") or {}
+        user_type = str(user.get("type") or "")
+        login = str(user.get("login") or "unknown")
         if association not in TRUSTED_ASSOCIATIONS or user_type == "Bot":
             diagnostics.append(f"ignored untrusted routing report from {login}")
             continue
-        report = extract_report(body)
-        if report is None:
-            diagnostics.append(f"invalid JSON routing report from {login}")
-            continue
-        errors = validate_report(report, expected_head)
+        errors = validate_report_comment(body, expected_head)
         if not errors:
-            return report, diagnostics
-        diagnostics.append(f"routing report from {login} invalid: " + "; ".join(errors))
+            extracted = extract_report(body)
+            assert extracted is not None and extracted[1] is not None
+            return extracted[1], diagnostics
+        diagnostics.append(
+            f"routing report from {login} invalid: " + "; ".join(errors)
+        )
     return None, diagnostics or ["no agent-routing-report:v1 comment found"]
 
 
@@ -248,6 +300,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-head", required=True)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--report-file")
+    source.add_argument("--comment-file")
     source.add_argument("--comments-json")
     args = parser.parse_args(argv)
 
@@ -259,18 +312,19 @@ def main(argv: list[str] | None = None) -> int:
     if args.report_file:
         report = json.loads(Path(args.report_file).read_text(encoding="utf-8"))
         errors = validate_report(report, expected)
-        if errors:
-            for error in errors:
-                print(f"- {error}", file=sys.stderr)
-            return 1
+    elif args.comment_file:
+        errors = validate_report_comment(
+            Path(args.comment_file).read_text(encoding="utf-8"), expected
+        )
     else:
         comments = json.loads(Path(args.comments_json).read_text(encoding="utf-8"))
         report, diagnostics = find_valid_trusted_report(comments, expected)
-        if report is None:
-            for item in diagnostics:
-                print(f"- {item}", file=sys.stderr)
-            return 1
+        errors = [] if report is not None else diagnostics
 
+    if errors:
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
     print(f"agent-routing-report:v1 valid for HEAD {expected}")
     return 0
 
