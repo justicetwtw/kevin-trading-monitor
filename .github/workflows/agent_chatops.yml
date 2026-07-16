@@ -95,7 +95,8 @@ jobs:
           default_branch=$(gh repo view "$GH_REPO" --json defaultBranchRef --jq '.defaultBranchRef.name')
           gh api "repos/$GH_REPO/contents/scripts/verify_agent_routing_report.py?ref=$default_branch" \
             --jq '.content' | tr -d '\n' | base64 --decode > /tmp/verify_agent_routing_report.py
-          gh api --paginate --slurp "repos/$GH_REPO/issues/$PR_NUM/comments?per_page=100" > /tmp/comments.json
+          gh api --paginate "repos/$GH_REPO/issues/$PR_NUM/comments?per_page=100" \
+            | jq -s 'add' > /tmp/comments.json
           if ! python /tmp/verify_agent_routing_report.py \
             --expected-head "$head" --comments-json /tmp/comments.json \
             > /tmp/routing-report.log 2>&1; then
