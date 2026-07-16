@@ -1,4 +1,4 @@
-"""Telegram Bot wrapper with multi-chat support and privacy-aware logging."""
+"""Telegram Bot wrapper with reliable multi-chat delivery and safe logging."""
 
 import asyncio
 
@@ -38,19 +38,22 @@ class TelegramNotifier:
         parse_mode: str | None = "HTML",
         disable_notification: bool = False,
         sensitive: bool = False,
+        require_all: bool = True,
     ) -> bool:
-        """Send to every chat ID; redact sensitive message text from CI logs.
+        """Send to configured recipients without leaking credentials or chat IDs.
 
-        `parse_mode=None` sends literal plain text. The field is omitted rather
-        than serialized as JSON null, which keeps arbitrary Truth Social text
-        from being interpreted as Telegram HTML or Markdown.
+        `parse_mode=None` sends literal plain text. `require_all=True` means a
+        multi-recipient send is successful only when every configured recipient
+        accepted the message. This prevents one failed recipient from being
+        silently treated as delivered.
         """
         url = f"{TELEGRAM_API_BASE}/bot{self.token}/sendMessage"
-        results = []
+        results: list[bool] = []
         async with httpx.AsyncClient(
             timeout=DEFAULT_TIMEOUT_SEC
         ) as client:
-            for chat_id in self.chat_ids:
+            for index, chat_id in enumerate(self.chat_ids, start=1):
+                destination = f"recipient#{index}"
                 payload = {
                     "chat_id": chat_id,
                     "text": text,
@@ -67,25 +70,33 @@ class TelegramNotifier:
                             else f"{text[:50]}..."
                         )
                         logger.info(
-                            f"Telegram sent to {chat_id}: {preview}"
+                            f"Telegram sent to {destination}: {preview}"
                         )
                         results.append(True)
                     else:
+                        # Do not log response bodies: Telegram errors may echo
+                        # request details, and Actions logs are public.
                         logger.error(
-                            f"Telegram failed for {chat_id}: "
-                            f"HTTP {response.status_code} "
-                            f"{response.text[:200]}"
+                            f"Telegram failed for {destination}: "
+                            f"HTTP {response.status_code}"
                         )
                         results.append(False)
                 except httpx.HTTPError as exc:
-                    logger.error(f"Telegram failed for {chat_id}: {exc}")
+                    # Exception strings may contain the Bot API URL (and token).
+                    logger.error(
+                        f"Telegram transport failed for {destination}: "
+                        f"{type(exc).__name__}"
+                    )
                     results.append(False)
                 except Exception as exc:
                     logger.error(
-                        f"Telegram unexpected error for {chat_id}: {exc}"
+                        f"Telegram unexpected failure for {destination}: "
+                        f"{type(exc).__name__}"
                     )
                     results.append(False)
-        return any(results)
+        if not results:
+            return False
+        return all(results) if require_all else any(results)
 
     def send_message(self, text: str, **kwargs) -> bool:
         return asyncio.run(self.send_message_async(text, **kwargs))
