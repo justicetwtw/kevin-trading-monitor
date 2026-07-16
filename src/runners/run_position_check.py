@@ -1,8 +1,8 @@
-"""部位管理檢查 (每日 EOD cron: LEAPS PnL / Short Delta / Hedge DTE / Drawdown)。
+"""Daily private position management check.
 
-`get_account_snapshot()` 會打 yfinance 取股價，只在 EOD 跑。每次執行只把
-**去識別化摘要**寫入 `data_store/position_snapshot.json`，避免公開 repo 洩漏
-真實持倉、履約價、成本或帳戶金額。
+Exact positions and account values exist only in memory. Public repository state
+contains redacted health metadata, encrypted drawdown values and opaque alert
+keys only.
 """
 
 from loguru import logger
@@ -13,6 +13,7 @@ from src.management.account_drawdown import update_account_value
 from src.management.current_positions import get_account_snapshot
 from src.management.hedge_dte_tracker import scan_all_hedges
 from src.management.leaps_pnl_tracker import scan_all_leaps
+from src.management.private_position_privacy import private_alert_dedup_key
 from src.management.short_delta_monitor import scan_all_shorts
 from src.storage.state_manager import write_json
 
@@ -25,7 +26,9 @@ def _route_with_kind(alerts, kind: str) -> int:
                 **alert,
                 "kind": kind,
                 "alert_level": alert.get("alert_level", "yellow"),
+                "sensitive": True,
             }
+            merged["dedup_key"] = private_alert_dedup_key(merged, kind)
             merged["message"] = format_position_alert(merged)
             if route_alert(merged):
                 pushed += 1
@@ -35,12 +38,13 @@ def _route_with_kind(alerts, kind: str) -> int:
 
 
 def _public_snapshot(snapshot: dict) -> dict:
-    """Return state that is safe to commit in a public repository."""
+    """Return aggregate state safe to commit in a public repository."""
     stocks = snapshot.get("stocks") or []
     options = snapshot.get("options") or []
     configured = bool(stocks or options)
     return {
         "mode": snapshot.get("mode"),
+        "position_source": snapshot.get("position_source"),
         "configured": configured,
         "position_count": len(stocks) + len(options),
         "n_long_options": int(snapshot.get("n_long_options", 0) or 0),
@@ -77,27 +81,43 @@ def main() -> None:
 
         try:
             snapshot = get_account_snapshot() or {}
-            if not write_json("position_snapshot.json", _public_snapshot(snapshot)):
-                logger.error("position_check: failed to persist redacted position_snapshot.json")
+            if not write_json(
+                "position_snapshot.json", _public_snapshot(snapshot)
+            ):
+                logger.error(
+                    "position_check: failed to persist redacted position snapshot"
+                )
 
-            # get_account_snapshot() returns `total_estimated_value`. The old
-            # runner used `total_value`, so drawdown tracking silently never ran.
+            # `get_account_snapshot` returns `total_estimated_value`. The old
+            # runner used `total_value`, so drawdown tracking never ran.
             total = snapshot.get("total_estimated_value")
             if isinstance(total, (int, float)) and total > 0:
                 drawdown = update_account_value(total) or {}
-                if drawdown.get("alert_level") and drawdown["alert_level"] != "normal":
+                if (
+                    drawdown.get("alert_level")
+                    and drawdown["alert_level"] != "normal"
+                ):
                     pct = drawdown.get("drawdown_pct")
-                    pct_str = f"{pct * 100:.1f}%" if pct is not None else "n/a"
+                    pct_str = (
+                        f"{pct * 100:.1f}%" if pct is not None else "n/a"
+                    )
                     drawdown_alert = {
                         "kind": "drawdown",
                         "level": drawdown.get("alert_level"),
                         "alert_level": "green",
-                        "message": f"回撤 {pct_str} — {drawdown.get('action', '')}",
+                        "sensitive": True,
+                        "dedup_key": "private-position::account-drawdown",
+                        "message": (
+                            f"回撤 {pct_str} — {drawdown.get('action', '')}"
+                        ),
                     }
                     if route_alert(drawdown_alert):
                         pushed += 1
             else:
-                logger.info("position_check: no positive total_estimated_value (mode_3 / no positions)")
+                logger.info(
+                    "position_check: no positive total_estimated_value "
+                    "(mode_3 / no positions)"
+                )
         except Exception as exc:
             logger.error(f"drawdown/snapshot check failed: {exc}")
 
