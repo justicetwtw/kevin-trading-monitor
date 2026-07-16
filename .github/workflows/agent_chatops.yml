@@ -89,15 +89,17 @@ jobs:
             exit 1
           fi
 
-          # Read the deterministic verifier from the exact reviewed HEAD without
-          # cloning or executing arbitrary repository entrypoints.
-          gh api "repos/$GH_REPO/contents/scripts/verify_agent_routing_report.py?ref=$head" \
+          # The issue_comment workflow itself and its verifier come from the
+          # default branch. Never execute a verifier supplied by the PR branch,
+          # because that would let the implementation owner self-authorize.
+          default_branch=$(gh repo view "$GH_REPO" --json defaultBranchRef --jq '.defaultBranchRef.name')
+          gh api "repos/$GH_REPO/contents/scripts/verify_agent_routing_report.py?ref=$default_branch" \
             --jq '.content' | tr -d '\n' | base64 --decode > /tmp/verify_agent_routing_report.py
-          gh api "repos/$GH_REPO/issues/$PR_NUM/comments?per_page=100" > /tmp/comments.json
+          gh api --paginate --slurp "repos/$GH_REPO/issues/$PR_NUM/comments?per_page=100" > /tmp/comments.json
           if ! python /tmp/verify_agent_routing_report.py \
             --expected-head "$head" --comments-json /tmp/comments.json \
             > /tmp/routing-report.log 2>&1; then
-            printf '⚠️ `/%s` 被拒絕：current HEAD 尚無受信任 actor 提交的有效 `agent-routing-report:v1`。\n\n```\n%s\n```\n' \
+            printf '⚠️ `/%s` 被拒絕：current HEAD 尚無受信任 actor 提交的有效 `agent-routing-report:v1`，或 default-branch verifier尚未啟用。\n\n```\n%s\n```\n' \
               "$command" "$(tail -n 20 /tmp/routing-report.log)" > /tmp/reject.md
             gh issue comment "$PR_NUM" --repo "$GH_REPO" --body-file /tmp/reject.md
             exit 1
@@ -123,4 +125,4 @@ jobs:
           gh issue edit "$PR_NUM" --repo "$GH_REPO" --remove-label 'agent:review' --remove-label 'agent:blocked' --remove-label 'needs-kevin' 2>/dev/null || true
           gh issue edit "$PR_NUM" --repo "$GH_REPO" --add-label "$target"
           marker="<!-- agent-handoff:v1 command=$command head=$head -->"
-          gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "## Agent handoff state\n\n- Remote HEAD: \`$head\`\n- State: \`$target\`\n- Actor: @$COMMENT_USER\n- Gate: exact SHA + valid routing report + actual repo checks; **not merge authorization**.\n\n$marker\n\nRun: $RUN_URL"
+          gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "## Agent handoff state\n\n- Remote HEAD: \`$head\`\n- State: \`$target\`\n- Actor: @$COMMENT_USER\n- Gate: exact SHA + trusted default-branch verifier + valid routing report + actual repo checks; **not merge authorization**.\n\n$marker\n\nRun: $RUN_URL"
