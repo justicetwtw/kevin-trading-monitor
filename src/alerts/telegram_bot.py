@@ -18,7 +18,9 @@ class TelegramNotifier:
         self.token = token or TELEGRAM_BOT_TOKEN
         if chat_ids is not None:
             self.chat_ids = (
-                list(chat_ids) if not isinstance(chat_ids, str) else [chat_ids]
+                list(chat_ids)
+                if not isinstance(chat_ids, str)
+                else [chat_ids]
             )
         elif chat_id is not None:
             self.chat_ids = [chat_id] if chat_id else []
@@ -33,21 +35,29 @@ class TelegramNotifier:
     async def send_message_async(
         self,
         text: str,
-        parse_mode: str = "HTML",
+        parse_mode: str | None = "HTML",
         disable_notification: bool = False,
         sensitive: bool = False,
     ) -> bool:
-        """Send to every chat ID; redact sensitive message text from CI logs."""
+        """Send to every chat ID; redact sensitive message text from CI logs.
+
+        `parse_mode=None` sends literal plain text. The field is omitted rather
+        than serialized as JSON null, which keeps arbitrary Truth Social text
+        from being interpreted as Telegram HTML or Markdown.
+        """
         url = f"{TELEGRAM_API_BASE}/bot{self.token}/sendMessage"
         results = []
-        async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT_SEC) as client:
+        async with httpx.AsyncClient(
+            timeout=DEFAULT_TIMEOUT_SEC
+        ) as client:
             for chat_id in self.chat_ids:
                 payload = {
                     "chat_id": chat_id,
                     "text": text,
-                    "parse_mode": parse_mode,
                     "disable_notification": disable_notification,
                 }
+                if parse_mode:
+                    payload["parse_mode"] = parse_mode
                 try:
                     response = await client.post(url, json=payload)
                     if response.status_code == 200:
@@ -56,7 +66,9 @@ class TelegramNotifier:
                             if sensitive
                             else f"{text[:50]}..."
                         )
-                        logger.info(f"Telegram sent to {chat_id}: {preview}")
+                        logger.info(
+                            f"Telegram sent to {chat_id}: {preview}"
+                        )
                         results.append(True)
                     else:
                         logger.error(
