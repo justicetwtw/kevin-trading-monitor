@@ -85,6 +85,10 @@ def _public_snapshot(
         "position_count": len(stocks) + len(options),
         "n_long_options": int(snapshot.get("n_long_options", 0) or 0),
         "n_short_options": int(snapshot.get("n_short_options", 0) or 0),
+        "valuation_complete": snapshot.get("valuation_complete"),
+        "valuation_missing_count": int(
+            snapshot.get("valuation_missing_count", 0) or 0
+        ),
         "snapshot_at": snapshot.get("snapshot_at"),
         "status": "configured" if configured else "empty",
         "workflow_status": workflow_status,
@@ -183,8 +187,7 @@ def main() -> int:
             errors.append("drawdown_update_failed")
             logger.error("drawdown_update_failed (details redacted)")
     elif configured:
-        # Positions exist but no positive account estimate means price/IV coverage
-        # was insufficient for cross-day drawdown monitoring.
+        # Never update drawdown from a partial portfolio valuation.
         errors.append("account_value_unavailable")
 
     brief_sent = _send_private_risk_brief(snapshot)
