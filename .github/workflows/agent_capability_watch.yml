@@ -39,19 +39,16 @@ jobs:
           python-version: '3.11'
       - name: Verify durable workflow contract
         id: contract
-        continue-on-error: true
         run: python scripts/verify_agent_workflow_contract.py
       - name: Test watcher and verifier
         id: tests
-        continue-on-error: true
         run: python -m pytest -q tests/test_agent_capability_watch.py tests/test_agent_workflow_contract.py
       - name: Audit local contract only on pull requests
         if: github.event_name == 'pull_request'
         id: offline
-        continue-on-error: true
         run: python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline --report "$RUNNER_TEMP/report.json" --markdown "$RUNNER_TEMP/report.md"
       - name: Audit current official sources
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request'
         id: online
         continue-on-error: true
         run: python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --report "$RUNNER_TEMP/report.json" --markdown "$RUNNER_TEMP/report.md"
@@ -100,11 +97,3 @@ jobs:
               gh issue comment "$issue" --repo "$GH_REPO" --body "New capability/workflow fingerprint: \`$fingerprint\`. Re-read official docs and update through a Draft PR; do not auto-accept baseline."
             fi
           fi
-      - name: Enforce watcher reliability on PR
-        if: always() && github.event_name == 'pull_request'
-        env:
-          CONTRACT_OUTCOME: ${{ steps.contract.outcome }}
-          TEST_OUTCOME: ${{ steps.tests.outcome }}
-          OFFLINE_OUTCOME: ${{ steps.offline.outcome }}
-        run: |
-          [ "$CONTRACT_OUTCOME" = success ] && [ "$TEST_OUTCOME" = success ] && [ "$OFFLINE_OUTCOME" = success ]
