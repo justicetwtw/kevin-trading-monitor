@@ -1,10 +1,10 @@
 # Private positions schema
 
-> This repository is public. **Never commit real holdings, strikes, costs or account value.**
+> This repository is public. **Never commit real holdings, symbols, strikes, costs or account value.**
 
 ## Runtime source priority
 
-1. `POSITIONS_JSON` — encrypted GitHub Actions repository secret used by cloud position checks.
+1. `POSITIONS_JSON` — GitHub Actions repository secret used by cloud position checks.
 2. `data_store/positions.json` — local-development fallback only.
 
 When `POSITIONS_JSON` exists but is malformed, the loader fails closed to an empty portfolio. It does not fall back to the public example file.
@@ -15,7 +15,7 @@ When `POSITIONS_JSON` exists but is malformed, the loader fails closed to an emp
 
 | Mode | Behavior | Use case |
 |---|---|---|
-| `mode_1` | Required. Empty/invalid private input triggers one warning and the system continues with an empty portfolio. | Production position monitoring |
+| `mode_1` | Required. Empty/invalid private input or missing decision links degrades the workflow. | Production position monitoring |
 | `mode_2` | Optional; empty input is allowed. | Signal observation with occasional local position checks |
 | `mode_3` | Disabled; position getters return empty state and account value is `None`. | Pure signal mode |
 
@@ -55,7 +55,7 @@ The scheduled `position_check.yml` workflow uses `mode_1` and reads `POSITIONS_J
 - `symbol` — required, non-empty ticker string.
 - `shares` — required numeric quantity, zero or greater.
 - `avg_cost` — optional numeric average cost.
-- `thesis_id` — recommended link to `data_store/thesis_tracker.json`.
+- `thesis_id` — **required for healthy production decision monitoring**. It must map to an approved theme/thesis ID in `data_store/thesis_tracker.json`; missing IDs produce the safe public error code `position_thesis_id_missing`.
 - `_example` — optional boolean; `true` is ignored.
 
 ### `options[]`
@@ -67,21 +67,41 @@ The scheduled `position_check.yml` workflow uses `mode_1` and reads `POSITIONS_J
 - `contracts` — optional positive integer, default `1`.
 - `cost_per_contract` — numeric **whole-contract cost in USD** (`premium per share × 100`). Required for LEAPS PnL monitoring.
 - `id` — recommended stable identifier.
-- `thesis_id` — recommended thesis link.
+- `thesis_id` — **required for healthy production decision monitoring**. Portfolio hedges should use an explicit approved hedge thesis such as `portfolio_hedge`, not inherit an issuer thesis.
 - `_example` — optional boolean; `true` is ignored.
+
+Schema validation still accepts a missing `thesis_id` so legacy data cannot crash the loader, but the position workflow fails closed to `degraded` until the decision link is repaired. This separates transport/schema validity from decision-model completeness.
+
+## Private decision-risk output
+
+The private Telegram portfolio brief now includes:
+
+- symbol and theme Delta exposure;
+- overlapping correlation baskets such as `ai_capex`, `memory_cycle`, `hbm`, `commodity_dram`, `nand` and `optical_interconnect`;
+- protective negative Delta divided by positive Delta;
+- option roll counts at ≤90, ≤180 and ≤270 days;
+- missing thesis IDs, unmapped basket coverage and review flags.
+
+The current 50% correlated-basket threshold is labeled `repo_default_pending_kevin_confirmation`. It is a review gate, not an automatic trim instruction.
 
 ## Public-state boundary
 
 During a position workflow run, exact positions and estimated account value exist only in memory. The committed `data_store/position_snapshot.json` may contain only:
 
-- mode and source type
-- configured/empty status
-- aggregate position count
-- long/short option counts
-- snapshot timestamp
-- privacy marker
+- mode and source type;
+- configured/empty status;
+- aggregate position and long/short option counts;
+- valuation completeness counts;
+- workflow status, generic error codes and timestamp;
+- aggregate decision-risk counts/ratios:
+  - missing thesis ID count;
+  - unmapped-symbol count;
+  - maximum basket gross-weight ratio;
+  - hedge-coverage ratio;
+  - roll-window counts;
+  - generic review flags.
 
-It must never contain symbols, shares, strikes, expiries, costs, PnL or account value.
+It must never contain symbols, shares, basket names, strikes, expiries, costs, PnL, account value or detailed Greeks. Tests serialize the public decision-risk state and assert private symbols/basket names are absent.
 
 ## Updating the GitHub secret
 
@@ -90,7 +110,7 @@ Open repository **Settings → Secrets and variables → Actions → New reposit
 - Name: `POSITIONS_JSON`
 - Value: the complete valid JSON object shown above, with real values and no comments.
 
-After updating, manually run **Position Management Check** once. Confirm the public health snapshot says `configured` without exposing any position details.
+After updating, manually run **Position Management Check** once. Confirm the public health snapshot says `configured` without exposing any position details, and confirm no `position_thesis_id_missing` or `position_correlation_basket_unmapped` error remains.
 
 ## Local development
 
@@ -102,5 +122,7 @@ To reset the one-time `mode_1` warning locally, delete `data_store/mode1_warned.
 
 `hedge_dte_tracker` treats either condition as a hedge:
 
-- a long option on an `ETF_HEDGE` symbol such as `QQQ`, `SPY`, `SMH` or `SOXL`
-- any `long_put`
+- a long option on an `ETF_HEDGE` symbol such as `QQQ`, `SPY`, `SMH` or `SOXL`;
+- any `long_put`.
+
+Recognition is not proof of economic effectiveness. Basis risk, expiry mismatch, liquidity and intended-alpha preservation remain human review items.
