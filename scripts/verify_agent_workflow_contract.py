@@ -16,7 +16,7 @@ REQUIRED = {
         "needs-kevin",
         "not_decision_grade",
         "Kevin",
-        "不得 merge",
+        "只有 Kevin 對該 PR 明確說可 merge 後才可合併",
     ],
     "CLAUDE.md": ["@AGENTS.md", "Independent review"],
     "docs/agent-team-workflow.md": [
@@ -57,14 +57,22 @@ def verify(root: Path = ROOT) -> list[str]:
         text = path.read_text(encoding="utf-8")
         for phrase in phrases:
             if phrase.lower() not in text.lower():
-                errors.append(f"{relative}: missing contract phrase {phrase!r}")
-    agents = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").exists() else ""
+                errors.append(
+                    f"{relative}: missing contract phrase {phrase!r}"
+                )
+    agents = (
+        (root / "AGENTS.md").read_text(encoding="utf-8")
+        if (root / "AGENTS.md").exists()
+        else ""
+    )
     for pattern in FORBIDDEN_ROOT_PATTERNS:
         if pattern.lower() in agents.lower():
             errors.append(f"AGENTS.md: forbidden pattern {pattern!r}")
     claude = root / "CLAUDE.md"
     if claude.exists() and claude.stat().st_size > 3000:
-        errors.append(f"CLAUDE.md must remain thin; observed {claude.stat().st_size} bytes")
+        errors.append(
+            f"CLAUDE.md must remain thin; observed {claude.stat().st_size} bytes"
+        )
     return errors
 
 
