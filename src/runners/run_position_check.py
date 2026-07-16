@@ -69,7 +69,9 @@ def _route_with_kind(alerts, kind: str) -> tuple[int, int]:
                 pushed += 1
         except Exception:
             failures += 1
-            logger.error(f"{kind} private alert processing failed (details redacted)")
+            logger.error(
+                f"{kind} private alert processing failed (details redacted)"
+            )
     return pushed, failures
 
 
@@ -124,8 +126,25 @@ def _analyze_and_send_private_risk(
         )
         return sent, decision_risk
     except Exception:
-        logger.error("private portfolio decision-risk brief failed (details redacted)")
+        logger.error(
+            "private portfolio decision-risk brief failed (details redacted)"
+        )
         return False, {}
+
+
+def _send_private_risk_brief(snapshot: dict) -> bool:
+    """Compatibility wrapper that records only aggregate in-process metadata.
+
+    Existing callers/tests use the boolean interface. The runner retrieves the
+    attached decision-risk result immediately after the call; no private detail
+    is persisted on the function attribute.
+    """
+    sent, decision_risk = _analyze_and_send_private_risk(snapshot)
+    _send_private_risk_brief.last_decision_risk = decision_risk
+    return sent
+
+
+_send_private_risk_brief.last_decision_risk = {}
 
 
 def _scan_safely(scanner, error_code: str, errors: list[str]) -> list:
@@ -204,7 +223,22 @@ def main() -> int:
         # Never update drawdown from a partial portfolio valuation.
         errors.append("account_value_unavailable")
 
-    brief_sent, decision_risk = _analyze_and_send_private_risk(snapshot)
+    # Reset per-run metadata before calling the compatibility wrapper. A test or
+    # downstream caller may monkeypatch the wrapper; that must not reuse stale
+    # decision-risk state from an earlier process invocation.
+    try:
+        _send_private_risk_brief.last_decision_risk = {}
+    except (AttributeError, TypeError):
+        pass
+    brief_sent = _send_private_risk_brief(snapshot)
+    decision_risk = getattr(
+        _send_private_risk_brief,
+        "last_decision_risk",
+        {},
+    )
+    if not isinstance(decision_risk, dict):
+        decision_risk = {}
+
     if configured and not brief_sent:
         errors.append("private_brief_failed")
     if int(decision_risk.get("missing_thesis_id_count", 0) or 0) > 0:
