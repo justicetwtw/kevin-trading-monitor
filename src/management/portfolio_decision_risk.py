@@ -15,51 +15,87 @@ from src.storage.state_manager import read_json
 BASKET_REVIEW_WEIGHT = 0.50
 
 
-def _theme_baskets() -> dict[str, set[str]]:
+def _theme_context() -> tuple[dict[str, set[str]], set[str]]:
+    """Return symbol basket mapping and approved theme/subtheme thesis IDs."""
     document = read_json("thesis_tracker.json", default={})
     mapping: dict[str, set[str]] = defaultdict(set)
+    valid_ids: set[str] = set()
     if not isinstance(document, dict):
-        return mapping
+        return mapping, valid_ids
+
     for theme in document.get("themes") or []:
         if not isinstance(theme, dict):
             continue
-        theme_id = str(theme.get("id") or "")
+        theme_id = str(theme.get("id") or "").strip()
+        if theme_id:
+            valid_ids.add(theme_id)
         for subtheme in theme.get("subthemes") or []:
             if not isinstance(subtheme, dict):
                 continue
-            sub_id = str(subtheme.get("id") or "")
+            sub_id = str(subtheme.get("id") or "").strip()
+            if sub_id:
+                valid_ids.add(sub_id)
             for symbol in subtheme.get("symbols") or []:
+                symbol_text = str(symbol).strip()
+                if not symbol_text:
+                    continue
                 if theme_id:
-                    mapping[str(symbol)].add(theme_id)
+                    mapping[symbol_text].add(theme_id)
                 if sub_id:
-                    mapping[str(symbol)].add(sub_id)
+                    mapping[symbol_text].add(sub_id)
+
     for thesis in document.get("symbols") or []:
-        if isinstance(thesis, dict) and thesis.get("symbol") and thesis.get("theme"):
-            mapping[str(thesis["symbol"])].add(str(thesis["theme"]))
-    return mapping
+        if not isinstance(thesis, dict):
+            continue
+        symbol = str(thesis.get("symbol") or "").strip()
+        theme = str(thesis.get("theme") or "").strip()
+        if symbol and theme:
+            mapping[symbol].add(theme)
+            valid_ids.add(theme)
+    return mapping, valid_ids
 
 
 def analyze_portfolio_decision_risk(
     summary: dict[str, Any],
     snapshot: dict[str, Any],
 ) -> dict[str, Any]:
-    positions = list(snapshot.get("stocks") or []) + list(snapshot.get("options") or [])
-    missing_thesis_ids = sum(
-        1 for item in positions if not isinstance(item.get("thesis_id"), str) or not item.get("thesis_id", "").strip()
+    positions = list(snapshot.get("stocks") or []) + list(
+        snapshot.get("options") or []
     )
-    basket_map = _theme_baskets()
+    basket_map, valid_thesis_ids = _theme_context()
+    thesis_ids = [
+        str(item.get("thesis_id") or "").strip()
+        if isinstance(item, dict)
+        else ""
+        for item in positions
+    ]
+    missing_thesis_ids = sum(1 for value in thesis_ids if not value)
+    invalid_thesis_ids = sum(
+        1
+        for value in thesis_ids
+        if value and value not in valid_thesis_ids
+    )
+
     gross = float(summary.get("gross_delta_notional", 0) or 0)
     basket_gross: dict[str, float] = defaultdict(float)
     unmapped_symbols: set[str] = set()
     positive_delta = 0.0
     negative_delta = 0.0
-    roll_counts = {"dte_le_90": 0, "dte_le_180": 0, "dte_le_270": 0}
+    roll_counts = {
+        "dte_le_90": 0,
+        "dte_le_180": 0,
+        "dte_le_270": 0,
+    }
 
     for row in summary.get("rows") or []:
         if not isinstance(row, dict):
             continue
         symbol = str(row.get("symbol") or "")
-        delta_notional = float(row.get("delta_notional", 0) or 0) if row.get("market_data_ok") else 0.0
+        delta_notional = (
+            float(row.get("delta_notional", 0) or 0)
+            if row.get("market_data_ok")
+            else 0.0
+        )
         if delta_notional >= 0:
             positive_delta += delta_notional
         else:
@@ -89,12 +125,20 @@ def analyze_portfolio_decision_risk(
         }
         for basket, value in basket_gross.items()
     ]
-    basket_exposure.sort(key=lambda item: item["gross_delta_notional"], reverse=True)
-    max_weight = basket_exposure[0]["gross_weight"] if basket_exposure else 0.0
-    hedge_coverage = negative_delta / positive_delta if positive_delta > 0 else None
+    basket_exposure.sort(
+        key=lambda item: item["gross_delta_notional"], reverse=True
+    )
+    max_weight = (
+        basket_exposure[0]["gross_weight"] if basket_exposure else 0.0
+    )
+    hedge_coverage = (
+        negative_delta / positive_delta if positive_delta > 0 else None
+    )
     flags = []
     if missing_thesis_ids:
         flags.append("position_thesis_id_missing")
+    if invalid_thesis_ids:
+        flags.append("position_thesis_id_invalid")
     if unmapped_symbols:
         flags.append("position_correlation_basket_unmapped")
     if max_weight > BASKET_REVIEW_WEIGHT:
@@ -104,6 +148,7 @@ def analyze_portfolio_decision_risk(
     return {
         "position_count": len(positions),
         "missing_thesis_id_count": missing_thesis_ids,
+        "invalid_thesis_id_count": invalid_thesis_ids,
         "unmapped_symbol_count": len(unmapped_symbols),
         "basket_exposure": basket_exposure,
         "max_basket_gross_weight": max_weight,
@@ -120,9 +165,18 @@ def analyze_portfolio_decision_risk(
 
 def public_decision_risk_state(value: dict[str, Any]) -> dict[str, Any]:
     return {
-        "missing_thesis_id_count": int(value.get("missing_thesis_id_count", 0) or 0),
-        "unmapped_symbol_count": int(value.get("unmapped_symbol_count", 0) or 0),
-        "max_basket_gross_weight": value.get("max_basket_gross_weight"),
+        "missing_thesis_id_count": int(
+            value.get("missing_thesis_id_count", 0) or 0
+        ),
+        "invalid_thesis_id_count": int(
+            value.get("invalid_thesis_id_count", 0) or 0
+        ),
+        "unmapped_symbol_count": int(
+            value.get("unmapped_symbol_count", 0) or 0
+        ),
+        "max_basket_gross_weight": value.get(
+            "max_basket_gross_weight"
+        ),
         "hedge_coverage_ratio": value.get("hedge_coverage_ratio"),
         "roll_window_counts": dict(value.get("roll_window_counts") or {}),
         "review_flags": list(value.get("review_flags") or []),
@@ -134,10 +188,21 @@ def public_decision_risk_state(value: dict[str, Any]) -> dict[str, Any]:
 def format_private_decision_risk(value: dict[str, Any]) -> str:
     lines = ["\n<b>決策風險與相關曝險（私有）</b>"]
     missing = int(value.get("missing_thesis_id_count", 0) or 0)
-    lines.append(f"Thesis ID 缺口：{missing} | 未映射 basket：{int(value.get('unmapped_symbol_count', 0) or 0)}")
+    invalid = int(value.get("invalid_thesis_id_count", 0) or 0)
+    unmapped = int(value.get("unmapped_symbol_count", 0) or 0)
+    lines.append(
+        f"Thesis ID 缺口：{missing} | 無效：{invalid} | "
+        f"未映射 basket：{unmapped}"
+    )
     coverage = value.get("hedge_coverage_ratio")
-    coverage_text = f"{float(coverage) * 100:.1f}%" if isinstance(coverage, (int, float)) else "—"
-    lines.append(f"Protective negative Delta / positive Delta：{coverage_text}")
+    coverage_text = (
+        f"{float(coverage) * 100:.1f}%"
+        if isinstance(coverage, (int, float))
+        else "—"
+    )
+    lines.append(
+        f"Protective negative Delta / positive Delta：{coverage_text}"
+    )
     baskets = value.get("basket_exposure") or []
     if baskets:
         lines.append("<b>相關 basket gross Delta</b>")
@@ -156,6 +221,12 @@ def format_private_decision_risk(value: dict[str, Any]) -> str:
     )
     flags = value.get("review_flags") or []
     if flags:
-        lines.append("⚠ Review flags：" + escape("、".join(str(item) for item in flags)))
-    lines.append("<i>50% basket threshold 是待 Kevin 確認的 review gate，不是自動減碼指令。</i>")
+        lines.append(
+            "⚠ Review flags："
+            + escape("、".join(str(item) for item in flags))
+        )
+    lines.append(
+        "<i>50% basket threshold 是待 Kevin 確認的 review gate，"
+        "不是自動減碼指令。</i>"
+    )
     return "\n".join(lines)
