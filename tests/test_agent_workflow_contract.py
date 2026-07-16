@@ -15,15 +15,17 @@ def test_contract_passes_when_all_required_phrases_exist(tmp_path: Path):
     assert verify(tmp_path) == []
 
 
-def test_contract_detects_missing_sha_gate(tmp_path: Path):
+def test_contract_detects_missing_routing_report_gate(tmp_path: Path):
     _materialize(tmp_path)
-    workflow = tmp_path / ".github/workflows/claude_review.yml"
+    workflow = tmp_path / ".github/workflows/agent_chatops.yml"
     workflow.write_text(
-        "ANTHROPIC_API_KEY\nauthor_association\nReview only",
+        workflow.read_text(encoding="utf-8").replace(
+            "verify_agent_routing_report.py", "missing_verifier.py"
+        ),
         encoding="utf-8",
     )
     errors = verify(tmp_path)
-    assert any("40-character" in error for error in errors)
+    assert any("verify_agent_routing_report.py" in error for error in errors)
 
 
 def test_claude_wrapper_must_remain_thin(tmp_path: Path):
@@ -48,14 +50,27 @@ def test_short_sha_prefix_gate_is_forbidden(tmp_path: Path):
     assert any('case "$head"' in error for error in errors)
 
 
-def test_claude_secret_must_not_enter_preflight_shell(tmp_path: Path):
+def test_chatops_cannot_checkout_or_call_ai(tmp_path: Path):
+    _materialize(tmp_path)
+    workflow = tmp_path / ".github/workflows/agent_chatops.yml"
+    workflow.write_text(
+        workflow.read_text(encoding="utf-8")
+        + "\nuses: actions/checkout@v4\nuses: anthropics/claude-code-action@v1",
+        encoding="utf-8",
+    )
+    errors = verify(tmp_path)
+    assert any("actions/checkout" in error for error in errors)
+    assert any("claude-code-action" in error for error in errors)
+
+
+def test_repo_ai_inference_workflow_is_forbidden(tmp_path: Path):
     _materialize(tmp_path)
     workflow = tmp_path / ".github/workflows/claude_review.yml"
     workflow.write_text(
-        workflow.read_text(encoding="utf-8")
-        + "\nANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}",
+        "uses: anthropics/claude-code-action@v1\n"
+        "anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}\n",
         encoding="utf-8",
     )
-    assert any(
-        "ANTHROPIC_KEY" in error for error in verify(tmp_path)
-    )
+    errors = verify(tmp_path)
+    assert any("must not exist" in error for error in errors)
+    assert any("ANTHROPIC_API_KEY" in error for error in errors)
