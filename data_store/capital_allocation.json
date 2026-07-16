@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "last_updated": "2026-07-16",
-  "note": "Manual priority is research attention order, not an automatic buy ranking. Decision readiness remains not_decision_grade until current price/as-of, source-backed scenarios and valid probabilities are supplied.",
+  "note": "Manual priority is research attention order, not an automatic buy ranking. Decision readiness remains not_decision_grade until current price/as-of, source-backed scenarios, structured evidence and valid probabilities are supplied.",
   "candidates": [
     {
       "manual_rank": 1,
@@ -15,12 +15,13 @@
       "invalidation": "HBM/DRAM supply-demand or AI-capex assumptions deteriorate materially.",
       "decision_inputs": {
         "evidence": {
-          "quality": "medium",
+          "quality": "low",
           "as_of": "2026-07-16",
           "sources": [
             "Kevin house view consolidated in thesis_tracker.json",
             "public monitor fundamentals/regime/options state"
-          ]
+          ],
+          "limitation": "House view and monitor state are not yet a structured source-backed issuer evidence pack."
         },
         "next_catalyst": {
           "date": "2026-07-31",
@@ -55,12 +56,13 @@
       "invalidation": "Broad, persistent capex cuts or a confirmed options-fear and earnings breakdown.",
       "decision_inputs": {
         "evidence": {
-          "quality": "medium",
+          "quality": "low",
           "as_of": "2026-07-16",
           "sources": [
             "Kevin house view consolidated in thesis_tracker.json",
             "public monitor fundamentals/regime/options state"
-          ]
+          ],
+          "limitation": "House view and monitor state are not yet a structured source-backed issuer evidence pack."
         },
         "next_catalyst": {
           "date": "2026-07-31",
@@ -91,12 +93,13 @@
       "invalidation": "Capacity returns faster than demand and NAND pricing weakens.",
       "decision_inputs": {
         "evidence": {
-          "quality": "medium",
+          "quality": "low",
           "as_of": "2026-07-16",
           "sources": [
             "Kevin house view consolidated in thesis_tracker.json",
             "public monitor fundamentals/regime/options state"
-          ]
+          ],
+          "limitation": "House view and monitor state are not yet a structured source-backed issuer evidence pack."
         },
         "next_catalyst": {
           "date": "2026-07-31",
@@ -133,7 +136,8 @@
           "sources": [
             "Kevin watchlist context",
             "public monitor state with known coverage gap"
-          ]
+          ],
+          "limitation": "Coverage gap is acknowledged; evidence is insufficient for capital review."
         },
         "next_catalyst": {
           "date": "2026-07-31",
