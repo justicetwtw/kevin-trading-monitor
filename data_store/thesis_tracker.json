@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-07-16",
+  "source": "Kevin discussions consolidated through 2026-07-16",
+  "themes": [
+    {
+      "id": "memory_cycle",
+      "name": "Memory cycle",
+      "status": "active",
+      "summary": "HBM, commodity DRAM and NAND must be evaluated separately; one blended memory label hides materially different supply-demand and late-cycle risks.",
+      "subthemes": [
+        {
+          "id": "hbm",
+          "name": "HBM",
+          "status": "structural_tightness_watch",
+          "symbols": ["MU", "NVDA", "TSM", "AVGO"],
+          "monitor": "AI accelerator demand, capacity qualification, packaging constraints, content per system and customer attempts to reduce memory content."
+        },
+        {
+          "id": "commodity_dram",
+          "name": "Commodity DRAM",
+          "status": "cycle_tightness_watch",
+          "symbols": ["MU"],
+          "monitor": "Pricing, supply discipline, node transitions, inventory and whether capacity additions arrive faster than demand."
+        },
+        {
+          "id": "nand",
+          "name": "NAND",
+          "status": "late_cycle_risk_watch",
+          "symbols": ["SNDK", "WDC", "MU", "STX"],
+          "monitor": "Consumer demand, capacity returns, pricing discipline and whether NAND supply loosens earlier than HBM or DRAM."
+        }
+      ],
+      "invalidation": [
+        "HBM qualification or packaging constraints ease materially faster than demand grows.",
+        "Commodity DRAM pricing and inventory reverse while suppliers accelerate capacity.",
+        "AI infrastructure demand weakens enough to reduce memory content growth."
+      ],
+      "next_review": "2026-07-31"
+    },
+    {
+      "id": "ai_capex",
+      "name": "AI capex and infrastructure",
+      "status": "active",
+      "summary": "NVDA, MU, AVGO, MRVL and LITE can move together when the market reprices AI infrastructure spending; symbol-level signals must include shared capex-sentiment risk.",
+      "subthemes": [
+        {
+          "id": "compute",
+          "name": "Compute and accelerators",
+          "status": "active",
+          "symbols": ["NVDA", "AVGO"]
+        },
+        {
+          "id": "memory_interconnect",
+          "name": "Memory and interconnect",
+          "status": "active",
+          "symbols": ["MU", "MRVL", "LITE"]
+        }
+      ],
+      "invalidation": [
+        "Hyperscaler capex guidance weakens broadly rather than shifting between vendors.",
+        "Options-market fear and credit stress confirm that a price decline is structural rather than positioning noise."
+      ],
+      "next_review": "2026-07-31"
+    }
+  ],
+  "symbols": [
+    {
+      "symbol": "MU",
+      "theme": "memory_cycle",
+      "status": "active",
+      "summary": "Mixed HBM, DRAM and NAND exposure; monitor each component separately instead of extrapolating one memory datapoint to the whole company.",
+      "catalysts": [
+        "HBM qualification, capacity and content growth",
+        "DRAM contract pricing and inventory",
+        "AI server demand and customer memory configurations"
+      ],
+      "invalidation": [
+        "HBM or DRAM supply-demand turns decisively before earnings expectations adjust.",
+        "AI capex weakness becomes broad and persistent.",
+        "Management guidance or margins deteriorate beyond a normal memory-cycle fluctuation."
+      ],
+      "next_review": "2026-07-31"
+    },
+    {
+      "symbol": "NVDA",
+      "theme": "ai_capex",
+      "status": "active",
+      "summary": "Core AI-capex barometer; evaluate price weakness together with put skew, volatility demand, support and shared infrastructure sentiment.",
+      "catalysts": [
+        "Platform shipment and customer capex updates",
+        "Next-generation system configuration and memory content",
+        "Options fear versus orderly positioning"
+      ],
+      "invalidation": [
+        "Broad hyperscaler capex cuts persist.",
+        "Put skew and volatility rise with a confirmed break of support and earnings expectations."
+      ],
+      "next_review": "2026-07-31"
+    },
+    {
+      "symbol": "SNDK",
+      "theme": "memory_cycle",
+      "status": "watch",
+      "summary": "More direct NAND-cycle exposure than MU; upside and late-cycle oversupply risk should not be inferred from HBM or DRAM data.",
+      "catalysts": [
+        "NAND pricing and supply discipline",
+        "Enterprise and consumer storage demand",
+        "Capacity restarts and inventory"
+      ],
+      "invalidation": [
+        "NAND supply returns faster than end demand.",
+        "Pricing weakens while inventories rebuild."
+      ],
+      "next_review": "2026-07-31"
+    }
+  ]
+}
