@@ -1,4 +1,4 @@
-"""Trump monitor must capture every post and never fake source health."""
+"""Trump monitor must capture every current post and never fake health."""
 
 from datetime import datetime, timedelta, timezone
 
@@ -27,6 +27,19 @@ def _post(
         "media_count": 0,
         "tier": tier,
         "matched_keywords": {"tier1": {}, "tier2": {}},
+    }
+
+
+def _healthy_result(posts):
+    return {
+        "status": "healthy",
+        "source": "truth_social_official_api",
+        "latest_post_at": posts[-1]["created_at"] if posts else None,
+        "posts": posts,
+        "attempts": [],
+        "raw_count": len(posts),
+        "returned_count": len(posts),
+        "source_limit": trump_truth.SOURCE_POST_LIMIT,
     }
 
 
@@ -84,6 +97,34 @@ def test_stale_cnn_archive_is_not_accepted_as_live(monkeypatch):
     )
 
 
+def test_huge_mirror_returns_only_latest_bounded_set(monkeypatch):
+    now = datetime.now(timezone.utc)
+    raw = [
+        {
+            "id": str(index),
+            "created_at": (now - timedelta(minutes=index)).isoformat(),
+            "text": f"post {index}",
+        }
+        for index in range(trump_truth.SOURCE_POST_LIMIT + 50)
+    ]
+    monkeypatch.setattr(
+        trump_truth,
+        "fetch_from_truth_api",
+        lambda: (_ for _ in ()).throw(RuntimeError("official unavailable")),
+    )
+    monkeypatch.setattr(trump_truth, "fetch_from_cnn_mirror", lambda: raw)
+
+    result = trump_truth.fetch_recent_posts_with_health()
+
+    assert result["status"] == "healthy"
+    assert result["source"] == "cnn_historical_archive"
+    assert result["raw_count"] == trump_truth.SOURCE_POST_LIMIT + 50
+    assert result["returned_count"] == trump_truth.SOURCE_POST_LIMIT
+    assert len(result["posts"]) == trump_truth.SOURCE_POST_LIMIT
+    assert result["posts"][0]["id"] == "0"
+    assert result["posts"][-1]["id"] == str(trump_truth.SOURCE_POST_LIMIT - 1)
+
+
 def test_retruth_text_and_activity_are_preserved():
     normalized = trump_truth.normalize_post(
         {
@@ -127,13 +168,7 @@ def test_tier1_and_tier3_both_delivered_in_same_poll(monkeypatch):
     monkeypatch.setattr(
         run_trump_monitor,
         "fetch_recent_posts_with_health",
-        lambda: {
-            "status": "healthy",
-            "source": "truth_social_official_api",
-            "latest_post_at": posts[-1]["created_at"],
-            "posts": posts,
-            "attempts": [],
-        },
+        lambda: _healthy_result(posts),
     )
     monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda value: value)
     monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
@@ -162,8 +197,70 @@ def test_tier1_and_tier3_both_delivered_in_same_poll(monkeypatch):
     assert "Apparently unrelated post" in joined
     assert "New tariff policy" in joined
     assert sorted(seen) == ["high", "low"]
-    assert health["trump_monitor_health.json"]["delivery_status"] == "delivered_all"
-    assert health["trump_monitor_health.json"]["capture_policy"].startswith("all_posts")
+    state = health["trump_monitor_health.json"]
+    assert state["delivery_status"] == "delivered_all"
+    assert state["capture_policy"].startswith("all_posts")
+    assert state["eligible_count"] == 2
+
+
+def test_first_activation_backfills_24h_but_not_years_of_history(monkeypatch):
+    recent = _post("recent", "current policy", hours_ago=2)
+    historical = _post("old", "historical post", hours_ago=48)
+    posts = [historical, recent]
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "fetch_recent_posts_with_health",
+        lambda: _healthy_result(posts),
+    )
+    captured = []
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "get_unseen_posts",
+        lambda value: captured.extend(value) or value,
+    )
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda value: None)
+    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
+    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
+    writes = {}
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "write_json",
+        lambda filename, value: writes.setdefault(filename, value) is value,
+    )
+
+    assert run_trump_monitor.main() == 0
+    assert [post["id"] for post in captured] == ["recent"]
+    state = writes["trump_monitor_health.json"]
+    assert state["initial_backfill_hours"] == 24
+    assert state["eligible_count"] == 1
+
+
+def test_existing_capture_checkpoint_is_reused(monkeypatch):
+    checkpoint = datetime.now(timezone.utc) - timedelta(days=3)
+    posts = [_post("two-days", "missed during downtime", hours_ago=48)]
+    previous = {"capture_started_at": checkpoint.isoformat()}
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "fetch_recent_posts_with_health",
+        lambda: _healthy_result(posts),
+    )
+    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda value: value)
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda value: None)
+    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
+    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: previous)
+    writes = {}
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "write_json",
+        lambda filename, value: writes.setdefault(filename, value) is value,
+    )
+
+    assert run_trump_monitor.main() == 0
+    state = writes["trump_monitor_health.json"]
+    assert state["eligible_count"] == 1
+    assert state["capture_started_at"] == checkpoint.isoformat()
 
 
 def test_source_unavailable_is_explicit_failure(monkeypatch):
@@ -197,7 +294,7 @@ def test_source_unavailable_is_explicit_failure(monkeypatch):
     health = writes["trump_monitor_health.json"]
     assert health["status"] == "unavailable"
     assert health["delivery_status"] == "source_unavailable"
-    assert health["fetched_count"] == 0
+    assert health["eligible_count"] == 0
 
 
 def test_long_post_is_split_without_truncating_content():
@@ -208,4 +305,8 @@ def test_long_post_is_split_without_truncating_content():
     assert len(chunks) > 1
     delivered = "".join(chunk["message"] for chunk in chunks)
     assert delivered.count("政策內容") == text.count("政策內容")
-    assert all(len(chunk["message"]) <= run_trump_monitor.MAX_TELEGRAM_CHARS + 20 for chunk in chunks)
+    assert all(
+        len(chunk["message"])
+        <= run_trump_monitor.MAX_TELEGRAM_CHARS + 20
+        for chunk in chunks
+    )
