@@ -1,95 +1,107 @@
-# Trading Monitor v3 — Decision-grade Mission Control
+# Trading Monitor v3 — Decision-grade readiness and auditable agent workflow
 
-Date: 2026-07-16  
-Status: implemented in Draft PR #8; not merged or production-activated  
-Prior foundation: [`trading_monitor_v2.md`](trading_monitor_v2.md)
+> Date: 2026-07-16  
+> Status: Draft PR implementation; not merged or activated  
+> Product boundary: decision support only, no automated orders.
 
-## Product change
+## 1. Product outcome
 
-v2 solved the passive-dashboard, privacy and false-green workflow problems. v3 adds a stricter product contract:
+Trading Monitor v3 adds a fail-closed decision layer on top of Mission Control:
 
-> The system may rank research attention, but it must not call a setup decision-ready until current price/as-of/source, valid scenarios, Kevin-approved assumptions, fresh evidence, a future proof point, screen coverage and correlated-risk context are all present.
+- company thesis status, security readiness and decision posture are separate;
+- scenario math requires current price, as-of, source and probabilities that sum to 100%;
+- stale/misaligned market anchors, unapproved thresholds, weak evidence and expired catalysts cannot become `review_ready`;
+- correlated research baskets and private portfolio basket/hedge/roll risk are explicit;
+- decision history is append-only and calibration remains insufficient until enough resolved forecasts exist.
 
-This is a decision-support system, not an automated trading system.
+The implementation improves decision hygiene; it does not prove alpha and does not invent missing valuation inputs.
 
-## What is now implemented
+## 2. Agent workflow outcome
 
-### 1. Decision readiness rather than a second decorative score
+The repo uses the same model-neutral, quota-aware workflow as the current `jin-yi-yang-bot` contract:
 
-- Company thesis, security readiness and decision posture are separate fields.
-- States: `not_decision_grade`, `screen_grade`, `review_ready`, `re_underwrite`.
-- Missing data is never replaced by a neutral value.
-- Existing watchlist score remains a secondary heuristic screen and retains coverage/component status.
-- Scenario EV/skew is calculated only after validating source, as-of, current price, positive cases and probabilities summing to 100%.
-- Scenario price anchor drift over 5% or date mismatch over 3 days invalidates decision grade.
-- Mathematically valid but unapproved assumptions, partial market context, stale evidence, an expired proof point or unapproved thresholds can reach only `screen_grade`.
+- Kevin works with the strongest available Conversation／Workflow Orchestrator;
+- owner is chosen per task using quota／availability, task fit, authenticated delivery path, tools and failure mode;
+- one PR has one branch owner;
+- optional lower-cost subagents handle only bounded, independent, verifiable support work;
+- implementation completion requires a current-HEAD `agent-routing-report:v1`, deterministic CI and remote delivery;
+- independent reviewer must not be the implementation owner; use a different provider/model family when practical;
+- findings return to the original owner, with at most two repair rounds;
+- Kevin alone authorizes merge, Ready, deployment and production risk.
 
-### 2. Public delayed market context
+Repo Actions do not hold OpenAI／Anthropic API keys or run model inference. Codex review uses the verified repository integration. Fable／Claude／other workers use an authenticated task surface; missing delivery path is `BLOCKED_DELIVERY`, not an invented mention.
 
-A scheduled workflow refreshes each allocation candidate after the U.S. close:
+## 3. Decision readiness
+
+### `not_decision_grade`
+
+Core price/source/as-of/scenario or thesis requirements are absent, market context is unhealthy, or scenario anchor conflicts materially with the current market snapshot.
+
+### `screen_grade`
+
+Math exists but evidence, approval, catalyst, score coverage or freshness remains incomplete. This supports research prioritization only.
+
+### `review_ready`
+
+All required inputs, approvals, evidence, source posture, dated catalyst, screen coverage, correlation baskets and instrument lenses are present. This means “ready for Kevin review,” never “buy.”
+
+### `re_underwrite`
+
+Company thesis is broken/invalidated or materially impaired. Security ranking is suspended until the thesis is rebuilt.
+
+## 4. Market context
+
+`Decision Market Context` refreshes delayed public timing/risk fields after U.S. close:
 
 - current close/as-of;
-- 1M, 3M and 6M return;
+- 1M/3M/6M return;
 - distance from 52-week high;
-- 20-day realized volatility.
+- 20-day annualized realized volatility.
 
-The source is labeled delayed/unofficial yfinance data. It is timing/risk context only, not an official tape, valuation or target price. Unavailable candidates produce a committed safe degraded state followed by a red workflow.
+This source is delayed/unofficial and cannot substitute for official tape, consensus estimates, paid options history or valuation underwriting. Partial/unavailable data remains visible and fails closed.
 
-### 3. Scenario and evidence gaps are visible
+## 5. Private portfolio decision risk
 
-Mission Control now exposes:
+Exact positions remain only in process memory and private Telegram. The private brief adds:
 
-- readiness counts and blocking inputs;
-- market-context health;
-- scenario expected return and downside/upside skew when valid;
-- manual research priority separately from dynamic readiness;
-- research-candidate correlation baskets;
-- decision-log sample size and Brier score only when resolved probability forecasts exist.
-
-The initial MU/NVDA/SNDK/LITE scenario fields remain `null`; the system therefore correctly reports them as not decision-grade rather than inventing price targets or probabilities.
-
-### 4. Private thesis-linked portfolio risk
-
-Private Telegram adds:
-
-- overlapping basket gross Delta;
+- overlapping theme/subtheme basket Delta exposure;
 - protective negative Delta / positive Delta;
-- roll windows at ≤90, ≤180 and ≤270 days;
-- missing and invalid `thesis_id` counts;
-- unmapped correlation risk and review flags.
+- ≤90/180/270-day roll windows;
+- missing/invalid thesis IDs and unmapped basket coverage;
+- review flags with threshold origin.
 
-Public state contains aggregate counts/ratios only. It cannot contain symbols, basket names, shares, contracts, strikes, expiries, costs, account value or detailed Greeks.
+Public state contains only aggregate counts/ratios and generic flags; never symbols, basket names, strikes, expiries, costs or account value.
 
-`portfolio_hedge` is an explicit risk-control thesis. Recognition of a QQQ/SPY/SMH/SOXL put does not prove effectiveness; basis risk, carry, liquidity, expiry mismatch and intended-alpha preservation remain human review items.
+## 6. Routing evidence
 
-### 5. Durable dual-agent governance
+Before `/agent-fix-complete <current-head>`, a trusted PR comment must contain a schema-valid `agent-routing-report:v1` with:
 
-The workflow adapted from `jin-yi-yang-bot` adds:
+- exact 40-character current remote HEAD;
+- dated owner/provider/surface/session mode and assignment basis;
+- whether subagents were used and why;
+- bounded delegation ownership/outcome/evidence when applicable;
+- actual usage/credit/latency evidence or explicit `unavailable` source;
+- lead re-verification;
+- tests and passing CI;
+- non-owner reviewer assignment.
 
-- one implementation owner per branch;
-- exact 40-character remote-HEAD handoffs;
-- blocking deterministic CI and workflow-contract verification;
-- trusted-actor ChatOps;
-- official `@codex review` adapter;
-- trusted exact-SHA Claude review using `anthropics/claude-code-action@v1`;
-- OpenAI/Anthropic official-capability watcher;
-- permanent Kevin-specific merge gate.
+The deterministic verifier rejects Bot/untrusted reports, stale SHA, incomplete schema, invented unavailable metrics, and sensitive/reasoning keys. ChatOps also queries actual GitHub checks; the report cannot certify itself.
 
-A reviewer pass never authorizes merge. Every implementation PR must be reported with exact tested SHA, CI evidence, review verdicts and residual limitations; Kevin must explicitly authorize that PR.
+## 7. Activation after merge
 
-## What v3 still does not prove
+Owner-only actions, not performed by this Draft PR:
 
-v3 improves epistemic discipline and risk visibility. It does **not** prove investment alpha.
+1. Configure `POSITIONS_JSON` and `POSITION_STATE_KEY` without sharing values in chat/PR/issues.
+2. Configure `ENABLE_GITHUB_PAGES=true` and Pages source = GitHub Actions if the public-safe dashboard should deploy.
+3. Run **Decision Market Context**, **Position Management Check** and **Dashboard Build** once.
+4. Ensure every production position has an approved `thesis_id`, including `portfolio_hedge` for hedge instruments.
+5. Confirm public state remains redacted and all workflows are healthy.
+6. Confirm the selected reviewer has an authenticated task/review surface; do not add a model API secret to Actions merely for review.
 
-Still required for empirically validated capital allocation:
+## 8. Known limitations
 
-1. Source-backed issuer/sector KPI time series and consensus/variant expectations.
-2. Current valuation and price-implied expectations for each security.
-3. Paid or otherwise reliable historical options skew/OI/UOA data.
-4. Walk-forward/out-of-sample testing with realistic baselines.
-5. Transaction costs, bid/ask spread, liquidity, taxes and executable instrument constraints.
-6. A real append-only decision writer/resolver and enough resolved forecasts for calibration.
-7. Performance attribution separating thesis alpha, factor beta, timing, convexity and hedging cost.
-8. Exchange holiday/special early-close calendar integration.
-
-Until those exist, the correct output is often `wait_for_proof`, not a confident buy/sell label.
+- No approved company valuation scenarios are supplied by this implementation; initial candidates remain not decision-grade.
+- yfinance is delayed/unofficial.
+- Paid put-skew/OI/UOA history remains unconnected.
+- Walk-forward/out-of-sample baselines, transaction costs, option spread/liquidity, tax and sufficiently large decision history remain necessary before claiming empirical value.
+- Exchange holidays and special early closes remain a separate market-calendar limitation.
