@@ -1,10 +1,9 @@
 """Capture and deliver every new Donald Trump Truth Social activity.
 
-No keyword filter decides whether a post is captured or delivered. Tier only
-controls notification urgency. On first activation, the monitor establishes a
-24-hour backfill checkpoint; this captures recent context without treating the
-mirror's multi-year archive as thousands of new posts. A split long post is
-marked seen only after its final chunk succeeds.
+Keywords never decide whether an activity is retained or delivered. Tier only
+controls notification urgency. The monitor uses a 24-hour first-run checkpoint,
+keeps source health explicit, and marks a split post seen only after its final
+fragment reaches every configured Telegram recipient.
 """
 
 from __future__ import annotations
@@ -56,14 +55,13 @@ def _eligible_since_checkpoint(
     capture_started_at: datetime,
 ) -> tuple[list[dict[str, Any]], int]:
     """Exclude historical archive rows and count timestamp-invalid activities."""
-    eligible = []
+    eligible: list[dict[str, Any]] = []
     missing_timestamp = 0
     for post in posts:
         created = _parse_time(post.get("created_at"))
         if created is None:
             missing_timestamp += 1
-            continue
-        if created >= capture_started_at:
+        elif created >= capture_started_at:
             eligible.append(post)
     return eligible, missing_timestamp
 
@@ -86,14 +84,9 @@ def _post_block(post: dict[str, Any]) -> str:
         str(post.get("activity_type") or "發文"),
     )
     source_account = post.get("original_account")
-    account_note = (
-        f"｜原帳號 @{source_account}" if source_account else ""
-    )
-    media_note = (
-        f"｜媒體附件 {post.get('media_count')}"
-        if int(post.get("media_count", 0) or 0) > 0
-        else ""
-    )
+    account_note = f"｜原帳號 @{source_account}" if source_account else ""
+    media_count = int(post.get("media_count", 0) or 0)
+    media_note = f"｜媒體附件 {media_count}" if media_count > 0 else ""
     return (
         f"🇺🇸 Trump Truth Social｜{tier}\n"
         f"{_taipei_time(post.get('created_at'))}｜"
@@ -109,7 +102,7 @@ def _split_long_block(
 ) -> list[str]:
     if len(block) <= max_chars:
         return [block]
-    parts = []
+    parts: list[str] = []
     remaining = block
     while remaining:
         if len(remaining) <= max_chars:
@@ -165,8 +158,11 @@ def build_delivery_chunks(
         audible = post.get("tier") in {"tier1", "tier2"}
         for index, block in enumerate(block_parts):
             separator_len = 14 if current_parts else 0
-            projected = current_length + separator_len + len(block)
-            if current_parts and projected > MAX_TELEGRAM_CHARS:
+            if (
+                current_parts
+                and current_length + separator_len + len(block)
+                > MAX_TELEGRAM_CHARS
+            ):
                 flush()
             current_parts.append(block)
             if index == len(block_parts) - 1:
@@ -177,16 +173,26 @@ def build_delivery_chunks(
     return chunks
 
 
-def _should_send_unavailable_notice(
-    previous: dict[str, Any],
-) -> bool:
+def _should_send_unavailable_notice(previous: dict[str, Any]) -> bool:
     last = _parse_time(previous.get("last_unavailable_notice_at"))
     if last is None:
         return True
-    return (
-        datetime.now(timezone.utc) - last
-        >= UNAVAILABLE_NOTICE_COOLDOWN
-    )
+    return datetime.now(timezone.utc) - last >= UNAVAILABLE_NOTICE_COOLDOWN
+
+
+def _completeness_note(result: dict[str, Any]) -> str:
+    source = result.get("source")
+    if source == "truth_social_official_api":
+        return (
+            "Direct official API polling is bounded and is not an audited "
+            "complete historical feed; end-to-end completeness is unverified."
+        )
+    if source == "cnn_historical_archive":
+        return (
+            "Fresh mirror available; 100% parity with official Truth Social "
+            "and recovery beyond the bounded source window are unverified."
+        )
+    return "No current source; completeness cannot be verified."
 
 
 def _write_health(
@@ -201,14 +207,23 @@ def _write_health(
     delivery_status: str,
     last_notice_at: str | None = None,
 ) -> dict[str, Any]:
+    raw_count = result.get("raw_count")
+    returned_count = result.get("returned_count")
+    source_limit = result.get("source_limit")
+    bounded = (
+        isinstance(raw_count, int)
+        and isinstance(returned_count, int)
+        and raw_count > returned_count
+    )
     health = {
         "status": result.get("status"),
         "source": result.get("source"),
         "latest_post_at": result.get("latest_post_at"),
         "attempts": result.get("attempts", []),
-        "source_raw_count": result.get("raw_count"),
-        "source_returned_count": result.get("returned_count"),
-        "source_limit": result.get("source_limit"),
+        "source_raw_count": raw_count,
+        "source_returned_count": returned_count,
+        "source_limit": source_limit,
+        "source_window_bounded": bounded,
         "capture_started_at": capture_started_at.isoformat(),
         "initial_backfill_hours": int(
             INITIAL_BACKFILL_WINDOW.total_seconds() / 3600
@@ -219,6 +234,7 @@ def _write_health(
         "archived_count": archived_count,
         "delivered_count": delivered_count,
         "delivery_status": delivery_status,
+        "delivery_requires_all_recipients": True,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "capture_policy": (
             "all_posts_replies_retruths_after_capture_checkpoint"
@@ -226,14 +242,10 @@ def _write_health(
         "keyword_policy": (
             "tier_is_metadata_and_notification_urgency_only"
         ),
-        "source_completeness_verified": (
-            result.get("source") == "truth_social_official_api"
-        ),
-        "source_completeness_note": (
-            "Official public API response"
-            if result.get("source") == "truth_social_official_api"
-            else "Fresh mirror available; 100% parity with official Truth Social is not independently verified"
-        ),
+        # A direct endpoint is better than a mirror, but neither a bounded API
+        # poll nor a bounded mirror window proves audited, gap-free completeness.
+        "source_completeness_verified": False,
+        "source_completeness_note": _completeness_note(result),
         "last_unavailable_notice_at": last_notice_at,
     }
     write_json(HEALTH_FILE, health)
@@ -293,13 +305,9 @@ def main() -> int:
             archived_count=0,
             delivered_count=0,
             delivery_status="no_new_posts",
-            last_notice_at=previous.get(
-                "last_unavailable_notice_at"
-            ),
+            last_notice_at=previous.get("last_unavailable_notice_at"),
         )
-        logger.info(
-            "=== run_trump_monitor done: healthy, no new posts ==="
-        )
+        logger.info("=== run_trump_monitor done: healthy, no new posts ===")
         return 0
 
     archived_count = archive_posts(new_posts)
@@ -335,9 +343,7 @@ def main() -> int:
     )
 
     if failed:
-        logger.error(
-            "Trump delivery failed; incomplete posts remain unseen"
-        )
+        logger.error("Trump delivery failed; incomplete posts remain unseen")
         return 1
 
     logger.info(
