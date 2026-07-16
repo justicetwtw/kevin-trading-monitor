@@ -1,0 +1,86 @@
+"""Regression tests for Taiwan-first market hours and brief copy."""
+
+from datetime import date, datetime
+from pathlib import Path
+
+from src.config.market_clock import (
+    NEW_YORK,
+    TAIPEI,
+    canonical_market_hours_text,
+    is_us_regular_market_hours,
+    normalize_market_brief_copy,
+    taiwan_regular_session,
+    us_regular_session_for_eastern_date,
+)
+
+
+def test_taiwan_regular_session_is_0900_to_1330_taipei():
+    session = taiwan_regular_session(date(2026, 7, 16))
+    assert session.open_at.tzinfo.zone == "Asia/Taipei"
+    assert session.open_at.strftime("%H:%M") == "09:00"
+    assert session.close_at.strftime("%H:%M") == "13:30"
+
+
+def test_us_summer_session_converts_to_2130_and_next_day_0400_taipei():
+    session = us_regular_session_for_eastern_date(date(2026, 7, 16))
+    assert session.open_at.strftime("%Y-%m-%d %H:%M") == "2026-07-16 21:30"
+    assert session.close_at.strftime("%Y-%m-%d %H:%M") == "2026-07-17 04:00"
+
+
+def test_us_winter_session_converts_to_2230_and_next_day_0500_taipei():
+    session = us_regular_session_for_eastern_date(date(2026, 12, 15))
+    assert session.open_at.strftime("%Y-%m-%d %H:%M") == "2026-12-15 22:30"
+    assert session.close_at.strftime("%Y-%m-%d %H:%M") == "2026-12-16 05:00"
+
+
+def test_us_regular_market_gate_uses_eastern_core_session():
+    inside = NEW_YORK.localize(datetime(2026, 7, 16, 9, 30))
+    before = NEW_YORK.localize(datetime(2026, 7, 16, 9, 29))
+    close = NEW_YORK.localize(datetime(2026, 7, 16, 16, 0))
+    weekend = NEW_YORK.localize(datetime(2026, 7, 18, 12, 0))
+    assert is_us_regular_market_hours(inside) is True
+    assert is_us_regular_market_hours(before) is False
+    assert is_us_regular_market_hours(close) is False
+    assert is_us_regular_market_hours(weekend) is False
+
+
+def test_brief_copy_does_not_call_0830_taiwan_market_open():
+    legacy = (
+        "<b>🇹🇼 台股開盤 brief</b>\n\nbody"
+        "\n\n<i>下次 brief: 台股收盤 (台北 13:30)</i>"
+    )
+    message = normalize_market_brief_copy(legacy, "tw_open")
+    assert "台股盤前 brief" in message
+    assert "正式開盤 09:00" in message
+    assert "08:30 盤前" in message
+
+
+def test_us_open_copy_uses_2130_summer_2230_winter():
+    legacy = "<b>🚀 美股開盤 brief</b>\n\nbody"
+    message = normalize_market_brief_copy(legacy, "us_open")
+    assert "夏令 21:30" in message
+    assert "冬令 22:30" in message
+    assert "翌日 04:00" in message
+    assert "翌日 05:00" in message
+
+
+def test_canonical_text_is_taipei_first():
+    text = canonical_market_hours_text()
+    assert "台股正式交易 09:00-13:30" in text
+    assert "美股正式交易 夏令 21:30-翌日04:00" in text
+    assert "冬令 22:30-翌日05:00" in text
+
+
+def test_workflow_crons_match_exact_us_open_and_close():
+    market_brief = Path(".github/workflows/market_brief.yml").read_text(
+        encoding="utf-8"
+    )
+    eod = Path(".github/workflows/signal_scan_eod.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "30 13 * * 1-5" in market_brief  # 21:30 Taipei DST open
+    assert "30 14 * * 1-5" in market_brief  # 22:30 Taipei standard open
+    assert "30 20 * * 1-5" in market_brief  # 04:30 Taipei DST EOD brief
+    assert "30 21 * * 1-5" in market_brief  # 05:30 Taipei standard EOD brief
+    assert "15 20 * * 1-5" in eod            # 04:15 Taipei DST EOD scan
+    assert "15 21 * * 1-5" in eod            # 05:15 Taipei standard EOD scan
