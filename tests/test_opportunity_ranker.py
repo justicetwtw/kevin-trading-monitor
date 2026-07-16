@@ -114,6 +114,36 @@ def test_complete_inputs_are_review_ready_not_auto_buy():
     assert row["not_a_trade_signal"] is True
 
 
+def test_scenario_price_anchor_drift_invalidates_readiness():
+    market = _market()
+    market["current_price"] = 112
+    row = assess_candidate(
+        _candidate(_scenario()),
+        thesis=_thesis(),
+        watchlist=_watchlist(),
+        options={"status": "ok"},
+        market_context=market,
+        regime="risk_on",
+    )
+    assert row["security_readiness"] == "not_decision_grade"
+    assert "scenario_price_anchor_stale" in row["missing_inputs"]
+
+
+def test_scenario_asof_drift_invalidates_readiness():
+    market = _market()
+    market["as_of"] = "2026-07-21"
+    row = assess_candidate(
+        _candidate(_scenario()),
+        thesis=_thesis(),
+        watchlist=_watchlist(),
+        options={"status": "ok"},
+        market_context=market,
+        regime="risk_on",
+    )
+    assert row["security_readiness"] == "not_decision_grade"
+    assert "scenario_market_asof_mismatch" in row["missing_inputs"]
+
+
 def test_broken_company_thesis_suspends_security_ranking():
     row = assess_candidate(
         _candidate(_scenario()),
@@ -142,11 +172,20 @@ def test_payload_exposes_correlation_candidate_overlap():
     payload = build_decision_payload(
         allocation_doc={"candidates": [_candidate(None)]},
         thesis_doc={"symbols": [_thesis()]},
-        watchlist_payload={"data": {"regime": "risk_on", "rows": [{"symbol": "MU", **_watchlist()}]}},
-        options_payload={"data": {"rows": [{"symbol": "MU", "status": "ok"}]}},
+        watchlist_payload={
+            "data": {
+                "regime": "risk_on",
+                "rows": [{"symbol": "MU", **_watchlist()}],
+            }
+        },
+        options_payload={
+            "data": {"rows": [{"symbol": "MU", "status": "ok"}]}
+        },
         market_context_doc={"rows": [_market()]},
         decision_log=[],
     )
     assert payload["rows"][0]["symbol"] == "MU"
-    baskets = {item["basket"] for item in payload["correlation_baskets"]}
+    baskets = {
+        item["basket"] for item in payload["correlation_baskets"]
+    }
     assert baskets == {"ai_capex", "hbm"}
