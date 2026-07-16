@@ -24,7 +24,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run position check
+      - name: Run private position check
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -32,6 +32,21 @@ jobs:
           PRIVATE_POSITION_CONTEXT: '1'
           POSITIONS_JSON: ${{ secrets.POSITIONS_JSON }}
           POSITION_STATE_KEY: ${{ secrets.POSITION_STATE_KEY }}
-        run: python -m src.runners.run_position_check
+        shell: bash
+        run: |
+          # The repository and Actions logs are public. Suppress all raw runtime
+          # output because third-party market-data libraries may print private
+          # tickers outside our logging controls. The runner persists only safe,
+          # generic health/error codes in position_snapshot.json.
+          set +e
+          python -m src.runners.run_position_check > /tmp/private-position-check.log 2>&1
+          status=$?
+          rm -f /tmp/private-position-check.log
+          if [ "$status" -eq 0 ]; then
+            echo "Private position check completed successfully (runtime output suppressed)."
+          else
+            echo "Private position check failed; inspect redacted position_snapshot.json error_codes."
+          fi
+          exit "$status"
       - if: always()
         uses: ./.github/actions/commit-state
