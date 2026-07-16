@@ -27,4 +27,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run tests
-        run: python -m pytest -q
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q > pytest.log 2>&1
+          status=$?
+          tail -n 140 pytest.log
+          exit $status
