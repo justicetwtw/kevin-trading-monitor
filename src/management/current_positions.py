@@ -195,7 +195,7 @@ def get_short_options() -> list:
 
 
 def _estimate_option_value(option: dict) -> Optional[float]:
-    """Estimate current option value per all contracts; unavailable data returns None."""
+    """Estimate all contracts; unavailable price/IV returns None."""
     try:
         from src.data.greeks_calculator import calc_bs_price
         from src.data.iv_rank import get_atm_iv
@@ -258,7 +258,9 @@ def _estimate_stock_value(stock: dict) -> Optional[float]:
 def get_account_snapshot() -> dict:
     """Build an in-memory private snapshot for risk checks.
 
-    Exact position details and total value must never be committed by callers.
+    Account valuation fails closed: if any real position cannot be valued, the
+    aggregate account value is `None` and drawdown monitoring must not use a
+    partial portfolio estimate.
     """
     now_iso = datetime.now(timezone.utc).isoformat()
     if POSITION_MODE == "mode_3":
@@ -268,6 +270,8 @@ def get_account_snapshot() -> dict:
             "stocks": [],
             "options": [],
             "total_estimated_value": None,
+            "valuation_complete": None,
+            "valuation_missing_count": 0,
             "n_long_options": 0,
             "n_short_options": 0,
             "snapshot_at": now_iso,
@@ -288,26 +292,36 @@ def get_account_snapshot() -> dict:
         if str(option.get("type", "")).startswith("short_")
     ]
 
-    total: Optional[float] = 0.0
+    total = 0.0
+    missing_count = 0
     for stock in stocks:
         value = _estimate_stock_value(stock)
-        if value is not None:
+        if value is None:
+            missing_count += 1
+        else:
             total += value
     for option in longs:
         value = _estimate_option_value(option)
-        if value is not None:
+        if value is None:
+            missing_count += 1
+        else:
             total += value
     for option in shorts:
         value = _estimate_option_value(option)
-        if value is not None:
+        if value is None:
+            missing_count += 1
+        else:
             total -= value
 
+    valuation_complete = missing_count == 0
     return {
         "mode": POSITION_MODE,
         "position_source": get_position_source(),
         "stocks": stocks,
         "options": options,
-        "total_estimated_value": total,
+        "total_estimated_value": total if valuation_complete else None,
+        "valuation_complete": valuation_complete,
+        "valuation_missing_count": missing_count,
         "n_long_options": len(longs),
         "n_short_options": len(shorts),
         "snapshot_at": now_iso,
