@@ -420,5 +420,108 @@
       "tier2": {}
     },
     "captured_at": "2026-07-16T06:32:39.743516+00:00"
+  },
+  "116928021654827754": {
+    "id": "116928021654827754",
+    "created_at": "2026-07-16T05:33:37.992Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116928021654827754",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-16T10:50:38.154449+00:00"
+  },
+  "116928008726091908": {
+    "id": "116928008726091908",
+    "created_at": "2026-07-16T05:30:20.715Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116928008726091908",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-16T10:50:38.154494+00:00"
+  },
+  "116927914613324285": {
+    "id": "116927914613324285",
+    "created_at": "2026-07-16T05:06:24.603Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116927914613324285",
+    "text": "https://www.breitbart.com/politics/2026/07/15/exclusive-azerbaijani-president-ilham-aliyev-lauds-trump-as-man-peace-credits-him-armenia-azerbaijan-deal/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-16T10:50:38.158568+00:00"
+  },
+  "116927910243652851": {
+    "id": "116927910243652851",
+    "created_at": "2026-07-16T05:05:17.922Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116927910243652851",
+    "text": "https://www.breitbart.com/politics/2026/07/15/trump-announces-nearly-10-billion-in-defense-industrial-base-investments-in-pennsylvania-at-mccormicks-summit/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-16T10:50:38.158674+00:00"
+  },
+  "116927905183625323": {
+    "id": "116927905183625323",
+    "created_at": "2026-07-16T05:04:00.783Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116927905183625323",
+    "text": "FREEDOM 250 GRAND PRIX🏎️🇺🇸🏁",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-16T10:50:38.158731+00:00"
+  },
+  "116927888438883834": {
+    "id": "116927888438883834",
+    "created_at": "2026-07-16T04:59:45.278Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116927888438883834",
+    "text": "With today's announcement, Pennsylvania will play a key role in building the arsenal of freedom to defend our nation in the modern world!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-16T10:50:38.158796+00:00"
   }
 }

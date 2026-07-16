@@ -8118,5 +8118,35 @@
     "seen_at": "2026-07-16T06:32:43.106298+00:00",
     "created_at": "2026-07-16T04:56:45.523Z",
     "source": "cnn_historical_archive"
+  },
+  "116927888438883834": {
+    "seen_at": "2026-07-16T10:50:39.080740+00:00",
+    "created_at": "2026-07-16T04:59:45.278Z",
+    "source": "cnn_historical_archive"
+  },
+  "116927905183625323": {
+    "seen_at": "2026-07-16T10:50:39.080740+00:00",
+    "created_at": "2026-07-16T05:04:00.783Z",
+    "source": "cnn_historical_archive"
+  },
+  "116927910243652851": {
+    "seen_at": "2026-07-16T10:50:39.080740+00:00",
+    "created_at": "2026-07-16T05:05:17.922Z",
+    "source": "cnn_historical_archive"
+  },
+  "116927914613324285": {
+    "seen_at": "2026-07-16T10:50:39.080740+00:00",
+    "created_at": "2026-07-16T05:06:24.603Z",
+    "source": "cnn_historical_archive"
+  },
+  "116928008726091908": {
+    "seen_at": "2026-07-16T10:50:39.080740+00:00",
+    "created_at": "2026-07-16T05:30:20.715Z",
+    "source": "cnn_historical_archive"
+  },
+  "116928021654827754": {
+    "seen_at": "2026-07-16T10:50:39.080740+00:00",
+    "created_at": "2026-07-16T05:33:37.992Z",
+    "source": "cnn_historical_archive"
   }
 }
