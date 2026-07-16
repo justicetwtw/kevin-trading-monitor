@@ -8,8 +8,6 @@
 
 ## 2. Required notification secrets
 
-Create these repository secrets:
-
 | Name | Purpose |
 |---|---|
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token used for alerts |
@@ -17,21 +15,38 @@ Create these repository secrets:
 
 ## 3. Private position monitoring
 
-Create one additional repository secret:
+Create both repository secrets:
 
 | Name | Purpose |
 |---|---|
-| `POSITIONS_JSON` | Complete private holdings JSON used only during the Position Management Check workflow |
+| `POSITIONS_JSON` | Complete private holdings JSON used only during Position Management Check |
+| `POSITION_STATE_KEY` | Stable Fernet key used to encrypt account peak/current values before state is committed |
 
-The value must follow `docs/positions_schema.md`. Paste the complete JSON object as the secret value. Do not base64-encode it and do not commit it to the repository.
+### `POSITIONS_JSON`
 
-Security behavior:
+The value must follow `docs/positions_schema.md`. Paste the complete JSON object as the secret value. Do not base64-encode it and do not commit it.
 
-- `position_check.yml` injects the value only into the position-check process.
-- The loader validates the schema before use.
-- A malformed secret fails closed to an empty portfolio and never falls back to the public example file.
-- Exact holdings and account value stay in memory.
-- Only a redacted health snapshot is committed.
+### `POSITION_STATE_KEY`
+
+Generate a Fernet key locally:
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Store the printed value exactly as `POSITION_STATE_KEY`. Do not reuse an API token or password.
+
+Rotating or deleting this key makes previous encrypted high-water state unreadable. The next position check will safely reset the drawdown peak to the then-current estimated value.
+
+### Security behavior
+
+- `position_check.yml` injects both values only into the position-check process.
+- The position loader validates schema before use.
+- A malformed `POSITIONS_JSON` fails closed and never falls back to the public example file.
+- Exact holdings and account values stay in memory.
+- Position alert dedup/quota keys are HMAC-derived opaque identifiers.
+- Account peak/current values are Fernet-encrypted before persistence.
+- Public state exposes only aggregate counts, drawdown percentage, alert level and timestamps.
 
 ## 4. Other currently used secrets
 
@@ -52,7 +67,9 @@ Only add secrets for workflows that are actually enabled.
 1. Run **Health Check** and confirm the System Online Telegram message.
 2. Run **Position Management Check** manually.
 3. Confirm `data_store/position_snapshot.json` reports `configured: true` and `privacy: redacted_public_state`.
-4. Confirm the committed file contains no symbols, strikes, costs, PnL or account value.
+4. Confirm `data_store/drawdown_history.json` contains `encrypted_state` and no `peak` or `current` fields.
+5. Confirm `alert_dedup.json` / `alert_routing_state.json` use `private-position::...` keys rather than position symbols.
+6. Search the changed state files for a known private ticker, strike and account amount; none should appear.
 
 ## Safety rules
 
