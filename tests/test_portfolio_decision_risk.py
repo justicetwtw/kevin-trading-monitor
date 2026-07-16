@@ -21,6 +21,15 @@ def _thesis_doc():
                     {"id": "nand", "symbols": ["MU", "SNDK"]},
                 ],
             },
+            {
+                "id": "portfolio_hedge",
+                "subthemes": [
+                    {
+                        "id": "broad_market_hedge",
+                        "symbols": ["QQQ", "SPY", "SMH"],
+                    }
+                ],
+            },
         ],
         "symbols": [
             {"symbol": "MU", "theme": "memory_cycle"},
@@ -106,6 +115,9 @@ def test_private_decision_risk_maps_overlapping_baskets_and_rolls(monkeypatch):
     assert "memory_cycle" in baskets
     assert "hbm" in baskets
     assert "nand" in baskets
+    assert "portfolio_hedge" in baskets
+    assert result["missing_thesis_id_count"] == 0
+    assert result["invalid_thesis_id_count"] == 0
     assert result["hedge_coverage_ratio"] == pytest.approx(10000 / 130000)
     assert result["roll_window_counts"] == {
         "dte_le_90": 1,
@@ -113,6 +125,15 @@ def test_private_decision_risk_maps_overlapping_baskets_and_rolls(monkeypatch):
         "dte_le_270": 2,
     }
     assert "option_roll_window_le_90d" in result["review_flags"]
+
+
+def test_unknown_thesis_id_is_explicitly_invalid(monkeypatch):
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: _thesis_doc())
+    snapshot = _snapshot()
+    snapshot["stocks"][0]["thesis_id"] = "invented_thesis"
+    result = risk.analyze_portfolio_decision_risk(_summary(), snapshot)
+    assert result["invalid_thesis_id_count"] == 1
+    assert "position_thesis_id_invalid" in result["review_flags"]
 
 
 def test_public_state_cannot_reveal_symbols_or_basket_names(monkeypatch):
@@ -129,6 +150,7 @@ def test_public_state_cannot_reveal_symbols_or_basket_names(monkeypatch):
         "portfolio_hedge",
     ):
         assert private_value not in serialized
+    assert public["invalid_thesis_id_count"] == 0
     assert public["privacy"] == "aggregate_decision_risk_only"
 
 
@@ -151,6 +173,7 @@ def test_missing_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
             True,
             {
                 "missing_thesis_id_count": 3,
+                "invalid_thesis_id_count": 0,
                 "unmapped_symbol_count": 0,
                 "roll_window_counts": {},
                 "review_flags": ["position_thesis_id_missing"],
@@ -177,3 +200,41 @@ def test_missing_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
         "portfolio_hedge",
     ):
         assert private_value not in serialized
+
+
+def test_invalid_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
+    monkeypatch.setattr(run_position_check, "scan_all_leaps", lambda: [])
+    monkeypatch.setattr(run_position_check, "scan_all_shorts", lambda: [])
+    monkeypatch.setattr(run_position_check, "scan_all_hedges", lambda: [])
+    monkeypatch.setattr(
+        run_position_check, "get_account_snapshot", lambda: _snapshot(True)
+    )
+    monkeypatch.setattr(
+        run_position_check,
+        "update_account_value",
+        lambda value: {"alert_level": "normal"},
+    )
+    monkeypatch.setattr(
+        run_position_check,
+        "_analyze_and_send_private_risk",
+        lambda snapshot: (
+            True,
+            {
+                "missing_thesis_id_count": 0,
+                "invalid_thesis_id_count": 1,
+                "unmapped_symbol_count": 0,
+                "roll_window_counts": {},
+                "review_flags": ["position_thesis_id_invalid"],
+            },
+        ),
+    )
+    writes = {}
+    monkeypatch.setattr(
+        run_position_check,
+        "write_json",
+        lambda filename, value: writes.setdefault(filename, value) is value,
+    )
+    assert run_position_check.main() == 1
+    public = writes["position_snapshot.json"]
+    assert "position_thesis_id_invalid" in public["error_codes"]
+    assert public["decision_risk"]["invalid_thesis_id_count"] == 1
