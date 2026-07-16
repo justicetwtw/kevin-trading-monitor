@@ -12,6 +12,7 @@ from src.config.market_clock import (
     taiwan_regular_session,
     us_regular_session_for_eastern_date,
 )
+from src.runners.run_brief_sanity import _expected_today
 
 
 def test_taiwan_regular_session_is_0900_to_1330_taipei():
@@ -78,9 +79,35 @@ def test_workflow_crons_match_exact_us_open_and_close():
     eod = Path(".github/workflows/signal_scan_eod.yml").read_text(
         encoding="utf-8"
     )
+    sanity = Path(".github/workflows/brief_sanity.yml").read_text(
+        encoding="utf-8"
+    )
     assert "30 13 * * 1-5" in market_brief  # 21:30 Taipei DST open
     assert "30 14 * * 1-5" in market_brief  # 22:30 Taipei standard open
     assert "30 20 * * 1-5" in market_brief  # 04:30 Taipei DST EOD brief
     assert "30 21 * * 1-5" in market_brief  # 05:30 Taipei standard EOD brief
     assert "15 20 * * 1-5" in eod            # 04:15 Taipei DST EOD scan
     assert "15 21 * * 1-5" in eod            # 05:15 Taipei standard EOD scan
+    assert "45 15 * * *" in sanity            # 23:45 Taipei sanity
+    assert "55 15 * * *" in sanity            # 23:55 Taipei backup
+
+
+def test_tuesday_late_sanity_checks_overnight_and_local_briefs():
+    now = TAIPEI.localize(datetime(2026, 7, 14, 23, 45))  # Tuesday
+    expected = set(_expected_today(now))
+    assert {
+        "us_midday",
+        "us_eod",
+        "tw_open",
+        "tw_close",
+        "us_premarket",
+        "us_open",
+    } <= expected
+
+
+def test_monday_late_sanity_does_not_expect_prior_weekend_us_briefs():
+    now = TAIPEI.localize(datetime(2026, 7, 13, 23, 45))  # Monday
+    expected = set(_expected_today(now))
+    assert "us_midday" not in expected
+    assert "us_eod" not in expected
+    assert {"tw_open", "tw_close", "us_premarket", "us_open"} <= expected
