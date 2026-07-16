@@ -1,7 +1,7 @@
 # Trading Monitor v2 — Thesis-first Mission Control
 
 Date: 2026-07-16  
-Status: P0 Mission Control + P1 private-position runtime foundation  
+Status: P0 Mission Control + P1 private portfolio risk foundation  
 Epic: #6
 
 ## Why v1 felt useless
@@ -20,7 +20,7 @@ Many dashboard fields were also explicit Phase 1 placeholders. Honest `null` val
 
 Trading Monitor v2 is a **Personal Capital Allocation / Thesis Monitor**.
 
-- Telegram: urgent P0/P1 exceptions and scheduled briefs.
+- Telegram: urgent P0/P1 exceptions and private scheduled briefs.
 - Dashboard: complete public review state and non-urgent context.
 - TradingView: charting and visual technical analysis.
 - GitHub repo: source of truth for strategy, theses, configuration and review history.
@@ -102,9 +102,26 @@ The scheduled position workflow reads real holdings only from the encrypted GitH
 
 The required schema and update procedure are documented in `docs/positions_schema.md` and `docs/github_secrets_setup.md`.
 
-### Public-state privacy boundary
+### Private portfolio risk brief
 
-This repository is public. Exact holdings, strikes, costs, PnL and account values must not be committed.
+Every configured EOD position check now sends a silent, private Telegram summary containing:
+
+- estimated account value
+- net and gross delta notional
+- delta-equivalent shares by symbol
+- daily theta
+- vega per 1% IV move
+- symbol concentration
+- theme exposure
+- explicit `thesis_id` coverage
+- option DTE and delta
+- market-data gaps
+
+This detailed payload exists only in memory and Telegram. It is not written to Git, dashboard JSON or Actions artifacts.
+
+### Public-state and log privacy boundary
+
+This repository is public. Exact holdings, strikes, costs, PnL and account values must not be committed or printed in Actions logs.
 
 The position workflow therefore persists only:
 
@@ -115,15 +132,20 @@ The position workflow therefore persists only:
 - timestamp
 - privacy marker
 
-Position-alert dedup and quota records use HMAC-derived opaque keys instead of `symbol::kind`.
+Additional controls:
 
-Account peak/current values are Fernet-encrypted using `POSITION_STATE_KEY`. Public drawdown state exposes percentage, alert level, action and timestamp, but not account amounts.
+- Position-alert dedup and quota records use HMAC-derived opaque keys instead of `symbol::kind`.
+- Account peak/current values are Fernet-encrypted using `POSITION_STATE_KEY`.
+- Public drawdown state exposes percentage, alert level, action and timestamp, but not account amounts.
+- Sensitive Telegram sends replace the message preview in CI logs with `<sensitive message redacted>`.
+- Position workflow suppresses symbol-bearing management/data-library logs.
 
 ### Position-monitor correctness fixes
 
 1. `run_position_check.py` previously read `snapshot["total_value"]`, while the snapshot returns `total_estimated_value`; drawdown updates therefore never ran.
 2. `leaps_pnl_tracker.py` compared Black–Scholes premium per share with `cost_per_contract` (premium ×100), producing approximately -99% false losses. Both sides now use per-contract USD.
-3. The stale v4 test expected a stock short-premium threshold of IVR 30. The actual v4.1 rule is stock 70 / ETF 30; the test now matches the implemented strategy rule.
+3. Position alerts defaulted to `yellow`, which maps to P2; the router intentionally does not send P2/P3. LEAPS PnL, short-delta and hedge-DTE alerts now map to routable P1, while major drawdowns retain P0 logic.
+4. The stale v4 test expected a stock short-premium threshold of IVR 30. The actual v4.1 rule is stock 70 / ETF 30; the test now matches the implemented strategy rule.
 
 ## Activation requirement
 
@@ -132,17 +154,16 @@ The code path is complete, but production position monitoring remains intentiona
 - `POSITIONS_JSON`
 - `POSITION_STATE_KEY`
 
-No agent should receive or paste their actual values. The owner sets them directly in GitHub repository Actions secrets and manually runs **Position Management Check** once to validate the redacted state.
+No agent should receive or paste their actual values. The owner sets them directly in GitHub repository Actions secrets and manually runs **Position Management Check** once to validate the redacted state and private Telegram brief.
 
 ## Remaining work
 
-### P1 — thesis-linked portfolio risk
+### P1 — deeper thesis-linked portfolio risk
 
-- enforce `thesis_id` linkage for every private holding
-- compute delta-equivalent exposure and concentration
-- track theta, vega, DTE and roll windows
-- compare correlated AI-capex exposure across symbols
-- route only material exceptions to Telegram
+- require or flag missing `thesis_id` during private position validation
+- add explicit correlated-basket exposure for AI capex and memory subthemes
+- add contract-level roll windows and hedge-coverage ratios to the private brief
+- compare current exposure with the capital-allocation queue before new capital is reviewed
 
 ### P2 — opportunity ranking
 
