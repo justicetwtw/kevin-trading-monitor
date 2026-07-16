@@ -2,10 +2,12 @@ name: Signal Scan Intraday
 
 on:
   schedule:
-    # 美股交易時段 14:30 - 21:00 UTC (夏令) / 15:30 - 22:00 UTC (冬令)
-    # 為簡化,涵蓋 13:00 - 22:00 UTC,每 15 分鐘
-    # runner 內透過 is_us_market_hours 二次過濾(避免跑非交易時段)
-    - cron: '*/15 13-22 * * 1-5'
+    # NYSE/Nasdaq core session 09:30-16:00 ET equals:
+    #   daylight time: 13:30-20:00 UTC / Taipei 21:30-04:00 next day
+    #   standard time: 14:30-21:00 UTC / Taipei 22:30-05:00 next day
+    # Cron intentionally covers a wider UTC window; the runner uses
+    # is_us_market_hours() as the authoritative 09:30-16:00 ET gate.
+    - cron: '*/15 13-21 * * 1-5'
   workflow_dispatch:
 
 concurrency:

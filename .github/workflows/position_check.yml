@@ -2,7 +2,9 @@ name: Position Management Check
 
 on:
   schedule:
-    - cron: '0 22 * * 1-5'  # 美股收盤後 22:00 UTC
+    # 22:00 UTC = Taipei 06:00: 2 hours after the U.S. daylight-time
+    # close or 1 hour after the standard-time close.
+    - cron: '0 22 * * 1-5'
   workflow_dispatch:
 
 concurrency:
@@ -24,10 +26,67 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run position check
+      - name: Run private position check
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python -m src.runners.run_position_check
+          POSITION_MODE: mode_1
+          PRIVATE_POSITION_CONTEXT: '1'
+          POSITIONS_JSON: ${{ secrets.POSITIONS_JSON }}
+          POSITION_STATE_KEY: ${{ secrets.POSITION_STATE_KEY }}
+        shell: bash
+        run: |
+          # The repository and Actions logs are public. Suppress all raw runtime
+          # output because third-party market-data libraries may print private
+          # tickers outside our logging controls. The runner persists only safe,
+          # generic health/error codes in position_snapshot.json.
+          snapshot="data_store/position_snapshot.json"
+          before_hash="$(sha256sum "$snapshot" 2>/dev/null | awk '{print $1}')"
+
+          set +e
+          python -m src.runners.run_position_check > /tmp/private-position-check.log 2>&1
+          status=$?
+          rm -f /tmp/private-position-check.log
+          set -e
+
+          after_hash="$(sha256sum "$snapshot" 2>/dev/null | awk '{print $1}')"
+          if [ "$status" -ne 0 ] && [ "$before_hash" = "$after_hash" ]; then
+            # Import/startup crashes can occur before the runner writes its safe
+            # health state. Replace stale green state with a generic failure.
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          path = Path("data_store/position_snapshot.json")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(
+              json.dumps(
+                  {
+                      "mode": "mode_1",
+                      "position_source": "actions_secret",
+                      "configured": None,
+                      "position_count": None,
+                      "n_long_options": None,
+                      "n_short_options": None,
+                      "snapshot_at": datetime.now(timezone.utc).isoformat(),
+                      "status": "unknown",
+                      "workflow_status": "failed",
+                      "error_codes": ["runner_process_failed"],
+                      "privacy": "redacted_public_state",
+                  },
+                  indent=2,
+              ),
+              encoding="utf-8",
+          )
+          PY
+          fi
+
+          if [ "$status" -eq 0 ]; then
+            echo "Private position check completed successfully (runtime output suppressed)."
+          else
+            echo "Private position check failed; inspect redacted position_snapshot.json error_codes."
+          fi
+          exit "$status"
       - if: always()
         uses: ./.github/actions/commit-state

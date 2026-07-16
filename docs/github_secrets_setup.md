@@ -1,31 +1,79 @@
-# GitHub Secrets 設置教學
+# GitHub Actions secrets setup
 
-## 1. 進入 Repo Settings
+## 1. Open repository settings
 
-1. 開你的 GitHub repo 頁面
-2. 點 Settings(右上角)
-3. 左側選 Secrets and variables → Actions
+1. Open the GitHub repository.
+2. Select **Settings**.
+3. Select **Secrets and variables → Actions**.
 
-## 2. 新增 Secrets
+## 2. Required notification secrets
 
-點 "New repository secret" 兩次,各加入:
-
-| Name | Value |
+| Name | Purpose |
 |---|---|
-| `TELEGRAM_BOT_TOKEN` | 你的 Bot token(類似 `1234567890:AAEhBP...`) |
-| `TELEGRAM_CHAT_ID` | 你的 Chat ID(類似 `123456789`) |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token used for alerts |
+| `TELEGRAM_CHAT_ID` | One or more destination chat IDs |
 
-## 3. 驗證
+## 3. Private position monitoring
 
-到 Actions 頁面 → Health Check → Run workflow,手動觸發。
-30-60 秒後,Telegram 應收到 System Online 訊息。
+Create both repository secrets:
 
-## 安全注意
+| Name | Purpose |
+|---|---|
+| `POSITIONS_JSON` | Complete private holdings JSON used only during Position Management Check |
+| `POSITION_STATE_KEY` | Stable Fernet key used to encrypt account peak/current values before state is committed |
 
-- ❌ 不要把 token 直接寫進程式碼
-- ❌ 不要 commit `.env` 檔
-- ✅ 一律走 GitHub Secrets
+### `POSITIONS_JSON`
 
-## 後續(可選)
+The value must follow `docs/positions_schema.md`. Paste the complete JSON object as the secret value. Do not base64-encode it and do not commit it.
 
-之後階段如果加入其他 API key(例如 FRED API key 等),都用同一方式新增 Secret。
+### `POSITION_STATE_KEY`
+
+Generate a Fernet key locally:
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Store the printed value exactly as `POSITION_STATE_KEY`. Do not reuse an API token or password.
+
+Rotating or deleting this key makes previous encrypted high-water state unreadable. The next position check will safely reset the drawdown peak to the then-current estimated value.
+
+### Security behavior
+
+- `position_check.yml` injects both values only into the position-check process.
+- The position loader validates schema before use.
+- A malformed `POSITIONS_JSON` fails closed and never falls back to the public example file.
+- Exact holdings and account values stay in memory.
+- Position alert dedup/quota keys are HMAC-derived opaque identifiers.
+- Account peak/current values are Fernet-encrypted before persistence.
+- Public state exposes only aggregate counts, drawdown percentage, alert level and timestamps.
+
+## 4. Other currently used secrets
+
+Depending on enabled workflows, the repository also uses:
+
+- `FRED_API_KEY`
+- `SEC_EDGAR_USER_AGENT`
+- `GMAIL_SENDER`
+- `GMAIL_APP_PASSWORD`
+- `EMAIL_RECIPIENT`
+- `GEMINI_API_KEY`
+- optional `GEMINI_MODEL`
+
+Only add secrets for workflows that are actually enabled.
+
+## 5. Validation
+
+1. Run **Health Check** and confirm the System Online Telegram message.
+2. Run **Position Management Check** manually.
+3. Confirm `data_store/position_snapshot.json` reports `configured: true` and `privacy: redacted_public_state`.
+4. Confirm `data_store/drawdown_history.json` contains `encrypted_state` and no `peak` or `current` fields.
+5. Confirm `alert_dedup.json` / `alert_routing_state.json` use `private-position::...` keys rather than position symbols.
+6. Search the changed state files for a known private ticker, strike and account amount; none should appear.
+
+## Safety rules
+
+- Never write secret values in code, issues, PR comments, logs or committed documentation.
+- Never commit a `.env` file.
+- Never paste real positions into `data_store/positions.json` in the public repository.
+- Rotate a secret immediately if it is exposed.

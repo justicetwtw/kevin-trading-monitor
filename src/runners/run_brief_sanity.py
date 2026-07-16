@@ -1,12 +1,7 @@
-"""Phase 2.5.5 — Brief sanity check runner。
+"""Daily market-brief delivery sanity check in Asia/Taipei.
 
-每天 23:00 / 23:30 台北時間檢查當日預期 brief 是否都送達。
-依台北 weekday 與時段決定哪些 brief_type 該已送出,缺的就推一則告警。
-
-dedup 紀錄 source:data_store/brief_sent_today.json(由 run_market_brief.mark_sent 寫入)。
-
-Sprint 2.5.9: 6 種 brief。tw_eod → tw_close。新增 tw_open + us_open。
-us_midday 推送時間 02:00 台北次日,在 23:00 sanity 視窗內不會檢查當日 us_midday。
+The check runs at 23:45 / 23:55 Taipei, after the latest U.S. standard-time
+opening backup. It verifies dispatch completion, not exchange opening times.
 """
 
 import json
@@ -21,14 +16,17 @@ from src.config.settings import TIMEZONE_USER
 
 DEDUP_PATH = Path("data_store/brief_sent_today.json")
 
-# 各 brief_type 該在台北時間幾點之前推完(寬限視窗)
-# Sprint 2.5.9 新時間表(夏令以最晚 cron 為準,留 90 min 緩衝):
+# Brief deadlines in Taipei hours. Actual exchange times:
+# - TW regular: 09:00-13:30
+# - US daylight: 21:30-04:00 next day
+# - US standard: 22:30-05:00 next day
 EXPECTED_BY_HOUR = {
-    "us_eod": 7,         # 主 cron 05:30 → 給到 07:00 算正常
-    "tw_open": 10,       # 主 cron 08:30 → 給到 10:00
-    "tw_close": 15,      # 主 cron 13:30 → 給到 15:00
-    "us_premarket": 19,  # 主 cron 17:00 / 18:00 → 給到 19:00
-    "us_open": 23,       # 主 cron 22:00 / 23:00 → 給到 23:00 算正常
+    "us_midday": 4,      # primary 01:00 / 02:00, checked Tue-Sat
+    "us_eod": 7,         # primary 04:30 / 05:30, checked Tue-Sat
+    "tw_open": 10,       # 08:30 pre-open brief; formal open 09:00
+    "tw_close": 15,      # primary 13:40; formal close 13:30
+    "us_premarket": 19,  # primary 17:00 / 18:00
+    "us_open": 23,       # exact open 21:30 / 22:30; backup by 23:00
 }
 
 
@@ -44,24 +42,28 @@ def _load_sent_today() -> dict:
 
 
 def _expected_today(now_taipei: datetime) -> list:
-    """sanity 在 23:00 台北跑時,當日預期已推:
-       us_eod (Tue-Sat) / tw_open (Mon-Fri) / tw_close (Mon-Fri) /
-       us_premarket (Mon-Fri) / us_open (Mon-Fri)
-       us_midday 在 02:00 隔日,不在當日視窗。
-    """
+    """Return briefs that should have completed by the current Taipei time."""
     weekday = now_taipei.weekday()  # 0=Mon, 6=Sun
     hour = now_taipei.hour
-    expected: list = []
-    if weekday in (0, 1, 2, 3, 4) and hour >= EXPECTED_BY_HOUR["tw_open"]:
-        expected.append("tw_open")
-    if weekday in (0, 1, 2, 3, 4) and hour >= EXPECTED_BY_HOUR["tw_close"]:
-        expected.append("tw_close")
-    if weekday in (0, 1, 2, 3, 4) and hour >= EXPECTED_BY_HOUR["us_premarket"]:
-        expected.append("us_premarket")
-    if weekday in (0, 1, 2, 3, 4) and hour >= EXPECTED_BY_HOUR["us_open"]:
-        expected.append("us_open")
-    if weekday in (1, 2, 3, 4, 5) and hour >= EXPECTED_BY_HOUR["us_eod"]:
-        expected.append("us_eod")
+    expected: list[str] = []
+
+    if weekday in (0, 1, 2, 3, 4):
+        for brief_type in (
+            "tw_open",
+            "tw_close",
+            "us_premarket",
+            "us_open",
+        ):
+            if hour >= EXPECTED_BY_HOUR[brief_type]:
+                expected.append(brief_type)
+
+    # These belong to the preceding U.S. Mon-Fri session and arrive in Taipei
+    # early Tue-Sat.
+    if weekday in (1, 2, 3, 4, 5):
+        for brief_type in ("us_midday", "us_eod"):
+            if hour >= EXPECTED_BY_HOUR[brief_type]:
+                expected.append(brief_type)
+
     return expected
 
 
@@ -71,20 +73,28 @@ def main() -> int:
 
     sent_today = _load_sent_today()
     expected = _expected_today(now_taipei)
-    missing = [bt for bt in expected if not sent_today.get(bt, False)]
+    missing = [
+        brief_type
+        for brief_type in expected
+        if not sent_today.get(brief_type, False)
+    ]
 
     if not missing:
         logger.info(
-            f"All expected briefs sent today ({today_str}, {len(expected)} expected)"
+            f"All expected briefs sent today "
+            f"({today_str}, {len(expected)} expected)"
         )
         return 0
 
     message = (
         "⚠ <b>Brief 觸發異常</b>\n\n"
         f"今日 {today_str} 預期推送但未送達:\n"
-        + "\n".join(f"  • {bt}" for bt in missing)
-        + "\n\n可能原因:GitHub schedule throttle\n"
-          "可至 Actions 頁面手動 dispatch 補推"
+        + "\n".join(f"  • {brief_type}" for brief_type in missing)
+        + "\n\n市場時間以台北為準："
+        "台股 09:00-13:30；美股夏令 21:30-04:00、"
+        "冬令 22:30-05:00。\n"
+        "可能原因: GitHub schedule throttle；"
+        "可至 Actions 手動 dispatch 補推。"
     )
     success = send_telegram(message, parse_mode="HTML")
     if not success:

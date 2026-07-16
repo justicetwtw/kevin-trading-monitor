@@ -1,14 +1,13 @@
 name: Dashboard Build
 
-# 靜態 dashboard 產生:讀既有 data_store/ state(由其他 scheduled workflow 維護),
-# 產出 public/dashboard/{index.html, data/*.json}。
-# 不打外部 API、不需要任何 secret、不影響 Telegram 推播。
+# Build a public-safe static Mission Control dashboard from committed state.
+# Exact positions/account values are never included in public/dashboard/.
 
 on:
   schedule:
-    # 在 us_eod / tw_close 的 state commit 之後跑,涵蓋夏令與冬令
-    - cron: '30 23 * * 1-5'   # 台北 07:30(美股收盤後,state 已更新)
-    - cron: '30 6 * * 1-5'    # 台北 14:30(台股收盤後)
+    # Run after US EOD and Taiwan close state commits.
+    - cron: '30 23 * * 1-5'
+    - cron: '30 6 * * 1-5'
   workflow_dispatch:
     inputs:
       commit_output:
@@ -22,6 +21,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: dashboard-build
@@ -44,12 +45,20 @@ jobs:
           pip install -r requirements.txt
       - name: Build dashboard
         run: python -m src.runners.run_dashboard_build
-      - name: Upload dashboard artifact
+      - name: Upload review artifact
         uses: actions/upload-artifact@v4
         with:
           name: dashboard
           path: public/dashboard/
           retention-days: 14
+      - name: Configure GitHub Pages
+        if: vars.ENABLE_GITHUB_PAGES == 'true' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+      - name: Upload GitHub Pages artifact
+        if: vars.ENABLE_GITHUB_PAGES == 'true' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public/dashboard/
       - name: Commit dashboard output
         if: github.event_name == 'schedule' || github.event.inputs.commit_output == 'true'
         run: |
@@ -71,3 +80,15 @@ jobs:
           done
           echo "Push failed after 3 attempts"
           exit 1
+
+  deploy:
+    if: vars.ENABLE_GITHUB_PAGES == 'true' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

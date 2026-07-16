@@ -267,7 +267,7 @@ def test_lock6_context_override(monkeypatch):
 
 
 # ============================
-# v4 reals 用戶沒列(防禦性測試)
+# v4/v4.1 reals 用戶沒列(防禦性測試)
 # ============================
 def test_v4_min_leaps_dte_below_365():
     """LEAPS DTE=200 → veto(v4 真實學習鎖,用戶清單沒列)"""
@@ -278,13 +278,13 @@ def test_v4_min_leaps_dte_below_365():
         f"expected DTE 365 veto, got {reasons}"
 
 
-def test_v4_min_ivr_below_30_short_premium():
-    """IVR=20 賣 CALL → veto"""
+def test_v41_min_stock_ivr_below_70_short_premium():
+    """v4.1 個股 IVR=20 賣 CALL → 低於 70，必須 veto。"""
     with patch("src.signals.veto_checker.is_earnings_within_days", return_value=False):
         fails = veto_checker.check_all_hard_rules("sell_call", "NVDA", ivr=20)
     reasons = [r for ok, r in fails if not ok]
-    assert any("ivr" in r.lower() and "30" in r for r in reasons), \
-        f"expected IVR 30 veto, got {reasons}"
+    assert any("ivr" in r.lower() and "70" in r for r in reasons), \
+        f"expected stock IVR 70 veto, got {reasons}"
 
 
 def test_v4_vix_consecutive_above_30_blocks_leaps():

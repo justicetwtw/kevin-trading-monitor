@@ -1,18 +1,26 @@
-"""帳戶回撤防線 -10 / -20 / -30 + 純讀介面。
+"""Account drawdown guard with encrypted high-water state.
 
-主名:update_account_value(current_value)  — 寫檔 + 觸發判斷
-純讀:get_current_drawdown() -> dict        — 不寫檔,給 veto_checker context
+The repository is public. Exact `peak` and `current` account values are stored
+only inside a Fernet token. Public JSON exposes drawdown percentage, alert level
+and timestamps, but never account amounts.
 """
 
+from __future__ import annotations
+
+import json
+import os
 from datetime import datetime, timezone
 from typing import Optional
 
+from cryptography.fernet import Fernet, InvalidToken
 from loguru import logger
 
 from src.config.thresholds import ACCOUNT_DRAWDOWN_LEVELS
 from src.storage.state_manager import read_json, write_json
 
 DRAWDOWN_FILE = "drawdown_history.json"
+POSITION_STATE_KEY_ENV = "POSITION_STATE_KEY"
+_EPHEMERAL_KEY = Fernet.generate_key()
 
 
 def _classify(drawdown_pct: float) -> tuple[str, Optional[str]]:
@@ -25,46 +33,94 @@ def _classify(drawdown_pct: float) -> tuple[str, Optional[str]]:
     return "normal", None
 
 
+def _fernet() -> tuple[Fernet, str]:
+    raw = os.getenv(POSITION_STATE_KEY_ENV, "").strip()
+    if raw:
+        try:
+            return Fernet(raw.encode("utf-8")), "actions_secret"
+        except (TypeError, ValueError) as exc:
+            logger.error(
+                f"{POSITION_STATE_KEY_ENV} is invalid; using ephemeral key: {exc}"
+            )
+    return Fernet(_EPHEMERAL_KEY), "ephemeral_process"
+
+
+def _decrypt_private_state(history: dict, fernet: Fernet) -> dict:
+    token = history.get("encrypted_state")
+    if not isinstance(token, str) or not token:
+        return {"peak": 0.0, "current": 0.0}
+    try:
+        decoded = fernet.decrypt(token.encode("utf-8"))
+        value = json.loads(decoded.decode("utf-8"))
+        peak = float(value.get("peak", 0.0) or 0.0)
+        current = float(value.get("current", 0.0) or 0.0)
+        return {"peak": peak, "current": current}
+    except (InvalidToken, ValueError, TypeError, json.JSONDecodeError) as exc:
+        logger.error(f"encrypted drawdown state could not be read; resetting: {exc}")
+        return {"peak": 0.0, "current": 0.0}
+
+
 def update_account_value(current_value: float) -> dict:
-    """更新帳戶高點與當前回撤,寫入 data_store/drawdown_history.json。"""
-    history = read_json(DRAWDOWN_FILE, default={"peak": 0, "current": 0})
-    if current_value > history.get("peak", 0):
-        history["peak"] = current_value
-    history["current"] = current_value
-    history["last_updated"] = datetime.now(timezone.utc).isoformat()
+    """Update encrypted peak/current state and write a privacy-safe public record."""
+    current_value = float(current_value)
+    if current_value < 0:
+        raise ValueError("current account value cannot be negative")
 
-    peak = history.get("peak") or 0
+    history = read_json(DRAWDOWN_FILE, default={})
+    if not isinstance(history, dict):
+        history = {}
+    fernet, key_source = _fernet()
+    private = _decrypt_private_state(history, fernet)
+
+    peak = max(float(private.get("peak", 0.0) or 0.0), current_value)
     drawdown = (current_value - peak) / peak if peak else 0.0
-    history["drawdown_pct"] = drawdown
-
     level, action = _classify(drawdown)
-    history["alert_level"] = level
-    history["action"] = action
+    now = datetime.now(timezone.utc).isoformat()
 
-    write_json(DRAWDOWN_FILE, history)
-    return history
+    encrypted = fernet.encrypt(
+        json.dumps(
+            {"peak": peak, "current": current_value},
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).decode("utf-8")
+
+    public_history = {
+        "schema_version": 2,
+        "encrypted_state": encrypted,
+        "drawdown_pct": drawdown,
+        "alert_level": level,
+        "action": action,
+        "last_updated": now,
+        "privacy": "fernet_encrypted_account_values",
+        "key_source": key_source,
+    }
+    write_json(DRAWDOWN_FILE, public_history)
+
+    # Return private values only to the current process for compatibility/tests.
+    return {
+        **public_history,
+        "peak": peak,
+        "current": current_value,
+    }
 
 
 def get_current_drawdown() -> dict:
-    """純讀介面:不寫檔。冷啟動(無歷史檔)→ drawdown_pct=None / alert_level='normal'。"""
+    """Read public drawdown state without decrypting account values."""
     history = read_json(DRAWDOWN_FILE, default={})
-    peak = history.get("peak")
-    current = history.get("current")
-    if not peak:
+    if not isinstance(history, dict):
+        history = {}
+    drawdown = history.get("drawdown_pct")
+    if not isinstance(drawdown, (int, float)):
         return {
-            "peak": peak,
-            "current": current,
+            "peak": None,
+            "current": None,
             "drawdown_pct": None,
             "alert_level": "normal",
         }
-    drawdown = (current - peak) / peak if (current is not None and peak) else None
-    if drawdown is None:
-        return {"peak": peak, "current": current, "drawdown_pct": None,
-                "alert_level": "normal"}
-    level, _ = _classify(drawdown)
+    level, _ = _classify(float(drawdown))
     return {
-        "peak": peak,
-        "current": current,
-        "drawdown_pct": drawdown,
+        "peak": None,
+        "current": None,
+        "drawdown_pct": float(drawdown),
         "alert_level": level,
     }

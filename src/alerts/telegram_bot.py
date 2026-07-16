@@ -1,15 +1,4 @@
-"""Telegram Bot 封裝 - 簡單 send_message 介面。
-
-Phase 2.5.7:
-- 支援多 chat_id(逗號分隔的 TELEGRAM_CHAT_ID env)
-- send_message 對列表內每個 chat_id 都嘗試推送
-- 部分成功(any True)即視為成功(避免一個 chat 失效拖垮整體流程)
-
-Phase 2.5.7 hotfix:
-- 改用 httpx 直接打 Telegram API(不依賴 python-telegram-bot library)
-- 顯式 30 秒 timeout,迴圈推送多 chat 不會 stuck
-- 所有 chat 共用一個 AsyncClient(connection 重用)
-"""
+"""Telegram Bot wrapper with reliable multi-chat delivery and safe logging."""
 
 import asyncio
 
@@ -23,16 +12,16 @@ DEFAULT_TIMEOUT_SEC = 30.0
 
 
 class TelegramNotifier:
-    """Telegram 推播封裝(支援多 chat_id,直接 HTTP API)。"""
+    """Telegram sender for one or more chat IDs."""
 
     def __init__(self, token: str = None, chat_ids=None, chat_id=None):
-        """
-        chat_ids: list[str] — 主要參數
-        chat_id : str       — 舊版單值,相容用;chat_ids 為 None 才考慮
-        """
         self.token = token or TELEGRAM_BOT_TOKEN
         if chat_ids is not None:
-            self.chat_ids = list(chat_ids) if not isinstance(chat_ids, str) else [chat_ids]
+            self.chat_ids = (
+                list(chat_ids)
+                if not isinstance(chat_ids, str)
+                else [chat_ids]
+            )
         elif chat_id is not None:
             self.chat_ids = [chat_id] if chat_id else []
         else:
@@ -46,45 +35,73 @@ class TelegramNotifier:
     async def send_message_async(
         self,
         text: str,
-        parse_mode: str = "HTML",
+        parse_mode: str | None = "HTML",
         disable_notification: bool = False,
+        sensitive: bool = False,
+        require_all: bool = True,
     ) -> bool:
-        """對所有 chat_id 推送(共用一個 AsyncClient)。任一成功即回 True。"""
+        """Send to configured recipients without leaking credentials or chat IDs.
+
+        `parse_mode=None` sends literal plain text. `require_all=True` means a
+        multi-recipient send is successful only when every configured recipient
+        accepted the message. This prevents one failed recipient from being
+        silently treated as delivered.
+        """
         url = f"{TELEGRAM_API_BASE}/bot{self.token}/sendMessage"
-        results = []
-        async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT_SEC) as client:
-            for cid in self.chat_ids:
+        results: list[bool] = []
+        async with httpx.AsyncClient(
+            timeout=DEFAULT_TIMEOUT_SEC
+        ) as client:
+            for index, chat_id in enumerate(self.chat_ids, start=1):
+                destination = f"recipient#{index}"
                 payload = {
-                    "chat_id": cid,
+                    "chat_id": chat_id,
                     "text": text,
-                    "parse_mode": parse_mode,
                     "disable_notification": disable_notification,
                 }
+                if parse_mode:
+                    payload["parse_mode"] = parse_mode
                 try:
-                    resp = await client.post(url, json=payload)
-                    if resp.status_code == 200:
-                        logger.info(f"Telegram sent to {cid}: {text[:50]}...")
+                    response = await client.post(url, json=payload)
+                    if response.status_code == 200:
+                        preview = (
+                            "<sensitive message redacted>"
+                            if sensitive
+                            else f"{text[:50]}..."
+                        )
+                        logger.info(
+                            f"Telegram sent to {destination}: {preview}"
+                        )
                         results.append(True)
                     else:
+                        # Do not log response bodies: Telegram errors may echo
+                        # request details, and Actions logs are public.
                         logger.error(
-                            f"Telegram failed for {cid}: "
-                            f"HTTP {resp.status_code} {resp.text[:200]}"
+                            f"Telegram failed for {destination}: "
+                            f"HTTP {response.status_code}"
                         )
                         results.append(False)
-                except httpx.HTTPError as e:
-                    logger.error(f"Telegram failed for {cid}: {e}")
+                except httpx.HTTPError as exc:
+                    # Exception strings may contain the Bot API URL (and token).
+                    logger.error(
+                        f"Telegram transport failed for {destination}: "
+                        f"{type(exc).__name__}"
+                    )
                     results.append(False)
-                except Exception as e:
-                    logger.error(f"Telegram unexpected error for {cid}: {e}")
+                except Exception as exc:
+                    logger.error(
+                        f"Telegram unexpected failure for {destination}: "
+                        f"{type(exc).__name__}"
+                    )
                     results.append(False)
-        return any(results)
+        if not results:
+            return False
+        return all(results) if require_all else any(results)
 
     def send_message(self, text: str, **kwargs) -> bool:
-        """同步包裝(GitHub Actions 用)。"""
         return asyncio.run(self.send_message_async(text, **kwargs))
 
 
 def send_telegram(text: str, **kwargs) -> bool:
-    """便捷函數。"""
     notifier = TelegramNotifier()
     return notifier.send_message(text, **kwargs)

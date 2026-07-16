@@ -72,7 +72,7 @@
 | `handoffs/README.md` | handoff 慣例與最新進度入口 |
 | `context/kevin-trading-project-context.md` | 專案總覽（是什麼、給誰、現況） |
 
-> onboarding 內容若與程式碼衝突，**以程式碼與 `docs/` 既有規格為準**，並把矛盾回報給使用者，不要自行「修正」程式。
+> onboarding 內容若與程式碼衝突，**以程式碼與 `docs/` 既有規格為準**，並把矛盾回報使用者，不要自行「修正」程式。
 
 ## 7. Codex Environment
 
@@ -129,6 +129,8 @@ deploy、scheduled run、雲端推播與狀態更新由 GitHub Actions 處理。
 
 目前程式碼或 GitHub Actions workflow 已實際使用的額外 secret / 識別值：
 
+- `POSITIONS_JSON`：`position_check.yml` runtime 私有持倉輸入。格式見 `docs/positions_schema.md`；不得寫入 committed 檔案、issue、PR 或 log。
+- `POSITION_STATE_KEY`：Fernet key，用於加密 `drawdown_history.json` 內的 account peak/current；輪替後舊高水位會安全重置。
 - `FRED_API_KEY`：目前 `src/data/fred_api.py` 與 macro / market brief / signal workflow 會使用。
 - `SEC_EDGAR_USER_AGENT`：SEC EDGAR 要求的識別字串，目前 `src/data/sec_edgar.py` 與 SEC / institutional workflow 會使用；這不是 market data API key，但仍不得寫進 committed 檔案。
 - `GMAIL_SENDER` / `GMAIL_APP_PASSWORD` / `EMAIL_RECIPIENT`：`active_etf_digest.yml` 與 `gooaye_digest.yml` 的 email 寄送。

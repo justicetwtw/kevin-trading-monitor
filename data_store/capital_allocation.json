@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-07-16",
+  "note": "Manual priority is an attention order, not an automatic buy ranking. Live score fields are joined by the dashboard when available.",
+  "candidates": [
+    {
+      "manual_rank": 1,
+      "symbol": "MU",
+      "theme": "memory_cycle",
+      "subtheme": "HBM + commodity DRAM + NAND mix",
+      "status": "active_monitor",
+      "preferred_instrument": "stock_or_deep_itm_leaps",
+      "reason": "Highest-conviction memory-cycle proxy in recent discussions, but the three memory businesses must be monitored separately.",
+      "trigger": "Manual review of valuation, earnings expectations, price structure and whether options-market fear confirms or rejects the move.",
+      "invalidation": "HBM/DRAM supply-demand or AI-capex assumptions deteriorate materially."
+    },
+    {
+      "manual_rank": 2,
+      "symbol": "NVDA",
+      "theme": "ai_capex",
+      "subtheme": "compute",
+      "status": "active_monitor",
+      "preferred_instrument": "stock_or_defined_risk_options",
+      "reason": "Core AI-capex barometer and correlation anchor for the wider infrastructure basket.",
+      "trigger": "Review price support together with volatility demand, put skew and earnings expectations rather than price alone.",
+      "invalidation": "Broad, persistent capex cuts or a confirmed options-fear and earnings breakdown."
+    },
+    {
+      "manual_rank": 3,
+      "symbol": "SNDK",
+      "theme": "memory_cycle",
+      "subtheme": "NAND",
+      "status": "late_cycle_risk_watch",
+      "preferred_instrument": "wait_or_tactical_only",
+      "reason": "Direct NAND beta can diverge from HBM and DRAM; opportunity and oversupply risk must be evaluated independently.",
+      "trigger": "Require NAND pricing, inventory and capacity discipline to remain supportive.",
+      "invalidation": "Capacity returns faster than demand and NAND pricing weakens."
+    },
+    {
+      "manual_rank": 4,
+      "symbol": "LITE",
+      "theme": "ai_capex",
+      "subtheme": "optical interconnect",
+      "status": "coverage_gap",
+      "preferred_instrument": "manual_review",
+      "reason": "Recently traded AI-infrastructure name; it should be tracked as part of the correlated capex basket.",
+      "trigger": "Add complete fundamentals, price and options coverage before relying on monitor scores.",
+      "invalidation": "AI optical demand or company execution deteriorates."
+    }
+  ]
+}

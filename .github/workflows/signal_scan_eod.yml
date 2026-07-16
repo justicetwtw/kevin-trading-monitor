@@ -2,7 +2,12 @@ name: Signal Scan EOD
 
 on:
   schedule:
-    - cron: '15 21 * * 1-5'  # 美股收盤後 (夏令時 21:15 UTC = 紐約 17:15)
+    # NYSE/Nasdaq core close is 16:00 ET:
+    #   U.S. daylight time = Taipei 04:00 next day
+    #   U.S. standard time = Taipei 05:00 next day
+    # Run 15 minutes after close and gate by current U.S. DST state.
+    - cron: '15 20 * * 1-5'  # daylight: Taipei 04:15 next day
+    - cron: '15 21 * * 1-5'  # standard: Taipei 05:15 next day
   workflow_dispatch:
 
 concurrency:
@@ -24,7 +29,27 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Gate the daylight/standard cron
+        id: gate
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          IS_DST=$(python -c "from src.config.market_clock import is_us_dst_active; print('true' if is_us_dst_active() else 'false')")
+          case "${{ github.event.schedule }}" in
+            "15 20 * * 1-5") REQUIRES_DST="true" ;;
+            "15 21 * * 1-5") REQUIRES_DST="false" ;;
+            *) REQUIRES_DST="invalid" ;;
+          esac
+          if [ "$REQUIRES_DST" = "$IS_DST" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Run EOD scan
+        if: steps.gate.outputs.skip == 'false'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

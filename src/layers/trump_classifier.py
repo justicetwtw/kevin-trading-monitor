@@ -1,59 +1,66 @@
-"""Layer 0+.1 - Trump Truth Social 三級分類
+"""Layer 0+.1 — classify every captured Trump Truth Social activity.
 
-只產生 tag(post_id / tier / matched_keywords / events / created_at / scan_time),不加減分。
-60 分鐘有效期過濾邏輯由 Batch 7 signals 層處理(scorer 自己看 created_at + 60min)。
+Classification is metadata, not a gate. Tier 3 posts are retained because a
+post that appears unrelated to stocks can still affect war, policy, tariffs,
+regulation, diplomacy or market sentiment.
 """
+
+from __future__ import annotations
 
 from datetime import datetime, timezone
 
 from loguru import logger
 
-from src.config.keywords import classify_post, get_matched_keywords
 from src.config.position_mapping import map_event_to_positions
-from src.data.trump_truth import fetch_recent_posts, filter_new_posts, extract_text
+from src.data.trump_truth import (
+    archive_posts,
+    fetch_recent_posts_with_health,
+    get_unseen_posts,
+)
 from src.storage.state_manager import write_json
 
 
-def scan_and_classify() -> list:
-    """抓新貼文 + 分類 + 映射部位。失敗回 []。"""
-    try:
-        posts = fetch_recent_posts() or []
-        new_posts = filter_new_posts(posts) or []
+def scan_and_classify() -> list[dict]:
+    """Fetch, retain and classify all new posts; never suppress Tier 3."""
+    result = fetch_recent_posts_with_health()
+    posts = result.get("posts", []) if isinstance(result, dict) else []
+    new_posts = get_unseen_posts(posts)
 
-        classified = []
-        for p in new_posts:
-            try:
-                text = extract_text(p)
-                if not text:
-                    continue
-                tier = classify_post(text)
-                if tier == "tier3":
-                    continue  # 入庫不推
-
-                matched = get_matched_keywords(text)
-                events = map_event_to_positions(matched)
-
-                classified.append({
-                    "post_id": str(p.get("id", "")),
-                    "tier": tier,
-                    "text": text[:500],
-                    "created_at": p.get("created_at", ""),
-                    "matched_keywords": matched,
-                    "events": events,
-                    "scan_time": datetime.now(timezone.utc).isoformat(),
-                })
-            except Exception as inner_e:
-                logger.warning(f"trump_classifier per-post failed (skip): {inner_e}")
-                continue
-
+    classified = []
+    for post in new_posts:
         try:
-            write_json("layer_trump_classifier_state.json", {
-                "classified": classified,
-                "fetched_at": datetime.now(timezone.utc).isoformat(),
-            })
-        except Exception as we:
-            logger.warning(f"trump_classifier state write failed (non-fatal): {we}")
-        return classified
-    except Exception as e:
-        logger.warning(f"scan_and_classify failed (cold-start fallback): {e}")
-        return []
+            matched = post.get("matched_keywords") or {}
+            classified.append(
+                {
+                    **post,
+                    "events": map_event_to_positions(matched),
+                    "scan_time": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+        except Exception as exc:
+            logger.warning(f"Trump classifier per-post failed: {exc}")
+            classified.append(
+                {
+                    **post,
+                    "events": [],
+                    "scan_time": datetime.now(timezone.utc).isoformat(),
+                    "classification_error": type(exc).__name__,
+                }
+            )
+
+    if classified:
+        archive_posts(classified)
+
+    write_json(
+        "layer_trump_classifier_state.json",
+        {
+            "classified": classified,
+            "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "source_status": result.get("status") if isinstance(result, dict) else "unavailable",
+            "source": result.get("source") if isinstance(result, dict) else None,
+            "latest_post_at": result.get("latest_post_at") if isinstance(result, dict) else None,
+            "attempts": result.get("attempts", []) if isinstance(result, dict) else [],
+            "filter_policy": "retain_all_posts_tier_is_metadata_only",
+        },
+    )
+    return classified

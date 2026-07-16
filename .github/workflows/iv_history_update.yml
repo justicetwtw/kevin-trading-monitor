@@ -2,7 +2,9 @@ name: IV History Update
 
 on:
   schedule:
-    # 工作日 22:00 UTC = 美東 17:00 (EST) / 18:00 (EDT),收盤後 1 小時
+    # 22:00 UTC = Taipei 06:00.
+    # This is 2 hours after the U.S. daylight-time close (04:00 Taipei)
+    # and 1 hour after the standard-time close (05:00 Taipei).
     - cron: '0 22 * * 1-5'
   workflow_dispatch:
 

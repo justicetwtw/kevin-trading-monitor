@@ -2,8 +2,10 @@ name: Brief Sanity Check
 
 on:
   schedule:
-    - cron: '0 15 * * *'   # 台北 23:00
-    - cron: '30 15 * * *'  # 台北 23:30 (備援)
+    # Taipei 23:45 / 23:55. This is after the U.S. standard-time opening
+    # brief (22:30 primary, 23:00 backup), avoiding a false missing alert.
+    - cron: '45 15 * * *'
+    - cron: '55 15 * * *'
   workflow_dispatch:
 
 concurrency:
