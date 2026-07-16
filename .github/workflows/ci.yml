@@ -24,8 +24,8 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip --quiet
+          pip install --quiet -r requirements.txt
       - name: Run tests
         shell: bash
         run: |
@@ -34,3 +34,11 @@ jobs:
           status=$?
           tail -n 140 pytest.log
           exit $status
+      - name: Upload pytest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: pytest.log
+          if-no-files-found: error
+          retention-days: 7
