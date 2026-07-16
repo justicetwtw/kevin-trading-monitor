@@ -29,6 +29,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           POSITION_MODE: mode_1
+          PRIVATE_POSITION_CONTEXT: '1'
           POSITIONS_JSON: ${{ secrets.POSITIONS_JSON }}
           POSITION_STATE_KEY: ${{ secrets.POSITION_STATE_KEY }}
         run: python -m src.runners.run_position_check
