@@ -15,6 +15,7 @@ def test_mission_control_payload_has_first_screen_contract():
         "summary",
         "attention",
         "account",
+        "trump_monitor",
         "themes",
         "theses",
         "allocation_queue",
@@ -23,6 +24,7 @@ def test_mission_control_payload_has_first_screen_contract():
     assert data["summary"]["needs_attention_count"] == len(data["attention"])
     assert data["summary"]["estimated_account_value"] is None
     assert data["account"]["positions"] == []
+    assert data["trump_monitor"]["content_published_here"] is False
     assert all(
         row["not_a_trade_signal"] is True
         for row in data["allocation_queue"]
@@ -48,6 +50,8 @@ def test_mission_control_build_smoke(tmp_path):
     for text in (
         "Kevin Trading Mission Control",
         "Needs attention",
+        "Trump Truth Social source health",
+        "Tier determines urgency only",
         "Theme map",
         "Capital allocation queue",
         "Portfolio workflow health",
@@ -60,6 +64,7 @@ def test_mission_control_build_smoke(tmp_path):
         )
     )
     assert mission_json["data"]["summary"]
+    assert "trump_monitor" in mission_json["data"]
 
 
 def test_position_runner_persists_redacted_snapshot_and_uses_correct_total(
