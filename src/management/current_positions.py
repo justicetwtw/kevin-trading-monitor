@@ -1,39 +1,131 @@
-"""positions.json 載入 + 三模式判斷 + account snapshot。
+"""Private position loading, mode handling and account snapshots.
 
-三模式行為(從 settings.POSITION_MODE):
-- mode_1 必填:positions 為空時 logger.warning + 寫 mode1_warned.flag(防重複) + 推 Telegram 一次
-- mode_2 選填(預設):positions 為空時靜默回空集合
-- mode_3 不填:全部 getter 直接回 [] / total=None,不讀檔
+Source priority:
+1. `POSITIONS_JSON` GitHub Actions secret / environment variable.
+2. Local `data_store/positions.json` for development only.
+
+When `POSITIONS_JSON` exists but is malformed, loading fails closed to an empty
+portfolio. It never falls back to the public example file.
 """
 
+from __future__ import annotations
+
+import json
+import os
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 from loguru import logger
 
 from src.config.settings import POSITION_MODE
-from src.storage.state_manager import read_json, write_json, DATA_STORE_DIR
+from src.storage.state_manager import DATA_STORE_DIR, read_json
 
 POSITIONS_FILE = "positions.json"
+POSITIONS_ENV = "POSITIONS_JSON"
 MODE1_WARN_FLAG = "mode1_warned.flag"
+ALLOWED_OPTION_TYPES = {"long_call", "long_put", "short_call", "short_put"}
+
+
+def _empty_positions() -> dict[str, list]:
+    return {"stocks": [], "options": []}
+
+
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _validate_positions(value: Any) -> dict:
+    """Validate private positions without logging any secret contents."""
+    if not isinstance(value, dict):
+        raise ValueError("top level must be an object")
+
+    stocks = value.get("stocks", [])
+    options = value.get("options", [])
+    if not isinstance(stocks, list) or not isinstance(options, list):
+        raise ValueError("stocks and options must be arrays")
+
+    for index, stock in enumerate(stocks):
+        if not isinstance(stock, dict):
+            raise ValueError(f"stocks[{index}] must be an object")
+        if stock.get("_example"):
+            continue
+        if not isinstance(stock.get("symbol"), str) or not stock["symbol"].strip():
+            raise ValueError(f"stocks[{index}].symbol is required")
+        if not _is_number(stock.get("shares")):
+            raise ValueError(f"stocks[{index}].shares must be numeric")
+        if float(stock["shares"]) < 0:
+            raise ValueError(f"stocks[{index}].shares cannot be negative")
+        if stock.get("avg_cost") is not None and not _is_number(stock["avg_cost"]):
+            raise ValueError(f"stocks[{index}].avg_cost must be numeric")
+
+    for index, option in enumerate(options):
+        if not isinstance(option, dict):
+            raise ValueError(f"options[{index}] must be an object")
+        if option.get("_example"):
+            continue
+        if not isinstance(option.get("symbol"), str) or not option["symbol"].strip():
+            raise ValueError(f"options[{index}].symbol is required")
+        if option.get("type") not in ALLOWED_OPTION_TYPES:
+            raise ValueError(f"options[{index}].type is invalid")
+        if not _is_number(option.get("strike")) or float(option["strike"]) <= 0:
+            raise ValueError(f"options[{index}].strike must be positive")
+        expiry = option.get("expiry")
+        if not isinstance(expiry, str):
+            raise ValueError(f"options[{index}].expiry is required")
+        try:
+            datetime.strptime(expiry, "%Y-%m-%d")
+        except ValueError as exc:
+            raise ValueError(
+                f"options[{index}].expiry must use YYYY-MM-DD"
+            ) from exc
+        contracts = option.get("contracts", 1)
+        if not isinstance(contracts, int) or isinstance(contracts, bool) or contracts <= 0:
+            raise ValueError(f"options[{index}].contracts must be a positive integer")
+        if option.get("cost_per_contract") is not None and not _is_number(
+            option["cost_per_contract"]
+        ):
+            raise ValueError(
+                f"options[{index}].cost_per_contract must be numeric"
+            )
+
+    return {"stocks": stocks, "options": options}
+
+
+def get_position_source() -> str:
+    """Return source metadata without exposing position contents."""
+    return "actions_secret" if os.getenv(POSITIONS_ENV, "").strip() else "local_file"
 
 
 def load_positions() -> dict:
-    """載入目前部位。冷啟動回 {"stocks": [], "options": []}。"""
-    return read_json(POSITIONS_FILE, default={"stocks": [], "options": []})
+    """Load validated positions; malformed secret input fails closed."""
+    raw = os.getenv(POSITIONS_ENV, "").strip()
+    if raw:
+        try:
+            return _validate_positions(json.loads(raw))
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.error(
+                f"{POSITIONS_ENV} validation failed; using empty positions: {exc}"
+            )
+            return _empty_positions()
+
+    file_value = read_json(POSITIONS_FILE, default=_empty_positions())
+    try:
+        return _validate_positions(file_value)
+    except ValueError as exc:
+        logger.error(f"{POSITIONS_FILE} validation failed; using empty positions: {exc}")
+        return _empty_positions()
 
 
 def _is_real(item: dict) -> bool:
-    """過濾 _example 範本項目。"""
     return isinstance(item, dict) and not item.get("_example")
 
 
 def _real_stocks(pos: dict) -> list:
-    return [s for s in (pos.get("stocks") or []) if _is_real(s)]
+    return [stock for stock in (pos.get("stocks") or []) if _is_real(stock)]
 
 
 def _real_options(pos: dict) -> list:
-    return [o for o in (pos.get("options") or []) if _is_real(o)]
+    return [option for option in (pos.get("options") or []) if _is_real(option)]
 
 
 def _is_positions_empty(pos: dict) -> bool:
@@ -41,130 +133,138 @@ def _is_positions_empty(pos: dict) -> bool:
 
 
 def _maybe_warn_mode1(pos: dict) -> None:
-    """mode_1 + 部位空 → 第一次 logger.warning + Telegram + 寫 flag(冪等)。"""
-    if POSITION_MODE != "mode_1":
-        return
-    if not _is_positions_empty(pos):
+    """Warn once when required private positions are unavailable."""
+    if POSITION_MODE != "mode_1" or not _is_positions_empty(pos):
         return
     flag_path = DATA_STORE_DIR / MODE1_WARN_FLAG
     if flag_path.exists():
         return
     msg = (
-        "POSITION_MODE=mode_1 但 positions.json 為空(或全為 _example 範本)。"
-        "請依 docs/positions_schema.md 填入真實部位。系統繼續以空部位運行。"
+        "POSITION_MODE=mode_1 but no valid private positions were loaded. "
+        "Configure the POSITIONS_JSON Actions secret or a local positions.json. "
+        "The system will continue with an empty portfolio."
     )
     logger.warning(msg)
     try:
         from src.alerts.telegram_bot import send_telegram
-        send_telegram(f"[mode_1 提醒] {msg}")
-    except Exception as e:
-        logger.warning(f"mode_1 Telegram 推送失敗(忽略): {e}")
+
+        send_telegram(f"[mode_1 reminder] {msg}")
+    except Exception as exc:
+        logger.warning(f"mode_1 Telegram reminder failed: {exc}")
     try:
         flag_path.write_text(datetime.now(timezone.utc).isoformat(), encoding="utf-8")
-    except Exception as e:
-        logger.warning(f"mode_1 flag 寫入失敗(下次仍會警告): {e}")
+    except Exception as exc:
+        logger.warning(f"mode_1 warning flag write failed: {exc}")
 
 
 def get_holdings_symbols() -> list:
-    """目前持倉的 symbols list(用於 P0 優先級)。mode_3 → []。"""
     if POSITION_MODE == "mode_3":
         return []
     pos = load_positions()
     _maybe_warn_mode1(pos)
-    syms = set()
-    for s in _real_stocks(pos):
-        if "symbol" in s:
-            syms.add(s["symbol"])
-    for o in _real_options(pos):
-        if "symbol" in o:
-            syms.add(o["symbol"])
-    return list(syms)
+    symbols = {
+        item["symbol"]
+        for item in _real_stocks(pos) + _real_options(pos)
+        if item.get("symbol")
+    }
+    return sorted(symbols)
 
 
 def get_long_options() -> list:
-    """所有 long_call / long_put。mode_3 → []。"""
     if POSITION_MODE == "mode_3":
         return []
     pos = load_positions()
     _maybe_warn_mode1(pos)
-    return [o for o in _real_options(pos) if str(o.get("type", "")).startswith("long_")]
+    return [
+        option
+        for option in _real_options(pos)
+        if str(option.get("type", "")).startswith("long_")
+    ]
 
 
 def get_short_options() -> list:
-    """所有 short_call / short_put。mode_3 → []。"""
     if POSITION_MODE == "mode_3":
         return []
     pos = load_positions()
     _maybe_warn_mode1(pos)
-    return [o for o in _real_options(pos) if str(o.get("type", "")).startswith("short_")]
+    return [
+        option
+        for option in _real_options(pos)
+        if str(option.get("type", "")).startswith("short_")
+    ]
 
 
-def _estimate_option_value(opt: dict) -> Optional[float]:
-    """單口 long/short option 當前 BS 估值(per contract = price * 100)。
-    任何 price/IV/expiry 拿不到 → 回 None,呼叫端跳過該筆。"""
+def _estimate_option_value(option: dict) -> Optional[float]:
+    """Estimate current option value per all contracts; unavailable data returns None."""
     try:
-        from src.data.price_data import get_latest_price
-        from src.data.iv_rank import get_atm_iv
         from src.data.greeks_calculator import calc_bs_price
+        from src.data.iv_rank import get_atm_iv
+        from src.data.price_data import get_latest_price
 
-        sym = opt.get("symbol")
-        strike = opt.get("strike")
-        expiry = opt.get("expiry")
-        opt_type_raw = str(opt.get("type", ""))
-        if not sym or strike is None or not expiry or not opt_type_raw:
+        symbol = option.get("symbol")
+        strike = option.get("strike")
+        expiry = option.get("expiry")
+        option_type = str(option.get("type", ""))
+        if not symbol or strike is None or not expiry or not option_type:
             return None
 
-        S = get_latest_price(sym)
-        if S is None:
-            return None
-        iv = get_atm_iv(sym)
-        if iv is None:
+        underlying = get_latest_price(symbol)
+        implied_volatility = get_atm_iv(symbol)
+        if underlying is None or implied_volatility is None:
             return None
 
-        expiry_dt = datetime.strptime(expiry, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        today = datetime.now(timezone.utc)
-        dte = (expiry_dt.date() - today.date()).days
+        expiry_dt = datetime.strptime(expiry, "%Y-%m-%d").replace(
+            tzinfo=timezone.utc
+        )
+        dte = (expiry_dt.date() - datetime.now(timezone.utc).date()).days
         if dte <= 0:
             return 0.0
 
-        bs_type = "call" if "call" in opt_type_raw else "put"
         per_share = calc_bs_price(
-            S=float(S), K=float(strike), T=dte / 365, r=0.045,
-            sigma=float(iv), option_type=bs_type,
+            S=float(underlying),
+            K=float(strike),
+            T=dte / 365,
+            r=0.045,
+            sigma=float(implied_volatility),
+            option_type="call" if "call" in option_type else "put",
         )
-        contracts = int(opt.get("contracts", 1))
-        return per_share * 100 * contracts
-    except Exception as e:
-        logger.warning(f"_estimate_option_value({opt.get('symbol')}) failed: {e}")
+        return per_share * 100 * int(option.get("contracts", 1))
+    except Exception as exc:
+        logger.warning(
+            f"_estimate_option_value({option.get('symbol')}) failed: {exc}"
+        )
         return None
 
 
 def _estimate_stock_value(stock: dict) -> Optional[float]:
     try:
         from src.data.price_data import get_latest_price
-        sym = stock.get("symbol")
+
+        symbol = stock.get("symbol")
         shares = stock.get("shares")
-        if not sym or shares is None:
+        if not symbol or shares is None:
             return None
-        price = get_latest_price(sym)
+        price = get_latest_price(symbol)
         if price is None:
             return None
         return float(price) * float(shares)
-    except Exception as e:
-        logger.warning(f"_estimate_stock_value({stock.get('symbol')}) failed: {e}")
+    except Exception as exc:
+        logger.warning(
+            f"_estimate_stock_value({stock.get('symbol')}) failed: {exc}"
+        )
         return None
 
 
 def get_account_snapshot() -> dict:
-    """完整帳戶快照(給 Batch 11 runner / drawdown 餵真實值用)。
+    """Build an in-memory private snapshot for risk checks.
 
-    冷啟動 / mode_3 → total_estimated_value=None / 0,不崩。
-    任何單筆估值失敗 → 跳過該筆,total 仍計其他筆。
+    Exact position details and total value must never be committed by callers.
     """
     now_iso = datetime.now(timezone.utc).isoformat()
     if POSITION_MODE == "mode_3":
         return {
             "mode": "mode_3",
+            "position_source": "disabled",
             "stocks": [],
             "options": [],
             "total_estimated_value": None,
@@ -173,32 +273,38 @@ def get_account_snapshot() -> dict:
             "snapshot_at": now_iso,
         }
 
-    pos = load_positions()
-    _maybe_warn_mode1(pos)
-    stocks = _real_stocks(pos)
-    options = _real_options(pos)
-    longs = [o for o in options if str(o.get("type", "")).startswith("long_")]
-    shorts = [o for o in options if str(o.get("type", "")).startswith("short_")]
+    positions = load_positions()
+    _maybe_warn_mode1(positions)
+    stocks = _real_stocks(positions)
+    options = _real_options(positions)
+    longs = [
+        option
+        for option in options
+        if str(option.get("type", "")).startswith("long_")
+    ]
+    shorts = [
+        option
+        for option in options
+        if str(option.get("type", "")).startswith("short_")
+    ]
 
-    if not stocks and not options:
-        total: Optional[float] = 0.0
-    else:
-        total = 0.0
-        for s in stocks:
-            v = _estimate_stock_value(s)
-            if v is not None:
-                total += v
-        for o in longs:
-            v = _estimate_option_value(o)
-            if v is not None:
-                total += v
-        for o in shorts:
-            v = _estimate_option_value(o)
-            if v is not None:
-                total -= v
+    total: Optional[float] = 0.0
+    for stock in stocks:
+        value = _estimate_stock_value(stock)
+        if value is not None:
+            total += value
+    for option in longs:
+        value = _estimate_option_value(option)
+        if value is not None:
+            total += value
+    for option in shorts:
+        value = _estimate_option_value(option)
+        if value is not None:
+            total -= value
 
     return {
         "mode": POSITION_MODE,
+        "position_source": get_position_source(),
         "stocks": stocks,
         "options": options,
         "total_estimated_value": total,
