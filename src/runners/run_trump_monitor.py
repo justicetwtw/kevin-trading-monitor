@@ -3,8 +3,8 @@
 No keyword filter decides whether a post is captured or delivered. Tier only
 controls notification urgency. On first activation, the monitor establishes a
 24-hour backfill checkpoint; this captures recent context without treating the
-mirror's multi-year archive as thousands of new posts. After activation, every
-unseen activity returned by the bounded live source set is eligible.
+mirror's multi-year archive as thousands of new posts. A split long post is
+marked seen only after its final chunk succeeds.
 """
 
 from __future__ import annotations
@@ -131,7 +131,7 @@ def _split_long_block(
 def build_delivery_chunks(
     posts: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Build ordered Telegram chunks while retaining post IDs per chunk."""
+    """Build chunks and mark a post complete only on its final fragment."""
     ordered = sorted(
         posts,
         key=lambda item: _parse_time(item.get("created_at"))
@@ -139,38 +139,38 @@ def build_delivery_chunks(
     )
     chunks: list[dict[str, Any]] = []
     current_parts: list[str] = []
-    current_posts: list[dict[str, Any]] = []
+    current_mark_posts: list[dict[str, Any]] = []
     current_length = 0
     current_audible = False
 
     def flush() -> None:
-        nonlocal current_parts, current_posts
+        nonlocal current_parts, current_mark_posts
         nonlocal current_length, current_audible
         if not current_parts:
             return
         chunks.append(
             {
                 "message": "\n\n──────────\n\n".join(current_parts),
-                "posts": list(current_posts),
+                "mark_posts": list(current_mark_posts),
                 "audible": current_audible,
             }
         )
         current_parts = []
-        current_posts = []
+        current_mark_posts = []
         current_length = 0
         current_audible = False
 
     for post in ordered:
         block_parts = _split_long_block(_post_block(post))
         audible = post.get("tier") in {"tier1", "tier2"}
-        for block in block_parts:
+        for index, block in enumerate(block_parts):
             separator_len = 14 if current_parts else 0
             projected = current_length + separator_len + len(block)
             if current_parts and projected > MAX_TELEGRAM_CHARS:
                 flush()
             current_parts.append(block)
-            if post not in current_posts:
-                current_posts.append(post)
+            if index == len(block_parts) - 1:
+                current_mark_posts.append(post)
             current_length += separator_len + len(block)
             current_audible = current_audible or audible
     flush()
@@ -225,6 +225,14 @@ def _write_health(
         ),
         "keyword_policy": (
             "tier_is_metadata_and_notification_urgency_only"
+        ),
+        "source_completeness_verified": (
+            result.get("source") == "truth_social_official_api"
+        ),
+        "source_completeness_note": (
+            "Official public API response"
+            if result.get("source") == "truth_social_official_api"
+            else "Fresh mirror available; 100% parity with official Truth Social is not independently verified"
         ),
         "last_unavailable_notice_at": last_notice_at,
     }
@@ -306,8 +314,10 @@ def main() -> int:
         if not ok:
             failed = True
             break
-        mark_posts_seen(chunk["posts"])
-        delivered_count += len(chunk["posts"])
+        completed_posts = chunk["mark_posts"]
+        if completed_posts:
+            mark_posts_seen(completed_posts)
+            delivered_count += len(completed_posts)
 
     delivery_status = (
         "delivered_all" if not failed else "delivery_failed_partial"
@@ -326,7 +336,7 @@ def main() -> int:
 
     if failed:
         logger.error(
-            "Trump delivery failed; undelivered posts remain unseen"
+            "Trump delivery failed; incomplete posts remain unseen"
         )
         return 1
 
