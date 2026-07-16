@@ -38,10 +38,48 @@ jobs:
           # output because third-party market-data libraries may print private
           # tickers outside our logging controls. The runner persists only safe,
           # generic health/error codes in position_snapshot.json.
+          snapshot="data_store/position_snapshot.json"
+          before_hash="$(sha256sum "$snapshot" 2>/dev/null | awk '{print $1}')"
+
           set +e
           python -m src.runners.run_position_check > /tmp/private-position-check.log 2>&1
           status=$?
           rm -f /tmp/private-position-check.log
+          set -e
+
+          after_hash="$(sha256sum "$snapshot" 2>/dev/null | awk '{print $1}')"
+          if [ "$status" -ne 0 ] && [ "$before_hash" = "$after_hash" ]; then
+            # Import/startup crashes can occur before the runner writes its safe
+            # health state. Replace stale green state with a generic failure.
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          path = Path("data_store/position_snapshot.json")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(
+              json.dumps(
+                  {
+                      "mode": "mode_1",
+                      "position_source": "actions_secret",
+                      "configured": None,
+                      "position_count": None,
+                      "n_long_options": None,
+                      "n_short_options": None,
+                      "snapshot_at": datetime.now(timezone.utc).isoformat(),
+                      "status": "unknown",
+                      "workflow_status": "failed",
+                      "error_codes": ["runner_process_failed"],
+                      "privacy": "redacted_public_state",
+                  },
+                  indent=2,
+              ),
+              encoding="utf-8",
+          )
+          PY
+          fi
+
           if [ "$status" -eq 0 ]; then
             echo "Private position check completed successfully (runtime output suppressed)."
           else
