@@ -1,9 +1,13 @@
-"""Phase 2.5.5 + Sprint 2.5.9 — brief sanity check 測試。
+"""Brief sanity check tests using canonical Asia/Taipei dispatch windows.
 
-新時間表(夏令):us_eod 05:30 / tw_open 08:30 / tw_close 13:30 /
-us_premarket 17:00 / us_open 22:00 / us_midday 02:00 (隔日)
-sanity 在 23:00 跑 → 當日預期含 us_eod / tw_open / tw_close /
-us_premarket / us_open(us_midday 在 02:00 隔日,不在當日視窗)。
+Regular market times:
+- Taiwan: 09:00-13:30 Taipei.
+- U.S. daylight: 21:30-04:00 next day Taipei.
+- U.S. standard: 22:30-05:00 next day Taipei.
+
+The sanity job runs at 23:45 / 23:55 and checks all briefs that should already
+have arrived on that Taipei calendar date, including the 01:00 / 02:00 U.S.
+midday brief and the 04:30 / 05:30 U.S. EOD brief on Tue-Sat.
 """
 
 import json
@@ -18,93 +22,109 @@ from src.runners import run_brief_sanity as rbs
 
 @pytest.fixture
 def tmp_dedup(tmp_path, monkeypatch):
-    p = tmp_path / "data_store" / "brief_sent_today.json"
-    monkeypatch.setattr(rbs, "DEDUP_PATH", p)
-    return p
+    path = tmp_path / "data_store" / "brief_sent_today.json"
+    monkeypatch.setattr(rbs, "DEDUP_PATH", path)
+    return path
 
 
 def _taipei(year, month, day, hour, minute=0):
-    tz = pytz.timezone("Asia/Taipei")
-    return tz.localize(datetime(year, month, day, hour, minute))
+    timezone = pytz.timezone("Asia/Taipei")
+    return timezone.localize(datetime(year, month, day, hour, minute))
 
 
 def test_expected_today_friday_full_day():
-    """週五 23:00 → us_eod + tw_open + tw_close + us_premarket + us_open。"""
-    fri_23 = _taipei(2026, 5, 8, 23, 0)
-    expected = rbs._expected_today(fri_23)
-    assert set(expected) == {
-        "us_eod", "tw_open", "tw_close", "us_premarket", "us_open",
+    """Friday late sanity includes overnight U.S. and local daytime briefs."""
+    friday = _taipei(2026, 5, 8, 23, 45)
+    expected = set(rbs._expected_today(friday))
+    assert expected == {
+        "us_midday",
+        "us_eod",
+        "tw_open",
+        "tw_close",
+        "us_premarket",
+        "us_open",
     }
 
 
 def test_expected_today_monday_full_day():
-    """週一 23:00 → tw_open + tw_close + us_premarket + us_open
-    (週一 us_eod 視窗在週日 cron 推送之外,故無;us_midday 不在當日)。
-    """
-    mon_23 = _taipei(2026, 5, 4, 23, 0)
-    expected = rbs._expected_today(mon_23)
-    assert "tw_open" in expected
-    assert "tw_close" in expected
-    assert "us_premarket" in expected
-    assert "us_open" in expected
-    assert "us_eod" not in expected
-    # tw_eod 已 retire
+    """Monday has no prior Sunday-night U.S. session briefs."""
+    monday = _taipei(2026, 5, 4, 23, 45)
+    expected = set(rbs._expected_today(monday))
+    assert expected == {
+        "tw_open",
+        "tw_close",
+        "us_premarket",
+        "us_open",
+    }
     assert "tw_eod" not in expected
 
 
 def test_expected_today_saturday():
-    """週六 → 只有 us_eod(週五美股收盤推送);無 tw_*、us_premarket、us_open。"""
-    sat_23 = _taipei(2026, 5, 9, 23, 0)
-    expected = rbs._expected_today(sat_23)
-    assert expected == ["us_eod"]
+    """Saturday receives Friday U.S. midday and EOD briefs only."""
+    saturday = _taipei(2026, 5, 9, 23, 45)
+    assert rbs._expected_today(saturday) == ["us_midday", "us_eod"]
 
 
 def test_expected_today_sunday_empty():
-    sun = _taipei(2026, 5, 10, 23, 0)
-    expected = rbs._expected_today(sun)
-    assert expected == []
+    sunday = _taipei(2026, 5, 10, 23, 45)
+    assert rbs._expected_today(sunday) == []
 
 
-def test_expected_today_before_us_eod_window_empty():
-    """週二 06:00(us_eod 視窗 07:00 前)→ 預期空。"""
-    tue_6 = _taipei(2026, 5, 5, 6, 0)
-    assert rbs._expected_today(tue_6) == []
+def test_expected_today_after_midday_before_eod():
+    """Tuesday 06:00 has the overnight midday brief but EOD grace ends at 07:00."""
+    tuesday_6 = _taipei(2026, 5, 5, 6, 0)
+    assert rbs._expected_today(tuesday_6) == ["us_midday"]
 
 
-def test_expected_today_at_us_eod_window_only_us_eod():
-    """週二 07:00(剛進入 us_eod 視窗)→ 只有 us_eod。"""
-    tue_7 = _taipei(2026, 5, 5, 7, 0)
-    assert rbs._expected_today(tue_7) == ["us_eod"]
+def test_expected_today_at_us_eod_window():
+    """Tuesday 07:00 expects both overnight U.S. briefs."""
+    tuesday_7 = _taipei(2026, 5, 5, 7, 0)
+    assert rbs._expected_today(tuesday_7) == ["us_midday", "us_eod"]
 
 
 def test_main_no_missing_no_alert(tmp_dedup, monkeypatch):
     today_str = datetime.now(rbs.TIMEZONE_USER).strftime("%Y-%m-%d")
     tmp_dedup.parent.mkdir(parents=True, exist_ok=True)
     tmp_dedup.write_text(
-        json.dumps({today_str: {
-            "us_eod": True, "tw_open": True, "tw_close": True,
-            "us_premarket": True, "us_open": True, "us_midday": True,
-        }}),
+        json.dumps(
+            {
+                today_str: {
+                    "us_eod": True,
+                    "tw_open": True,
+                    "tw_close": True,
+                    "us_premarket": True,
+                    "us_open": True,
+                    "us_midday": True,
+                }
+            }
+        ),
         encoding="utf-8",
     )
     with patch.object(rbs, "send_telegram") as mock_send:
-        rc = rbs.main()
-    assert rc == 0
+        result = rbs.main()
+    assert result == 0
     mock_send.assert_not_called()
 
 
 def test_main_sends_alert_when_missing(tmp_dedup, monkeypatch):
-    """週五晚上但 dedup file 不存在 → 全部 missing → 發告警。"""
-    fri_23 = _taipei(2026, 5, 8, 23, 30)
-    with patch.object(rbs, "datetime") as mock_dt, \
-         patch.object(rbs, "send_telegram", return_value=True) as mock_send:
-        mock_dt.now.return_value = fri_23
-        mock_dt.strptime = datetime.strptime
-        rc = rbs.main()
-    assert rc == 0
+    """Friday late sanity reports every missing brief, including us_midday."""
+    friday = _taipei(2026, 5, 8, 23, 45)
+    with patch.object(rbs, "datetime") as mock_datetime, patch.object(
+        rbs, "send_telegram", return_value=True
+    ) as mock_send:
+        mock_datetime.now.return_value = friday
+        mock_datetime.strptime = datetime.strptime
+        result = rbs.main()
+    assert result == 0
     mock_send.assert_called_once()
-    args, _ = mock_send.call_args
-    msg = args[0]
-    assert "Brief 觸發異常" in msg
-    for bt in ("us_eod", "tw_open", "tw_close", "us_premarket", "us_open"):
-        assert bt in msg
+    message = mock_send.call_args.args[0]
+    assert "Brief 觸發異常" in message
+    for brief_type in (
+        "us_midday",
+        "us_eod",
+        "tw_open",
+        "tw_close",
+        "us_premarket",
+        "us_open",
+    ):
+        assert brief_type in message
