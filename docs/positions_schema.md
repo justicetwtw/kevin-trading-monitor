@@ -15,7 +15,7 @@ When `POSITIONS_JSON` exists but is malformed, the loader fails closed to an emp
 
 | Mode | Behavior | Use case |
 |---|---|---|
-| `mode_1` | Required. Empty/invalid private input or missing decision links degrades the workflow. | Production position monitoring |
+| `mode_1` | Required. Empty/invalid private input or missing/unknown decision links degrades the workflow. | Production position monitoring |
 | `mode_2` | Optional; empty input is allowed. | Signal observation with occasional local position checks |
 | `mode_3` | Disabled; position getters return empty state and account value is `None`. | Pure signal mode |
 
@@ -55,7 +55,9 @@ The scheduled `position_check.yml` workflow uses `mode_1` and reads `POSITIONS_J
 - `symbol` — required, non-empty ticker string.
 - `shares` — required numeric quantity, zero or greater.
 - `avg_cost` — optional numeric average cost.
-- `thesis_id` — **required for healthy production decision monitoring**. It must map to an approved theme/thesis ID in `data_store/thesis_tracker.json`; missing IDs produce the safe public error code `position_thesis_id_missing`.
+- `thesis_id` — **required for healthy production decision monitoring**. It must exactly match an existing theme or subtheme ID in `data_store/thesis_tracker.json`.
+  - empty/missing → safe code `position_thesis_id_missing`;
+  - non-empty but unknown → safe code `position_thesis_id_invalid`.
 - `_example` — optional boolean; `true` is ignored.
 
 ### `options[]`
@@ -70,19 +72,19 @@ The scheduled `position_check.yml` workflow uses `mode_1` and reads `POSITIONS_J
 - `thesis_id` — **required for healthy production decision monitoring**. Portfolio hedges should use an explicit approved hedge thesis such as `portfolio_hedge`, not inherit an issuer thesis.
 - `_example` — optional boolean; `true` is ignored.
 
-Schema validation still accepts a missing `thesis_id` so legacy data cannot crash the loader, but the position workflow fails closed to `degraded` until the decision link is repaired. This separates transport/schema validity from decision-model completeness.
+Schema validation still accepts a missing or unknown `thesis_id` so legacy data cannot crash the loader, but the position workflow fails closed to `degraded` until the decision link is repaired. This separates transport/schema validity from decision-model completeness.
 
 ## Private decision-risk output
 
 The private Telegram portfolio brief now includes:
 
 - symbol and theme Delta exposure;
-- overlapping correlation baskets such as `ai_capex`, `memory_cycle`, `hbm`, `commodity_dram`, `nand` and `optical_interconnect`;
+- overlapping correlation baskets such as `ai_capex`, `memory_cycle`, `hbm`, `commodity_dram`, `nand`, `optical_interconnect` and `portfolio_hedge`;
 - protective negative Delta divided by positive Delta;
 - option roll counts at ≤90, ≤180 and ≤270 days;
-- missing thesis IDs, unmapped basket coverage and review flags.
+- missing/invalid thesis IDs, unmapped basket coverage and review flags.
 
-The current 50% correlated-basket threshold is labeled `repo_default_pending_kevin_confirmation`. It is a review gate, not an automatic trim instruction.
+The current 50% correlated-basket threshold is labeled `repo_default_pending_kevin_confirmation`. It is a review gate, not an automatic trim instruction. Basket gross weights overlap and may sum above 100%; they are factor lenses, not allocation slices.
 
 ## Public-state boundary
 
@@ -95,6 +97,7 @@ During a position workflow run, exact positions and estimated account value exis
 - workflow status, generic error codes and timestamp;
 - aggregate decision-risk counts/ratios:
   - missing thesis ID count;
+  - invalid thesis ID count;
   - unmapped-symbol count;
   - maximum basket gross-weight ratio;
   - hedge-coverage ratio;
@@ -110,7 +113,11 @@ Open repository **Settings → Secrets and variables → Actions → New reposit
 - Name: `POSITIONS_JSON`
 - Value: the complete valid JSON object shown above, with real values and no comments.
 
-After updating, manually run **Position Management Check** once. Confirm the public health snapshot says `configured` without exposing any position details, and confirm no `position_thesis_id_missing` or `position_correlation_basket_unmapped` error remains.
+After updating, manually run **Position Management Check** once. Confirm the public health snapshot says `configured` without exposing position details, and confirm none of these safe errors remain:
+
+- `position_thesis_id_missing`
+- `position_thesis_id_invalid`
+- `position_correlation_basket_unmapped`
 
 ## Local development
 
