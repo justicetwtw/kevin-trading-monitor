@@ -19,11 +19,11 @@ PR #8 同時處理兩層：
 - Root `AGENTS.md`：動態 owner assignment、optional bounded subagents、non-owner review、Kevin merge gate。
 - `docs/agent-team-workflow.md`：canonical roles、authenticated delivery adapters、兩輪停止條件。
 - `docs/agent-runtime-preferences-2026-07.md`：Kevin 當期 Ultra／strongest-orchestrator preference，明確標為 dated、可重新評估。
-- `agent-routing-report:v1`：放在 trusted PR comment，綁 current 40-character HEAD；避免把 HEAD commit 回 branch 造成自我變更循環。
-- `scripts/verify_agent_routing_report.py`：驗 owner、subagent delegation、usage evidence、lead re-verification、tests、CI、trusted actor 與 forbidden sensitive/reasoning keys。
-- `/agent-fix-complete`／`/agent-review-pass`：驗 exact HEAD、routing report與 GitHub actual checks。
+- `agent-routing-report:v1`：放在 trusted PR comment，綁 current 40-character HEAD；避免把 HEAD commit 回 branch造成自我變更循環。
+- `scripts/verify_agent_routing_report.py`：驗 owner、subagent delegation、usage evidence、lead re-verification、tests、CI、trusted actor與 forbidden sensitive/reasoning keys。
+- `/agent-fix-complete`／`/agent-review-pass`：使用 default-branch已審核 verifier，驗 exact HEAD、routing report與 GitHub actual checks。
 - Capability watcher：追蹤 OpenAI Codex review／AGENTS／subagents與 Anthropic subagents／agent teams／permissions／context。
-- Repo 移除 Claude inference GitHub Action；不需要 `ANTHROPIC_API_KEY`／`OPENAI_API_KEY` 作 agent workflow secret。
+- Repo移除 Claude inference GitHub Action；不需要 `ANTHROPIC_API_KEY`／`OPENAI_API_KEY`作 agent workflow secret。
 
 ## 3. Delivery contract
 
@@ -41,18 +41,26 @@ PR #8 同時處理兩層：
 - 私有 thesis-ID、basket Delta、hedge coverage、roll-window Telegram risk；公開 state只留 aggregate ratios/counts。
 - Append-only decision log與 Brier calibration；少量樣本不得宣稱有效。
 
-## 5. Merge 前 acceptance gate
+## 5. PR #8 bootstrap gate
+
+GitHub `issue_comment` workflow與 verifier都由 default branch載入。PR #8正是在新增這套 gate，因此它**不能用尚未 merge 的新 `/agent-fix-complete`／`/agent-review-pass` 自我認證**。
+
+PR #8 merge前使用以下替代 gate：
 
 1. Current HEAD 的 full `python -m pytest -q`。
 2. `python scripts/verify_agent_workflow_contract.py`。
 3. Agent Capability Watch offline audit。
 4. Blocking Trump live source probe。
-5. Trusted current-HEAD `agent-routing-report:v1`。
-6. `/agent-fix-complete <exact-head>` 成功。
-7. Non-owner fresh-context review；findings回原 owner，最多兩輪。
-8. `/agent-review-pass <exact-head>` 只移至 `needs-kevin`。
-9. 向 Kevin 回報 exact tested HEAD、CI、review verdict、限制與 activation步驟。
-10. Kevin 對 PR #8 明確授權後才可 merge。
+5. Trusted current-HEAD `agent-routing-report:v1`，由 branch verifier＋GitHub connector人工核對。
+6. Non-owner fresh-context review；findings回原 owner，最多兩輪。
+7. 向 Kevin回報 exact tested HEAD、CI、review verdict、限制與 activation步驟。
+8. Kevin對 PR #8明確授權後才可 merge。
+
+Merge後，下一支低風險測試 PR或第一支真實 PR必須驗證 production ChatOps：
+
+- `/agent-fix-complete <exact-head>`；
+- default-branch verifier不能被 PR branch替換；
+- `/agent-review-pass <exact-head>`只移至 `needs-kevin`，不 merge。
 
 ## 6. Post-merge owner-only activation
 
@@ -70,3 +78,4 @@ PR #8 同時處理兩層：
 - Walk-forward/out-of-sample、交易成本、options spread/liquidity、tax與足夠 decision history仍缺。
 - Exchange holiday／special early close另案處理。
 - Routing-report usage metrics若產品不提供，必須記 `unavailable`，不得估算。
+- Capability watcher的 official source hashes尚未建立 human-approved baseline；online run應提示 `baseline_missing`，不得自動接受。
