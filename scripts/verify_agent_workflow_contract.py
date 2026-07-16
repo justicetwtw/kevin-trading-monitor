@@ -32,11 +32,13 @@ REQUIRED = {
         "not merge authorization",
     ],
     ".github/workflows/claude_review.yml": [
-        "anthropics/claude-code-action@v1",
+        "anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342",
         "ANTHROPIC_API_KEY",
         "author_association",
         "40-character",
         "Review only",
+        "--allowedTools \"Read,Glob,Grep\"",
+        "HAS_ANTHROPIC_KEY",
     ],
 }
 
