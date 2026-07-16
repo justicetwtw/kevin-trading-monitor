@@ -1,9 +1,10 @@
 """Capture and deliver every new Donald Trump Truth Social activity.
 
-No keyword filter is allowed to decide whether a post is captured or delivered.
-Tier classification only controls notification urgency and downstream tagging.
-If no current source is available, this runner writes an explicit unavailable
-health state, sends a throttled warning and exits non-zero.
+No keyword filter decides whether a post is captured or delivered. Tier only
+controls notification urgency. On first activation, the monitor establishes a
+24-hour backfill checkpoint; this captures recent context without treating the
+mirror's multi-year archive as thousands of new posts. After activation, every
+unseen activity returned by the bounded live source set is eligible.
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from src.storage.state_manager import read_json, write_json
 HEALTH_FILE = "trump_monitor_health.json"
 MAX_TELEGRAM_CHARS = 3600
 UNAVAILABLE_NOTICE_COOLDOWN = timedelta(hours=6)
+INITIAL_BACKFILL_WINDOW = timedelta(hours=24)
 
 
 def _parse_time(value: Any) -> datetime | None:
@@ -37,9 +39,33 @@ def _parse_time(value: Any) -> datetime | None:
         parsed = isoparse(str(value))
         if parsed.tzinfo is None:
             parsed = parsed.replace(tzinfo=timezone.utc)
-        return parsed
+        return parsed.astimezone(timezone.utc)
     except (TypeError, ValueError, OverflowError):
         return None
+
+
+def _capture_started_at(previous: dict[str, Any]) -> datetime:
+    existing = _parse_time(previous.get("capture_started_at"))
+    if existing is not None:
+        return existing
+    return datetime.now(timezone.utc) - INITIAL_BACKFILL_WINDOW
+
+
+def _eligible_since_checkpoint(
+    posts: list[dict[str, Any]],
+    capture_started_at: datetime,
+) -> tuple[list[dict[str, Any]], int]:
+    """Exclude historical archive rows and count timestamp-invalid activities."""
+    eligible = []
+    missing_timestamp = 0
+    for post in posts:
+        created = _parse_time(post.get("created_at"))
+        if created is None:
+            missing_timestamp += 1
+            continue
+        if created >= capture_started_at:
+            eligible.append(post)
+    return eligible, missing_timestamp
 
 
 def _taipei_time(value: Any) -> str:
@@ -55,9 +81,14 @@ def _post_block(post: dict[str, Any]) -> str:
         "post": "原發文",
         "reply": "回覆",
         "retruth": "ReTruth",
-    }.get(str(post.get("activity_type")), str(post.get("activity_type") or "發文"))
+    }.get(
+        str(post.get("activity_type")),
+        str(post.get("activity_type") or "發文"),
+    )
     source_account = post.get("original_account")
-    account_note = f"｜原帳號 @{source_account}" if source_account else ""
+    account_note = (
+        f"｜原帳號 @{source_account}" if source_account else ""
+    )
     media_note = (
         f"｜媒體附件 {post.get('media_count')}"
         if int(post.get("media_count", 0) or 0) > 0
@@ -65,13 +96,17 @@ def _post_block(post: dict[str, Any]) -> str:
     )
     return (
         f"🇺🇸 Trump Truth Social｜{tier}\n"
-        f"{_taipei_time(post.get('created_at'))}｜{kind}{account_note}{media_note}\n"
+        f"{_taipei_time(post.get('created_at'))}｜"
+        f"{kind}{account_note}{media_note}\n"
         f"{post.get('text') or '[無文字內容]'}\n"
         f"{post.get('url') or ''}"
     ).strip()
 
 
-def _split_long_block(block: str, max_chars: int = MAX_TELEGRAM_CHARS) -> list[str]:
+def _split_long_block(
+    block: str,
+    max_chars: int = MAX_TELEGRAM_CHARS,
+) -> list[str]:
     if len(block) <= max_chars:
         return [block]
     parts = []
@@ -93,7 +128,9 @@ def _split_long_block(block: str, max_chars: int = MAX_TELEGRAM_CHARS) -> list[s
     ]
 
 
-def build_delivery_chunks(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def build_delivery_chunks(
+    posts: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     """Build ordered Telegram chunks while retaining post IDs per chunk."""
     ordered = sorted(
         posts,
@@ -107,7 +144,8 @@ def build_delivery_chunks(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
     current_audible = False
 
     def flush() -> None:
-        nonlocal current_parts, current_posts, current_length, current_audible
+        nonlocal current_parts, current_posts
+        nonlocal current_length, current_audible
         if not current_parts:
             return
         chunks.append(
@@ -127,7 +165,8 @@ def build_delivery_chunks(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
         audible = post.get("tier") in {"tier1", "tier2"}
         for block in block_parts:
             separator_len = 14 if current_parts else 0
-            if current_parts and current_length + separator_len + len(block) > MAX_TELEGRAM_CHARS:
+            projected = current_length + separator_len + len(block)
+            if current_parts and projected > MAX_TELEGRAM_CHARS:
                 flush()
             current_parts.append(block)
             if post not in current_posts:
@@ -138,16 +177,24 @@ def build_delivery_chunks(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return chunks
 
 
-def _should_send_unavailable_notice(previous: dict[str, Any]) -> bool:
+def _should_send_unavailable_notice(
+    previous: dict[str, Any],
+) -> bool:
     last = _parse_time(previous.get("last_unavailable_notice_at"))
     if last is None:
         return True
-    return datetime.now(timezone.utc) - last >= UNAVAILABLE_NOTICE_COOLDOWN
+    return (
+        datetime.now(timezone.utc) - last
+        >= UNAVAILABLE_NOTICE_COOLDOWN
+    )
 
 
 def _write_health(
     result: dict[str, Any],
     *,
+    capture_started_at: datetime,
+    eligible_count: int,
+    timestamp_missing_count: int,
     new_count: int,
     archived_count: int,
     delivered_count: int,
@@ -159,14 +206,26 @@ def _write_health(
         "source": result.get("source"),
         "latest_post_at": result.get("latest_post_at"),
         "attempts": result.get("attempts", []),
-        "fetched_count": len(result.get("posts", []) or []),
+        "source_raw_count": result.get("raw_count"),
+        "source_returned_count": result.get("returned_count"),
+        "source_limit": result.get("source_limit"),
+        "capture_started_at": capture_started_at.isoformat(),
+        "initial_backfill_hours": int(
+            INITIAL_BACKFILL_WINDOW.total_seconds() / 3600
+        ),
+        "eligible_count": eligible_count,
+        "timestamp_missing_count": timestamp_missing_count,
         "new_count": new_count,
         "archived_count": archived_count,
         "delivered_count": delivered_count,
         "delivery_status": delivery_status,
         "checked_at": datetime.now(timezone.utc).isoformat(),
-        "capture_policy": "all_posts_replies_retruths_no_keyword_filter",
-        "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
+        "capture_policy": (
+            "all_posts_replies_retruths_after_capture_checkpoint"
+        ),
+        "keyword_policy": (
+            "tier_is_metadata_and_notification_urgency_only"
+        ),
         "last_unavailable_notice_at": last_notice_at,
     }
     write_json(HEALTH_FILE, health)
@@ -178,6 +237,7 @@ def main() -> int:
     previous = read_json(HEALTH_FILE, default={})
     if not isinstance(previous, dict):
         previous = {}
+    capture_started_at = _capture_started_at(previous)
 
     result = fetch_recent_posts_with_health()
     if result.get("status") != "healthy":
@@ -185,8 +245,9 @@ def main() -> int:
         if _should_send_unavailable_notice(previous):
             notice = (
                 "⚠️ Trump Truth Social 監控目前無可用即時來源。\n"
-                "官方 API 與備援均未通過新鮮度／可用性檢查；"
-                "系統已停止假裝正常，請查看 trump_monitor_health.json。"
+                "官方 API 與鏡像均未通過新鮮度／可用性檢查；"
+                "系統已停止假裝正常，請查看 "
+                "trump_monitor_health.json。"
             )
             if send_telegram(
                 notice,
@@ -196,6 +257,9 @@ def main() -> int:
                 notice_at = datetime.now(timezone.utc).isoformat()
         _write_health(
             result,
+            capture_started_at=capture_started_at,
+            eligible_count=0,
+            timestamp_missing_count=0,
             new_count=0,
             archived_count=0,
             delivered_count=0,
@@ -205,18 +269,29 @@ def main() -> int:
         logger.error("Trump monitor unavailable: no current source")
         return 1
 
-    posts = result.get("posts", []) or []
-    new_posts = get_unseen_posts(posts)
+    source_posts = result.get("posts", []) or []
+    eligible, timestamp_missing = _eligible_since_checkpoint(
+        source_posts,
+        capture_started_at,
+    )
+    new_posts = get_unseen_posts(eligible)
     if not new_posts:
         _write_health(
             result,
+            capture_started_at=capture_started_at,
+            eligible_count=len(eligible),
+            timestamp_missing_count=timestamp_missing,
             new_count=0,
             archived_count=0,
             delivered_count=0,
             delivery_status="no_new_posts",
-            last_notice_at=previous.get("last_unavailable_notice_at"),
+            last_notice_at=previous.get(
+                "last_unavailable_notice_at"
+            ),
         )
-        logger.info("=== run_trump_monitor done: healthy, no new posts ===")
+        logger.info(
+            "=== run_trump_monitor done: healthy, no new posts ==="
+        )
         return 0
 
     archived_count = archive_posts(new_posts)
@@ -234,9 +309,14 @@ def main() -> int:
         mark_posts_seen(chunk["posts"])
         delivered_count += len(chunk["posts"])
 
-    delivery_status = "delivered_all" if not failed else "delivery_failed_partial"
+    delivery_status = (
+        "delivered_all" if not failed else "delivery_failed_partial"
+    )
     _write_health(
         result,
+        capture_started_at=capture_started_at,
+        eligible_count=len(eligible),
+        timestamp_missing_count=timestamp_missing,
         new_count=len(new_posts),
         archived_count=archived_count,
         delivered_count=delivered_count,
@@ -245,7 +325,9 @@ def main() -> int:
     )
 
     if failed:
-        logger.error("Trump delivery failed; undelivered posts remain unseen for retry")
+        logger.error(
+            "Trump delivery failed; undelivered posts remain unseen"
+        )
         return 1
 
     logger.info(
