@@ -1,7 +1,8 @@
 """Build the thesis-first public Trading Mission Control dashboard.
 
 Legacy public payloads remain available for compatibility, but all position
-payloads are redacted before they are written to `public/dashboard/`.
+payloads are redacted before they are written to `public/dashboard/`. Trump
+health shows source and capture policy but never publishes post text.
 """
 
 from __future__ import annotations
@@ -26,6 +27,10 @@ def _e(value: Any) -> str:
         return "Yes" if value else "No"
     if isinstance(value, float):
         return f"{value:,.2f}"
+    if isinstance(value, dict):
+        return html.escape(
+            ", ".join(f"{key}={item}" for key, item in value.items())
+        ) or "—"
     if isinstance(value, (list, tuple, set)):
         return html.escape(", ".join(str(item) for item in value)) or "—"
     return html.escape(str(value))
@@ -33,17 +38,29 @@ def _e(value: Any) -> str:
 
 def _badge(value: Any) -> str:
     text = _e(value)
-    slug = str(value or "unknown").lower().replace("_", "-").replace(" ", "-")
+    slug = (
+        str(value or "unknown")
+        .lower()
+        .replace("_", "-")
+        .replace(" ", "-")
+    )
     return f'<span class="badge {html.escape(slug)}">{text}</span>'
 
 
-def _table(rows: list[dict[str, Any]], columns: list[tuple[str, str]]) -> str:
+def _table(
+    rows: list[dict[str, Any]],
+    columns: list[tuple[str, str]],
+) -> str:
     if not rows:
         return '<div class="empty">No data yet.</div>'
-    head = "".join(f"<th>{html.escape(label)}</th>" for _, label in columns)
+    head = "".join(
+        f"<th>{html.escape(label)}</th>" for _, label in columns
+    )
     body = []
     for row in rows:
-        cells = "".join(f"<td>{_e(row.get(key))}</td>" for key, _ in columns)
+        cells = "".join(
+            f"<td>{_e(row.get(key))}</td>" for key, _ in columns
+        )
         body.append(f"<tr>{cells}</tr>")
     return (
         '<div class="table-wrap"><table><thead><tr>'
@@ -58,6 +75,8 @@ def _summary_cards(data: dict[str, Any]) -> str:
     summary = data.get("summary", {})
     configured = bool(summary.get("position_configured"))
     workflow = summary.get("position_workflow_status") or "unknown"
+    trump_status = summary.get("trump_monitor_status") or "unknown"
+    trump_source = summary.get("trump_monitor_source") or "no verified source"
     cards = [
         (
             "Market regime",
@@ -73,6 +92,11 @@ def _summary_cards(data: dict[str, Any]) -> str:
             "Private positions",
             "Configured" if configured else "Not configured",
             f"{_e(summary.get('position_count'))} positions · {_e(workflow)}",
+        ),
+        (
+            "Trump capture",
+            _badge(trump_status),
+            f"source: {_e(trump_source)}",
         ),
         (
             "Tracked theses",
@@ -116,6 +140,68 @@ def _attention_section(data: dict[str, Any]) -> str:
         '<h2>Needs attention</h2>'
         '<p>Exceptions first, not a wall of normal states.</p>'
         f"</div>{content}</section>"
+    )
+
+
+def _trump_section(data: dict[str, Any]) -> str:
+    state = data.get("trump_monitor", {})
+    attempts = [
+        item for item in (state.get("attempts") or [])
+        if isinstance(item, dict)
+    ]
+    strip = (
+        '<div class="account-strip">'
+        f'<span>Status <strong>{_badge(state.get("status"))}</strong></span>'
+        f'<span>Current source <strong>{_e(state.get("source"))}</strong></span>'
+        f'<span>Latest post <strong>{_e(state.get("latest_post_at"))}</strong></span>'
+        f'<span>Last check <strong>{_e(state.get("checked_at"))}</strong></span>'
+        f'<span>Health age <strong>{_e(state.get("health_age_hours"))}h</strong></span>'
+        f'<span>Delivery <strong>{_e(state.get("delivery_status"))}</strong></span>'
+        "</div>"
+    )
+    policy = (
+        '<div class="privacy-note">'
+        '<strong>Capture contract:</strong> '
+        f'{_e(state.get("capture_policy"))}. '
+        '<strong>Keyword contract:</strong> '
+        f'{_e(state.get("keyword_policy"))}. '
+        'Tier determines urgency only; it must not suppress a post. '
+        f'Initial backfill: {_e(state.get("initial_backfill_hours"))} hours; '
+        f'capture checkpoint: {_e(state.get("capture_started_at"))}.'
+        "</div>"
+    )
+    counts = (
+        '<div class="account-strip">'
+        f'<span>Source raw <strong>{_e(state.get("source_raw_count"))}</strong></span>'
+        f'<span>Bounded window <strong>{_e(state.get("source_returned_count"))}/'
+        f'{_e(state.get("source_limit"))}</strong></span>'
+        f'<span>Eligible <strong>{_e(state.get("eligible_count"))}</strong></span>'
+        f'<span>New <strong>{_e(state.get("new_count"))}</strong></span>'
+        f'<span>Delivered <strong>{_e(state.get("delivered_count"))}</strong></span>'
+        "</div>"
+    )
+    attempts_html = _table(
+        attempts,
+        [
+            ("source", "Attempted source"),
+            ("status", "Status"),
+            ("latest_post_at", "Latest post"),
+            ("raw_count", "Raw rows"),
+            ("returned_count", "Bounded rows"),
+            ("error", "Error"),
+        ],
+    )
+    return (
+        '<section id="trump"><div class="section-head">'
+        '<h2>Trump Truth Social source health</h2>'
+        '<p>Source honesty and all-post capture policy; post text stays in the archive and Telegram.</p>'
+        "</div>"
+        + strip
+        + counts
+        + policy
+        + '<h3>Source attempts</h3>'
+        + attempts_html
+        + "</section>"
     )
 
 
@@ -296,12 +382,12 @@ def _market_context(payloads: dict[str, Any]) -> str:
 
 
 CSS = """
-:root{color-scheme:dark;--bg:#090b10;--panel:#11151d;--panel2:#171c26;--line:#293140;--text:#f5f7fb;--muted:#9aa6b6;--accent:#8ab4ff;--red:#ff6b7a;--amber:#ffc857;--green:#58d68d}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#172035 0,#090b10 38%);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{padding:42px max(24px,5vw) 24px;border-bottom:1px solid var(--line)}header h1{font-size:clamp(30px,5vw,58px);letter-spacing:-.045em;margin:0 0 8px}.kicker{color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:12px}.subtitle{color:var(--muted);max-width:900px}.meta,.muted,.attention-meta{color:var(--muted);font-size:12px}nav{position:sticky;top:0;z-index:5;display:flex;gap:8px;overflow:auto;padding:12px max(24px,5vw);background:rgba(9,11,16,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}nav a{color:var(--muted);text-decoration:none;padding:7px 11px;border-radius:999px;white-space:nowrap}nav a:hover{color:var(--text);background:var(--panel2)}main{padding:28px max(24px,5vw) 80px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px}.card,.theme-card,.attention-item,.account-strip,.privacy-note{background:linear-gradient(145deg,rgba(23,28,38,.95),rgba(15,19,27,.95));border:1px solid var(--line);border-radius:18px}.card{padding:18px}.card-label,.card-note{color:var(--muted)}.card-value{font-size:27px;font-weight:750;margin:8px 0}.card-note{font-size:12px}section{margin:24px 0 38px;scroll-margin-top:80px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:14px}.section-head h2{font-size:25px;margin:0}.section-head p{margin:0;color:var(--muted);text-align:right}.attention-list{display:grid;gap:10px}.attention-item{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:16px}.attention-title{font-weight:750;font-size:16px}.attention-detail{margin-top:3px}.badge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:12px;background:#202735}.badge.p0,.badge.failed,.badge.broken{color:var(--red)}.badge.p1,.badge.degraded{color:var(--amber)}.badge.active,.badge.healthy,.badge.risk-on{color:var(--green)}.theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.theme-card{padding:20px}.theme-title{display:flex;justify-content:space-between;align-items:center;gap:12px}.theme-title h3{margin:0}.subtheme{border-top:1px solid var(--line);padding:12px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:rgba(17,21,29,.92)}table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#171c26;color:#cbd5e1;font-size:12px;text-transform:uppercase}td{max-width:380px}.empty,.ok-state{padding:22px;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}.ok-state{color:var(--green)}.account-strip{display:flex;flex-wrap:wrap;gap:18px;padding:14px 16px}.account-strip span{color:var(--muted)}.account-strip strong{color:var(--text);margin-left:5px}.privacy-note{padding:16px;margin-top:10px;color:var(--muted)}@media(max-width:760px){.section-head{align-items:start;flex-direction:column}.section-head p{text-align:left}.cards{grid-template-columns:1fr}.card-value{font-size:22px}}
+:root{color-scheme:dark;--bg:#090b10;--panel:#11151d;--panel2:#171c26;--line:#293140;--text:#f5f7fb;--muted:#9aa6b6;--accent:#8ab4ff;--red:#ff6b7a;--amber:#ffc857;--green:#58d68d}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#172035 0,#090b10 38%);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{padding:42px max(24px,5vw) 24px;border-bottom:1px solid var(--line)}header h1{font-size:clamp(30px,5vw,58px);letter-spacing:-.045em;margin:0 0 8px}.kicker{color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:12px}.subtitle{color:var(--muted);max-width:900px}.meta,.muted,.attention-meta{color:var(--muted);font-size:12px}nav{position:sticky;top:0;z-index:5;display:flex;gap:8px;overflow:auto;padding:12px max(24px,5vw);background:rgba(9,11,16,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}nav a{color:var(--muted);text-decoration:none;padding:7px 11px;border-radius:999px;white-space:nowrap}nav a:hover{color:var(--text);background:var(--panel2)}main{padding:28px max(24px,5vw) 80px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px}.card,.theme-card,.attention-item,.account-strip,.privacy-note{background:linear-gradient(145deg,rgba(23,28,38,.95),rgba(15,19,27,.95));border:1px solid var(--line);border-radius:18px}.card{padding:18px}.card-label,.card-note{color:var(--muted)}.card-value{font-size:27px;font-weight:750;margin:8px 0}.card-note{font-size:12px}section{margin:24px 0 38px;scroll-margin-top:80px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:14px}.section-head h2{font-size:25px;margin:0}.section-head p{margin:0;color:var(--muted);text-align:right}.attention-list{display:grid;gap:10px}.attention-item{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:16px}.attention-title{font-weight:750;font-size:16px}.attention-detail{margin-top:3px}.badge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:12px;background:#202735}.badge.p0,.badge.failed,.badge.broken,.badge.unavailable{color:var(--red)}.badge.p1,.badge.degraded,.badge.stale{color:var(--amber)}.badge.active,.badge.healthy,.badge.risk-on{color:var(--green)}.theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.theme-card{padding:20px}.theme-title{display:flex;justify-content:space-between;align-items:center;gap:12px}.theme-title h3{margin:0}.subtheme{border-top:1px solid var(--line);padding:12px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:rgba(17,21,29,.92)}table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#171c26;color:#cbd5e1;font-size:12px;text-transform:uppercase}td{max-width:380px}.empty,.ok-state{padding:22px;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}.ok-state{color:var(--green)}.account-strip{display:flex;flex-wrap:wrap;gap:18px;padding:14px 16px;margin-bottom:10px}.account-strip span{color:var(--muted)}.account-strip strong{color:var(--text);margin-left:5px}.privacy-note{padding:16px;margin-top:10px;color:var(--muted)}@media(max-width:760px){.section-head{align-items:start;flex-direction:column}.section-head p{text-align:left}.cards{grid-template-columns:1fr}.card-value{font-size:22px}}
 """
 
 
 def _redacted_leaps_payload(original: dict[str, Any]) -> dict[str, Any]:
-    """Preserve the legacy endpoint without ever publishing contract details."""
+    """Preserve the legacy endpoint without publishing contract details."""
     return {
         "schema_version": original.get("schema_version", 1),
         "generated_at": original.get("generated_at"),
@@ -309,7 +395,9 @@ def _redacted_leaps_payload(original: dict[str, Any]) -> dict[str, Any]:
         "data": {
             "positions": [],
             "status": "redacted_private_positions",
-            "privacy": "exact LEAPS exposure is delivered only by private Telegram",
+            "privacy": (
+                "exact LEAPS exposure is delivered only by private Telegram"
+            ),
         },
     }
 
@@ -321,6 +409,7 @@ def render_html(payloads: dict[str, Any]) -> str:
         [
             _summary_cards(data),
             _attention_section(data),
+            _trump_section(data),
             _theme_section(data),
             _allocation_section(data),
             _positions_section(data),
@@ -332,9 +421,9 @@ def render_html(payloads: dict[str, Any]) -> str:
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kevin Trading Mission Control</title><style>{CSS}</style></head><body>
 <header><div class="kicker">Personal capital allocation / thesis monitor</div><h1>Kevin Trading Mission Control</h1>
-<div class="subtitle">Exceptions, theses and opportunity context first. Telegram carries urgent alerts and private portfolio risk; this page keeps public-safe review state.</div>
+<div class="subtitle">Exceptions, source honesty, theses and opportunity context first. Telegram carries urgent alerts, every new Trump post and private portfolio risk.</div>
 <div class="meta">generated_at {_e(mission.get('generated_at'))} · repo is the source of truth · decision support only · no automated trading</div></header>
-<nav><a href="#attention">Attention</a><a href="#themes">Themes</a><a href="#allocation">Allocation</a><a href="#positions">Portfolio health</a><a href="#theses">Theses</a><a href="#context">Market context</a></nav>
+<nav><a href="#attention">Attention</a><a href="#trump">Trump source</a><a href="#themes">Themes</a><a href="#allocation">Allocation</a><a href="#positions">Portfolio health</a><a href="#theses">Theses</a><a href="#context">Market context</a></nav>
 <main>{sections}<p class="meta">{_e(data.get('disclaimer'))}</p></main></body></html>"""
 
 
