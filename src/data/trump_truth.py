@@ -1,17 +1,12 @@
 """Donald Trump Truth Social ingestion with explicit source health.
 
-The old implementation treated a non-empty CNN archive as a live feed. In July
-2026 that archive returned January 2023 posts, so the official Truth Social API
-was never attempted. This module now:
+The official public API is attempted first. A broad CNN archive may be used as
+a current mirror only when its newest timestamp is demonstrably fresh. Because
+the mirror contains years of history, only its newest bounded activity set is
+returned to the monitor; the runner separately establishes a capture-start
+checkpoint so first activation cannot flood Telegram with historical posts.
 
-1. Tries the official public Truth Social account/status endpoints first.
-2. Validates recency before calling any source healthy.
-3. Treats the CNN JSON as a historical archive unless it is demonstrably fresh.
-4. Normalizes original posts, replies and re-truths without keyword filtering.
-5. Exposes explicit `healthy` / `stale` / `unavailable` health metadata.
-
-If no current source works, callers must report that condition. Returning an
-empty list is not allowed to masquerade as successful monitoring.
+Classification is metadata only. No keyword filter removes a post.
 """
 
 from __future__ import annotations
@@ -22,7 +17,12 @@ from typing import Any
 import httpx
 from dateutil.parser import isoparse
 from loguru import logger
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from src.config.keywords import classify_post, get_matched_keywords
 from src.config.rss_sources import TRUMP_TRUTH_SOURCES
@@ -32,6 +32,7 @@ SEEN_POSTS_FILE = "trump_seen_posts.json"
 ARCHIVE_FILE = "trump_posts_archive.json"
 MAX_SEEN = 10000
 MAX_ARCHIVE = 5000
+SOURCE_POST_LIMIT = 1000
 LIVE_MAX_AGE = timedelta(days=7)
 MIRROR_MAX_AGE = timedelta(hours=48)
 HTTP_TIMEOUT = 20.0
@@ -42,7 +43,9 @@ class TrumpSourceError(RuntimeError):
 
 
 @retry(
-    retry=retry_if_exception_type((httpx.HTTPError, ValueError, TrumpSourceError)),
+    retry=retry_if_exception_type(
+        (httpx.HTTPError, ValueError, TrumpSourceError)
+    ),
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=6),
     reraise=True,
@@ -66,15 +69,21 @@ def fetch_truth_account_id() -> str:
     configured = str(TRUMP_TRUTH_SOURCES["configured_account_id"])
     try:
         payload = _get_json(TRUMP_TRUTH_SOURCES["truth_account_lookup"])
-        account_id = str(payload.get("id") or "") if isinstance(payload, dict) else ""
+        account_id = (
+            str(payload.get("id") or "")
+            if isinstance(payload, dict)
+            else ""
+        )
         return account_id or configured
     except Exception as exc:
-        logger.warning(f"Truth account lookup failed; using configured ID: {exc}")
+        logger.warning(
+            f"Truth account lookup failed; using configured ID: {exc}"
+        )
         return configured
 
 
 def fetch_from_truth_api() -> list[dict[str, Any]]:
-    """Fetch current activity from the official public account statuses API."""
+    """Fetch current activity from the official public statuses API."""
     account_id = fetch_truth_account_id()
     url = TRUMP_TRUTH_SOURCES["truth_statuses_template"].format(
         account_id=account_id
@@ -93,7 +102,7 @@ def fetch_from_truth_api() -> list[dict[str, Any]]:
 
 
 def fetch_from_cnn_mirror() -> list[dict[str, Any]]:
-    """Fetch the CNN archive for health comparison; it is not assumed live."""
+    """Fetch the broad CNN archive; freshness is validated separately."""
     payload = _get_json(TRUMP_TRUTH_SOURCES["cnn_historical_archive"])
     if isinstance(payload, list):
         return [item for item in payload if isinstance(item, dict)]
@@ -121,7 +130,9 @@ def extract_text(post: dict[str, Any]) -> str:
     if isinstance(reblog, dict):
         nested = extract_text(reblog)
         outer = _strip_html(post.get("content"))
-        return "\n".join(part for part in (outer, nested) if part).strip()
+        return "\n".join(
+            part for part in (outer, nested) if part
+        ).strip()
 
     for key in ("content", "text", "body", "message"):
         value = post.get(key)
@@ -131,7 +142,11 @@ def extract_text(post: dict[str, Any]) -> str:
 
 
 def _created_at(post: dict[str, Any]) -> str:
-    value = post.get("created_at") or post.get("timestamp") or post.get("date")
+    value = (
+        post.get("created_at")
+        or post.get("timestamp")
+        or post.get("date")
+    )
     return str(value or "")
 
 
@@ -147,11 +162,38 @@ def _parse_timestamp(value: Any) -> datetime | None:
         return None
 
 
-def normalize_post(post: dict[str, Any], source: str) -> dict[str, Any]:
+def _select_latest_raw_posts(
+    raw_posts: list[dict[str, Any]],
+    limit: int = SOURCE_POST_LIMIT,
+) -> list[dict[str, Any]]:
+    """Select latest timestamped activities from a potentially huge archive."""
+    ranked: list[tuple[datetime, dict[str, Any]]] = []
+    for item in raw_posts:
+        if not isinstance(item, dict):
+            continue
+        timestamp = _parse_timestamp(_created_at(item))
+        if timestamp is not None:
+            ranked.append((timestamp, item))
+    ranked.sort(key=lambda pair: pair[0], reverse=True)
+    return [item for _, item in ranked[:limit]]
+
+
+def normalize_post(
+    post: dict[str, Any], source: str
+) -> dict[str, Any]:
     """Normalize one Truth activity without deciding whether it matters."""
-    reblog = post.get("reblog") if isinstance(post.get("reblog"), dict) else None
+    reblog = (
+        post.get("reblog")
+        if isinstance(post.get("reblog"), dict)
+        else None
+    )
     payload = reblog or post
-    post_id = str(post.get("id") or post.get("post_id") or payload.get("id") or "")
+    post_id = str(
+        post.get("id")
+        or post.get("post_id")
+        or payload.get("id")
+        or ""
+    )
     text = extract_text(post)
     created_at = _created_at(post) or _created_at(payload)
     url = str(
@@ -163,10 +205,18 @@ def normalize_post(post: dict[str, Any], source: str) -> dict[str, Any]:
             else TRUMP_TRUTH_SOURCES["truth_profile"]
         )
     )
-    account = payload.get("account") if isinstance(payload.get("account"), dict) else {}
+    account = (
+        payload.get("account")
+        if isinstance(payload.get("account"), dict)
+        else {}
+    )
     media = payload.get("media_attachments")
     media_count = len(media) if isinstance(media, list) else 0
-    activity_type = "retruth" if reblog else ("reply" if post.get("in_reply_to_id") else "post")
+    activity_type = (
+        "retruth"
+        if reblog
+        else ("reply" if post.get("in_reply_to_id") else "post")
+    )
 
     return {
         "id": post_id,
@@ -175,7 +225,9 @@ def normalize_post(post: dict[str, Any], source: str) -> dict[str, Any]:
         "text": text,
         "activity_type": activity_type,
         "source": source,
-        "original_account": account.get("acct") or account.get("username"),
+        "original_account": (
+            account.get("acct") or account.get("username")
+        ),
         "media_count": media_count,
         "tier": classify_post(text),
         "matched_keywords": get_matched_keywords(text),
@@ -183,10 +235,11 @@ def normalize_post(post: dict[str, Any], source: str) -> dict[str, Any]:
     }
 
 
-def _latest_post_at(posts: list[dict[str, Any]]) -> datetime | None:
+def _latest_post_at(
+    posts: list[dict[str, Any]],
+) -> datetime | None:
     values = [
-        _parse_timestamp(post.get("created_at"))
-        for post in posts
+        _parse_timestamp(post.get("created_at")) for post in posts
     ]
     valid = [value for value in values if value is not None]
     return max(valid) if valid else None
@@ -198,45 +251,72 @@ def _source_result(
     raw_posts: list[dict[str, Any]],
     max_age: timedelta,
 ) -> dict[str, Any]:
+    raw_count = len(raw_posts)
+    selected = _select_latest_raw_posts(raw_posts)
     normalized = [
         normalize_post(item, source)
-        for item in raw_posts
+        for item in selected
         if isinstance(item, dict)
     ]
-    normalized = [item for item in normalized if item["id"] and item["text"]]
+    normalized = [
+        item
+        for item in normalized
+        if item["id"]
+        and item["text"]
+        and _parse_timestamp(item.get("created_at")) is not None
+    ]
+    normalized.sort(
+        key=lambda item: _parse_timestamp(item.get("created_at"))
+        or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
     latest = _latest_post_at(normalized)
     now = datetime.now(timezone.utc)
 
+    common = {
+        "source": source,
+        "raw_count": raw_count,
+        "returned_count": len(normalized),
+        "source_limit": SOURCE_POST_LIMIT,
+    }
     if not normalized:
         return {
+            **common,
             "status": "unavailable",
-            "source": source,
             "posts": [],
             "latest_post_at": None,
-            "error": "source_returned_no_usable_posts",
+            "error": "source_returned_no_usable_timestamped_posts",
         }
     if latest is None:
         return {
+            **common,
             "status": "stale",
-            "source": source,
             "posts": [],
             "latest_post_at": None,
             "error": "source_posts_missing_timestamps",
         }
     if now - latest > max_age:
         return {
+            **common,
             "status": "stale",
-            "source": source,
             "posts": [],
             "latest_post_at": latest.isoformat(),
             "error": "latest_post_too_old_for_live_monitor",
         }
     return {
+        **common,
         "status": "healthy",
-        "source": source,
         "posts": normalized,
         "latest_post_at": latest.isoformat(),
         "error": None,
+    }
+
+
+def _attempt_summary(result: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in result.items()
+        if key != "posts"
     }
 
 
@@ -256,9 +336,12 @@ def fetch_recent_posts_with_health() -> dict[str, Any]:
             "source": "truth_social_official_api",
             "posts": [],
             "latest_post_at": None,
+            "raw_count": 0,
+            "returned_count": 0,
+            "source_limit": SOURCE_POST_LIMIT,
             "error": type(exc).__name__,
         }
-    attempts.append({key: value for key, value in official.items() if key != "posts"})
+    attempts.append(_attempt_summary(official))
     if official["status"] == "healthy":
         return {**official, "attempts": attempts}
 
@@ -274,9 +357,12 @@ def fetch_recent_posts_with_health() -> dict[str, Any]:
             "source": "cnn_historical_archive",
             "posts": [],
             "latest_post_at": None,
+            "raw_count": 0,
+            "returned_count": 0,
+            "source_limit": SOURCE_POST_LIMIT,
             "error": type(exc).__name__,
         }
-    attempts.append({key: value for key, value in mirror.items() if key != "posts"})
+    attempts.append(_attempt_summary(mirror))
     if mirror["status"] == "healthy":
         return {**mirror, "attempts": attempts, "fallback": True}
 
@@ -285,13 +371,16 @@ def fetch_recent_posts_with_health() -> dict[str, Any]:
         "source": None,
         "posts": [],
         "latest_post_at": None,
+        "raw_count": 0,
+        "returned_count": 0,
+        "source_limit": SOURCE_POST_LIMIT,
         "error": "no_current_trump_source_available",
         "attempts": attempts,
     }
 
 
 def fetch_recent_posts() -> list[dict[str, Any]]:
-    """Compatibility wrapper; use fetch_recent_posts_with_health in runners."""
+    """Compatibility wrapper; use health-aware fetch in runners."""
     return fetch_recent_posts_with_health().get("posts", [])
 
 
@@ -302,9 +391,15 @@ def load_seen_ids() -> set[str]:
     return {str(key) for key in seen}
 
 
-def get_unseen_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def get_unseen_posts(
+    posts: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     seen = load_seen_ids()
-    return [post for post in posts if str(post.get("id") or "") not in seen]
+    return [
+        post
+        for post in posts
+        if str(post.get("id") or "") not in seen
+    ]
 
 
 def mark_posts_seen(posts: list[dict[str, Any]]) -> None:
@@ -330,7 +425,9 @@ def mark_posts_seen(posts: list[dict[str, Any]]) -> None:
     write_json(SEEN_POSTS_FILE, seen)
 
 
-def filter_new_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def filter_new_posts(
+    posts: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     """Legacy helper: return unseen posts and mark them immediately."""
     new_posts = get_unseen_posts(posts)
     mark_posts_seen(new_posts)
@@ -338,7 +435,7 @@ def filter_new_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def archive_posts(posts: list[dict[str, Any]]) -> int:
-    """Store every captured post in a rolling public archive, deduplicated by ID."""
+    """Store every captured post in a rolling archive, deduplicated by ID."""
     archive = read_json(ARCHIVE_FILE, default={})
     if not isinstance(archive, dict):
         archive = {}
@@ -350,14 +447,20 @@ def archive_posts(posts: list[dict[str, Any]]) -> int:
     if len(archive) > MAX_ARCHIVE:
         ordered = sorted(
             archive.items(),
-            key=lambda item: str(item[1].get("created_at") or item[1].get("captured_at") or ""),
+            key=lambda item: str(
+                item[1].get("created_at")
+                or item[1].get("captured_at")
+                or ""
+            ),
         )
         archive = dict(ordered[-MAX_ARCHIVE:])
     write_json(ARCHIVE_FILE, archive)
     return len(archive) - before
 
 
-def classify_and_enrich(post: dict[str, Any]) -> dict[str, Any]:
+def classify_and_enrich(
+    post: dict[str, Any],
+) -> dict[str, Any]:
     """Compatibility helper that never drops Tier 3 posts."""
     if "tier" in post and "text" in post:
         return post
