@@ -74,7 +74,7 @@ Fields that require paid data remain explicit `null` until a provider is approve
 
 `src/storage/mission_control_store.py` joins regime state, existing watchlist scores, IVR/IVP state, thesis tracking, capital-allocation context and redacted position-workflow health.
 
-`src/dashboard/build_mission_control.py` replaces the dashboard entrypoint while preserving existing JSON contracts. The page leads with:
+`src/dashboard/build_mission_control.py` replaces the dashboard entrypoint while preserving public JSON compatibility. The page leads with:
 
 1. summary cards
 2. needs-attention queue
@@ -83,6 +83,20 @@ Fields that require paid data remain explicit `null` until a provider is approve
 5. portfolio workflow health
 6. thesis tracker
 7. compact options/event context
+
+The legacy `leaps_exposure.json` endpoint remains present but is forcibly redacted. A local private positions file cannot accidentally publish contracts, strikes, expiries, costs or PnL into `public/dashboard/`.
+
+### Public URL deployment path
+
+`dashboard_build.yml` now supports GitHub Pages deployment in addition to the existing review artifact and committed output.
+
+Deployment is intentionally gated by the repository variable:
+
+```text
+ENABLE_GITHUB_PAGES=true
+```
+
+The owner must also set **Settings → Pages → Build and deployment → Source = GitHub Actions** once. After that, the scheduled Dashboard Build workflow publishes the public-safe `public/dashboard/` directory and exposes the deployment URL on the `github-pages` environment.
 
 ### Structured thesis context
 
@@ -117,7 +131,7 @@ Every configured EOD position check now sends a silent, private Telegram summary
 - option DTE and delta
 - market-data gaps
 
-This detailed payload exists only in memory and Telegram. It is not written to Git, dashboard JSON or Actions artifacts.
+This detailed payload exists only in memory and Telegram. It is not written to Git, dashboard JSON, Actions logs or Actions artifacts.
 
 ### Public-state and log privacy boundary
 
@@ -127,8 +141,9 @@ The position workflow therefore persists only:
 
 - configured / empty status
 - input source type
-- aggregate position count
-- long/short option counts
+- aggregate position and option counts
+- aggregate valuation-completeness status
+- workflow status and generic error codes
 - timestamp
 - privacy marker
 
@@ -138,23 +153,31 @@ Additional controls:
 - Account peak/current values are Fernet-encrypted using `POSITION_STATE_KEY`.
 - Public drawdown state exposes percentage, alert level, action and timestamp, but not account amounts.
 - Sensitive Telegram sends replace the message preview in CI logs with `<sensitive message redacted>`.
-- Position workflow suppresses symbol-bearing management/data-library logs.
+- The position workflow suppresses all raw runtime output because third-party market-data libraries may print tickers outside application logging controls.
+- If the runner crashes before writing health state, the workflow replaces stale state with a generic `runner_process_failed` record.
 
-### Position-monitor correctness fixes
+### Position-monitor correctness and reliability fixes
 
 1. `run_position_check.py` previously read `snapshot["total_value"]`, while the snapshot returns `total_estimated_value`; drawdown updates therefore never ran.
 2. `leaps_pnl_tracker.py` compared Black–Scholes premium per share with `cost_per_contract` (premium ×100), producing approximately -99% false losses. Both sides now use per-contract USD.
 3. Position alerts defaulted to `yellow`, which maps to P2; the router intentionally does not send P2/P3. LEAPS PnL, short-delta and hedge-DTE alerts now map to routable P1, while major drawdowns retain P0 logic.
-4. The stale v4 test expected a stock short-premium threshold of IVR 30. The actual v4.1 rule is stock 70 / ETF 30; the test now matches the implemented strategy rule.
+4. The runner previously swallowed failures and exited successfully. It now returns non-zero for degraded private monitoring and publishes only safe error codes.
+5. Account drawdown previously accepted partial valuation when one or more holdings lacked price or IV data. Account valuation now fails closed; cross-day drawdown is skipped unless every real position is valued.
+6. Mission Control surfaces stale, degraded or failed position workflow health instead of continuing to show a neutral-looking dashboard.
+7. The stale v4 test expected a stock short-premium threshold of IVR 30. The actual v4.1 rule is stock 70 / ETF 30; the test now matches the implemented strategy rule.
 
 ## Activation requirement
 
-The code path is complete, but production position monitoring remains intentionally unconfigured until the repository owner creates:
+The implementation is complete, but production private monitoring and the stable public URL remain intentionally unconfigured until the repository owner performs these one-time settings directly in GitHub:
 
-- `POSITIONS_JSON`
-- `POSITION_STATE_KEY`
+1. Create Actions secret `POSITIONS_JSON`.
+2. Create Actions secret `POSITION_STATE_KEY`.
+3. Create Actions variable `ENABLE_GITHUB_PAGES=true`.
+4. Set Pages source to **GitHub Actions**.
+5. Manually run **Position Management Check** once.
+6. Manually run **Dashboard Build** once.
 
-No agent should receive or paste their actual values. The owner sets them directly in GitHub repository Actions secrets and manually runs **Position Management Check** once to validate the redacted state and private Telegram brief.
+No agent should receive or paste the actual secret values. The first position run must produce a redacted healthy snapshot and a private Telegram brief; the first dashboard run must expose its Pages deployment URL.
 
 ## Remaining work
 
