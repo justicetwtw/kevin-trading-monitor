@@ -247,14 +247,21 @@ def test_review_pass_mode_requires_reviewer_to_exist():
     assert any("independent_reviewer is required" in error for error in errors)
 
 
-def _verdict_comment(head=HEAD, verdict="pass", *, association="OWNER", user_type="User"):
+def _verdict_comment(
+    head=HEAD,
+    verdict="pass",
+    *,
+    association="COLLABORATOR",
+    user_type="User",
+    login="independent-reviewer",
+):
     return {
         "body": (
             "## Independent review verdict\n\n"
             f"<!-- agent-review-verdict:v1 head={head} verdict={verdict} -->"
         ),
         "author_association": association,
-        "user": {"login": "kevin", "type": user_type},
+        "user": {"login": login, "type": user_type},
     }
 
 
@@ -314,6 +321,35 @@ def test_review_pass_requires_distinct_head_bound_verdict_comment():
     )
 
     # A distinct trusted PASS verdict bound to the exact HEAD satisfies it.
+    found, _ = find_valid_trusted_report(
+        [report_comment, _verdict_comment()], HEAD, require_reviewer_pass=True
+    )
+    assert found is not None
+
+
+def test_review_pass_verdict_must_come_from_a_different_actor():
+    """E1: one trusted account cannot post both the report and the verdict."""
+    passed_report = _report()
+    passed_report["independent_reviewer"]["status"] = "pass"
+    report_comment = _comment(passed_report)  # author login: kevin
+
+    # A verdict posted by the SAME login as the report author is not proof.
+    same_author_verdict = _verdict_comment(association="OWNER", login="kevin")
+    found, diagnostics = find_valid_trusted_report(
+        [report_comment, same_author_verdict], HEAD, require_reviewer_pass=True
+    )
+    assert found is None
+    assert any("other" in item and "kevin" in item for item in diagnostics)
+
+    # Case-insensitive login comparison cannot be bypassed.
+    found, _ = find_valid_trusted_report(
+        [report_comment, _verdict_comment(association="OWNER", login="KEVIN")],
+        HEAD,
+        require_reviewer_pass=True,
+    )
+    assert found is None
+
+    # A distinct trusted actor's verdict satisfies the gate.
     found, _ = find_valid_trusted_report(
         [report_comment, _verdict_comment()], HEAD, require_reviewer_pass=True
     )

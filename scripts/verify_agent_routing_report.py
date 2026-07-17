@@ -311,12 +311,24 @@ def find_review_pass_verdict(
     expected_head: str,
     *,
     exclude_index: int | None = None,
+    exclude_login: str | None = None,
 ) -> bool:
-    """Return whether a distinct trusted comment carries a HEAD-bound PASS."""
+    """Return whether a distinct trusted comment carries a HEAD-bound PASS.
+
+    The verdict must come from a different GitHub actor than the routing
+    report: with author comparison, one trusted account cannot satisfy the
+    independent-review gate by posting both artifacts itself. In a repo with
+    a single trusted human this command therefore fails closed and the label
+    must be applied manually by Kevin after reading the reviewer verdict.
+    """
+    excluded_login = (exclude_login or "").lower()
     for index, comment in enumerate(comments):
         if index == exclude_index or not isinstance(comment, dict):
             continue
         if not _is_trusted_comment(comment):
+            continue
+        login = str((comment.get("user") or {}).get("login") or "").lower()
+        if excluded_login and login == excluded_login:
             continue
         marker = VERDICT_MARKER_PATTERN.search(str(comment.get("body") or ""))
         if marker is None:
@@ -355,13 +367,18 @@ def find_valid_trusted_report(
         )
         if not errors:
             if require_reviewer_pass and not find_review_pass_verdict(
-                comments, expected_head, exclude_index=index
+                comments,
+                expected_head,
+                exclude_index=index,
+                exclude_login=login,
             ):
                 # The report's own reviewer field is self-attested; the PASS
-                # must also exist as a separate HEAD-bound verdict comment.
+                # must also exist as a separate HEAD-bound verdict comment
+                # from a different GitHub actor than the report author.
                 diagnostics.append(
-                    "no distinct trusted agent-review-verdict:v1 PASS comment "
-                    f"bound to current HEAD {expected_head}"
+                    "no trusted agent-review-verdict:v1 PASS comment bound "
+                    f"to current HEAD {expected_head} from an actor other "
+                    f"than the routing-report author {login}"
                 )
                 return None, diagnostics
             extracted = extract_report(body)
