@@ -101,7 +101,7 @@ Derived values：
 - 距 52-week high；
 - 20-day annualized realized volatility。
 
-來源目前是 yfinance 延遲公開資料，**只供 timing／risk context，不是 official tape、valuation 或 price target**。任一候選 unavailable 會先 commit 安全 state，再使 workflow 失敗；序列完整但最後一根 bar 超過 5 個日曆天視為 `stale_price_history`（unavailable），不得標 healthy。候選清單為空時寫入 `no_candidates` state 並以非零狀態結束，不得偽裝成 healthy。Mission Control 必須顯示 degraded（含 wall-clock stale 檢查），而不是空表。`partial` 可保留研究脈絡，但最多只到 `screen_grade`。
+來源目前是 yfinance 延遲公開資料，**只供 timing／risk context，不是 official tape、valuation 或 price target**。任一候選 unavailable 會先 commit 安全 state，再使 workflow 失敗；序列完整但最後一根 bar 超過 5 個日曆天視為 `stale_price_history`（unavailable），不得標 healthy。候選清單為空時寫入 `no_candidates` state 並以非零狀態結束，不得偽裝成 healthy。Mission Control 必須顯示 degraded（含 wall-clock stale 檢查），而不是空表。`partial`（任一指標因歷史深度不足缺失）同樣先 commit state 再以非零結束 —— AGENTS.md 禁止把 partial 偽裝成成功；state 內容保留供研究脈絡，但 readiness 最多只到 `screen_grade`。注意操作面 trade-off：上市未滿 6 個月的候選會持續 partial 而使排程紅燈，這是刻意的 fail-closed 提醒（screen 覆蓋結構性不足），若 Kevin 認為過度可另行放寬並記錄決定。
 
 ## 5. Screen score 的限制
 

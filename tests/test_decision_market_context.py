@@ -85,3 +85,25 @@ def test_main_writes_safe_state_then_returns_nonzero_on_missing_symbol(monkeypat
     state = writes[runner.OUTPUT_FILE]
     assert state["status"] == "degraded"
     assert state["safe_error_symbols"] == ["NVDA"]
+
+
+def test_partial_metrics_write_state_then_fail_workflow(monkeypatch):
+    """G1: partial coverage must not be disguised as a green workflow."""
+    monkeypatch.setattr(
+        runner,
+        "read_json",
+        lambda *args, **kwargs: {"candidates": [{"symbol": "MU"}]},
+    )
+    # 50 bars: too short for return_3m/6m -> partial row, complete otherwise.
+    short = _frame(rows=50, end=pd.Timestamp.now(tz="America/New_York").normalize())
+    monkeypatch.setattr(runner, "fetch_history", lambda symbol, **kwargs: short)
+    writes = {}
+    monkeypatch.setattr(
+        runner,
+        "write_json",
+        lambda filename, value: writes.setdefault(filename, value) is value,
+    )
+    assert runner.main() == 1
+    state = writes[runner.OUTPUT_FILE]
+    assert state["status"] == "partial"
+    assert state["rows"][0]["status"] == "partial"

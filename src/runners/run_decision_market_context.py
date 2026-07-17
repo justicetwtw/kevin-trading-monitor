@@ -170,7 +170,10 @@ def main() -> int:
         f"decision market context: {len(rows)} symbols, "
         f"unavailable={len(unavailable)}, partial={len(partial)}, status={status}"
     )
-    return 1 if (unavailable or not symbols) else 0
+    # AGENTS.md forbids disguising unavailable/empty/partial as success: the
+    # safe state is committed above, then any non-healthy status fails the
+    # workflow so degraded coverage is operationally visible, not just noted.
+    return 0 if status == "healthy" else 1
 
 
 if __name__ == "__main__":
