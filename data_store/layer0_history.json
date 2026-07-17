@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-07-17T17:40:26.990618+00:00",
+  "scan_time": "2026-07-17T18:42:14.977350+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,19 +16,19 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 17.829999923706055,
-          "regime": "risk_on"
+          "value": 18.68000030517578,
+          "regime": "neutral"
         },
         "copper_gold": {
-          "value": 0.10315821647217685,
+          "value": 0.10306671494896673,
           "regime": "neutral"
         }
       },
-      "risk_on_count": 3,
+      "risk_on_count": 2,
       "risk_off_count": 1,
-      "modifier": 10,
-      "regime": "risk_on",
-      "fetched_at": "2026-07-17T17:40:29.361013+00:00"
+      "modifier": 5,
+      "regime": "neutral",
+      "fetched_at": "2026-07-17T18:42:16.798540+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-07-17T13:40:29.372973-04:00"
+        "fetched_at": "2026-07-17T14:42:16.798833-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-07-17T17:40:31.076967+00:00"
+      "fetched_at": "2026-07-17T18:42:17.468768+00:00"
     },
     "distribution": {
       "spy": {
@@ -92,12 +92,12 @@
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-07-17T17:40:31.427172+00:00"
+        "fetched_at": "2026-07-17T18:42:17.653274+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
         "lookback": 25,
-        "count": 7,
+        "count": 8,
         "days": [
           {
             "date": "2026-06-17",
@@ -140,10 +140,16 @@
             "drop_pct": -0.016440476988213396,
             "volume": 39081100,
             "prev_volume": 32627600
+          },
+          {
+            "date": "2026-07-17",
+            "drop_pct": -0.013173906792086992,
+            "volume": 41453007,
+            "prev_volume": 39081100
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-07-17T17:40:31.727544+00:00"
+        "fetched_at": "2026-07-17T18:42:17.801192+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -151,7 +157,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-07-17T17:40:31.727812+00:00"
+      "fetched_at": "2026-07-17T18:42:17.801544+00:00"
     },
     "bubble": {
       "score": 0,
@@ -167,9 +173,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-07-17T13:40:32.109317-04:00"
+        "fetched_at": "2026-07-17T14:42:18.678496-04:00"
       },
-      "fetched_at": "2026-07-17T17:40:32.109362+00:00"
+      "fetched_at": "2026-07-17T18:42:18.678535+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -179,13 +185,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-07-17T17:40:32.829499+00:00"
+      "fetched_at": "2026-07-17T18:42:19.201999+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 17.829999923706055,
-        "vix9d": 15.670000076293945,
-        "vix3m": 20.09000015258789,
+        "vix": 18.68000030517578,
+        "vix9d": 16.899999618530273,
+        "vix3m": 20.489999771118164,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -195,19 +201,19 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-07-17T17:40:33.037133+00:00"
+      "fetched_at": "2026-07-17T18:42:19.243840+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-07-17T17:40:37.250437+00:00"
+      "fetched_at": "2026-07-17T18:42:23.403910+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": 2,
-    "sell_put": -5,
-    "leaps_entry": -10,
+    "sell_call": 3,
+    "sell_put": -10,
+    "leaps_entry": -15,
     "leaps_entry_veto": false
   }
 }
