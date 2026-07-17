@@ -1,14 +1,84 @@
 {
   "schema_version": 1,
-  "generated_at": null,
-  "status": "not_run",
-  "rows": [],
-  "unavailable_count": null,
-  "partial_count": null,
+  "generated_at": "2026-07-17T23:11:51.736860+00:00",
+  "status": "healthy",
+  "rows": [
+    {
+      "symbol": "LITE",
+      "status": "healthy",
+      "current_price": 732.820007,
+      "as_of": "2026-07-17T00:00:00-04:00",
+      "source": "yfinance_delayed_public_market_data",
+      "sample_count": 251,
+      "return_1m": -0.162836,
+      "return_3m": -0.177734,
+      "return_6m": 1.209819,
+      "pct_from_52w_high": -0.325013,
+      "realized_vol_20d": 0.870668,
+      "missing_metrics": [],
+      "limitations": [
+        "delayed/unofficial market data",
+        "timing and risk context only; not valuation or a price target"
+      ]
+    },
+    {
+      "symbol": "MU",
+      "status": "healthy",
+      "current_price": 848.950012,
+      "as_of": "2026-07-17T00:00:00-04:00",
+      "source": "yfinance_delayed_public_market_data",
+      "sample_count": 251,
+      "return_1m": -0.168316,
+      "return_3m": 0.856724,
+      "return_6m": 1.546723,
+      "pct_from_52w_high": -0.323546,
+      "realized_vol_20d": 1.095751,
+      "missing_metrics": [],
+      "limitations": [
+        "delayed/unofficial market data",
+        "timing and risk context only; not valuation or a price target"
+      ]
+    },
+    {
+      "symbol": "NVDA",
+      "status": "healthy",
+      "current_price": 202.809998,
+      "as_of": "2026-07-17T00:00:00-04:00",
+      "source": "yfinance_delayed_public_market_data",
+      "sample_count": 251,
+      "return_1m": -0.022178,
+      "return_3m": 0.022485,
+      "return_6m": 0.107404,
+      "pct_from_52w_high": -0.142597,
+      "realized_vol_20d": 0.389998,
+      "missing_metrics": [],
+      "limitations": [
+        "delayed/unofficial market data",
+        "timing and risk context only; not valuation or a price target"
+      ]
+    },
+    {
+      "symbol": "SNDK",
+      "status": "healthy",
+      "current_price": 1354.819946,
+      "as_of": "2026-07-17T00:00:00-04:00",
+      "source": "yfinance_delayed_public_market_data",
+      "sample_count": 251,
+      "return_1m": -0.319716,
+      "return_3m": 0.473479,
+      "return_6m": 2.493515,
+      "pct_from_52w_high": -0.424556,
+      "realized_vol_20d": 1.597485,
+      "missing_metrics": [],
+      "limitations": [
+        "delayed/unofficial market data",
+        "timing and risk context only; not valuation or a price target"
+      ]
+    }
+  ],
+  "unavailable_count": 0,
+  "partial_count": 0,
   "safe_error_symbols": [],
-  "contract": "market_context_only_not_valuation_or_trade_instruction",
-  "limitations": [
-    "Run Decision Market Context after merge to populate delayed public timing/risk metrics.",
-    "Until populated, every candidate remains not_decision_grade."
-  ]
+  "max_age_days": 5,
+  "contract": "market_context_only_not_valuation_or_trade_instruction"
 }
