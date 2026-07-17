@@ -5,7 +5,7 @@ Status: implemented in PR #7; current mirror path verified from GitHub Actions
 
 ## 1. Canonical market times
 
-All user-facing times are **Asia/Taipei**. GitHub Actions cron expressions remain UTC because that is the scheduler format, but UTC must never be shown to Kevin as the primary time.
+All user-facing times are **Asia/Taipei**. 既有 workflows 的 cron 以 UTC 撰寫（早期 scheduler 僅支援 UTC，因此配有 DST gate）；GitHub Actions 現已支援 `on.schedule` 條目的選用 `timezone` 屬性（IANA 名稱，timezone-aware scheduling），新 workflows（如 Decision Market Context、Agent Capability Watch）直接以 `timezone: 'Asia/Taipei'` 排程。無論何種寫法，UTC 都不得作為對 Kevin 顯示的主要時間。
 
 ### Taiwan equities
 

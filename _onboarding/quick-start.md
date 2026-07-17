@@ -32,7 +32,7 @@
 - ❌ 不改 trading logic code（`src/signals`、`src/layers`、`src/management`、`src/config/thresholds.py`、`universe.py` …）
 - ❌ 不改 workflow 行為（`.github/workflows/*.yml`）
 - ❌ 不改 secrets 名稱（`TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` / `FRED_API_KEY` / `SEC_EDGAR_USER_AGENT`）
-- ❌ 不補寫 `docs/strategy_v4.md`（placeholder，策略全文尚未補入，不得自行推導）
+- ❌ 不改寫 `docs/strategy_v4.md` 的策略語意（該檔已由 Kevin 補入 v5 全文，為策略 single source of truth；AI 不得自行增删推導策略內容）
 - ❌ 訊號不得寫成「建議買 / 賣」（決策輔助，非自動下單）
 - ❌ 永不 force push；持久化文件一律進 repo
 

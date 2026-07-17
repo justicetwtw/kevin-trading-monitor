@@ -34,7 +34,7 @@
 2. **既有命名 / 風格 > 規格範例**：規格裡的命名可能是猜的；實作前先搜尋既有 code 確認真實命名。風格沿用既有（一致性 > 個人偏好）。規格範圍寫「所有 X」太絕對時，自我收斂到合理範圍。
 3. **不主動觸發收費 / 受限的外部服務**：付費 API、額度受限的推播，設計時找替代路徑（手動轉發、快取、fallback 免費路徑）。
 4. **不改 trading logic / workflow 行為 / secrets 名稱**（見 `AGENTS.md`）。
-5. **不補寫不存在的策略**：`docs/strategy_v4.md` 是 placeholder，策略全文尚未補入，AI 不得自行推導（見 `contexts/strategy.md`）。
+5. **不擅改策略全文**：`docs/strategy_v4.md` 已由 Kevin 補入完整 v5 全文，是策略 single source of truth（AGENTS.md §4）；AI 不得自行增删或推導策略語意，衝突時以 PR 釐清（見 `contexts/strategy.md`）。
 6. **訊號 ≠ 投資建議**：本系統是決策輔助。描述系統輸出時保持中性（「評為 72 分 / 觸發否決」），不要寫成「建議買進」。
 
 ## 5. 典型工作循環

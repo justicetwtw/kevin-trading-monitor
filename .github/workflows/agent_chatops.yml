@@ -1,0 +1,173 @@
+name: Agent ChatOps
+
+# Thin deterministic dispatcher: no repository checkout, no AI inference, no merge/deploy.
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  agent-status:
+    if: >
+      github.event.comment.user.type != 'Bot' &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR') &&
+      (github.event.comment.body == '/agent-status' ||
+       startsWith(github.event.comment.body, '/agent-status '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Reply with read-only status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          prs=$(gh pr list --repo "$GH_REPO" --state open --json number,title,headRefName,headRefOid,labels \
+            --jq '.[] | "- #\(.number) \(.title) — `\(.headRefName)` `\(.headRefOid)` — labels: \([.labels[].name] | join(", "))"')
+          [ -n "$prs" ] || prs='（無 open PR）'
+          printf '## agent-status（read-only）\n\n%s\n\n> 觸發者 @%s；本 workflow 未 checkout、未呼叫 AI、未 merge/deploy。\n> Run: %s\n' \
+            "$prs" "$ACTOR" "$RUN_URL" > /tmp/body.md
+          gh issue comment "$ISSUE_NUM" --repo "$GH_REPO" --body-file /tmp/body.md
+
+  review-handoff:
+    if: >
+      github.event.issue.pull_request != null &&
+      github.event.comment.user.type != 'Bot' &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR') &&
+      (startsWith(github.event.comment.body, '/agent-fix-complete ') ||
+       startsWith(github.event.comment.body, '/agent-review-pass '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: agent-review-handoff-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+      checks: read
+    steps:
+      - name: Validate exact SHA, routing report and checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.issue.number }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_USER: ${{ github.event.comment.user.login }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          command=''
+          target=''
+          supplied=''
+          if [[ "$COMMENT_BODY" =~ ^/agent-fix-complete[[:space:]]+([0-9a-fA-F]{40})$ ]]; then
+            command='agent-fix-complete'; target='agent:review'; supplied="${BASH_REMATCH[1],,}"
+          elif [[ "$COMMENT_BODY" =~ ^/agent-review-pass[[:space:]]+([0-9a-fA-F]{40})$ ]]; then
+            command='agent-review-pass'; target='needs-kevin'; supplied="${BASH_REMATCH[1],,}"
+          else
+            # A trusted actor issued a malformed command (e.g. short SHA).
+            # A silent green run would disguise the rejection as success.
+            printf '⚠️ Agent ChatOps 拒絕：命令格式錯誤。需要 `/agent-fix-complete <40-char-sha>` 或 `/agent-review-pass <40-char-sha>`（完整 40 字元 SHA）。\n' > /tmp/reject.md
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body-file /tmp/reject.md
+            exit 1
+          fi
+
+          pr=$(gh api "repos/$GH_REPO/pulls/$PR_NUM")
+          head=$(jq -r '.head.sha' <<<"$pr" | tr '[:upper:]' '[:lower:]')
+          state=$(jq -r '.state' <<<"$pr")
+          [ "$state" = open ] || { echo "PR not open"; exit 1; }
+          if [ "$supplied" != "$head" ]; then
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ \`/$command\` 被拒絕：指定 SHA \`$supplied\` 不是 current remote HEAD \`$head\`。"
+            exit 1
+          fi
+
+          # Gate-defining files must not self-authorize through branch-owned
+          # CI: a PR that edits workflows or the verifiers could weaken the
+          # exact checks this gate relies on. Such PRs take the manual path.
+          # Enumeration failure and no-match are distinct: an API error must
+          # fail closed instead of silently skipping this gate.
+          if ! changed_files=$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUM/files?per_page=100" --jq '.[].filename'); then
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ \`/$command\` 被拒絕：無法列舉 PR changed files（API 失敗）；fail closed，未改變狀態。"
+            exit 1
+          fi
+          gate_files=$(grep -E '^\.github/workflows/|^scripts/verify_agent_routing_report\.py$|^scripts/verify_agent_workflow_contract\.py$' <<<"$changed_files" || true)
+          if [ -n "$gate_files" ]; then
+            gh label create 'agent:blocked' --repo "$GH_REPO" --color D93F0B --description 'Agent 流程需要人類介入' --force >/dev/null
+            gh issue edit "$PR_NUM" --repo "$GH_REPO" --add-label 'agent:blocked'
+            printf '⚠️ `/%s` 被拒絕：此 PR 修改了 gate-defining files（workflows／verifiers），branch-owned CI 不可用來自我授權。此類 PR 必須由 Kevin 走人工 review 路徑。\n\n```\n%s\n```\n' \
+              "$command" "$gate_files" > /tmp/reject.md
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body-file /tmp/reject.md
+            exit 1
+          fi
+
+          # The issue_comment workflow itself and its verifier come from the
+          # default branch. Never execute a verifier supplied by the PR branch,
+          # because that would let the implementation owner self-authorize.
+          default_branch=$(gh repo view "$GH_REPO" --json defaultBranchRef --jq '.defaultBranchRef.name')
+          gh api "repos/$GH_REPO/contents/scripts/verify_agent_routing_report.py?ref=$default_branch" \
+            --jq '.content' | tr -d '\n' | base64 --decode > /tmp/verify_agent_routing_report.py
+          gh api --paginate "repos/$GH_REPO/issues/$PR_NUM/comments?per_page=100" \
+            | jq -s 'add' > /tmp/comments.json
+          verifier_args=(--expected-head "$head" --comments-json /tmp/comments.json)
+          if [ "$command" = 'agent-review-pass' ]; then
+            # Review-pass must prove an actual independent PASS verdict bound
+            # to this HEAD; pending/in_review/blocked statuses are not proof.
+            verifier_args+=(--require-reviewer-pass)
+          fi
+          if ! python /tmp/verify_agent_routing_report.py \
+            "${verifier_args[@]}" \
+            > /tmp/routing-report.log 2>&1; then
+            printf '⚠️ `/%s` 被拒絕：current HEAD 尚無受信任 actor 提交的有效 `agent-routing-report:v1`（review-pass 另需 reviewer PASS verdict），或 default-branch verifier尚未啟用。\n\n```\n%s\n```\n' \
+              "$command" "$(tail -n 20 /tmp/routing-report.log)" > /tmp/reject.md
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body-file /tmp/reject.md
+            exit 1
+          fi
+
+          set +e
+          checks=$(gh pr checks "$PR_NUM" --repo "$GH_REPO" --json name,bucket,workflow 2>&1)
+          rc=$?
+          set -e
+          if [ "$rc" -eq 1 ]; then
+            # gh pr checks exits 1 when checks exist and some have failed.
+            :
+          elif [ "$rc" -ne 0 ] && [ "$rc" -ne 8 ]; then
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ 無法讀取 checks（exit=$rc）；未改變狀態。"
+            exit 1
+          fi
+          jq -e . >/dev/null 2>&1 <<<"$checks" || {
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ 無法解析 checks 回應；未改變狀態。"; exit 1; }
+          jq -e 'any(.[]; .workflow == "CI" and .bucket == "pass")' <<<"$checks" >/dev/null || {
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ 找不到已通過的 \`CI\` workflow；未改變狀態。"; exit 1; }
+          blocking=$(jq -c '[.[] | select(.bucket != "pass" and .bucket != "skipping")]' <<<"$checks")
+          [ "$blocking" = '[]' ] || {
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⏳ Checks 仍有 pending/failed/cancelled：\`$blocking\`"; exit 1; }
+
+          # Close the TOCTOU window: a push after validation must invalidate
+          # this run instead of labeling a state the checks never covered.
+          head_now=$(gh api "repos/$GH_REPO/pulls/$PR_NUM" --jq '.head.sha' | tr '[:upper:]' '[:lower:]')
+          if [ "$head_now" != "$head" ]; then
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ \`/$command\` 被拒絕：驗證期間 current remote HEAD 已由 \`$head\` 前進為 \`$head_now\`；請對新 HEAD 重新執行。"
+            exit 1
+          fi
+
+          gh label create 'agent:review' --repo "$GH_REPO" --color 1D76DB --description '等待獨立 reviewer 複審' --force >/dev/null
+          gh label create 'agent:blocked' --repo "$GH_REPO" --color D93F0B --description 'Agent 流程需要人類介入' --force >/dev/null
+          gh label create 'needs-kevin' --repo "$GH_REPO" --color 5319E7 --description 'Review gate 完成，等待 Kevin 最終決策' --force >/dev/null
+          gh issue edit "$PR_NUM" --repo "$GH_REPO" --remove-label 'agent:review' --remove-label 'agent:blocked' --remove-label 'needs-kevin' 2>/dev/null || true
+          gh issue edit "$PR_NUM" --repo "$GH_REPO" --add-label "$target"
+          marker="<!-- agent-handoff:v1 command=$command head=$head -->"
+          printf '## Agent handoff state\n\n- Remote HEAD: `%s`\n- State: `%s`\n- Actor: @%s\n- Gate: exact SHA + trusted default-branch verifier + valid routing report + actual repo checks; **not merge authorization**.\n\n%s\n\nRun: %s\n' \
+            "$head" "$target" "$COMMENT_USER" "$marker" "$RUN_URL" > /tmp/handoff.md
+          gh issue comment "$PR_NUM" --repo "$GH_REPO" --body-file /tmp/handoff.md

@@ -43,7 +43,9 @@ def test_private_portfolio_risk_calculates_greeks_and_concentration(monkeypatch)
         "get_latest_price",
         lambda symbol: prices[symbol],
     )
-    monkeypatch.setattr(portfolio_risk_summary, "get_atm_iv", lambda symbol: 0.3)
+    monkeypatch.setattr(
+        portfolio_risk_summary, "get_atm_iv", lambda symbol: 0.3
+    )
     monkeypatch.setattr(
         portfolio_risk_summary,
         "calc_all_greeks",
@@ -87,7 +89,9 @@ def test_private_portfolio_brief_contains_decision_metrics(monkeypatch):
         "get_latest_price",
         lambda symbol: 10.0,
     )
-    monkeypatch.setattr(portfolio_risk_summary, "get_atm_iv", lambda symbol: 0.3)
+    monkeypatch.setattr(
+        portfolio_risk_summary, "get_atm_iv", lambda symbol: 0.3
+    )
     monkeypatch.setattr(
         portfolio_risk_summary,
         "calc_all_greeks",
@@ -132,6 +136,16 @@ def test_runner_sends_private_brief_as_silent_sensitive(monkeypatch):
         "format_private_portfolio_brief",
         lambda value: "PRIVATE MESSAGE",
     )
+    monkeypatch.setattr(
+        run_position_check,
+        "analyze_portfolio_decision_risk",
+        lambda summary, value: {"review_flags": []},
+    )
+    monkeypatch.setattr(
+        run_position_check,
+        "format_private_decision_risk",
+        lambda value: "\nDECISION RISK",
+    )
     calls = []
     monkeypatch.setattr(
         run_position_check,
@@ -142,7 +156,7 @@ def test_runner_sends_private_brief_as_silent_sensitive(monkeypatch):
     assert run_position_check._send_private_risk_brief(snapshot) is True
     assert calls == [
         (
-            "PRIVATE MESSAGE",
+            "PRIVATE MESSAGE\nDECISION RISK",
             {
                 "parse_mode": "HTML",
                 "disable_notification": True,
@@ -150,3 +164,32 @@ def test_runner_sends_private_brief_as_silent_sensitive(monkeypatch):
             },
         )
     ]
+    assert run_position_check._send_private_risk_brief.last_decision_risk == {
+        "review_flags": []
+    }
+
+
+def test_subtheme_thesis_id_counts_as_explicit_link(monkeypatch):
+    """F1: subtheme IDs are legal thesis_id values (positions_schema.md) and
+    must count as explicit links, matching portfolio_decision_risk."""
+    monkeypatch.setattr(
+        portfolio_risk_summary,
+        "read_json",
+        lambda *args, **kwargs: {
+            "themes": [
+                {
+                    "id": "memory_cycle",
+                    "subthemes": [{"id": "hbm", "symbols": ["AAA"]}],
+                }
+            ],
+            "symbols": [],
+        },
+    )
+    symbol_to_theme, known_ids = portfolio_risk_summary._theme_maps()
+    assert "memory_cycle" in known_ids
+    assert "hbm" in known_ids
+    theme, explicit_valid = portfolio_risk_summary._resolve_theme(
+        {"symbol": "AAA", "thesis_id": "hbm"}, symbol_to_theme, known_ids
+    )
+    assert theme == "hbm"
+    assert explicit_valid is True

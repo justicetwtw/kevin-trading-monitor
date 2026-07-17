@@ -6,6 +6,8 @@
 2. Select **Settings**.
 3. Select **Secrets and variables → Actions**.
 
+Never paste real secret values into issues, PR comments, agent conversations, logs or committed files.
+
 ## 2. Required notification secrets
 
 | Name | Purpose |
@@ -25,6 +27,8 @@ Create both repository secrets:
 ### `POSITIONS_JSON`
 
 The value must follow `docs/positions_schema.md`. Paste the complete JSON object as the secret value. Do not base64-encode it and do not commit it.
+
+Every production position should include an explicit approved `thesis_id`. Missing or invalid decision links do not leak details, but they make Position Management Check return `degraded` with safe generic error codes.
 
 ### `POSITION_STATE_KEY`
 
@@ -46,9 +50,22 @@ Rotating or deleting this key makes previous encrypted high-water state unreadab
 - Exact holdings and account values stay in memory.
 - Position alert dedup/quota keys are HMAC-derived opaque identifiers.
 - Account peak/current values are Fernet-encrypted before persistence.
-- Public state exposes only aggregate counts, drawdown percentage, alert level and timestamps.
+- Public state exposes only aggregate counts/ratios, generic error codes, drawdown percentage, alert level and timestamps.
+- Private Telegram contains symbol/basket risk details; sensitive message text, recipients and Bot API URLs are redacted from Actions logs.
 
-## 4. Other currently used secrets
+## 4. Agent workflow does not require AI API secrets
+
+The canonical workflow deliberately keeps model inference out of GitHub Actions:
+
+- Do **not** create `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` or another model key solely for PR routing/review.
+- GitHub Actions performs deterministic CI, capability/source drift checks, ChatOps state transitions and routing-report validation only.
+- Codex review uses the authenticated repository integration and verified `@codex review` adapter.
+- Claude Fable／Claude Code／other workers receive implementation or review work through an authenticated task surface selected at runtime.
+- If no authenticated worker path is available, record `BLOCKED_DELIVERY`; do not invent a GitHub mention or add an inference Action as a workaround.
+
+This repo policy is stricter than the set of integrations that vendors technically support. A future change to add a model inference Action, provider credential, GitHub App permission or paid service requires Kevin's explicit approval and a separate reviewed PR.
+
+## 5. Other currently used product secrets
 
 Depending on enabled workflows, the repository also uses:
 
@@ -62,14 +79,16 @@ Depending on enabled workflows, the repository also uses:
 
 Only add secrets for workflows that are actually enabled.
 
-## 5. Validation
+## 6. Validation
 
 1. Run **Health Check** and confirm the System Online Telegram message.
 2. Run **Position Management Check** manually.
 3. Confirm `data_store/position_snapshot.json` reports `configured: true` and `privacy: redacted_public_state`.
-4. Confirm `data_store/drawdown_history.json` contains `encrypted_state` and no `peak` or `current` fields.
-5. Confirm `alert_dedup.json` / `alert_routing_state.json` use `private-position::...` keys rather than position symbols.
-6. Search the changed state files for a known private ticker, strike and account amount; none should appear.
+4. Confirm its `decision_risk.privacy` is `aggregate_decision_risk_only` and contains no ticker/basket names.
+5. Confirm `data_store/drawdown_history.json` contains `encrypted_state` and no `peak` or `current` fields.
+6. Confirm `alert_dedup.json` / `alert_routing_state.json` use opaque `private-position::...` keys rather than position symbols.
+7. Search changed state files for a known private ticker, basket, strike and account amount; none should appear.
+8. On a Draft PR, verify `CI`, `Agent Capability Watch`, the live Trump source probe, a current-HEAD `agent-routing-report:v1`, and authenticated non-owner review delivery before asking Kevin for merge authorization.
 
 ## Safety rules
 
@@ -77,3 +96,4 @@ Only add secrets for workflows that are actually enabled.
 - Never commit a `.env` file.
 - Never paste real positions into `data_store/positions.json` in the public repository.
 - Rotate a secret immediately if it is exposed.
+- Do not grant an agent merge, deploy, Pages, Actions-write or secret-read permissions merely for convenience.

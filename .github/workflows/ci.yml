@@ -26,13 +26,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip --quiet
           pip install --quiet -r requirements.txt
+      - name: Verify agent workflow contract
+        run: python scripts/verify_agent_workflow_contract.py
       - name: Run tests
         shell: bash
         run: |
           set +e
           python -m pytest -q > pytest.log 2>&1
           status=$?
-          tail -n 140 pytest.log
+          tail -n 180 pytest.log
           exit $status
       - name: Upload pytest report
         if: always()
@@ -44,8 +46,7 @@ jobs:
           retention-days: 7
 
   trump-source-probe:
-    # This is deliberately blocking: mocked tests are not evidence that the
-    # live Truth Social source is reachable from a GitHub-hosted runner.
+    # Mocked tests are not proof that a current source is reachable from a runner.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
