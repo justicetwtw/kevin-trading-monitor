@@ -1,0 +1,355 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-17T08:35:00.036646+00:00",
+  "readiness_counts": {
+    "not_decision_grade": 3,
+    "re_underwrite": 1
+  },
+  "rows": [
+    {
+      "symbol": "MU",
+      "manual_rank": 1,
+      "theme": "memory_cycle",
+      "subtheme": "HBM + commodity DRAM + NAND mix",
+      "company_thesis_status": "active",
+      "security_readiness": "not_decision_grade",
+      "decision_posture": "wait_for_proof",
+      "decision_reason": "a current source/as-of, valid probability scenario, market-consistent price anchor and a company thesis with invalidation criteria are required",
+      "screen_score": null,
+      "screen_coverage": 0.6,
+      "screen_action_band": null,
+      "market_context": {
+        "status": null,
+        "current_price": null,
+        "as_of": null,
+        "return_1m": null,
+        "return_3m": null,
+        "return_6m": null,
+        "pct_from_52w_high": null,
+        "realized_vol_20d": null,
+        "source": null
+      },
+      "scenario": null,
+      "evidence_quality": "low",
+      "evidence_as_of": "2026-07-16",
+      "evidence_sources": [
+        "Kevin house view consolidated in thesis_tracker.json",
+        "public monitor fundamentals/regime/options state"
+      ],
+      "next_catalyst": {
+        "date": "2026-07-31",
+        "label": "Scheduled thesis and scenario refresh",
+        "source": "thesis_tracker.json next_review"
+      },
+      "correlation_baskets": [
+        "ai_capex",
+        "commodity_dram",
+        "hbm",
+        "memory_cycle",
+        "nand"
+      ],
+      "instrument_lenses": [
+        "stock",
+        "deep_itm_leaps",
+        "defined_risk_options"
+      ],
+      "options_status": "ok",
+      "ivr": 64.2,
+      "ivp": 37.3,
+      "regime": "risk_on",
+      "missing_inputs": [
+        "complete_screen_score_missing",
+        "evidence_quality_not_reviewable",
+        "market_as_of_missing",
+        "market_context_as_of_missing",
+        "market_context_unhealthy",
+        "market_current_price_missing",
+        "scenario_missing",
+        "threshold_origin_unapproved",
+        "watchlist_coverage_below_80pct"
+      ],
+      "threshold_origin": "draft_for_kevin_confirmation",
+      "not_a_trade_signal": true
+    },
+    {
+      "symbol": "NVDA",
+      "manual_rank": 2,
+      "theme": "ai_capex",
+      "subtheme": "compute",
+      "company_thesis_status": "active",
+      "security_readiness": "not_decision_grade",
+      "decision_posture": "wait_for_proof",
+      "decision_reason": "a current source/as-of, valid probability scenario, market-consistent price anchor and a company thesis with invalidation criteria are required",
+      "screen_score": null,
+      "screen_coverage": 0.6,
+      "screen_action_band": null,
+      "market_context": {
+        "status": null,
+        "current_price": null,
+        "as_of": null,
+        "return_1m": null,
+        "return_3m": null,
+        "return_6m": null,
+        "pct_from_52w_high": null,
+        "realized_vol_20d": null,
+        "source": null
+      },
+      "scenario": null,
+      "evidence_quality": "low",
+      "evidence_as_of": "2026-07-16",
+      "evidence_sources": [
+        "Kevin house view consolidated in thesis_tracker.json",
+        "public monitor fundamentals/regime/options state"
+      ],
+      "next_catalyst": {
+        "date": "2026-07-31",
+        "label": "Scheduled thesis and scenario refresh",
+        "source": "thesis_tracker.json next_review"
+      },
+      "correlation_baskets": [
+        "ai_capex",
+        "compute"
+      ],
+      "instrument_lenses": [
+        "stock",
+        "defined_risk_options"
+      ],
+      "options_status": "ok",
+      "ivr": 41.3,
+      "ivp": 60.8,
+      "regime": "risk_on",
+      "missing_inputs": [
+        "complete_screen_score_missing",
+        "evidence_quality_not_reviewable",
+        "market_as_of_missing",
+        "market_context_as_of_missing",
+        "market_context_unhealthy",
+        "market_current_price_missing",
+        "scenario_missing",
+        "threshold_origin_unapproved",
+        "watchlist_coverage_below_80pct"
+      ],
+      "threshold_origin": "draft_for_kevin_confirmation",
+      "not_a_trade_signal": true
+    },
+    {
+      "symbol": "LITE",
+      "manual_rank": 4,
+      "theme": "ai_capex",
+      "subtheme": "optical interconnect",
+      "company_thesis_status": "missing",
+      "security_readiness": "not_decision_grade",
+      "decision_posture": "wait_for_proof",
+      "decision_reason": "a current source/as-of, valid probability scenario, market-consistent price anchor and a company thesis with invalidation criteria are required",
+      "screen_score": null,
+      "screen_coverage": null,
+      "screen_action_band": null,
+      "market_context": {
+        "status": null,
+        "current_price": null,
+        "as_of": null,
+        "return_1m": null,
+        "return_3m": null,
+        "return_6m": null,
+        "pct_from_52w_high": null,
+        "realized_vol_20d": null,
+        "source": null
+      },
+      "scenario": null,
+      "evidence_quality": "low",
+      "evidence_as_of": "2026-07-16",
+      "evidence_sources": [
+        "Kevin watchlist context",
+        "public monitor state with known coverage gap"
+      ],
+      "next_catalyst": {
+        "date": "2026-07-31",
+        "label": "Coverage-gap review",
+        "source": "capital_allocation.json manual review gate"
+      },
+      "correlation_baskets": [
+        "ai_capex",
+        "optical_interconnect"
+      ],
+      "instrument_lenses": [
+        "wait_for_proof",
+        "manual_review"
+      ],
+      "options_status": null,
+      "ivr": null,
+      "ivp": null,
+      "regime": "risk_on",
+      "missing_inputs": [
+        "complete_screen_score_missing",
+        "evidence_quality_not_reviewable",
+        "market_as_of_missing",
+        "market_context_as_of_missing",
+        "market_context_unhealthy",
+        "market_current_price_missing",
+        "scenario_missing",
+        "symbol_thesis_missing",
+        "thesis_invalidation_missing",
+        "thesis_next_review_missing",
+        "threshold_origin_unapproved",
+        "watchlist_coverage_missing"
+      ],
+      "threshold_origin": "draft_for_kevin_confirmation",
+      "not_a_trade_signal": true
+    },
+    {
+      "symbol": "SNDK",
+      "manual_rank": 3,
+      "theme": "memory_cycle",
+      "subtheme": "NAND",
+      "company_thesis_status": "watch",
+      "security_readiness": "re_underwrite",
+      "decision_posture": "re_underwrite",
+      "decision_reason": "company thesis is on watch/impaired; the security must be re-underwritten before capital review",
+      "screen_score": null,
+      "screen_coverage": null,
+      "screen_action_band": null,
+      "market_context": {
+        "status": null,
+        "current_price": null,
+        "as_of": null,
+        "return_1m": null,
+        "return_3m": null,
+        "return_6m": null,
+        "pct_from_52w_high": null,
+        "realized_vol_20d": null,
+        "source": null
+      },
+      "scenario": null,
+      "evidence_quality": "low",
+      "evidence_as_of": "2026-07-16",
+      "evidence_sources": [
+        "Kevin house view consolidated in thesis_tracker.json",
+        "public monitor fundamentals/regime/options state"
+      ],
+      "next_catalyst": {
+        "date": "2026-07-31",
+        "label": "Scheduled NAND thesis and scenario refresh",
+        "source": "thesis_tracker.json next_review"
+      },
+      "correlation_baskets": [
+        "memory_cycle",
+        "nand"
+      ],
+      "instrument_lenses": [
+        "wait_for_proof",
+        "stock",
+        "defined_risk_options"
+      ],
+      "options_status": null,
+      "ivr": null,
+      "ivp": null,
+      "regime": "risk_on",
+      "missing_inputs": [
+        "complete_screen_score_missing",
+        "evidence_quality_not_reviewable",
+        "market_as_of_missing",
+        "market_context_as_of_missing",
+        "market_context_unhealthy",
+        "market_current_price_missing",
+        "scenario_missing",
+        "threshold_origin_unapproved",
+        "watchlist_coverage_missing"
+      ],
+      "threshold_origin": "draft_for_kevin_confirmation",
+      "not_a_trade_signal": true
+    }
+  ],
+  "correlation_baskets": [
+    {
+      "basket": "ai_capex",
+      "symbols": [
+        "LITE",
+        "MU",
+        "NVDA"
+      ],
+      "candidate_count": 3
+    },
+    {
+      "basket": "commodity_dram",
+      "symbols": [
+        "MU"
+      ],
+      "candidate_count": 1
+    },
+    {
+      "basket": "compute",
+      "symbols": [
+        "NVDA"
+      ],
+      "candidate_count": 1
+    },
+    {
+      "basket": "hbm",
+      "symbols": [
+        "MU"
+      ],
+      "candidate_count": 1
+    },
+    {
+      "basket": "memory_cycle",
+      "symbols": [
+        "MU",
+        "SNDK"
+      ],
+      "candidate_count": 2
+    },
+    {
+      "basket": "nand",
+      "symbols": [
+        "MU",
+        "SNDK"
+      ],
+      "candidate_count": 2
+    },
+    {
+      "basket": "optical_interconnect",
+      "symbols": [
+        "LITE"
+      ],
+      "candidate_count": 1
+    }
+  ],
+  "decision_log": {
+    "decision_count": 0,
+    "resolved_count": 0,
+    "calibrated_forecast_count": 0,
+    "invalid_probability_count": 0,
+    "brier_score": null,
+    "status": "insufficient_history",
+    "append_only": true
+  },
+  "model_contract": {
+    "company_security_action_separated": true,
+    "scenario_probabilities_sum_to_one": true,
+    "scenario_market_anchor_required": true,
+    "missing_data_never_neutral_filled": true,
+    "score_is_screen_not_trade_instruction": true,
+    "automatic_orders": false,
+    "approved_fresh_inputs_required_for_review_ready": true
+  },
+  "portfolio_decision_risk": {},
+  "market_context_health": {
+    "status": "not_run",
+    "stale": true,
+    "generated_at": null,
+    "unavailable_count": null,
+    "partial_count": null,
+    "contract": "market_context_only_not_valuation_or_trade_instruction"
+  },
+  "quality_gate_contract": {
+    "approved_values": [
+      "approved",
+      "approved_by_kevin"
+    ],
+    "max_evidence_market_gap_days": 45,
+    "max_market_context_age_days": 5,
+    "partial_market_context_is_screen_only": true,
+    "future_catalyst_required": true,
+    "threshold_origin": "repo_default_pending_kevin_confirmation"
+  }
+}

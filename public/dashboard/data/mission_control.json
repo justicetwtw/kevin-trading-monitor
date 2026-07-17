@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-17T08:58:26.676537+08:00",
+  "generated_at": "2026-07-17T16:34:59.828596+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -21,11 +21,11 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-17T00:11:02.116180+00:00",
+      "trump_monitor_checked_at": "2026-07-17T08:21:23.656273+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
-      "tracked_theme_count": 2,
+      "tracked_theme_count": 3,
       "tracked_thesis_count": 3,
       "allocation_candidate_count": 4,
       "needs_attention_count": 4
@@ -80,9 +80,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-16T12:48:47.296000+00:00",
-      "checked_at": "2026-07-17T00:11:02.116180+00:00",
-      "health_age_hours": 0.8,
+      "latest_post_at": "2026-07-17T01:16:53.597000+00:00",
+      "checked_at": "2026-07-17T08:21:23.656273+00:00",
+      "health_age_hours": 0.2,
       "attempts": [
         {
           "status": "unavailable",
@@ -95,20 +95,20 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 34716,
+          "raw_count": 34718,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-16T12:48:47.296000+00:00",
+          "latest_post_at": "2026-07-17T01:16:53.597000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 34716,
+      "source_raw_count": 34718,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-15T06:32:32.760175+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 31,
+      "eligible_count": 33,
       "new_count": 0,
       "delivered_count": 0,
       "delivery_status": "no_new_posts",
@@ -188,11 +188,46 @@
               "MRVL",
               "LITE"
             ]
+          },
+          {
+            "id": "optical_interconnect",
+            "name": "Optical interconnect",
+            "status": "active",
+            "symbols": [
+              "LITE"
+            ],
+            "monitor": "AI datacenter optical demand, transceiver pricing and share, customer concentration and capacity execution."
           }
         ],
         "invalidation": [
           "Hyperscaler capex guidance weakens broadly rather than shifting between vendors.",
           "Options-market fear and credit stress confirm that a price decline is structural rather than positioning noise."
+        ],
+        "next_review": "2026-07-31"
+      },
+      {
+        "id": "portfolio_hedge",
+        "name": "Portfolio hedge",
+        "status": "active",
+        "summary": "A hedge is held to reduce an identified unwanted factor or tail risk while preserving intended alpha. Recognition as a put or ETF hedge does not prove economic effectiveness.",
+        "subthemes": [
+          {
+            "id": "broad_market_hedge",
+            "name": "Broad-market and semiconductor hedge instruments",
+            "status": "manual_effectiveness_review",
+            "symbols": [
+              "QQQ",
+              "SPY",
+              "SMH",
+              "SOXL"
+            ],
+            "monitor": "Delta offset, basis risk versus the actual portfolio, expiry mismatch, convexity, liquidity, carry and whether the hedge still targets the intended risk."
+          }
+        ],
+        "invalidation": [
+          "The hedge no longer offsets the intended risk factor or creates larger unintended exposure.",
+          "Expiry, liquidity, carry or basis risk makes the protection economically ineffective.",
+          "The underlying portfolio thesis or risk budget changes enough that the original hedge objective is obsolete."
         ],
         "next_review": "2026-07-31"
       }
