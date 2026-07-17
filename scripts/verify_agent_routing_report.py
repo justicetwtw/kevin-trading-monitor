@@ -32,6 +32,14 @@ HEAD_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 MARKER_PATTERN = re.compile(
     r"<!--\s*agent-routing-report:v1\s+head=([0-9a-fA-F]{40})\s*-->"
 )
+# A review PASS must exist as its own explicit, HEAD-bound artifact posted
+# separately from the routing report, so the owner's report cannot simply
+# self-attest a reviewer verdict. In a single-maintainer repo this cannot
+# cryptographically prove reviewer independence; Kevin's merge gate remains
+# the final backstop, and this marker makes the verdict auditable.
+VERDICT_MARKER_PATTERN = re.compile(
+    r"<!--\s*agent-review-verdict:v1\s+head=([0-9a-fA-F]{40})\s+verdict=([A-Za-z_]+)\s*-->"
+)
 FORBIDDEN_KEY_PATTERNS = (
     ("forbidden_chain_of_thought_key", re.compile(r"chain[_-]?of[_-]?thought|reasoning[_-]?trace|^cot$", re.I)),
     ("forbidden_prompt_dump_key", re.compile(r"(?:system|full|raw|private)[_-]?prompt", re.I)),
@@ -291,6 +299,35 @@ def validate_report_comment(
     return errors
 
 
+def _is_trusted_comment(comment: dict[str, Any]) -> bool:
+    association = str(comment.get("author_association") or "").upper()
+    user = comment.get("user") or {}
+    user_type = str(user.get("type") or "")
+    return association in TRUSTED_ASSOCIATIONS and user_type != "Bot"
+
+
+def find_review_pass_verdict(
+    comments: list[Any],
+    expected_head: str,
+    *,
+    exclude_index: int | None = None,
+) -> bool:
+    """Return whether a distinct trusted comment carries a HEAD-bound PASS."""
+    for index, comment in enumerate(comments):
+        if index == exclude_index or not isinstance(comment, dict):
+            continue
+        if not _is_trusted_comment(comment):
+            continue
+        marker = VERDICT_MARKER_PATTERN.search(str(comment.get("body") or ""))
+        if marker is None:
+            continue
+        if marker.group(1).lower() != expected_head:
+            continue
+        if marker.group(2).lower() in REVIEWER_PASS_STATUSES:
+            return True
+    return False
+
+
 def find_valid_trusted_report(
     comments: Any,
     expected_head: str,
@@ -301,23 +338,32 @@ def find_valid_trusted_report(
     if not isinstance(comments, list):
         return None, ["comments payload must be an array"]
     diagnostics: list[str] = []
-    for comment in reversed(comments):
+    for index in range(len(comments) - 1, -1, -1):
+        comment = comments[index]
         if not isinstance(comment, dict):
             continue
         body = str(comment.get("body") or "")
         if "agent-routing-report:v1" not in body:
             continue
-        association = str(comment.get("author_association") or "").upper()
         user = comment.get("user") or {}
-        user_type = str(user.get("type") or "")
         login = str(user.get("login") or "unknown")
-        if association not in TRUSTED_ASSOCIATIONS or user_type == "Bot":
+        if not _is_trusted_comment(comment):
             diagnostics.append(f"ignored untrusted routing report from {login}")
             continue
         errors = validate_report_comment(
             body, expected_head, require_reviewer_pass=require_reviewer_pass
         )
         if not errors:
+            if require_reviewer_pass and not find_review_pass_verdict(
+                comments, expected_head, exclude_index=index
+            ):
+                # The report's own reviewer field is self-attested; the PASS
+                # must also exist as a separate HEAD-bound verdict comment.
+                diagnostics.append(
+                    "no distinct trusted agent-review-verdict:v1 PASS comment "
+                    f"bound to current HEAD {expected_head}"
+                )
+                return None, diagnostics
             extracted = extract_report(body)
             assert extracted is not None and extracted[1] is not None
             return extracted[1], diagnostics

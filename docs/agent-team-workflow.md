@@ -200,7 +200,7 @@ Bootstrap PR依上一節的人工／CI替代gate處理，不能宣稱已用尚�
 
 - `/agent-status`：read-only顯示open PR與狀態。
 - `/agent-fix-complete <40-char-sha>`：驗exact HEAD、trusted routing report與實際repo checks後移至`agent:review`。
-- `/agent-review-pass <40-char-sha>`：以 `--require-reviewer-pass` mode 再驗exact HEAD與routing report——report 必須含 `independent_reviewer` 且 `status` 為明確 PASS verdict（`pending`／`in_review`／`blocked_delivery` 不是證明），加上實際checks後才移至`needs-kevin`。
+- `/agent-review-pass <40-char-sha>`：以 `--require-reviewer-pass` mode 再驗exact HEAD與routing report——report 必須含 `independent_reviewer` 且 `status` 為明確 PASS verdict（`pending`／`in_review`／`blocked_delivery` 不是證明），**且必須另有一則獨立的 trusted comment 帶 `<!-- agent-review-verdict:v1 head=<same-head> verdict=pass -->` marker**（與 routing report 不同則 comment；report 內自我宣稱不算），加上實際checks後才移至`needs-kevin`。單一維護者 repo 中此 gate 無法密碼學證明 reviewer 獨立性；它讓 verdict 成為可稽核、HEAD-bound 的獨立 artifact，最終防線仍是 Kevin 的 merge gate。
 
 額外 gate：
 

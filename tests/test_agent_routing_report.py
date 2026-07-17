@@ -3,6 +3,7 @@ import json
 from scripts.verify_agent_routing_report import (
     MAX_REPORT_BYTES,
     extract_report,
+    find_review_pass_verdict,
     find_valid_trusted_report,
     validate_report,
     validate_report_comment,
@@ -246,6 +247,17 @@ def test_review_pass_mode_requires_reviewer_to_exist():
     assert any("independent_reviewer is required" in error for error in errors)
 
 
+def _verdict_comment(head=HEAD, verdict="pass", *, association="OWNER", user_type="User"):
+    return {
+        "body": (
+            "## Independent review verdict\n\n"
+            f"<!-- agent-review-verdict:v1 head={head} verdict={verdict} -->"
+        ),
+        "author_association": association,
+        "user": {"login": "kevin", "type": user_type},
+    }
+
+
 def test_review_pass_mode_flows_through_comment_search():
     pending = _comment(_report())
     assert find_valid_trusted_report([pending], HEAD)[0] is not None
@@ -258,6 +270,51 @@ def test_review_pass_mode_flows_through_comment_search():
     passed_report = _report()
     passed_report["independent_reviewer"]["status"] = "pass"
     found, _ = find_valid_trusted_report(
-        [_comment(passed_report)], HEAD, require_reviewer_pass=True
+        [_comment(passed_report), _verdict_comment()],
+        HEAD,
+        require_reviewer_pass=True,
+    )
+    assert found is not None
+
+
+def test_review_pass_requires_distinct_head_bound_verdict_comment():
+    """C2: a self-attested reviewer field is not proof; a separate trusted
+    HEAD-bound agent-review-verdict:v1 PASS comment is required."""
+    passed_report = _report()
+    passed_report["independent_reviewer"]["status"] = "pass"
+    report_comment = _comment(passed_report)
+
+    # Report alone (even claiming pass) is rejected in review-pass mode.
+    found, diagnostics = find_valid_trusted_report(
+        [report_comment], HEAD, require_reviewer_pass=True
+    )
+    assert found is None
+    assert any("agent-review-verdict:v1" in item for item in diagnostics)
+
+    # A verdict embedded in the SAME comment as the report does not count.
+    combined = dict(report_comment)
+    combined["body"] += (
+        f"\n<!-- agent-review-verdict:v1 head={HEAD} verdict=pass -->"
+    )
+    found, _ = find_valid_trusted_report(
+        [combined], HEAD, require_reviewer_pass=True
+    )
+    assert found is None
+
+    # Wrong head, non-pass verdict, or untrusted author never satisfy it.
+    assert not find_review_pass_verdict([_verdict_comment(head="b" * 40)], HEAD)
+    assert not find_review_pass_verdict(
+        [_verdict_comment(verdict="changes_required")], HEAD
+    )
+    assert not find_review_pass_verdict(
+        [_verdict_comment(user_type="Bot")], HEAD
+    )
+    assert not find_review_pass_verdict(
+        [_verdict_comment(association="NONE")], HEAD
+    )
+
+    # A distinct trusted PASS verdict bound to the exact HEAD satisfies it.
+    found, _ = find_valid_trusted_report(
+        [report_comment, _verdict_comment()], HEAD, require_reviewer_pass=True
     )
     assert found is not None

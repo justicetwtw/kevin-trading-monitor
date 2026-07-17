@@ -53,6 +53,7 @@ REQUIRED = {
         "--require-reviewer-pass",
         "pulls/$PR_NUM/files",
         "gate-defining files",
+        'if ! changed_files=$(gh api --paginate',
     ],
     "scripts/verify_agent_routing_report.py": [
         "agent-routing-report:v1",
@@ -69,6 +70,8 @@ REQUIRED = {
         "SECRET_VALUE_PATTERNS",
         "REVIEWER_PASS_STATUSES",
         "require_reviewer_pass",
+        "agent-review-verdict:v1",
+        "find_review_pass_verdict",
     ],
 }
 

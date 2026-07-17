@@ -96,8 +96,13 @@ jobs:
           # Gate-defining files must not self-authorize through branch-owned
           # CI: a PR that edits workflows or the verifiers could weaken the
           # exact checks this gate relies on. Such PRs take the manual path.
-          gate_files=$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUM/files?per_page=100" --jq '.[].filename' \
-            | grep -E '^\.github/workflows/|^scripts/verify_agent_routing_report\.py$|^scripts/verify_agent_workflow_contract\.py$' || true)
+          # Enumeration failure and no-match are distinct: an API error must
+          # fail closed instead of silently skipping this gate.
+          if ! changed_files=$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUM/files?per_page=100" --jq '.[].filename'); then
+            gh issue comment "$PR_NUM" --repo "$GH_REPO" --body "⚠️ \`/$command\` 被拒絕：無法列舉 PR changed files（API 失敗）；fail closed，未改變狀態。"
+            exit 1
+          fi
+          gate_files=$(grep -E '^\.github/workflows/|^scripts/verify_agent_routing_report\.py$|^scripts/verify_agent_workflow_contract\.py$' <<<"$changed_files" || true)
           if [ -n "$gate_files" ]; then
             gh label create 'agent:blocked' --repo "$GH_REPO" --color D93F0B --description 'Agent 流程需要人類介入' --force >/dev/null
             gh issue edit "$PR_NUM" --repo "$GH_REPO" --add-label 'agent:blocked'
