@@ -22,10 +22,10 @@
 
 - current price 或 as-of；
 - source-backed probability scenario；
-- 至少兩個 case、每個正價格、機率 0–1 且總和 100%；
+- 至少兩個 case、每個正價格、機率 0 < p ≤ 1 且總和 100%（0% 機率 case 視為建模錯誤，整個 scenario 無效）；
 - scenario 的 current price 與 market context 相差超過 5%，或 as-of 相差超過 3 天；
 - company thesis 或 invalidation；
-- market context unavailable。
+- market context unavailable 或超過 wall-clock 新鮮度上限（market as-of 距執行當下超過 5 個日曆天即 `market_context_stale`）。
 
 系統仍可顯示 manual research rank、market timing context 與缺口，但不得計算可信 EV 或稱為決策就緒。
 
@@ -38,9 +38,10 @@ Scenario math 存在，但任一 approval／freshness／coverage gate 未完成�
 - market context 僅為 `partial`；
 - evidence 比 market as-of 舊超過 45 天，或 evidence 日期晚於 market context；
 - next catalyst／proof point 已過期或不是未來日期；
-- evidence、screen coverage、source posture 不足。
+- evidence、screen coverage、source posture 不足；
+- **任一 `missing_inputs` gap 未關閉**（含 thesis next-review、watchlist coverage、correlation baskets、instrument lenses）——缺口不以中性值補齊，全部關閉前不得升為 `review_ready`。
 
-可用於研究優先順序，不能作 senior capital-allocation decision。45 天 evidence gate 是 repo default，仍需 Kevin 確認，不是自然定律。
+可用於研究優先順序，不能作 senior capital-allocation decision。45 天 evidence gate 與 5 天 market-context 新鮮度上限都是 repo default，仍需 Kevin 確認，不是自然定律。
 
 ### `review_ready`
 
@@ -100,7 +101,7 @@ Derived values：
 - 距 52-week high；
 - 20-day annualized realized volatility。
 
-來源目前是 yfinance 延遲公開資料，**只供 timing／risk context，不是 official tape、valuation 或 price target**。任一候選 unavailable 會先 commit 安全 state，再使 workflow 失敗；Mission Control 必須顯示 degraded，而不是空表。`partial` 可保留研究脈絡，但最多只到 `screen_grade`。
+來源目前是 yfinance 延遲公開資料，**只供 timing／risk context，不是 official tape、valuation 或 price target**。任一候選 unavailable 會先 commit 安全 state，再使 workflow 失敗；序列完整但最後一根 bar 超過 5 個日曆天視為 `stale_price_history`（unavailable），不得標 healthy。候選清單為空時寫入 `no_candidates` state 並以非零狀態結束，不得偽裝成 healthy。Mission Control 必須顯示 degraded（含 wall-clock stale 檢查），而不是空表。`partial` 可保留研究脈絡，但最多只到 `screen_grade`。
 
 ## 5. Screen score 的限制
 
@@ -152,7 +153,7 @@ MU 可同時屬於 AI capex 與多個 memory subthemes；不能把它們當成�
 }
 ```
 
-舊 row 不覆寫；結果以 resolver 追加／版本化。只有 outcome 為 boolean 且 probability 有效的 resolved forecasts 才進 Brier score。少於 10 筆明確標示 `insufficient_history`，不得拿一兩次命中宣稱模型有效。
+舊 row 不覆寫；結果以 resolver 追加／版本化。只有 outcome 為 boolean 且 probability 在 [0, 1] 內的 resolved forecasts 才進 Brier score；超界機率不平均進分數，改計入 `invalid_probability_count`。少於 10 筆明確標示 `insufficient_history`，不得拿一兩次命中宣稱模型有效。
 
 目前 v1 只有讀取、摘要與空白 journal initialization；尚未建立 append-only writer／resolver。文件上的 append-only 是資料契約，不應誤稱為已由 storage layer 強制執行。
 

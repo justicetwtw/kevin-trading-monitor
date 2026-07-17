@@ -55,6 +55,13 @@
           "name": "Memory and interconnect",
           "status": "active",
           "symbols": ["MU", "MRVL", "LITE"]
+        },
+        {
+          "id": "optical_interconnect",
+          "name": "Optical interconnect",
+          "status": "active",
+          "symbols": ["LITE"],
+          "monitor": "AI datacenter optical demand, transceiver pricing and share, customer concentration and capacity execution."
         }
       ],
       "invalidation": [

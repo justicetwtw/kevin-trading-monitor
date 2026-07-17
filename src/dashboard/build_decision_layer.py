@@ -4,15 +4,33 @@ from __future__ import annotations
 
 import html
 import json
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from src.decision.decision_grade import MAX_MARKET_CONTEXT_AGE_DAYS
 from src.decision.opportunity_ranker import build_decision_payload
 from src.storage import dashboard_store
 from src.storage.state_manager import read_json
 
 START = "<!-- decision-layer:start -->"
 END = "<!-- decision-layer:end -->"
+
+
+def _market_context_is_stale(
+    generated_at: Any, *, today: date | None = None
+) -> bool:
+    """A frozen snapshot must degrade the health strip, not stay green."""
+    if not isinstance(generated_at, str) or not generated_at:
+        return True
+    try:
+        generated = datetime.fromisoformat(
+            generated_at.replace("Z", "+00:00")
+        ).date()
+    except ValueError:
+        return True
+    reference = today or datetime.now(timezone.utc).date()
+    return (reference - generated).days > MAX_MARKET_CONTEXT_AGE_DAYS
 
 
 def build_from_store() -> dict[str, Any]:
@@ -41,8 +59,10 @@ def build_from_store() -> dict[str, Any]:
     payload["portfolio_decision_risk"] = (
         public_risk if isinstance(public_risk, dict) else {}
     )
+    stale = _market_context_is_stale(market.get("generated_at"))
     payload["market_context_health"] = {
         "status": market.get("status"),
+        "stale": stale,
         "generated_at": market.get("generated_at"),
         "unavailable_count": market.get("unavailable_count"),
         "partial_count": market.get("partial_count"),
@@ -52,15 +72,22 @@ def build_from_store() -> dict[str, Any]:
 
 
 def _e(value: Any) -> str:
+    """Escape and plainly format a value; never guess percent from range."""
     if value is None or value == "":
         return "—"
     if isinstance(value, float):
-        if -1 <= value <= 1:
-            return f"{value * 100:.1f}%"
-        return f"{value:,.2f}"
+        text = f"{value:,.4f}".rstrip("0").rstrip(".")
+        return text if text not in {"", "-"} else "0"
     if isinstance(value, (list, tuple, set)):
         return html.escape("、".join(str(item) for item in value)) or "—"
     return html.escape(str(value))
+
+
+def _pct(value: Any) -> str:
+    """Format a known ratio field as a percentage."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return "—"
+    return f"{float(value) * 100:.1f}%"
 
 
 def _badge(value: Any) -> str:
@@ -97,15 +124,15 @@ def render_section(payload: dict[str, Any]) -> str:
             f'<td>{_e(market.get("current_price"))}<br>'
             f'<span class="muted">{_e(market.get("as_of"))} · '
             f'{_e(market.get("source"))}</span></td>'
-            f'<td>{_e(market.get("return_1m"))} / '
-            f'{_e(market.get("return_3m"))} / '
-            f'{_e(market.get("return_6m"))}</td>'
-            f'<td>{_e(scenario.get("expected_return_pct"))}<br>'
+            f'<td>{_pct(market.get("return_1m"))} / '
+            f'{_pct(market.get("return_3m"))} / '
+            f'{_pct(market.get("return_6m"))}</td>'
+            f'<td>{_pct(scenario.get("expected_return_pct"))}<br>'
             f'<span class="muted">D/U '
             f'{_e(scenario.get("downside_upside_ratio"))}</span></td>'
             f'<td>{_e(row.get("screen_score"))}<br>'
             f'<span class="muted">coverage '
-            f'{_e(row.get("screen_coverage"))}</span></td>'
+            f'{_pct(row.get("screen_coverage"))}</span></td>'
             f'<td>{_e(row.get("correlation_baskets"))}</td>'
             f'<td>{_e(row.get("missing_inputs"))}</td>'
             "</tr>"
@@ -134,9 +161,11 @@ def render_section(payload: dict[str, Any]) -> str:
     ) or '<div class="empty">No correlation baskets configured.</div>'
 
     health = payload.get("market_context_health") or {}
+    freshness = "stale_degraded" if health.get("stale") else "fresh"
     market_health = (
         '<div class="account-strip">'
         f'<span>Market context <strong>{_badge(health.get("status"))}</strong></span>'
+        f'<span>Freshness <strong>{_badge(freshness)}</strong></span>'
         f'<span>Generated <strong>{_e(health.get("generated_at"))}</strong></span>'
         f'<span>Unavailable <strong>{_e(health.get("unavailable_count"))}</strong></span>'
         f'<span>Partial <strong>{_e(health.get("partial_count"))}</strong></span>'
@@ -145,24 +174,39 @@ def render_section(payload: dict[str, Any]) -> str:
     )
 
     private_risk = payload.get("portfolio_decision_risk") or {}
-    rolls = private_risk.get("roll_window_counts") or {}
-    portfolio_health = (
-        '<div class="account-strip">'
-        f'<span>Thesis ID gaps <strong>'
-        f'{_e(private_risk.get("missing_thesis_id_count"))}</strong></span>'
-        f'<span>Unmapped positions <strong>'
-        f'{_e(private_risk.get("unmapped_symbol_count"))}</strong></span>'
-        f'<span>Max basket gross weight <strong>'
-        f'{_e(private_risk.get("max_basket_gross_weight"))}</strong></span>'
-        f'<span>Protective Δ coverage <strong>'
-        f'{_e(private_risk.get("hedge_coverage_ratio"))}</strong></span>'
-        f'<span>Roll ≤90/180/270d <strong>'
-        f'{_e(rolls.get("dte_le_90"))}/'
-        f'{_e(rolls.get("dte_le_180"))}/'
-        f'{_e(rolls.get("dte_le_270"))}</strong></span>'
-        f'<span>Flags <strong>{_e(private_risk.get("review_flags"))}</strong></span>'
-        "</div>"
-    )
+    risk_status = str(private_risk.get("status") or "analysis_unavailable")
+    if risk_status == "ok":
+        rolls = private_risk.get("roll_window_counts") or {}
+        portfolio_health = (
+            '<div class="account-strip">'
+            f'<span>Decision-risk <strong>{_badge(risk_status)}</strong></span>'
+            f'<span>Thesis ID gaps <strong>'
+            f'{_e(private_risk.get("missing_thesis_id_count"))}</strong></span>'
+            f'<span>Unmapped positions <strong>'
+            f'{_e(private_risk.get("unmapped_position_count"))}</strong></span>'
+            f'<span>Max basket gross weight <strong>'
+            f'{_pct(private_risk.get("max_basket_gross_weight"))}</strong></span>'
+            f'<span>Protective Δ coverage <strong>'
+            f'{_pct(private_risk.get("hedge_coverage_ratio"))}</strong></span>'
+            f'<span>Δ offset <strong>'
+            f'{_pct(private_risk.get("delta_offset_ratio"))}</strong></span>'
+            f'<span>Roll ≤90/180/270d <strong>'
+            f'{_e(rolls.get("dte_le_90"))}/'
+            f'{_e(rolls.get("dte_le_180"))}/'
+            f'{_e(rolls.get("dte_le_270"))}</strong></span>'
+            f'<span>Flags <strong>{_e(private_risk.get("review_flags"))}</strong></span>'
+            "</div>"
+        )
+    else:
+        # Never render a failed/skipped analysis as clean zero-gap counts.
+        portfolio_health = (
+            '<div class="account-strip">'
+            f'<span>Decision-risk <strong>{_badge(risk_status)}</strong></span>'
+            '<span class="muted">Aggregate decision-risk metrics are '
+            'unavailable for this snapshot; treat gaps as unknown, '
+            'not zero.</span>'
+            "</div>"
+        )
 
     log = payload.get("decision_log") or {}
     calibration = (

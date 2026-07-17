@@ -7,7 +7,7 @@ market context before a row can remain ``review_ready``.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Any
 
 from src.decision.opportunity_ranker import (
@@ -17,6 +17,9 @@ from src.decision.opportunity_ranker import (
 
 APPROVED_VALUES = {"approved", "approved_by_kevin"}
 MAX_EVIDENCE_MARKET_GAP_DAYS = 45
+# Wall-clock anchor: a market snapshot older than this (calendar days,
+# covering long holiday weekends) cannot support review_ready rows.
+MAX_MARKET_CONTEXT_AGE_DAYS = 5
 
 
 def _date(value: Any) -> date | None:
@@ -39,6 +42,7 @@ def _candidate_map(allocation_doc: dict[str, Any]) -> dict[str, dict[str, Any]]:
 def _quality_gaps(
     row: dict[str, Any],
     candidate: dict[str, Any],
+    today: date,
 ) -> list[str]:
     gaps: list[str] = []
     inputs = (
@@ -64,6 +68,12 @@ def _quality_gaps(
     market_date = _date(market.get("as_of"))
     if market.get("status") == "partial":
         gaps.append("market_context_partial")
+    if market_date is None:
+        gaps.append("market_context_as_of_missing")
+    elif (today - market_date).days > MAX_MARKET_CONTEXT_AGE_DAYS:
+        # Every other freshness gate compares against the market as-of; a
+        # frozen snapshot must therefore fail against the wall clock here.
+        gaps.append("market_context_stale")
 
     evidence_date = _date(row.get("evidence_as_of"))
     if market_date and evidence_date:
@@ -82,8 +92,11 @@ def _quality_gaps(
 def apply_quality_gates(
     payload: dict[str, Any],
     allocation_doc: dict[str, Any],
+    today: date | None = None,
 ) -> dict[str, Any]:
     """Downgrade optimistic rows without inventing replacement scores."""
+    if today is None:
+        today = datetime.now(timezone.utc).date()
     candidates = _candidate_map(allocation_doc)
     rows = payload.get("rows") or []
     readiness_counts: dict[str, int] = {}
@@ -93,6 +106,7 @@ def apply_quality_gates(
         gaps = _quality_gaps(
             row,
             candidates.get(str(row.get("symbol")), {}),
+            today,
         )
         row["missing_inputs"] = sorted(
             set(row.get("missing_inputs") or []) | set(gaps)
@@ -130,6 +144,7 @@ def apply_quality_gates(
     payload["quality_gate_contract"] = {
         "approved_values": sorted(APPROVED_VALUES),
         "max_evidence_market_gap_days": MAX_EVIDENCE_MARKET_GAP_DAYS,
+        "max_market_context_age_days": MAX_MARKET_CONTEXT_AGE_DAYS,
         "partial_market_context_is_screen_only": True,
         "future_catalyst_required": True,
         "threshold_origin": "repo_default_pending_kevin_confirmation",
@@ -141,5 +156,6 @@ def build_decision_grade_payload(**kwargs: Any) -> dict[str, Any]:
     allocation_doc = kwargs.get("allocation_doc")
     if not isinstance(allocation_doc, dict):
         allocation_doc = {}
+    today = kwargs.pop("today", None)
     payload = build_base_payload(**kwargs)
-    return apply_quality_gates(payload, allocation_doc)
+    return apply_quality_gates(payload, allocation_doc, today=today)

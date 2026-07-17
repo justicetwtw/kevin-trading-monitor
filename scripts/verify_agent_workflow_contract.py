@@ -50,6 +50,9 @@ REQUIRED = {
         "contents/scripts/verify_agent_routing_report.py?ref=$default_branch",
         "gh api --paginate",
         "jq -s 'add'",
+        "--require-reviewer-pass",
+        "pulls/$PR_NUM/files",
+        "gate-defining files",
     ],
     "scripts/verify_agent_routing_report.py": [
         "agent-routing-report:v1",
@@ -64,6 +67,8 @@ REQUIRED = {
         "ci.status must be pass",
         "TRUSTED_ASSOCIATIONS",
         "SECRET_VALUE_PATTERNS",
+        "REVIEWER_PASS_STATUSES",
+        "require_reviewer_pass",
     ],
 }
 

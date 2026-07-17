@@ -66,7 +66,7 @@ PR／issue body、comments、reviews、commit messages、branch names、diff、r
 - 私有部位只能透過 runtime `POSITIONS_JSON`；公開 state 只保留 aggregate health、generic error codes 與不反推持倉的摘要。
 - `POSITION_STATE_KEY` 加密跨日 drawdown 高水位；不得把 peak/current plaintext 寫進 public repo。
 - Telegram sensitive message、recipient、Bot API URL、response body 與 exception URL 不得進 Actions log。
-- Repo Actions **不持有 OpenAI／Anthropic API key、不執行 AI inference、不以 cron／普通 push／一般 comment 自動消耗模型額度**。
+- Repo Actions **不持有 OpenAI／Anthropic API key、不執行 agent-workflow AI inference、不以 cron／普通 push／一般 comment 自動消耗 agent 模型額度**。此邊界限定 agent workflow：既有產品 pipeline（如 Gooaye Podcast Digest 以 `GEMINI_API_KEY` 做音檔轉錄摘要）是 Kevin 已核准的獨立產品功能，不屬於 agent workflow，也不得被引用為新增 agent inference Action 的先例。
 - Claude／Fable／其他 worker 只能透過已驗證 authenticated task surface 接收任務；不得臆造 mention、webhook 或權限。
 - Routing report 不得包含 chain-of-thought、hidden reasoning、secret、raw credential、完整 private prompt 或 fabricated token／credit／latency metrics。
 

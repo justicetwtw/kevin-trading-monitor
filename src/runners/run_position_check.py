@@ -85,6 +85,14 @@ def _public_snapshot(
     stocks = snapshot.get("stocks") or []
     options = snapshot.get("options") or []
     configured = bool(stocks or options)
+    decision_risk_state = (
+        public_decision_risk_state(decision_risk or {})
+        if configured
+        else {
+            "status": "not_configured",
+            "privacy": "aggregate_decision_risk_only",
+        }
+    )
     return {
         "mode": snapshot.get("mode"),
         "position_source": snapshot.get("position_source"),
@@ -100,7 +108,7 @@ def _public_snapshot(
         "status": "configured" if configured else "empty",
         "workflow_status": workflow_status,
         "error_codes": sorted(set(error_codes or [])),
-        "decision_risk": public_decision_risk_state(decision_risk or {}),
+        "decision_risk": decision_risk_state,
         "privacy": "redacted_public_state",
     }
 

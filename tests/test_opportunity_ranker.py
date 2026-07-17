@@ -189,3 +189,101 @@ def test_payload_exposes_correlation_candidate_overlap():
         item["basket"] for item in payload["correlation_baskets"]
     }
     assert baskets == {"ai_capex", "hbm"}
+
+
+def test_missing_thesis_never_becomes_review_ready():
+    """R1: no company thesis (no kill criterion) must block review_ready."""
+    row = assess_candidate(
+        _candidate(scenario=_scenario()),
+        thesis=None,
+        watchlist=_watchlist(),
+        options=None,
+        market_context=_market(),
+        regime="neutral",
+    )
+    assert row["security_readiness"] == "not_decision_grade"
+    assert row["decision_posture"] != "eligible_for_capital_review"
+    assert "symbol_thesis_missing" in row["missing_inputs"]
+
+
+def test_missing_correlation_baskets_blocks_review_ready():
+    """R1: correlation context is required before review_ready."""
+    candidate = _candidate(scenario=_scenario())
+    candidate["decision_inputs"].pop("correlation_baskets")
+    row = assess_candidate(
+        candidate,
+        thesis=_thesis(),
+        watchlist=_watchlist(),
+        options=None,
+        market_context=_market(),
+        regime="neutral",
+    )
+    assert row["security_readiness"] == "screen_grade"
+    assert "correlation_baskets_missing" in row["missing_inputs"]
+
+
+def test_any_nonempty_missing_inputs_blocks_review_ready():
+    """R1: fail closed on every remaining gap, not a whitelisted subset."""
+    candidate = _candidate(scenario=_scenario())
+    candidate["decision_inputs"].pop("instrument_lenses")
+    row = assess_candidate(
+        candidate,
+        thesis=_thesis(),
+        watchlist=_watchlist(),
+        options=None,
+        market_context=_market(),
+        regime="neutral",
+    )
+    assert row["security_readiness"] == "screen_grade"
+
+    incomplete_watch = assess_candidate(
+        _candidate(scenario=_scenario()),
+        thesis=_thesis(),
+        watchlist={"total_score": 78, "action_band": "review"},
+        options=None,
+        market_context=_market(),
+        regime="neutral",
+    )
+    assert incomplete_watch["security_readiness"] == "screen_grade"
+    assert "watchlist_coverage_missing" in incomplete_watch["missing_inputs"]
+
+
+def test_watch_thesis_downgrades_readiness_to_re_underwrite():
+    """R11: watch/impaired thesis is a readiness state, not just posture."""
+    row = assess_candidate(
+        _candidate(scenario=_scenario()),
+        thesis=_thesis(status="watch"),
+        watchlist=_watchlist(),
+        options=None,
+        market_context=_market(),
+        regime="neutral",
+    )
+    assert row["security_readiness"] == "re_underwrite"
+    assert row["decision_posture"] == "re_underwrite"
+
+
+def test_zero_probability_case_invalidates_scenario():
+    """R13: a 0%-probability fantasy case must not shape the skew."""
+    scenario = _scenario()
+    scenario["cases"] = [
+        {"name": "down", "probability": 0.5, "price": 70},
+        {"name": "base", "probability": 0.5, "price": 120},
+        {"name": "moon", "probability": 0.0, "price": 900},
+    ]
+    validated, errors = validate_scenario(scenario)
+    assert validated is None
+    assert "scenario_case_2_probability_invalid" in errors
+
+
+def test_brier_excludes_out_of_range_probabilities():
+    """R12: an out-of-range probability must not corrupt the Brier score."""
+    log = [
+        {"forecast_probability": 1.0, "outcome": True},
+        {"forecast_probability": 7.0, "outcome": True},
+        {"forecast_probability": -0.2, "outcome": False},
+    ]
+    summary = summarize_decision_log(log)
+    assert summary["calibrated_forecast_count"] == 1
+    assert summary["invalid_probability_count"] == 2
+    assert summary["brier_score"] == 0.0
+    assert summary["status"] == "insufficient_history"

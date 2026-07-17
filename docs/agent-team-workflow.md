@@ -200,7 +200,13 @@ Bootstrap PR依上一節的人工／CI替代gate處理，不能宣稱已用尚�
 
 - `/agent-status`：read-only顯示open PR與狀態。
 - `/agent-fix-complete <40-char-sha>`：驗exact HEAD、trusted routing report與實際repo checks後移至`agent:review`。
-- `/agent-review-pass <40-char-sha>`：再次驗exact HEAD、routing report與實際checks後移至`needs-kevin`。
+- `/agent-review-pass <40-char-sha>`：以 `--require-reviewer-pass` mode 再驗exact HEAD與routing report——report 必須含 `independent_reviewer` 且 `status` 為明確 PASS verdict（`pending`／`in_review`／`blocked_delivery` 不是證明），加上實際checks後才移至`needs-kevin`。
+
+額外 gate：
+
+- 格式錯誤的命令（如非 40 字元 SHA）會得到明確拒絕 comment 並以非零結束，不得靜默綠色 run。
+- 修改 gate-defining files（`.github/workflows/**`、`scripts/verify_agent_routing_report.py`、`scripts/verify_agent_workflow_contract.py`）的 PR 不得經 branch-owned CI 自我授權：兩個 handoff 命令都會拒絕並標 `agent:blocked`，必須由 Kevin 走人工路徑。
+- 貼標前會重新讀取 current remote HEAD；驗證期間 HEAD 前進即拒絕，避免 label 覆蓋未驗證的狀態。
 
 ChatOps不clone repo、不跑產品tests、不呼叫AI inference、不merge、不deploy。
 

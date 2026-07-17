@@ -65,7 +65,7 @@ This source is delayed/unofficial and cannot substitute for official tape, conse
 Exact positions remain only in process memory and private Telegram. The private brief adds:
 
 - overlapping theme/subtheme basket Delta exposure;
-- protective negative Delta / positive Delta;
+- protective negative Delta（僅 long put／short stock；short call 只計入 Delta offset，不是下檔保護）/ positive Delta，另列總 Delta offset ratio;
 - ≤90/180/270-day roll windows;
 - missing/invalid thesis IDs and unmapped basket coverage;
 - review flags with threshold origin.

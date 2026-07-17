@@ -13,6 +13,9 @@ from typing import Any
 from src.storage.state_manager import read_json
 
 BASKET_REVIEW_WEIGHT = 0.50
+# Option kinds whose negative delta actually protects downside. Short calls
+# are deliberately excluded: they offset delta without providing a floor.
+PROTECTIVE_KINDS = {"long_put"}
 
 
 def _theme_context() -> tuple[dict[str, set[str]], set[str]]:
@@ -79,8 +82,12 @@ def analyze_portfolio_decision_risk(
     gross = float(summary.get("gross_delta_notional", 0) or 0)
     basket_gross: dict[str, float] = defaultdict(float)
     unmapped_symbols: set[str] = set()
+    unmapped_positions = 0
     positive_delta = 0.0
     negative_delta = 0.0
+    protective_delta = 0.0
+    nonprotective_negative_delta = 0.0
+    invalid_expiry_count = 0
     roll_counts = {
         "dte_le_90": 0,
         "dte_le_180": 0,
@@ -91,6 +98,7 @@ def analyze_portfolio_decision_risk(
         if not isinstance(row, dict):
             continue
         symbol = str(row.get("symbol") or "")
+        kind = str(row.get("kind") or "")
         delta_notional = (
             float(row.get("delta_notional", 0) or 0)
             if row.get("market_data_ok")
@@ -100,16 +108,28 @@ def analyze_portfolio_decision_risk(
             positive_delta += delta_notional
         else:
             negative_delta += abs(delta_notional)
+            # Negative delta is not synonymous with downside protection: a
+            # short call caps upside and adds negative gamma but provides no
+            # floor. Only long puts and short stock count as protective.
+            if kind in PROTECTIVE_KINDS or kind == "stock":
+                protective_delta += abs(delta_notional)
+            else:
+                nonprotective_negative_delta += abs(delta_notional)
         baskets = set(basket_map.get(symbol) or set())
         explicit_theme = str(row.get("theme") or "")
         if explicit_theme and explicit_theme != "unmapped":
             baskets.add(explicit_theme)
         if not baskets:
             unmapped_symbols.add(symbol)
+            unmapped_positions += 1
         for basket in baskets:
             basket_gross[basket] += abs(delta_notional)
         dte = row.get("dte")
-        if isinstance(dte, int) and row.get("kind") != "stock":
+        if isinstance(dte, int) and kind != "stock" and dte < 0:
+            # dte=-1 is the unparseable-expiry sentinel; counting it as a
+            # roll window would fabricate an option_roll_window flag.
+            invalid_expiry_count += 1
+        elif isinstance(dte, int) and kind != "stock" and dte >= 0:
             if dte <= 90:
                 roll_counts["dte_le_90"] += 1
             if dte <= 180:
@@ -132,6 +152,9 @@ def analyze_portfolio_decision_risk(
         basket_exposure[0]["gross_weight"] if basket_exposure else 0.0
     )
     hedge_coverage = (
+        protective_delta / positive_delta if positive_delta > 0 else None
+    )
+    delta_offset = (
         negative_delta / positive_delta if positive_delta > 0 else None
     )
     flags = []
@@ -145,16 +168,24 @@ def analyze_portfolio_decision_risk(
         flags.append("correlated_basket_weight_over_50pct")
     if roll_counts["dte_le_90"]:
         flags.append("option_roll_window_le_90d")
+    if invalid_expiry_count:
+        flags.append("option_expiry_unparseable")
     return {
+        "status": "ok",
         "position_count": len(positions),
         "missing_thesis_id_count": missing_thesis_ids,
         "invalid_thesis_id_count": invalid_thesis_ids,
         "unmapped_symbol_count": len(unmapped_symbols),
+        "unmapped_position_count": unmapped_positions,
         "basket_exposure": basket_exposure,
         "max_basket_gross_weight": max_weight,
         "positive_delta_notional": positive_delta,
-        "protective_negative_delta_notional": negative_delta,
+        "negative_delta_notional": negative_delta,
+        "protective_negative_delta_notional": protective_delta,
+        "nonprotective_negative_delta_notional": nonprotective_negative_delta,
         "hedge_coverage_ratio": hedge_coverage,
+        "delta_offset_ratio": delta_offset,
+        "invalid_expiry_count": invalid_expiry_count,
         "roll_window_counts": roll_counts,
         "review_flags": flags,
         "threshold_origin": "repo_default_pending_kevin_confirmation",
@@ -164,20 +195,32 @@ def analyze_portfolio_decision_risk(
 
 
 def public_decision_risk_state(value: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(value, dict) or value.get("status") != "ok":
+        # A crashed or skipped analysis must never be neutral-filled into
+        # zero-gap counts on the public dashboard.
+        return {
+            "status": "analysis_unavailable",
+            "privacy": "aggregate_decision_risk_only",
+        }
     return {
+        "status": "ok",
         "missing_thesis_id_count": int(
             value.get("missing_thesis_id_count", 0) or 0
         ),
         "invalid_thesis_id_count": int(
             value.get("invalid_thesis_id_count", 0) or 0
         ),
-        "unmapped_symbol_count": int(
-            value.get("unmapped_symbol_count", 0) or 0
+        "unmapped_position_count": int(
+            value.get("unmapped_position_count", 0) or 0
         ),
         "max_basket_gross_weight": value.get(
             "max_basket_gross_weight"
         ),
         "hedge_coverage_ratio": value.get("hedge_coverage_ratio"),
+        "delta_offset_ratio": value.get("delta_offset_ratio"),
+        "invalid_expiry_count": int(
+            value.get("invalid_expiry_count", 0) or 0
+        ),
         "roll_window_counts": dict(value.get("roll_window_counts") or {}),
         "review_flags": list(value.get("review_flags") or []),
         "threshold_origin": value.get("threshold_origin"),
@@ -200,8 +243,17 @@ def format_private_decision_risk(value: dict[str, Any]) -> str:
         if isinstance(coverage, (int, float))
         else "—"
     )
+    offset = value.get("delta_offset_ratio")
+    offset_text = (
+        f"{float(offset) * 100:.1f}%"
+        if isinstance(offset, (int, float))
+        else "—"
+    )
     lines.append(
-        f"Protective negative Delta / positive Delta：{coverage_text}"
+        f"Protective negative Delta（long put／short stock）/ positive Delta：{coverage_text}"
+    )
+    lines.append(
+        f"總 Delta offset（含 short call，非下檔保護）：{offset_text}"
     )
     baskets = value.get("basket_exposure") or []
     if baskets:

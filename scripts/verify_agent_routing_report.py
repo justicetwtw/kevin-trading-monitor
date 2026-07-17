@@ -25,6 +25,9 @@ DELEGATION_OWNERSHIP = {"read_only", "write_reintegrated_by_owner"}
 TEST_RESULTS = {"pass", "fail", "not_run"}
 CI_STATUSES = {"pass", "pending", "fail", "not_applicable"}
 USAGE_STATUSES = {"reported", "unavailable"}
+# The only reviewer statuses that prove an independent review PASSED.
+# pending / in_review / blocked_delivery are progress notes, not verdicts.
+REVIEWER_PASS_STATUSES = {"pass"}
 HEAD_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 MARKER_PATTERN = re.compile(
     r"<!--\s*agent-routing-report:v1\s+head=([0-9a-fA-F]{40})\s*-->"
@@ -90,7 +93,12 @@ def extract_report(body: str) -> tuple[str, dict[str, Any] | None, str | None] |
     return marker_head, parsed, None
 
 
-def validate_report(report: Any, expected_head: str) -> list[str]:
+def validate_report(
+    report: Any,
+    expected_head: str,
+    *,
+    require_reviewer_pass: bool = False,
+) -> list[str]:
     errors: list[str] = []
     if not isinstance(report, dict):
         return ["report must be a JSON object"]
@@ -124,13 +132,13 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
     else:
         if owner.get("role") != "implementation_owner":
             errors.append("owner.role must be 'implementation_owner'")
-        for field in ("provider", "session_mode"):
+        # surface and assignment_basis are the authenticated-delivery-path
+        # and quota/task-fit evidence; the canonical report requires both.
+        for field in ("provider", "session_mode", "surface"):
             if not _nonempty(owner.get(field)):
                 errors.append(f"owner.{field} is required")
-        if "surface" in owner and not _nonempty(owner.get("surface")):
-            errors.append("owner.surface must be non-empty when supplied")
         basis = owner.get("assignment_basis")
-        if basis is not None and (
+        if (
             not isinstance(basis, list)
             or not basis
             or not all(_nonempty(item) for item in basis)
@@ -234,6 +242,10 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
         errors.append("ci.status must be pass before /agent-fix-complete")
 
     reviewer = report.get("independent_reviewer")
+    if require_reviewer_pass and reviewer is None:
+        errors.append(
+            "independent_reviewer is required for /agent-review-pass"
+        )
     if reviewer is not None:
         if not isinstance(reviewer, dict):
             errors.append("independent_reviewer must be an object when supplied")
@@ -243,12 +255,25 @@ def validate_report(report: Any, expected_head: str) -> list[str]:
             for field in ("provider", "surface", "status"):
                 if not _nonempty(reviewer.get(field)):
                     errors.append(f"independent_reviewer.{field} is required")
+            if require_reviewer_pass:
+                status = str(reviewer.get("status") or "").lower()
+                if status not in REVIEWER_PASS_STATUSES:
+                    errors.append(
+                        "independent_reviewer.status must be an explicit PASS "
+                        f"verdict for /agent-review-pass; got {status!r} "
+                        "(pending/in_review/blocked statuses are not proof)"
+                    )
 
     _scan_forbidden(report, "$", errors)
     return errors
 
 
-def validate_report_comment(body: str, expected_head: str) -> list[str]:
+def validate_report_comment(
+    body: str,
+    expected_head: str,
+    *,
+    require_reviewer_pass: bool = False,
+) -> list[str]:
     extracted = extract_report(body)
     if extracted is None:
         return ["missing agent-routing-report:v1 head=<sha> marker"]
@@ -256,7 +281,9 @@ def validate_report_comment(body: str, expected_head: str) -> list[str]:
     if parse_error:
         return [parse_error]
     assert report is not None
-    errors = validate_report(report, expected_head)
+    errors = validate_report(
+        report, expected_head, require_reviewer_pass=require_reviewer_pass
+    )
     if report.get("head") != marker_head:
         errors.append(
             f"marker head {marker_head!r} does not equal report head {report.get('head')!r}"
@@ -265,7 +292,10 @@ def validate_report_comment(body: str, expected_head: str) -> list[str]:
 
 
 def find_valid_trusted_report(
-    comments: Any, expected_head: str
+    comments: Any,
+    expected_head: str,
+    *,
+    require_reviewer_pass: bool = False,
 ) -> tuple[dict[str, Any] | None, list[str]]:
     """Return newest schema-valid report posted by a trusted human actor."""
     if not isinstance(comments, list):
@@ -284,7 +314,9 @@ def find_valid_trusted_report(
         if association not in TRUSTED_ASSOCIATIONS or user_type == "Bot":
             diagnostics.append(f"ignored untrusted routing report from {login}")
             continue
-        errors = validate_report_comment(body, expected_head)
+        errors = validate_report_comment(
+            body, expected_head, require_reviewer_pass=require_reviewer_pass
+        )
         if not errors:
             extracted = extract_report(body)
             assert extracted is not None and extracted[1] is not None
@@ -298,6 +330,14 @@ def find_valid_trusted_report(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--expected-head", required=True)
+    parser.add_argument(
+        "--require-reviewer-pass",
+        action="store_true",
+        help=(
+            "Require an explicit independent-reviewer PASS verdict bound to "
+            "the expected HEAD (used by /agent-review-pass)."
+        ),
+    )
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--report-file")
     source.add_argument("--comment-file")
@@ -311,14 +351,22 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.report_file:
         report = json.loads(Path(args.report_file).read_text(encoding="utf-8"))
-        errors = validate_report(report, expected)
+        errors = validate_report(
+            report, expected, require_reviewer_pass=args.require_reviewer_pass
+        )
     elif args.comment_file:
         errors = validate_report_comment(
-            Path(args.comment_file).read_text(encoding="utf-8"), expected
+            Path(args.comment_file).read_text(encoding="utf-8"),
+            expected,
+            require_reviewer_pass=args.require_reviewer_pass,
         )
     else:
         comments = json.loads(Path(args.comments_json).read_text(encoding="utf-8"))
-        report, diagnostics = find_valid_trusted_report(comments, expected)
+        report, diagnostics = find_valid_trusted_report(
+            comments,
+            expected,
+            require_reviewer_pass=args.require_reviewer_pass,
+        )
         errors = [] if report is not None else diagnostics
 
     if errors:

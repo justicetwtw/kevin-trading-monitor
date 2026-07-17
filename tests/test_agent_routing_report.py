@@ -196,3 +196,68 @@ def test_reviewer_must_not_be_owner():
         }
     )
     assert any("same_as_owner must be false" in error for error in validate_report(report, HEAD))
+
+
+def test_owner_surface_and_assignment_basis_are_required():
+    """R20: delivery-path and quota/task-fit evidence cannot be omitted."""
+    no_surface = _report()
+    del no_surface["owner"]["surface"]
+    assert any(
+        "owner.surface" in error
+        for error in validate_report(no_surface, HEAD)
+    )
+
+    no_basis = _report()
+    del no_basis["owner"]["assignment_basis"]
+    assert any(
+        "assignment_basis" in error
+        for error in validate_report(no_basis, HEAD)
+    )
+
+    empty_basis = _report()
+    empty_basis["owner"]["assignment_basis"] = []
+    assert any(
+        "assignment_basis" in error
+        for error in validate_report(empty_basis, HEAD)
+    )
+
+
+def test_review_pass_mode_requires_explicit_reviewer_pass():
+    """R21: pending/in_review/blocked statuses never prove a review passed."""
+    for status in ("pending", "in_review", "blocked_delivery"):
+        report = _report()
+        report["independent_reviewer"]["status"] = status
+        # The base gate (fix-complete) accepts progress statuses...
+        assert validate_report(report, HEAD) == []
+        # ...but review-pass mode must reject them.
+        errors = validate_report(report, HEAD, require_reviewer_pass=True)
+        assert any("PASS" in error for error in errors)
+
+    passed = _report()
+    passed["independent_reviewer"]["status"] = "pass"
+    assert validate_report(passed, HEAD, require_reviewer_pass=True) == []
+
+
+def test_review_pass_mode_requires_reviewer_to_exist():
+    report = _report()
+    del report["independent_reviewer"]
+    assert validate_report(report, HEAD) == []
+    errors = validate_report(report, HEAD, require_reviewer_pass=True)
+    assert any("independent_reviewer is required" in error for error in errors)
+
+
+def test_review_pass_mode_flows_through_comment_search():
+    pending = _comment(_report())
+    assert find_valid_trusted_report([pending], HEAD)[0] is not None
+    report, diagnostics = find_valid_trusted_report(
+        [pending], HEAD, require_reviewer_pass=True
+    )
+    assert report is None
+    assert diagnostics
+
+    passed_report = _report()
+    passed_report["independent_reviewer"]["status"] = "pass"
+    found, _ = find_valid_trusted_report(
+        [_comment(passed_report)], HEAD, require_reviewer_pass=True
+    )
+    assert found is not None

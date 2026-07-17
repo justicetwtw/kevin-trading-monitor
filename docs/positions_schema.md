@@ -80,7 +80,7 @@ The private Telegram portfolio brief now includes:
 
 - symbol and theme Delta exposure;
 - overlapping correlation baskets such as `ai_capex`, `memory_cycle`, `hbm`, `commodity_dram`, `nand`, `optical_interconnect` and `portfolio_hedge`;
-- protective negative Delta divided by positive Delta;
+- protective negative Delta（only long puts / short stock；short calls are Delta offset, not downside protection）divided by positive Delta, plus a separate total Delta-offset ratio;
 - option roll counts at ≤90, ≤180 and ≤270 days;
 - missing/invalid thesis IDs, unmapped basket coverage and review flags.
 
@@ -98,7 +98,7 @@ During a position workflow run, exact positions and estimated account value exis
 - aggregate decision-risk counts/ratios:
   - missing thesis ID count;
   - invalid thesis ID count;
-  - unmapped-symbol count;
+  - unmapped-position count;
   - maximum basket gross-weight ratio;
   - hedge-coverage ratio;
   - roll-window counts;

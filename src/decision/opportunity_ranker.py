@@ -68,7 +68,9 @@ def validate_scenario(scenario: Any) -> tuple[dict[str, Any] | None, list[str]]:
         probability = _number(case.get("probability"))
         terminal = _number(case.get("price"))
         name = str(case.get("name") or f"case_{index}")
-        if probability is None or probability < 0 or probability > 1:
+        if probability is None or probability <= 0 or probability > 1:
+            # Zero-probability cases are modeling errors: they would still
+            # drive the downside/upside skew without contributing to EV.
             errors.append(f"scenario_case_{index}_probability_invalid")
             continue
         if terminal is None or terminal <= 0:
@@ -257,30 +259,36 @@ def assess_candidate(
             "company thesis is broken/invalidated; "
             "security ranking is suspended"
         )
-    elif scenario is None or market_quality != "usable" or anchor_errors:
+    elif thesis_status in THESIS_WATCH:
+        readiness = "re_underwrite"
+        posture = "re_underwrite"
+        reason = (
+            "company thesis is on watch/impaired; the security must be "
+            "re-underwritten before capital review"
+        )
+    elif (
+        scenario is None
+        or market_quality != "usable"
+        or anchor_errors
+        or not thesis
+        or not thesis.get("invalidation")
+    ):
         readiness = "not_decision_grade"
         posture = "wait_for_proof"
         reason = (
-            "a current source/as-of, valid probability scenario and "
-            "market-consistent price anchor are required"
+            "a current source/as-of, valid probability scenario, "
+            "market-consistent price anchor and a company thesis with "
+            "invalidation criteria are required"
         )
-    elif any(
-        item in missing
-        for item in {
-            "evidence_quality_not_reviewable",
-            "evidence_as_of_missing",
-            "evidence_sources_missing",
-            "dated_catalyst_missing",
-            "catalyst_source_missing",
-            "complete_screen_score_missing",
-            "watchlist_coverage_below_80pct",
-        }
-    ):
+    elif missing:
+        # Fail closed: any remaining gap (evidence, catalyst, screen
+        # coverage, correlation baskets, instrument lenses, review date)
+        # blocks review_ready; missing data is never neutral-filled.
         readiness = "screen_grade"
         posture = "wait_for_proof"
         reason = (
-            "scenario math exists, but evidence/screen/catalyst "
-            "coverage is incomplete"
+            "scenario math exists, but required decision inputs are "
+            "incomplete; every listed gap must close before review"
         )
     else:
         readiness = "review_ready"
@@ -292,12 +300,6 @@ def assess_candidate(
         elif ratio is not None and ratio > 1.0:
             posture = "deprioritized"
             reason = "credible downside exceeds modeled upside"
-        elif thesis_status in THESIS_WATCH:
-            posture = "re_underwrite"
-            reason = (
-                "company thesis is on watch/impaired even though "
-                "security inputs are complete"
-            )
         else:
             posture = "eligible_for_capital_review"
             reason = (
@@ -428,26 +430,29 @@ def summarize_decision_log(log: Any) -> dict[str, Any]:
         else []
     )
     resolved = [item for item in rows if item.get("outcome") is not None]
-    forecasts = [
-        item
-        for item in resolved
-        if _number(item.get("forecast_probability")) is not None
-        and isinstance(item.get("outcome"), bool)
-    ]
+    forecasts: list[tuple[float, bool]] = []
+    invalid_probability_count = 0
+    for item in resolved:
+        probability = _number(item.get("forecast_probability"))
+        if probability is None or not isinstance(item.get("outcome"), bool):
+            continue
+        if probability < 0.0 or probability > 1.0:
+            # An out-of-range probability would corrupt the published Brier
+            # score; exclude it and surface the count instead of averaging it.
+            invalid_probability_count += 1
+            continue
+        forecasts.append((probability, bool(item["outcome"])))
     brier = None
     if forecasts:
         brier = sum(
-            (
-                float(item["forecast_probability"])
-                - (1.0 if item["outcome"] else 0.0)
-            )
-            ** 2
-            for item in forecasts
+            (probability - (1.0 if outcome else 0.0)) ** 2
+            for probability, outcome in forecasts
         ) / len(forecasts)
     return {
         "decision_count": len(rows),
         "resolved_count": len(resolved),
         "calibrated_forecast_count": len(forecasts),
+        "invalid_probability_count": invalid_probability_count,
         "brier_score": round(brier, 6) if brier is not None else None,
         "status": (
             "insufficient_history"

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 from loguru import logger
@@ -17,6 +17,9 @@ from src.data.price_data import fetch_history
 from src.storage.state_manager import read_json, write_json
 
 OUTPUT_FILE = "decision_market_context.json"
+# Calendar-day bound (covers long holiday weekends). A complete series whose
+# last bar is older than this is stale price data, not a healthy snapshot.
+MAX_MARKET_AGE_DAYS = 5
 
 
 def _return(close, lookback: int) -> float | None:
@@ -37,7 +40,18 @@ def _realized_vol(close, window: int = 20) -> float | None:
     return round(value, 6) if math.isfinite(value) else None
 
 
-def summarize_history(symbol: str, frame) -> dict[str, Any]:
+def _parse_date(value: Any) -> date | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return date.fromisoformat(value[:10])
+    except ValueError:
+        return None
+
+
+def summarize_history(
+    symbol: str, frame, *, today: date | None = None
+) -> dict[str, Any]:
     if frame is None or frame.empty or "Close" not in frame or "High" not in frame:
         return {
             "symbol": symbol,
@@ -59,6 +73,25 @@ def summarize_history(symbol: str, frame) -> dict[str, Any]:
     high_52w = float(high.tail(252).max())
     as_of_index = close.index[-1]
     as_of = as_of_index.isoformat() if hasattr(as_of_index, "isoformat") else str(as_of_index)
+    as_of_date = (
+        as_of_index.date()
+        if hasattr(as_of_index, "date")
+        else _parse_date(as_of)
+    )
+    reference = today or datetime.now(timezone.utc).date()
+    if as_of_date is not None and (reference - as_of_date).days > MAX_MARKET_AGE_DAYS:
+        # Metric completeness alone must not label stale price data healthy:
+        # downstream freshness gates compare against this same as-of.
+        return {
+            "symbol": symbol,
+            "status": "unavailable",
+            "current_price": round(current, 6),
+            "as_of": as_of,
+            "source": "yfinance_delayed_public_market_data",
+            "sample_count": int(len(close)),
+            "error_code": "stale_price_history",
+            "max_age_days": MAX_MARKET_AGE_DAYS,
+        }
     metrics = {
         "return_1m": _return(close, 21),
         "return_3m": _return(close, 63),
@@ -109,14 +142,25 @@ def main() -> int:
             )
     unavailable = [row["symbol"] for row in rows if row.get("status") == "unavailable"]
     partial = [row["symbol"] for row in rows if row.get("status") == "partial"]
+    if not symbols:
+        # An empty candidate list is a degraded input (corrupt or emptied
+        # allocation doc), never a healthy run.
+        status = "no_candidates"
+    elif unavailable:
+        status = "degraded"
+    elif partial:
+        status = "partial"
+    else:
+        status = "healthy"
     document = {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "status": "degraded" if unavailable else "partial" if partial else "healthy",
+        "status": status,
         "rows": rows,
         "unavailable_count": len(unavailable),
         "partial_count": len(partial),
         "safe_error_symbols": unavailable,
+        "max_age_days": MAX_MARKET_AGE_DAYS,
         "contract": "market_context_only_not_valuation_or_trade_instruction",
     }
     if not write_json(OUTPUT_FILE, document):
@@ -124,9 +168,9 @@ def main() -> int:
         return 1
     logger.info(
         f"decision market context: {len(rows)} symbols, "
-        f"unavailable={len(unavailable)}, partial={len(partial)}"
+        f"unavailable={len(unavailable)}, partial={len(partial)}, status={status}"
     )
-    return 1 if unavailable else 0
+    return 1 if (unavailable or not symbols) else 0
 
 
 if __name__ == "__main__":

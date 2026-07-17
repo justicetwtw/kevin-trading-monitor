@@ -172,9 +172,11 @@ def test_missing_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
         lambda snapshot: (
             True,
             {
+                "status": "ok",
                 "missing_thesis_id_count": 3,
                 "invalid_thesis_id_count": 0,
                 "unmapped_symbol_count": 0,
+                "unmapped_position_count": 0,
                 "roll_window_counts": {},
                 "review_flags": ["position_thesis_id_missing"],
             },
@@ -220,9 +222,11 @@ def test_invalid_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
         lambda snapshot: (
             True,
             {
+                "status": "ok",
                 "missing_thesis_id_count": 0,
                 "invalid_thesis_id_count": 1,
                 "unmapped_symbol_count": 0,
+                "unmapped_position_count": 0,
                 "roll_window_counts": {},
                 "review_flags": ["position_thesis_id_invalid"],
             },
@@ -238,3 +242,117 @@ def test_invalid_thesis_id_is_a_safe_degraded_workflow_code(monkeypatch):
     public = writes["position_snapshot.json"]
     assert "position_thesis_id_invalid" in public["error_codes"]
     assert public["decision_risk"]["invalid_thesis_id_count"] == 1
+
+
+def test_short_call_negative_delta_is_not_protective(monkeypatch):
+    """R3: short calls offset delta but provide no downside floor."""
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: _thesis_doc())
+    summary = _summary()
+    summary["rows"].append(
+        {
+            "kind": "short_call",
+            "symbol": "NVDA",
+            "theme": "ai_capex",
+            "delta_notional": -20000,
+            "dte": 45,
+            "market_data_ok": True,
+        }
+    )
+    result = risk.analyze_portfolio_decision_risk(summary, _snapshot())
+    # Only the QQQ long put is protective; the short call is delta offset.
+    assert result["protective_negative_delta_notional"] == pytest.approx(10000)
+    assert result["nonprotective_negative_delta_notional"] == pytest.approx(20000)
+    assert result["hedge_coverage_ratio"] == pytest.approx(10000 / 130000)
+    assert result["delta_offset_ratio"] == pytest.approx(30000 / 130000)
+
+
+def test_short_stock_negative_delta_is_protective(monkeypatch):
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: _thesis_doc())
+    summary = _summary()
+    summary["rows"].append(
+        {
+            "kind": "stock",
+            "symbol": "SPY",
+            "theme": "portfolio_hedge",
+            "delta_notional": -5000,
+            "market_data_ok": True,
+        }
+    )
+    result = risk.analyze_portfolio_decision_risk(summary, _snapshot())
+    assert result["protective_negative_delta_notional"] == pytest.approx(15000)
+
+
+def test_invalid_expiry_sentinel_is_not_a_roll_window(monkeypatch):
+    """R10: dte=-1 (unparseable expiry) must not fabricate roll flags."""
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: _thesis_doc())
+    summary = {
+        "gross_delta_notional": 100000,
+        "rows": [
+            {
+                "kind": "stock",
+                "symbol": "NVDA",
+                "theme": "ai_capex",
+                "delta_notional": 100000,
+                "market_data_ok": True,
+            },
+            {
+                "kind": "long_call",
+                "symbol": "MU",
+                "theme": "memory_cycle",
+                "delta_notional": 0.0,
+                "dte": -1,
+                "market_data_ok": False,
+            },
+        ],
+    }
+    result = risk.analyze_portfolio_decision_risk(summary, _snapshot())
+    assert result["roll_window_counts"] == {
+        "dte_le_90": 0,
+        "dte_le_180": 0,
+        "dte_le_270": 0,
+    }
+    assert "option_roll_window_le_90d" not in result["review_flags"]
+    assert result["invalid_expiry_count"] == 1
+    assert "option_expiry_unparseable" in result["review_flags"]
+
+
+def test_unmapped_position_count_counts_positions_not_symbols(monkeypatch):
+    """R15: two unmapped positions on one symbol must not report as one."""
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: {})
+    summary = {
+        "gross_delta_notional": 20000,
+        "rows": [
+            {
+                "kind": "long_call",
+                "symbol": "LITE",
+                "theme": "",
+                "delta_notional": 10000,
+                "dte": 200,
+                "market_data_ok": True,
+            },
+            {
+                "kind": "long_call",
+                "symbol": "LITE",
+                "theme": "",
+                "delta_notional": 10000,
+                "dte": 400,
+                "market_data_ok": True,
+            },
+        ],
+    }
+    result = risk.analyze_portfolio_decision_risk(summary, _snapshot())
+    assert result["unmapped_symbol_count"] == 1
+    assert result["unmapped_position_count"] == 2
+    public = risk.public_decision_risk_state(result)
+    assert public["unmapped_position_count"] == 2
+    assert "unmapped_symbol_count" not in public
+
+
+def test_empty_analysis_is_analysis_unavailable_not_zero_gaps():
+    """R6: a crashed/skipped analysis must not render as zero gaps."""
+    public = risk.public_decision_risk_state({})
+    assert public["status"] == "analysis_unavailable"
+    assert "missing_thesis_id_count" not in public
+    assert "hedge_coverage_ratio" not in public
+    ok = risk.public_decision_risk_state({"status": "ok"})
+    assert ok["status"] == "ok"
