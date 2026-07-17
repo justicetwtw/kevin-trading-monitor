@@ -250,6 +250,8 @@ def main() -> int:
         errors.append("position_thesis_id_invalid")
     if int(decision_risk.get("unmapped_symbol_count", 0) or 0) > 0:
         errors.append("position_correlation_basket_unmapped")
+    if str(decision_risk.get("status") or "") == "degraded_market_data":
+        errors.append("position_market_data_missing")
 
     workflow_status = "healthy" if not errors else "degraded"
     public = _public_snapshot(

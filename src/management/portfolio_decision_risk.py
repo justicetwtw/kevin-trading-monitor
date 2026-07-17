@@ -94,11 +94,16 @@ def analyze_portfolio_decision_risk(
         "dte_le_270": 0,
     }
 
+    positions_missing_market_data = 0
     for row in summary.get("rows") or []:
         if not isinstance(row, dict):
             continue
         symbol = str(row.get("symbol") or "")
         kind = str(row.get("kind") or "")
+        if not row.get("market_data_ok"):
+            # A failed lookup is unknown exposure, not zero exposure; the
+            # aggregate ratios below must degrade instead of looking healthy.
+            positions_missing_market_data += 1
         delta_notional = (
             float(row.get("delta_notional", 0) or 0)
             if row.get("market_data_ok")
@@ -170,8 +175,15 @@ def analyze_portfolio_decision_risk(
         flags.append("option_roll_window_le_90d")
     if invalid_expiry_count:
         flags.append("option_expiry_unparseable")
+    if positions_missing_market_data:
+        flags.append("position_market_data_missing")
     return {
-        "status": "ok",
+        "status": (
+            "degraded_market_data"
+            if positions_missing_market_data
+            else "ok"
+        ),
+        "positions_missing_market_data": positions_missing_market_data,
         "position_count": len(positions),
         "missing_thesis_id_count": missing_thesis_ids,
         "invalid_thesis_id_count": invalid_thesis_ids,
@@ -195,15 +207,16 @@ def analyze_portfolio_decision_risk(
 
 
 def public_decision_risk_state(value: dict[str, Any]) -> dict[str, Any]:
-    if not isinstance(value, dict) or value.get("status") != "ok":
+    status = value.get("status") if isinstance(value, dict) else None
+    if status not in {"ok", "degraded_market_data"}:
         # A crashed or skipped analysis must never be neutral-filled into
         # zero-gap counts on the public dashboard.
         return {
             "status": "analysis_unavailable",
             "privacy": "aggregate_decision_risk_only",
         }
-    return {
-        "status": "ok",
+    public = {
+        "status": status,
         "missing_thesis_id_count": int(
             value.get("missing_thesis_id_count", 0) or 0
         ),
@@ -213,11 +226,6 @@ def public_decision_risk_state(value: dict[str, Any]) -> dict[str, Any]:
         "unmapped_position_count": int(
             value.get("unmapped_position_count", 0) or 0
         ),
-        "max_basket_gross_weight": value.get(
-            "max_basket_gross_weight"
-        ),
-        "hedge_coverage_ratio": value.get("hedge_coverage_ratio"),
-        "delta_offset_ratio": value.get("delta_offset_ratio"),
         "invalid_expiry_count": int(
             value.get("invalid_expiry_count", 0) or 0
         ),
@@ -226,10 +234,32 @@ def public_decision_risk_state(value: dict[str, Any]) -> dict[str, Any]:
         "threshold_origin": value.get("threshold_origin"),
         "privacy": "aggregate_decision_risk_only",
     }
+    if status == "ok":
+        # Exposure-derived aggregates are only publishable when every
+        # position had market data; partial ratios would look healthy while
+        # silently omitting unknown exposure.
+        public["max_basket_gross_weight"] = value.get(
+            "max_basket_gross_weight"
+        )
+        public["hedge_coverage_ratio"] = value.get("hedge_coverage_ratio")
+        public["delta_offset_ratio"] = value.get("delta_offset_ratio")
+    else:
+        public["positions_missing_market_data"] = int(
+            value.get("positions_missing_market_data", 0) or 0
+        )
+    return public
 
 
 def format_private_decision_risk(value: dict[str, Any]) -> str:
     lines = ["\n<b>決策風險與相關曝險（私有）</b>"]
+    missing_market = int(
+        value.get("positions_missing_market_data", 0) or 0
+    )
+    if missing_market:
+        lines.append(
+            f"⚠ {missing_market} 個部位缺市場資料：以下曝險/避險比率為"
+            "不完整估計（未知曝險未計入），不可作為健康訊號。"
+        )
     missing = int(value.get("missing_thesis_id_count", 0) or 0)
     invalid = int(value.get("invalid_thesis_id_count", 0) or 0)
     unmapped = int(value.get("unmapped_symbol_count", 0) or 0)

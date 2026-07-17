@@ -99,6 +99,7 @@ During a position workflow run, exact positions and estimated account value exis
   - missing thesis ID count;
   - invalid thesis ID count;
   - unmapped-position count;
+  - `status`（`ok`／`degraded_market_data`／`analysis_unavailable`）：任一部位缺市場資料時為 degraded，曝險比率（hedge coverage／delta offset／max basket weight）自 public state 抑制，未知曝險不得偽裝成健康比率;
   - maximum basket gross-weight ratio;
   - hedge-coverage ratio;
   - roll-window counts;

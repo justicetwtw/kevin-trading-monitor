@@ -356,3 +356,42 @@ def test_empty_analysis_is_analysis_unavailable_not_zero_gaps():
     assert "hedge_coverage_ratio" not in public
     ok = risk.public_decision_risk_state({"status": "ok"})
     assert ok["status"] == "ok"
+
+
+def test_missing_market_data_degrades_analysis_not_healthy(monkeypatch):
+    """D2: a failed lookup is unknown exposure, not zero exposure."""
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: _thesis_doc())
+    summary = _summary()
+    summary["rows"].append(
+        {
+            "kind": "long_call",
+            "symbol": "MU",
+            "theme": "memory_cycle",
+            "dte": 120,
+            "market_data_ok": False,
+        }
+    )
+    result = risk.analyze_portfolio_decision_risk(summary, _snapshot())
+    assert result["status"] == "degraded_market_data"
+    assert result["positions_missing_market_data"] == 1
+    assert "position_market_data_missing" in result["review_flags"]
+
+    public = risk.public_decision_risk_state(result)
+    assert public["status"] == "degraded_market_data"
+    assert public["positions_missing_market_data"] == 1
+    # Incomplete exposure ratios must not be published as healthy numbers.
+    assert "hedge_coverage_ratio" not in public
+    assert "delta_offset_ratio" not in public
+    assert "max_basket_gross_weight" not in public
+    # Market-data-independent counts remain available.
+    assert "missing_thesis_id_count" in public
+
+
+def test_complete_market_data_keeps_public_ratios(monkeypatch):
+    monkeypatch.setattr(risk, "read_json", lambda *args, **kwargs: _thesis_doc())
+    result = risk.analyze_portfolio_decision_risk(_summary(), _snapshot())
+    assert result["status"] == "ok"
+    public = risk.public_decision_risk_state(result)
+    assert public["status"] == "ok"
+    assert "hedge_coverage_ratio" in public
+    assert "positions_missing_market_data" not in public

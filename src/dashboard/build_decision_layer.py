@@ -175,7 +175,7 @@ def render_section(payload: dict[str, Any]) -> str:
 
     private_risk = payload.get("portfolio_decision_risk") or {}
     risk_status = str(private_risk.get("status") or "analysis_unavailable")
-    if risk_status == "ok":
+    if risk_status in {"ok", "degraded_market_data"}:
         rolls = private_risk.get("roll_window_counts") or {}
         portfolio_health = (
             '<div class="account-strip">'
