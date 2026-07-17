@@ -35,7 +35,7 @@
   "delivered_count": 0,
   "delivery_status": "no_new_posts",
   "delivery_requires_all_recipients": true,
-  "checked_at": "2026-07-17T22:12:58.037661+00:00",
+  "checked_at": "2026-07-17T23:07:37.713165+00:00",
   "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
   "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
   "source_completeness_verified": false,
