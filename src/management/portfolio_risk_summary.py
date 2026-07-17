@@ -39,11 +39,19 @@ def _theme_maps() -> tuple[dict[str, str], set[str]]:
         for item in (document.get("symbols") or [])
         if isinstance(item, dict) and item.get("symbol") and item.get("theme")
     }
-    theme_ids = {
-        str(item.get("id"))
-        for item in (document.get("themes") or [])
-        if isinstance(item, dict) and item.get("id")
-    }
+    # Both theme and subtheme IDs are legal thesis_id values
+    # (positions_schema.md, mirrored by portfolio_decision_risk._theme_context);
+    # collecting only theme IDs made explicit_thesis_links contradict the
+    # decision-risk section of the same private brief.
+    theme_ids: set[str] = set()
+    for theme in document.get("themes") or []:
+        if not isinstance(theme, dict):
+            continue
+        if theme.get("id"):
+            theme_ids.add(str(theme.get("id")))
+        for subtheme in theme.get("subthemes") or []:
+            if isinstance(subtheme, dict) and subtheme.get("id"):
+                theme_ids.add(str(subtheme.get("id")))
     return symbol_to_theme, theme_ids
 
 

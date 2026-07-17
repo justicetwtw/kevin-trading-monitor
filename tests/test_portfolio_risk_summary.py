@@ -167,3 +167,29 @@ def test_runner_sends_private_brief_as_silent_sensitive(monkeypatch):
     assert run_position_check._send_private_risk_brief.last_decision_risk == {
         "review_flags": []
     }
+
+
+def test_subtheme_thesis_id_counts_as_explicit_link(monkeypatch):
+    """F1: subtheme IDs are legal thesis_id values (positions_schema.md) and
+    must count as explicit links, matching portfolio_decision_risk."""
+    monkeypatch.setattr(
+        portfolio_risk_summary,
+        "read_json",
+        lambda *args, **kwargs: {
+            "themes": [
+                {
+                    "id": "memory_cycle",
+                    "subthemes": [{"id": "hbm", "symbols": ["AAA"]}],
+                }
+            ],
+            "symbols": [],
+        },
+    )
+    symbol_to_theme, known_ids = portfolio_risk_summary._theme_maps()
+    assert "memory_cycle" in known_ids
+    assert "hbm" in known_ids
+    theme, explicit_valid = portfolio_risk_summary._resolve_theme(
+        {"symbol": "AAA", "thesis_id": "hbm"}, symbol_to_theme, known_ids
+    )
+    assert theme == "hbm"
+    assert explicit_valid is True
