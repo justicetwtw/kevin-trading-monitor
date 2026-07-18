@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-17T16:34:59.828596+08:00",
+  "generated_at": "2026-07-18T08:53:04.899032+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -13,15 +13,15 @@
   ],
   "data": {
     "summary": {
-      "regime": "risk_on",
-      "regime_modifier": 10,
+      "regime": "neutral",
+      "regime_modifier": 5,
       "position_configured": false,
       "position_count": 0,
       "position_source": null,
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-17T08:21:23.656273+00:00",
+      "trump_monitor_checked_at": "2026-07-18T00:03:47.574589+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -80,9 +80,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-17T01:16:53.597000+00:00",
-      "checked_at": "2026-07-17T08:21:23.656273+00:00",
-      "health_age_hours": 0.2,
+      "latest_post_at": "2026-07-17T19:36:17.631000+00:00",
+      "checked_at": "2026-07-18T00:03:47.574589+00:00",
+      "health_age_hours": 0.8,
       "attempts": [
         {
           "status": "unavailable",
@@ -95,20 +95,20 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 34718,
+          "raw_count": 34729,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-17T01:16:53.597000+00:00",
+          "latest_post_at": "2026-07-17T19:36:17.631000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 34718,
+      "source_raw_count": 34729,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-15T06:32:32.760175+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 33,
+      "eligible_count": 44,
       "new_count": 0,
       "delivered_count": 0,
       "delivery_status": "no_new_posts",
@@ -297,8 +297,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 64.2,
-        "ivp": 37.3,
+        "ivr": 78.5,
+        "ivp": 63.5,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -315,8 +315,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 41.3,
-        "ivp": 60.8,
+        "ivr": 45.8,
+        "ivp": 67.3,
         "options_status": "ok",
         "not_a_trade_signal": true
       },

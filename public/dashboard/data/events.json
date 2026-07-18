@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-17T16:34:59.690437+08:00",
+  "generated_at": "2026-07-18T08:53:04.737887+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -27,10 +27,6 @@
       {
         "symbol": "UEC",
         "earnings_date": "2026-06-09"
-      },
-      {
-        "symbol": "TSM",
-        "earnings_date": "2026-07-16"
       },
       {
         "symbol": "GOOG",
@@ -315,6 +311,10 @@
       {
         "symbol": "ASML",
         "earnings_date": "2026-10-14"
+      },
+      {
+        "symbol": "TSM",
+        "earnings_date": "2026-10-15"
       }
     ]
   }
