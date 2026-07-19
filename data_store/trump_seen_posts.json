@@ -8253,5 +8253,65 @@
     "seen_at": "2026-07-19T14:42:30.794751+00:00",
     "created_at": "2026-07-19T14:05:05.638Z",
     "source": "cnn_historical_archive"
+  },
+  "116947970927862123": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:06:59.672Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947973927079025": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:07:45.440Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947974994666120": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:08:01.725Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947975944993549": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:08:16.228Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947976850103217": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:08:30.041Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947977880667502": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:08:45.764Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947978783478510": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:08:59.542Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947979682929338": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:09:13.267Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947982536049627": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:09:56.801Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947984234570305": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:10:22.720Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947986461055239": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:10:56.689Z",
+    "source": "cnn_historical_archive"
+  },
+  "116947987736463009": {
+    "seen_at": "2026-07-19T18:32:15.677911+00:00",
+    "created_at": "2026-07-19T18:11:16.152Z",
+    "source": "cnn_historical_archive"
   }
 }

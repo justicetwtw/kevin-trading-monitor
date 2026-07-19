@@ -21254,5 +21254,205 @@
       }
     },
     "captured_at": "2026-07-19T14:42:29.524820+00:00"
+  },
+  "116947987736463009": {
+    "id": "116947987736463009",
+    "created_at": "2026-07-19T18:11:16.152Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947987736463009",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.619531+00:00"
+  },
+  "116947986461055239": {
+    "id": "116947986461055239",
+    "created_at": "2026-07-19T18:10:56.689Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947986461055239",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116947984234570305Jack Posobiec: \"She said the quiet part out loud!\"",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-19T18:32:14.623246+00:00"
+  },
+  "116947984234570305": {
+    "id": "116947984234570305",
+    "created_at": "2026-07-19T18:10:22.720Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947984234570305",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623272+00:00"
+  },
+  "116947982536049627": {
+    "id": "116947982536049627",
+    "created_at": "2026-07-19T18:09:56.801Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947982536049627",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623290+00:00"
+  },
+  "116947979682929338": {
+    "id": "116947979682929338",
+    "created_at": "2026-07-19T18:09:13.267Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947979682929338",
+    "text": "PRESIDENT TRUMP HIGHLIGHTS NEARLY $10 BILLION IN DEFENSE INVESTMENTS AT PENNSYLVANIA SUMMIT: https://www.rsbnetwork.com/news/president-trump-highlights-nearly-10-billion-in-defense-investments-at-pennsylvania-summit/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623402+00:00"
+  },
+  "116947978783478510": {
+    "id": "116947978783478510",
+    "created_at": "2026-07-19T18:08:59.542Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947978783478510",
+    "text": "Pennsylvania defense summit leads to nearly $10 billion in defense contracts that will create thousands of jobs: https://www.washingtonexaminer.com/policy/defense/4650426/pennsylvania-defense-summit-trump-contracts-jobs/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623471+00:00"
+  },
+  "116947977880667502": {
+    "id": "116947977880667502",
+    "created_at": "2026-07-19T18:08:45.764Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947977880667502",
+    "text": "Trump says 'proud American veterans' will replace illegal immigrant truck drivers: https://www.washingtonexaminer.com/news/white-house/4650629/trump-veterans-replace-illegal-immigrant-truck-drivers/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623532+00:00"
+  },
+  "116947976850103217": {
+    "id": "116947976850103217",
+    "created_at": "2026-07-19T18:08:30.041Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947976850103217",
+    "text": "Trump Touts $10 Billion Pa. Defense Investment: https://www.newsmax.com/newsfront/donald-trump-defense-summit-pennsylvania/2026/07/15/id/1262982/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623590+00:00"
+  },
+  "116947975944993549": {
+    "id": "116947975944993549",
+    "created_at": "2026-07-19T18:08:16.228Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947975944993549",
+    "text": "Trump announces $10 billion for defense projects in Pennsylvania: https://www.washingtontimes.com/news/2026/jul/15/trump-announces-10-billion-defense-projects-pennsylvania/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623646+00:00"
+  },
+  "116947974994666120": {
+    "id": "116947974994666120",
+    "created_at": "2026-07-19T18:08:01.725Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947974994666120",
+    "text": "Trump calls Pennsylvania 'key' to national defense renaissance: https://justthenews.com/nation/states/center-square/pennsylvania-called-key-national-defense-renaissance-trump-says",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-19T18:32:14.623704+00:00"
+  },
+  "116947973927079025": {
+    "id": "116947973927079025",
+    "created_at": "2026-07-19T18:07:45.440Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947973927079025",
+    "text": "Trump Announces Nearly $10 Billion in Defense Industrial Base Investments in Pennsylvania at McCormick's Summit: https://www.breitbart.com/politics/2026/07/15/trump-announces-nearly-10-billion-in-defense-industrial-base-investments-in-pennsylvania-at-mccormicks-summit/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623769+00:00"
+  },
+  "116947970927862123": {
+    "id": "116947970927862123",
+    "created_at": "2026-07-19T18:06:59.672Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116947970927862123",
+    "text": "They do this, and the Republican Party is DEAD!Key House caucus leaders target Supreme Court, Senate filibuster: https://www.politico.com/live-updates/2026/06/24/congress/dem-caucuses-target-scotus-00973895",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-19T18:32:14.623870+00:00"
   }
 }
