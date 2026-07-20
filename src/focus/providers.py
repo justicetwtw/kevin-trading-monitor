@@ -71,12 +71,19 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-#: 用來「確認」下檔壓力方向所需的欄位(付費資料)。全缺 → required options 確認 unavailable。
+#: 「確認」下檔壓力方向所需的付費欄位(context)。此清單用於 coverage 報告。
 REQUIRED_PRESSURE_FIELDS = ("put_skew_25d", "gamma_flip_proxy", "strike_oi_concentration")
+
+#: 真正有「方向性」的欄位:gamma flip 的正負 + put skew 的「變化」(非絕對值)。
+#: 要到達 worsening / confirmed_ok(任何有向判定)必須同時具備這兩類證據;缺一即 unavailable。
+#: 絕對 put_skew_25d 或 strike_oi_concentration 單獨存在都「不」構成方向確認。
+DIRECTIONAL_GAMMA_FIELD = "gamma_flip_proxy"
+SKEW_CHANGE_FIELDS = ("put_skew_change_5d", "put_skew_change_20d")
 
 #: Market regime → 曝險上限倍數(只限制上限,不預測隔日方向,§ Layer B)。
 #: 未知/資料不足 → 0.0 fail closed(無法確認 regime 就不放行新增曝險)。
 REGIME_EXPOSURE_CAPS = {"calm": 1.0, "elevated": 0.5, "stress": 0.0}
+_REGIME_ORDER = ("calm", "elevated", "stress")
 
 
 def regime_exposure_cap(regime: str | None) -> dict[str, Any]:
@@ -86,46 +93,172 @@ def regime_exposure_cap(regime: str | None) -> dict[str, Any]:
         "regime": regime,
         "max_exposure_multiplier": cap,
         "blocks_new_exposure": cap <= 0.0,
+        "reduces_new_exposure": 0.0 < cap < 1.0,
         "basis": "caps exposure only; not a next-day direction forecast",
     }
 
 
-def build_options_pressure(capability: dict[str, Any] | None) -> dict[str, Any]:
+def _num(value: Any) -> float | None:
+    """回傳有效數值(排除 bool),否則 None。"""
+    if isinstance(value, bool):
+        return None
+    return float(value) if isinstance(value, (int, float)) else None
+
+
+def build_options_pressure(
+    capability: dict[str, Any] | None,
+    reference_date: Any = None,
+) -> dict[str, Any]:
     """從 options capability snapshot 導出一個「下檔壓力」adapter,三態分明:
 
-      - unavailable :確認所需的付費欄位(skew / gamma / OI 集中度)全缺 → 無法確認方向。
-      - worsening   :put skew 惡化 / gamma flip 轉負等(需付費資料才判得出)。
-      - confirmed_ok:壓力未惡化且資料足以確認。
+      - unavailable :方向性證據不足(缺 gamma flip 或 skew 變化)或證據 stale → 無法確認方向。
+      - worsening   :put skew 變化轉惡 / gamma flip 轉負(需付費資料才判得出)。
+      - confirmed_ok:方向性證據齊備且未惡化。
 
-    紅線:missing ≠ 「壓力未惡化」。unavailable 不會被當成 confirmed_ok,也不放行 add。
-    只有 screen-grade(current IV / put-call ratio)時,required 欄位全缺 → unavailable。
+    紅線(finding P1 修正):
+      - missing ≠ 「壓力未惡化」;partial 也不行。只要 gamma flip 或 skew 變化任一缺,
+        或必要證據 stale,一律 unavailable,不會 fall through 成 confirmed_ok。
+      - 絕對 put_skew_25d、strike_oi_concentration 單獨不具方向性,不足以解鎖 add。
+      - 有 as_of 時做 freshness 檢查;stale 視同 unavailable(舊資料不是確認)。
     """
+    from src.focus.freshness import MAX_PRICE_AGE_DAYS, freshness
+
     cap = capability or {}
-    have = {f: cap.get(f) for f in REQUIRED_PRESSURE_FIELDS}
-    if all(v is None for v in have.values()):
+    gamma_flip = _num(cap.get(DIRECTIONAL_GAMMA_FIELD))
+    skew_change = None
+    for f in SKEW_CHANGE_FIELDS:
+        skew_change = _num(cap.get(f))
+        if skew_change is not None:
+            break
+
+    present = [f for f in REQUIRED_PRESSURE_FIELDS if cap.get(f) is not None]
+    coverage = round(len(present) / len(REQUIRED_PRESSURE_FIELDS), 4)
+
+    as_of = cap.get("as_of")
+    fresh = freshness(as_of, reference_date, MAX_PRICE_AGE_DAYS) if as_of is not None else {"status": "unknown_age"}
+    stale = fresh.get("status") in ("stale", "missing")
+
+    have_direction = gamma_flip is not None and skew_change is not None
+    if not have_direction or stale:
+        missing: list[str] = []
+        if gamma_flip is None:
+            missing.append("gamma_flip_proxy")
+        if skew_change is None:
+            missing.append("put_skew_change")
+        reasons = ["required_options_confirmation_unavailable"]
+        if stale and as_of is not None:
+            reasons.append("options_evidence_stale")
         return {
             "status": "unavailable",
             "downside_pressure_worsening": False,
             "downside_pressure_confirmed_ok": False,
-            "reasons": ["required_options_confirmation_unavailable"],
+            "reasons": reasons,
+            "missing_fields": missing,
+            "coverage": coverage,
             "source": cap.get("source"),
-            "as_of": cap.get("as_of"),
+            "as_of": as_of,
+            "freshness": fresh,
         }
-    skew = cap.get("put_skew_25d")
-    skew_chg = cap.get("put_skew_change_5d")
-    gamma_flip = cap.get("gamma_flip_proxy")
-    worsening = bool(
-        (isinstance(skew_chg, (int, float)) and skew_chg > 0)
-        or (isinstance(gamma_flip, (int, float)) and gamma_flip < 0)
-    )
+
+    worsening = bool(skew_change > 0 or gamma_flip < 0)
     return {
         "status": "worsening" if worsening else "confirmed_ok",
         "downside_pressure_worsening": worsening,
         "downside_pressure_confirmed_ok": not worsening,
         "reasons": [],
+        "missing_fields": [],
+        "coverage": coverage,
         "source": cap.get("source"),
-        "as_of": cap.get("as_of"),
-        "put_skew_25d": skew,
+        "as_of": as_of,
+        "freshness": fresh,
+        "put_skew_25d": _num(cap.get("put_skew_25d")),
+        "put_skew_change": skew_change,
+        "gamma_flip_proxy": gamma_flip,
+    }
+
+
+def composite_market_regime(
+    vix_regime: str | None,
+    index_trend: dict[str, Any] | None,
+    breadth: dict[str, Any] | None,
+    *,
+    vix_available: bool = True,
+) -> dict[str, Any]:
+    """把 VIX regime 與 QQQ/SMH/SOXX 趨勢 + breadth 併成 composite regime。
+
+    紅線(finding P1 修正):
+      - regime 不能只看 VIX。若大盤(QQQ)與半導體(SMH)雙雙跌破 200DMA、或市場
+        breadth 嚴重受損,即使 VIX 偏低也要向上升級 regime(fail toward caution)。
+      - 缺資料的成分(VVIX/COR1M、index trend、breadth)標為 capability gap,不假裝健康。
+      - 回傳 auditable exposure_cap;non-zero cap(elevated=0.5)由下游實際縮小提案倉位。
+    """
+    index_trend = index_trend or {}
+    breadth = breadth or {}
+    gaps: list[str] = []
+
+    base = vix_regime if vix_regime in _REGIME_ORDER else None
+    if not vix_available or base is None:
+        gaps.append("vix_regime_unavailable")
+
+    def _below_200(sym: str) -> bool | None:
+        node = index_trend.get(sym) or {}
+        val = node.get("above_200dma")
+        return (val is False) if isinstance(val, bool) else None
+
+    qqq_below = _below_200("QQQ")
+    smh_below = _below_200("SMH")
+    if qqq_below is None:
+        gaps.append("broad_index_trend_unavailable")
+    if smh_below is None:
+        gaps.append("semi_index_trend_unavailable")
+
+    breadth_50 = breadth.get("breadth_above_50dma")
+    breadth_200 = breadth.get("breadth_above_200dma")
+    if breadth_50 is None:
+        gaps.append("breadth_50dma_unavailable")
+
+    escalation = 0
+    drivers: list[str] = []
+    # 兩大領先指標同時跌破 200DMA:結構性走弱 → 直接升到 stress 區(escalate 2)。
+    if qqq_below is True and smh_below is True:
+        escalation += 2
+        drivers.append("broad_and_semi_below_200dma")
+    elif qqq_below is True or smh_below is True:
+        escalation += 1
+        drivers.append("one_leader_below_200dma")
+    # breadth 嚴重受損。
+    if isinstance(breadth_50, (int, float)) and not isinstance(breadth_50, bool) and breadth_50 < 0.4:
+        escalation += 1
+        drivers.append("weak_breadth_below_50dma")
+
+    # composite regime:以 VIX base 為起點向上(更謹慎)升級;缺 VIX base 時,
+    # 若有 trend/breadth 訊號可據以定級,否則 unknown(fail closed cap=0)。
+    if base is not None:
+        idx = min(len(_REGIME_ORDER) - 1, _REGIME_ORDER.index(base) + escalation)
+        composite = _REGIME_ORDER[idx]
+    elif qqq_below is not None or smh_below is not None or isinstance(breadth_50, (int, float)):
+        # 無 VIX 但有市場結構證據:從 calm 起算再升級(至少能給出保守評級)。
+        idx = min(len(_REGIME_ORDER) - 1, escalation)
+        composite = _REGIME_ORDER[idx] if escalation > 0 else "elevated"
+        drivers.append("regime_from_trend_breadth_without_vix")
+    else:
+        composite = None  # 完全無證據 → unknown,cap 0.0 fail closed
+
+    cap = regime_exposure_cap(composite)
+    return {
+        "regime": composite,
+        "vix_regime": base,
+        "exposure_cap": cap,
+        "escalated_from_vix": bool(escalation) and base is not None and composite != base,
+        "escalation_drivers": drivers,
+        "capability_gaps": gaps,
+        "components": {
+            "qqq_below_200dma": qqq_below,
+            "smh_below_200dma": smh_below,
+            "breadth_above_50dma": breadth_50,
+            "breadth_above_200dma": breadth_200,
+        },
+        "basis": "composite of VIX regime + broad/semi trend + breadth; caps exposure only",
     }
 
 

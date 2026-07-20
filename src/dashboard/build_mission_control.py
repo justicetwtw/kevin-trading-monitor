@@ -372,18 +372,27 @@ def _focus_section(data: dict[str, Any]) -> str:
     if vol_fresh.get("status") in ("stale", "missing"):
         regime_blockers.append(f"volatility_{vol_fresh.get('status')}")
     cap = (regime.get("exposure_cap") or {}) if isinstance(regime, dict) else {}
+    composite = (regime.get("composite_regime") or {}) if isinstance(regime, dict) else {}
     mtrend = (regime.get("trend") or {}) if isinstance(regime, dict) else {}
     idx_trend = mtrend.get("index_trend") or {}
+    if cap.get("blocks_new_exposure"):
+        cap_effect = "blocks new exposure"
+    elif cap.get("reduces_new_exposure"):
+        cap_effect = "reduces new exposure"
+    else:
+        cap_effect = "full"
     market_regime_html = (
         "<h3>Market Regime</h3>"
         '<div class="account-strip">'
         f'<span>Workflow <strong>{_badge(health.get("workflow_status"))}</strong></span>'
         f'<span>Error codes <strong>{_e(health.get("error_codes") or [])}</strong></span>'
-        f'<span>Regime <strong>{_badge(regime.get("regime"))}</strong></span>'
+        f'<span>Composite regime <strong>{_badge(regime.get("regime"))}</strong></span>'
+        f'<span>VIX regime <strong>{_badge(composite.get("vix_regime"))}</strong></span>'
+        f'<span>Escalated <strong>{_e(composite.get("escalated_from_vix"))}</strong></span>'
         f'<span>VIX <strong>{_e(regime.get("vix"))}</strong></span>'
         f'<span>VIX as-of <strong>{_e(vol_fresh.get("as_of"))}</strong></span>'
         f'<span>Freshness <strong>{_badge(vol_fresh.get("status"))}</strong></span>'
-        f'<span>Exposure cap <strong>{_e(cap.get("max_exposure_multiplier"))}</strong></span>'
+        f'<span>Exposure cap <strong>{_e(cap.get("max_exposure_multiplier"))}</strong> ({cap_effect})</span>'
         f'<span>Term inversion <strong>{_e(regime.get("term_inversion"))}</strong></span>'
         "</div>"
         '<div class="account-strip">'
@@ -432,6 +441,7 @@ def _focus_section(data: dict[str, Any]) -> str:
             [
                 ("theme", "Theme"),
                 ("status", "Status"),
+                ("basket_kind", "Basket"),
                 ("member_coverage", "Coverage"),
                 ("as_of", "As of"),
                 ("theme_rank", "Rank"),
@@ -455,8 +465,10 @@ def _focus_section(data: dict[str, Any]) -> str:
                 ("timing_state", "Timing"),
                 ("exposure_posture", "Posture"),
                 ("add_allowed", "Add ready"),
+                ("proposed_size_multiplier", "Size mult"),
                 ("rs20_vs_qqq", "RS20"),
                 ("valuation_status", "Valuation"),
+                ("valuation_decision_grade", "Val OK"),
                 ("options_capability_status", "Options"),
                 ("readiness_blockers", "Blockers"),
                 ("as_of", "As of"),

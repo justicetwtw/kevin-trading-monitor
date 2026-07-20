@@ -93,6 +93,17 @@ def test_fresh_price_but_missing_valuation_and_options_is_not_add_ready():
     assert card["add_allowed"] is False
 
 
+def _approved_valuation_evidence():
+    # Decision-grade valuation evidence: source + fresh as_of + coverage + value band.
+    return {
+        "approval_status": "approved",
+        "source": "kevin_manual_review",
+        "as_of": "2026-07-10",
+        "coverage": 0.8,
+        "value_band": {"bear": 90.0, "base": 130.0, "bull": 170.0},
+    }
+
+
 def test_approved_valuation_and_confirmed_options_allow_add():
     trend = _ok_trend()
     fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
@@ -104,12 +115,53 @@ def test_approved_valuation_and_confirmed_options_allow_add():
     card = build_focus_card(
         "NVDA", trend, thesis_state="intact",
         valuation_status="approved",
+        valuation_evidence=_approved_valuation_evidence(),
         options_pressure=confirmed,
         benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
     )
     assert "valuation_not_approved" not in card["readiness_blockers"]
     assert "options_confirmation_unavailable" not in card["readiness_blockers"]
+    assert card["valuation_decision_grade"] is True
     assert card["add_allowed"] is True
+
+
+def test_bare_approved_string_without_evidence_cannot_add():
+    # finding P1: a bare valuation status string is NOT decision-grade approval.
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    confirmed = {"status": "confirmed_ok", "downside_pressure_worsening": False,
+                 "downside_pressure_confirmed_ok": True}
+    card = build_focus_card(
+        "NVDA", trend, thesis_state="intact",
+        valuation_status="approved",       # bare string, no evidence object
+        options_pressure=confirmed,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+    )
+    assert card["valuation_decision_grade"] is False
+    assert "valuation_not_approved" in card["readiness_blockers"]
+    assert card["add_allowed"] is False
+
+
+def test_stale_valuation_evidence_cannot_add():
+    # Approved status but the supporting evidence as_of is far stale → blocked.
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    confirmed = {"status": "confirmed_ok", "downside_pressure_worsening": False,
+                 "downside_pressure_confirmed_ok": True}
+    stale_evidence = {
+        "approval_status": "approved", "source": "kevin_manual_review",
+        "as_of": "2026-01-01", "coverage": 0.8,   # >45d before 2026-07-20
+        "value_band": {"bear": 90.0, "base": 130.0, "bull": 170.0},
+    }
+    card = build_focus_card(
+        "NVDA", trend, thesis_state="intact",
+        valuation_status="approved", valuation_evidence=stale_evidence,
+        options_pressure=confirmed,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+    )
+    assert card["valuation_decision_grade"] is False
+    assert "valuation_not_approved" in card["readiness_blockers"]
+    assert card["add_allowed"] is False
 
 
 def test_options_unavailable_keeps_wait_for_proof():
@@ -159,9 +211,50 @@ def test_stress_regime_exposure_cap_blocks_add():
     cap = {"max_exposure_multiplier": 0.0, "blocks_new_exposure": True, "regime": "stress"}
     card = build_focus_card(
         "NVDA", trend, thesis_state="intact",
-        valuation_status="approved", options_pressure=confirmed,
+        valuation_status="approved", valuation_evidence=_approved_valuation_evidence(),
+        options_pressure=confirmed,
         benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
         market_exposure_cap=cap,
     )
     assert "market_regime_caps_exposure" in card["readiness_blockers"]
     assert card["add_allowed"] is False
+    assert card["proposed_size_multiplier"] == 0.0
+
+
+def test_elevated_regime_materially_reduces_proposed_size():
+    # An elevated regime (cap 0.5) does not block add, but must materially reduce
+    # the proposed size (0.5, not full 1.0) — the cap is enforced, not display-only.
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    confirmed = {"status": "confirmed_ok", "downside_pressure_worsening": False,
+                 "downside_pressure_confirmed_ok": True}
+    elevated = {"max_exposure_multiplier": 0.5, "blocks_new_exposure": False,
+                "reduces_new_exposure": True, "regime": "elevated"}
+    card = build_focus_card(
+        "NVDA", trend, thesis_state="intact",
+        valuation_status="approved", valuation_evidence=_approved_valuation_evidence(),
+        options_pressure=confirmed,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+        market_exposure_cap=elevated,
+    )
+    assert card["add_allowed"] is True
+    assert card["proposed_size_multiplier"] == 0.5  # materially reduced vs 1.0
+
+
+def test_elevated_regime_reduces_leveraged_gross_further():
+    # For a leveraged instrument the non-zero cap applies to gross exposure, so a
+    # 2x name under a 0.5 cap is reduced below the cap (0.25), not left at 0.5/1.0.
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    confirmed = {"status": "confirmed_ok", "downside_pressure_worsening": False,
+                 "downside_pressure_confirmed_ok": True}
+    elevated = {"max_exposure_multiplier": 0.5, "blocks_new_exposure": False,
+                "reduces_new_exposure": True, "regime": "elevated"}
+    card = build_focus_card(
+        "NVDL", trend, thesis_state="intact",  # NVDL = 2x NVDA
+        valuation_status="approved", valuation_evidence=_approved_valuation_evidence(),
+        options_pressure=confirmed,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+        market_exposure_cap=elevated,
+    )
+    assert card["proposed_size_multiplier"] == 0.25  # 0.5 / 2x leverage

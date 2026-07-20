@@ -153,11 +153,36 @@ estimate history。
   剔除 stale 成員;輸出 theme `as_of`、valid/configured 成員與 `member_coverage`;coverage 低於
   門檻(0.6)拒絕給 RS/rank/percentile;RS 端點依日期對齊。
 
-## 10. 驗證
+## 10. Review round 3(第二次 incremental)— 已修正 findings
+
+針對第二次 incremental review(HEAD `dc856be`)的 5 個 P1 以 code + regression 修正:
+
+- **options-pressure 不再 partial fail-open**:`build_options_pressure` 改為欄位級
+  sufficiency —— 要到達 worsening/confirmed_ok 必須同時具備 `gamma_flip_proxy`(方向)與
+  put skew「變化」(`put_skew_change_5d/20d`);單獨的絕對 skew 或 `strike_oi_concentration`
+  不構成方向確認,一律 `unavailable`;有 `as_of` 時做 freshness,stale 視同 unavailable;
+  回傳 `coverage`/`missing_fields` 供稽核。runner 傳入 `reference_date`。
+- **Market Regime 真正 operational**:新增 `composite_market_regime` 把 VIX regime 與
+  QQQ/SMH/SOXX 趨勢 + breadth 併算,兩大領先指標同破 200DMA 或 breadth 受損時「向上升級」
+  regime(即使 VIX 低),缺資料標 capability gap;runner 先算 trend/breadth 再定 regime,
+  cap 由 composite 決定。`elevated=0.5` 不再只顯示:`build_focus_card` 依 cap 產出
+  `proposed_size_multiplier`(leveraged 依槓桿收斂 gross 曝險),stress/未知封頂擋 add。
+- **trade-level metrics 顯式 ledger**:`run_strategy` 以進出場 ledger 計 trade,entry/
+  rebalance/**exit 成本**都併入「當筆」trade;未平倉的 terminal trade 另計
+  `open_terminal_trade`,不計入 `closed_trade_count`;walk-forward 段界不再把一筆連續持有
+  拆成多筆假 closed trade。
+- **rotation breadth/breakout 只用 fresh valid 成員**:`_breakout_share` 與 breadth 改用
+  與 basket 相同的 `valid` 成員(stale 不再污染),並公開分母(`*_counted`);單一成分 theme
+  (`memory_hbm_dram=[MU]`)以明示的 `single_name_proxy` 進榜,不再永遠 insufficient_data。
+- **valuation 需 decision-grade evidence**:新增 `valuation_approved(evidence)`,要求
+  source + 新鮮 as_of + coverage + value_band/approved_scenarios + approved 狀態;單一字串
+  不再解鎖 add,缺/過期一律擋(fail closed)。
+
+## 11. 驗證
 
 ```bash
-python -m pytest -q                                   # 584 passed, 1 skipped
-python -m pytest -q tests/test_focus_*.py             # 117 focus 測試(含 round 2/3 regression)
+python -m pytest -q                                   # 598 passed, 1 skipped
+python -m pytest -q tests/test_focus_*.py             # 131 focus 測試(含 round 2/3/4 regression)
 python scripts/verify_agent_workflow_contract.py      # passed
 python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline  # ok
 ```

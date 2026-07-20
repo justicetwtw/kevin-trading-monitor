@@ -209,3 +209,51 @@ def test_trade_level_metrics_distinct_from_daily():
         assert k in out
     # closed trades are runs of in-market days, not rebalance events
     assert out["closed_trade_count"] <= out["trade_count"] + 1
+
+
+def _controlled_frame(closes):
+    n = len(closes)
+    idx = pd.date_range("2024-01-01", periods=n, freq="B")
+    return pd.DataFrame(
+        {"Close": closes, "High": [c * 1.01 for c in closes],
+         "Low": [c * 0.99 for c in closes], "Volume": [1e6] * n},
+        index=idx,
+    )
+
+
+def test_trade_ledger_includes_exit_cost():
+    # finding P1: the exit-bar transaction cost must be attributed to the trade
+    # being closed. With cost > 0 the single closed trade's return must be lower.
+    n = 260
+    closes = [100.0] * n
+    for i in range(120, 140):
+        closes[i] = 100.0 + (i - 119)   # rise while held
+    for i in range(140, n):
+        closes[i] = 120.0
+
+    def sig(frame, i, bench):
+        return 118 <= i < 145           # one long window, then exit
+
+    frame = _controlled_frame(closes)
+    free = run_strategy(frame, sig, cost_bps=0.0)
+    costly = run_strategy(frame, sig, cost_bps=50.0)
+    assert free["closed_trade_count"] == 1
+    assert costly["closed_trade_count"] == 1
+    # entry + exit costs strictly reduce the single closed trade's return
+    assert costly["closed_trades"][0] < free["closed_trades"][0]
+
+
+def test_open_terminal_trade_not_counted_as_closed():
+    # finding P1: a position still open at the end of the sample is an OPEN
+    # terminal trade, never counted inside closed_trade_count.
+    n = 260
+    closes = list(np.linspace(100.0, 130.0, n))
+
+    def sig(frame, i, bench):
+        return i >= 150                 # enters and never exits before sample end
+
+    out = run_strategy(_controlled_frame(closes), sig, cost_bps=0.0)
+    assert out["has_open_terminal_trade"] is True
+    assert out["open_terminal_trade"] is not None
+    assert out["closed_trade_count"] == 0
+    assert out["closed_trades"] == []

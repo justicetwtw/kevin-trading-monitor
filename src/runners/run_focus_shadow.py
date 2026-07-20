@@ -25,6 +25,7 @@ from src.focus.providers import (
     PublicVolatilityIndexProvider,
     YFinanceFocusOptionsProvider,
     build_options_pressure,
+    composite_market_regime,
 )
 from src.focus.rotation import build_rotation_panel
 from src.focus.trend import compute_trend_frame
@@ -48,7 +49,8 @@ _ALLOWED_CARD_KEYS = frozenset(
         "close", "sma20", "sma50", "sma200", "sma50_slope",
         "rs20_vs_qqq", "rs63_vs_qqq", "rs20_vs_smh",
         "rsi", "bb_pct_b", "donchian20", "donchian55",
-        "valuation_status", "options_capability_status",
+        "valuation_status", "valuation_decision_grade", "options_capability_status",
+        "proposed_size_multiplier", "market_regime",
         "timing_flags", "timing_reasons", "exposure_reasons",
         "readiness_blockers", "source", "as_of",
         "security_freshness", "benchmark_freshness", "not_a_trade_signal",
@@ -145,18 +147,38 @@ def build_shadow_state(
         volatility_state = None
         volatility_available = False
 
-    market_exposure_cap = (volatility_state or {}).get("exposure_cap") if volatility_available else None
-    if market_exposure_cap is None:
-        # No usable regime → fail closed: cap new exposure.
-        market_exposure_cap = {"max_exposure_multiplier": 0.0, "blocks_new_exposure": True,
-                               "regime": None, "basis": "regime_unavailable_fail_closed"}
-    # Broad/semi trend + focus breadth for the Market Regime block.
+    # Broad/semi trend + focus breadth (computed BEFORE the regime so trend/breadth
+    # actually drive the composite regime, not just the display block).
     market_trend = _market_trend_breadth(frames, card_symbols, reference_date)
+
+    # Composite regime = VIX regime escalated by damaged QQQ/SMH trend + breadth
+    # (fail toward caution). A low VIX alone cannot keep the regime calm when the
+    # leaders are below 200DMA / breadth is broken. This drives the auditable
+    # exposure cap that gates and sizes add-ready.
+    vix_regime = (volatility_state or {}).get("regime") if volatility_available else None
+    composite = composite_market_regime(
+        vix_regime,
+        market_trend.get("index_trend"),
+        {
+            "breadth_above_50dma": market_trend.get("breadth_above_50dma"),
+            "breadth_above_200dma": market_trend.get("breadth_above_200dma"),
+        },
+        vix_available=volatility_available,
+    )
+    market_exposure_cap = composite["exposure_cap"]
+
     if isinstance(volatility_state, dict):
-        volatility_state = {**volatility_state, "trend": market_trend}
+        volatility_state = {
+            **volatility_state, "trend": market_trend,
+            "vix_regime": vix_regime, "regime": composite["regime"],
+            "composite_regime": composite, "exposure_cap": market_exposure_cap,
+        }
     else:
-        volatility_state = {"regime": None, "trend": market_trend,
-                            "status": "insufficient_data"}
+        volatility_state = {
+            "regime": composite["regime"], "trend": market_trend,
+            "composite_regime": composite, "exposure_cap": market_exposure_cap,
+            "status": "insufficient_data",
+        }
 
     options_provider = YFinanceFocusOptionsProvider()
     cards: list[dict[str, Any]] = []
@@ -171,7 +193,7 @@ def build_shadow_state(
         # Derive options downside-pressure from the available snapshot via a
         # documented adapter; screen-grade data has no skew/gamma → unavailable
         # (not "not worsening"), which blocks add-ready by omission-safe default.
-        options_pressure = build_options_pressure(capability)
+        options_pressure = build_options_pressure(capability, reference_date=reference_date)
         card = build_focus_card(
             symbol,
             trend,

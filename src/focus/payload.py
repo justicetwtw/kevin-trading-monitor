@@ -26,6 +26,10 @@ MAX_CARD_AGE_DAYS = 5
 APPROVED_VALUATIONS = frozenset(
     {"approved", "approved_by_kevin", "value_band_confirmed"}
 )
+#: 估值證據新鮮度(季報節奏 → 較寬鬆窗口,但仍必須有 as_of)。
+MAX_VALUATION_AGE_DAYS = 45
+#: 估值 coverage(涵蓋 thesis/情境比例)最低門檻;不足視為未達 decision-grade。
+MIN_VALUATION_COVERAGE = 0.5
 
 
 def _as_of_date(value: Any) -> date | None:
@@ -37,6 +41,41 @@ def _as_of_date(value: Any) -> date | None:
         return None
 
 
+def valuation_approved(
+    evidence: dict[str, Any] | None,
+    reference_date: date | None = None,
+) -> dict[str, Any]:
+    """判斷估值是否達 decision-grade 核准(finding P1 修正)。
+
+    紅線:單一 ``valuation_status`` 字串**不足以**解鎖 add。必須提供 evidence object,
+    且同時滿足:approval_status 在核准集合、有 source、有新鮮 as_of、coverage 達標、
+    有 value_band 或 approved_scenarios。任一缺失/過期 → 不核准(fail closed)。
+    """
+    from src.focus.freshness import freshness as _freshness
+
+    if not isinstance(evidence, dict):
+        return {"approved": False, "reasons": ["valuation_evidence_missing"]}
+
+    reasons: list[str] = []
+    if evidence.get("approval_status") not in APPROVED_VALUATIONS:
+        reasons.append("valuation_not_approved")
+    if not evidence.get("source"):
+        reasons.append("valuation_source_missing")
+
+    fresh = _freshness(evidence.get("as_of"), reference_date, MAX_VALUATION_AGE_DAYS)
+    if fresh["status"] in ("missing", "stale"):
+        reasons.append("valuation_evidence_stale_or_missing_as_of")
+
+    coverage = evidence.get("coverage")
+    if not isinstance(coverage, (int, float)) or isinstance(coverage, bool) or coverage < MIN_VALUATION_COVERAGE:
+        reasons.append("valuation_coverage_insufficient")
+
+    if not (evidence.get("value_band") or evidence.get("approved_scenarios")):
+        reasons.append("valuation_value_band_missing")
+
+    return {"approved": not reasons, "reasons": reasons, "freshness": fresh}
+
+
 def build_focus_card(
     symbol: str,
     trend: dict[str, Any],
@@ -45,6 +84,7 @@ def build_focus_card(
     options_capability: dict[str, Any] | None = None,
     options_pressure: dict[str, Any] | None = None,
     valuation_status: str | None = None,
+    valuation_evidence: dict[str, Any] | None = None,
     source: str = "yfinance_delayed_public_market_data",
     as_of: str | None = None,
     reference_date: date | None = None,
@@ -97,7 +137,10 @@ def build_focus_card(
     # Fundamentals/options proof gate(finding P1):missing valuation approval 或
     # required options 確認 unavailable/worsening 都不得放行 add —— missing ≠ 可加碼。
     add_block_reasons: list[str] = []
-    if valuation_status not in APPROVED_VALUATIONS:
+    # 估值必須達 decision-grade(evidence object:source/as_of/coverage/value band/approval);
+    # 單一字串不解鎖 add(finding P1)。未提供 evidence 時退回舊 status 字串,但一律視為未核准。
+    val_gate = valuation_approved(valuation_evidence, reference_date)
+    if not val_gate["approved"]:
         add_block_reasons.append("valuation_not_approved")
         if "valuation_not_approved" not in blockers:
             blockers.append("valuation_not_approved")
@@ -109,11 +152,20 @@ def build_focus_card(
     elif opt_status == "worsening":
         add_block_reasons.append("options_pressure_worsening")
 
-    # Market regime exposure cap(§ Layer B):stress / 未知 regime 封頂新增曝險。
-    if market_exposure_cap is not None and market_exposure_cap.get("blocks_new_exposure"):
-        add_block_reasons.append("market_regime_caps_exposure")
-        if "market_regime_caps_exposure" not in blockers:
-            blockers.append("market_regime_caps_exposure")
+    # Market regime exposure cap(§ Layer B)。stress / 未知 regime → 封頂(擋 add);
+    # elevated(0<mult<1)不擋 add,但「實質縮小」提案倉位:leveraged 曝險以 gross 上限倍數計。
+    proposed_size_multiplier: float | None = None
+    if market_exposure_cap is not None:
+        mult = market_exposure_cap.get("max_exposure_multiplier")
+        if market_exposure_cap.get("blocks_new_exposure"):
+            add_block_reasons.append("market_regime_caps_exposure")
+            if "market_regime_caps_exposure" not in blockers:
+                blockers.append("market_regime_caps_exposure")
+            proposed_size_multiplier = 0.0
+        elif isinstance(mult, (int, float)) and not isinstance(mult, bool):
+            # non-zero cap:實際套用到提案倉位(leveraged 工具再按槓桿收斂 gross 曝險)。
+            lev = mapping["leverage"] or 1.0
+            proposed_size_multiplier = round(min(mult, mult / lev) if has_leverage else mult, 4)
 
     states = evaluate_symbol(
         trend,
@@ -151,6 +203,9 @@ def build_focus_card(
         "donchian20": donchian.get(20, {}).get("status"),
         "donchian55": donchian.get(55, {}).get("status"),
         "valuation_status": valuation_status or "not_connected",
+        "valuation_decision_grade": bool(val_gate["approved"]),
+        "proposed_size_multiplier": proposed_size_multiplier,
+        "market_regime": (market_exposure_cap or {}).get("regime"),
         "options_capability_status": (
             options_capability.get("status") if options_capability else "unknown"
         ),

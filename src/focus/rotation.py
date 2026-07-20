@@ -43,18 +43,20 @@ def _basket_close(
     frames: dict[str, pd.DataFrame],
     symbols: list[str],
     reference_date=None,
+    min_members: int = 2,
 ) -> pd.Series | None:
     """合成 theme basket 收盤序列:先「依日期對齊」到共同交易日,再在共同起點 rebase
     等權平均。避免 later-listed / 短史成員因各自 rebase 而扭曲權重與跨期比較。
 
-    stale 成員(給 reference_date 時)先剔除;有效成員 < 2 或無共同交易日回 None。
+    stale 成員(給 reference_date 時)先剔除;有效成員 < ``min_members`` 或無共同交易日回
+    None。單一成分 theme(configured==1)可傳 min_members=1 做「明示的 single-name proxy」。
     """
     cols: list[pd.Series] = []
     for sym in _valid_members(frames, symbols, reference_date):
         close = frames[sym]["Close"].dropna()
         if not close.empty:
             cols.append(close.rename(sym))
-    if len(cols) < 2:
+    if len(cols) < max(1, min_members):
         return None
     combined = pd.concat(cols, axis=1).dropna()  # align on common trading dates first
     if combined.empty or len(combined) < 2:
@@ -102,7 +104,14 @@ def theme_rotation_row(
     configured = len(symbols)
     valid = _valid_members(member_frames, symbols, reference_date)
     coverage = round(len(valid) / configured, 4) if configured else None
-    basket = _basket_close(member_frames, symbols, reference_date=reference_date)
+    # 單一成分 theme(如 memory_hbm_dram=[MU]):允許明示的 single-name proxy,
+    # 不再永遠 insufficient_data;>1 成分維持等權 basket(至少 2 有效成員)。
+    single_name = configured == 1
+    basket = _basket_close(
+        member_frames, symbols, reference_date=reference_date,
+        min_members=1 if single_name else 2,
+    )
+    basket_kind = "single_name_proxy" if single_name else "equal_weight_basket"
 
     # Coverage / freshness gate:成員覆蓋不足或無 basket → 拒絕給 RS/rank(不假裝當前)。
     if basket is None or coverage is None or coverage < MIN_MEMBER_COVERAGE:
@@ -110,6 +119,7 @@ def theme_rotation_row(
             "theme": theme,
             "status": "insufficient_coverage" if basket is not None else "insufficient_data",
             "metric_kind": "price_return_proxy",
+            "basket_kind": basket_kind,
             "member_count": configured,
             "valid_member_count": len(valid),
             "member_coverage": coverage,
@@ -137,13 +147,14 @@ def theme_rotation_row(
     else:
         rs_acceleration = None
 
-    # breakout share:成分股中處於 Donchian 上破的比例(no look-ahead),20D 與 55D 分開。
+    # breakout share:**只用**與 basket 相同的 fresh valid 成員(finding P1 修正:
+    # stale 成員不得再污染 breakout/breadth),20D 與 55D 分開,並公開分母。
     from src.focus.trend import donchian_state
 
-    def _breakout_share(window: int) -> float | None:
+    def _breakout_share(window: int) -> tuple[float | None, int]:
         up = 0
         counted = 0
-        for sym in symbols:
+        for sym in valid:
             frame = member_frames.get(sym)
             if frame is None or getattr(frame, "empty", True):
                 continue
@@ -153,10 +164,10 @@ def theme_rotation_row(
             counted += 1
             if state.get("status") == "breakout_up":
                 up += 1
-        return round(up / counted, 4) if counted else None
+        return (round(up / counted, 4) if counted else None), counted
 
-    breakout_20d_share = _breakout_share(20)
-    breakout_55d_share = _breakout_share(55)
+    breakout_20d_share, breakout_20d_counted = _breakout_share(20)
+    breakout_55d_share, breakout_55d_counted = _breakout_share(55)
 
     # leadership 方向:RS20 相對 RS63 加速(>0)或惡化(<0)。
     if rs_acceleration is None:
@@ -168,12 +179,13 @@ def theme_rotation_row(
     else:
         leadership_direction = "flat"
 
-    # breadth:成員中價格在各自 20/50/200DMA 之上的比例。
+    # breadth:**只用** fresh valid 成員中價格在各自 20/50/200DMA 之上的比例,並公開分母。
     breadth: dict[str, float | None] = {}
+    breadth_counted: dict[str, int] = {}
     for window in (20, 50, 200):
         above = 0
         counted = 0
-        for sym in symbols:
+        for sym in valid:
             frame = member_frames.get(sym)
             if frame is None or getattr(frame, "empty", True) or "Close" not in frame:
                 continue
@@ -186,11 +198,13 @@ def theme_rotation_row(
         breadth[f"above_sma_{window}"] = (
             round(above / counted, 4) if counted else None
         )
+        breadth_counted[f"above_sma_{window}"] = counted
 
     return {
         "theme": theme,
         "status": "ok",
         "metric_kind": "price_return_proxy",
+        "basket_kind": basket_kind,
         "member_count": configured,
         "valid_member_count": len(valid),
         "member_coverage": coverage,
@@ -202,8 +216,11 @@ def theme_rotation_row(
         "rs_acceleration": rs_acceleration,
         "leadership_direction": leadership_direction,
         "breakout_20d_share": breakout_20d_share,
+        "breakout_20d_counted": breakout_20d_counted,
         "breakout_55d_share": breakout_55d_share,
+        "breakout_55d_counted": breakout_55d_counted,
         "breadth": breadth,
+        "breadth_counted": breadth_counted,
         # theme_percentile_rank 由 panel 跨 theme 計算後補上(見 build_rotation_panel)。
     }
 

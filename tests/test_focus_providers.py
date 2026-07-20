@@ -125,6 +125,95 @@ def test_regime_exposure_cap_bands():
     assert regime_exposure_cap(None)["blocks_new_exposure"] is True
 
 
+def test_options_pressure_partial_evidence_stays_unavailable():
+    # finding P1: partial required options data must NOT fall through to confirmed_ok.
+    from src.focus.providers import build_options_pressure
+
+    # OI-only: strike concentration alone is not directional → unavailable.
+    oi_only = build_options_pressure({"strike_oi_concentration": 0.9, "source": "x"})
+    assert oi_only["status"] == "unavailable"
+    assert "gamma_flip_proxy" in oi_only["missing_fields"]
+
+    # Absolute skew only (no change, no gamma) → unavailable.
+    skew_only = build_options_pressure({"put_skew_25d": 0.05, "source": "x"})
+    assert skew_only["status"] == "unavailable"
+    assert "put_skew_change" in skew_only["missing_fields"]
+
+    # Mixed partial (gamma present but no skew change) → still unavailable.
+    mixed = build_options_pressure(
+        {"gamma_flip_proxy": 1.0, "strike_oi_concentration": 0.5, "source": "x"}
+    )
+    assert mixed["status"] == "unavailable"
+
+
+def test_options_pressure_confirmed_requires_direction_and_freshness():
+    from datetime import date
+
+    from src.focus.providers import build_options_pressure
+
+    complete = {
+        "gamma_flip_proxy": 1.0,          # positive → not adverse
+        "put_skew_change_5d": -0.01,      # skew easing → not worsening
+        "put_skew_25d": 0.04,
+        "strike_oi_concentration": 0.4,
+        "as_of": "2026-07-18", "source": "paid_provider",
+    }
+    ok = build_options_pressure(complete, reference_date=date(2026, 7, 20))
+    assert ok["status"] == "confirmed_ok"
+    assert ok["downside_pressure_confirmed_ok"] is True
+
+    # Same complete evidence but stale as_of → downgraded to unavailable (not confirmation).
+    stale = dict(complete, as_of="2026-05-01")
+    stale_res = build_options_pressure(stale, reference_date=date(2026, 7, 20))
+    assert stale_res["status"] == "unavailable"
+    assert "options_evidence_stale" in stale_res["reasons"]
+
+    # Worsening: skew change positive → worsening (blocks add downstream).
+    worse = dict(complete, put_skew_change_5d=0.02)
+    worse_res = build_options_pressure(worse, reference_date=date(2026, 7, 20))
+    assert worse_res["status"] == "worsening"
+
+
+def test_composite_regime_low_vix_but_damaged_trend_escalates():
+    # finding P1: a low VIX (calm base) must NOT keep the regime calm when both
+    # leaders are below 200DMA and breadth is broken — escalate + cap exposure.
+    from src.focus.providers import composite_market_regime
+
+    index_trend = {
+        "QQQ": {"above_50dma": False, "above_200dma": False},
+        "SMH": {"above_50dma": False, "above_200dma": False},
+        "SOXX": {"above_50dma": False, "above_200dma": False},
+    }
+    breadth = {"breadth_above_50dma": 0.15, "breadth_above_200dma": 0.1}
+    comp = composite_market_regime("calm", index_trend, breadth)
+    assert comp["regime"] in ("elevated", "stress")
+    assert comp["regime"] != "calm"
+    assert comp["escalated_from_vix"] is True
+    assert comp["exposure_cap"]["max_exposure_multiplier"] < 1.0
+
+
+def test_composite_regime_calm_when_healthy():
+    from src.focus.providers import composite_market_regime
+
+    index_trend = {
+        "QQQ": {"above_50dma": True, "above_200dma": True},
+        "SMH": {"above_50dma": True, "above_200dma": True},
+        "SOXX": {"above_50dma": True, "above_200dma": True},
+    }
+    breadth = {"breadth_above_50dma": 0.8, "breadth_above_200dma": 0.75}
+    comp = composite_market_regime("calm", index_trend, breadth)
+    assert comp["regime"] == "calm"
+    assert comp["exposure_cap"]["max_exposure_multiplier"] == 1.0
+
+
+def test_composite_regime_unknown_when_no_evidence_fails_closed():
+    from src.focus.providers import composite_market_regime
+
+    comp = composite_market_regime(None, {}, {}, vix_available=False)
+    assert comp["regime"] is None
+    assert comp["exposure_cap"]["blocks_new_exposure"] is True
+
+
 def test_volatility_state_computes_regime_and_preserves_none_inversion(monkeypatch):
     from datetime import date
     import src.data.vix_structure as vs

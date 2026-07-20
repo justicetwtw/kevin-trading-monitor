@@ -112,3 +112,59 @@ def test_basket_date_aligned_with_mixed_listing_starts():
     assert basket is not None
     # basket starts at the common aligned date, not A's first date
     assert basket.index[0] >= b.index[0]
+
+
+def _ending(n, end_date, level):
+    idx = pd.date_range(end=end_date, periods=n, freq="B")
+    c = np.linspace(level, level + 5, n)
+    return pd.DataFrame({"Close": c, "High": c * 1.01, "Low": c * 0.99, "Volume": [1e6] * n}, index=idx)
+
+
+def test_breadth_and_breakout_exclude_stale_members():
+    # finding P1: breadth/breakout must count ONLY the fresh valid members used by
+    # the basket — a stale constituent must not contaminate them, and the
+    # denominators are exposed.
+    from datetime import date
+    from src.focus.universe import THEME_CONSTITUENTS
+
+    syms = THEME_CONSTITUENTS["ai_compute"]           # NVDA/AMD/TSM/AVGO (4)
+    members = {s: _ending(300, "2026-07-18", i + 10) for i, s in enumerate(syms)}
+    members[syms[0]] = _ending(300, "2024-01-05", 10)  # one stale member
+    benchmarks = {"QQQ": _ending(300, "2026-07-18", 20), "SMH": _ending(300, "2026-07-18", 30)}
+    row = theme_rotation_row("ai_compute", members, benchmarks, reference_date=date(2026, 7, 20))
+    assert row["status"] == "ok"
+    assert row["valid_member_count"] == 3               # stale one dropped
+    # denominators reflect only the 3 fresh members, not 4
+    assert row["breakout_20d_counted"] == 3
+    assert row["breakout_55d_counted"] == 3
+    assert row["breadth_counted"]["above_sma_50"] == 3
+
+
+def test_single_name_memory_theme_ranks_as_labeled_proxy():
+    # finding P1: the core single-constituent memory theme (MU) must not be
+    # permanently insufficient_data; it ranks as an explicitly labeled proxy.
+    from src.focus.universe import THEME_CONSTITUENTS
+
+    assert THEME_CONSTITUENTS["memory_hbm_dram"] == ["MU"]
+    members = {"MU": _dated(300, "2024-06-03", 15)}
+    benchmarks = {"QQQ": _dated(300, "2024-06-03", 20), "SMH": _dated(300, "2024-06-03", 30)}
+    row = theme_rotation_row("memory_hbm_dram", members, benchmarks)
+    assert row["status"] == "ok"
+    assert row["basket_kind"] == "single_name_proxy"
+    assert row["rs_vs_qqq_20"] is not None
+    assert row["member_coverage"] == 1.0
+
+
+def test_single_name_theme_participates_in_panel_rank():
+    from src.focus.universe import THEME_CONSTITUENTS
+
+    members = {}
+    for theme, syms in THEME_CONSTITUENTS.items():
+        for i, s in enumerate(syms):
+            members[s] = _dated(300, "2024-06-03", i + 10)
+    benchmarks = {"QQQ": _dated(300, "2024-06-03", 20), "SMH": _dated(300, "2024-06-03", 30)}
+    panel = build_rotation_panel(members, benchmarks)
+    mem = [r for r in panel["rows"] if r["theme"] == "memory_hbm_dram"][0]
+    assert mem["status"] == "ok"
+    assert mem["theme_rank"] is not None
+    assert mem["basket_kind"] == "single_name_proxy"

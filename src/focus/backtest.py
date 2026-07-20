@@ -240,6 +240,8 @@ def _metrics(
     in_market_flags: list[int],
     bench_returns: list[float] | None,
     turnover: int,
+    closed_trades: list[float],
+    open_terminal_trade: float | None,
 ) -> dict[str, Any]:
     if len(equity) < 2:
         return {"status": "insufficient_history"}
@@ -278,11 +280,11 @@ def _metrics(
     avg_daily_loss = round(sum(d_losses) / len(d_losses), 6) if d_losses else None
     days_in_market = sum(in_market_flags)
 
-    # Trade-level 口徑:一筆 trade = 連續 in-market 的持有期,報酬為期間複利。
-    trade_returns = _trade_returns(strat_returns, in_market_flags)
-    t_wins = [r for r in trade_returns if r > 0]
-    t_losses = [r for r in trade_returns if r < 0]
-    trade_hit_rate = round(len(t_wins) / len(trade_returns), 4) if trade_returns else None
+    # Trade-level 口徑:由 run_strategy 的顯式 trade ledger 傳入(含 entry/rebalance/exit
+    # 成本,且已關閉的 trade 與尚未平倉的 terminal trade 分開)。只用「已關閉」的 trade 計統計。
+    t_wins = [r for r in closed_trades if r > 0]
+    t_losses = [r for r in closed_trades if r < 0]
+    trade_hit_rate = round(len(t_wins) / len(closed_trades), 4) if closed_trades else None
     avg_trade_win = round(sum(t_wins) / len(t_wins), 6) if t_wins else None
     avg_trade_loss = round(sum(t_losses) / len(t_losses), 6) if t_losses else None
 
@@ -304,7 +306,10 @@ def _metrics(
         "calmar": round(calmar, 4) if calmar is not None else None,
         "time_in_market": round(days_in_market / n, 4) if n else 0.0,
         "trade_count": turnover,
-        "closed_trade_count": len(trade_returns),
+        "closed_trade_count": len(closed_trades),
+        "closed_trades": [round(x, 6) for x in closed_trades],
+        "open_terminal_trade": (round(open_terminal_trade, 6) if open_terminal_trade is not None else None),
+        "has_open_terminal_trade": open_terminal_trade is not None,
         "daily_hit_rate": daily_hit_rate,
         "avg_daily_win": avg_daily_win,
         "avg_daily_loss": avg_daily_loss,
@@ -315,24 +320,6 @@ def _metrics(
         "recovery_bars": _recovery_bars(equity),
         "bars": n,
     }
-
-
-def _trade_returns(strat_returns: list[float], in_market_flags: list[int]) -> list[float]:
-    """把連續 in-market 的持有期複利成一筆 trade 報酬(trade-level 口徑)。"""
-    trades: list[float] = []
-    holding = False
-    equity = 1.0
-    for r, flag in zip(strat_returns, in_market_flags):
-        if flag:
-            equity *= (1.0 + r)
-            holding = True
-        elif holding:
-            trades.append(equity - 1.0)
-            equity = 1.0
-            holding = False
-    if holding:
-        trades.append(equity - 1.0)
-    return trades
 
 
 #: 倉位變動小於此值不計為一次 trade(避免 ATR sizing 每日微調灌爆 turnover)。
@@ -374,7 +361,14 @@ def run_strategy(
     turnover = 0
     cost_rate = cost_bps / 10000.0
 
+    # 顯式 trade ledger(finding P1 修正):以「持有→平倉」為一筆 trade,把 entry、
+    # rebalance、exit 的成本都複利進「當筆」trade;平倉當根(倉位歸零、僅剩 exit 成本)
+    # 也計入該筆。尚未平倉的 terminal trade 另計 open_terminal_trade,不當成 closed。
+    closed_trades: list[float] = []
+    open_trade: float | None = None  # 進行中 trade 的複利 equity(1.0 起算)
+
     for t in range(1, len(close)):
+        prev_position = position
         target = float(sizer(frame, t - 1, bench)) if signal(frame, t - 1, bench) else 0.0
         ret = float(close.iloc[t]) / float(close.iloc[t - 1]) - 1.0
         delta = abs(target - position)
@@ -398,7 +392,27 @@ def run_strategy(
             )
         equity.append(equity[-1] * (1.0 + day_ret))
 
-    result = _metrics(equity, strat_returns, in_market_flags, bench_returns, turnover)
+        # -- trade ledger accounting --
+        if position > 0:
+            # entry 或 hold/rebalance bar:報酬(含當根成本)累進進行中 trade。
+            if open_trade is None:
+                open_trade = 1.0
+            open_trade *= (1.0 + day_ret)
+        elif prev_position > 0:
+            # exit bar:倉位歸零、day_ret 僅含 exit 成本 → 併入該筆 trade 後關閉。
+            if open_trade is None:
+                open_trade = 1.0
+            open_trade *= (1.0 + day_ret)
+            closed_trades.append(open_trade - 1.0)
+            open_trade = None
+        # 否則(flat bar):不屬於任何 trade,略過。
+
+    open_terminal_trade = (open_trade - 1.0) if open_trade is not None else None
+
+    result = _metrics(
+        equity, strat_returns, in_market_flags, bench_returns, turnover,
+        closed_trades, open_terminal_trade,
+    )
     result["equity_final"] = round(equity[-1], 6)
     if metrics_start_index is not None:
         result["_oos_returns"] = strat_returns  # internal: for sequential OOS aggregation
