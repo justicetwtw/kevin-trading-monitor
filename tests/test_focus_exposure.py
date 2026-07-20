@@ -26,10 +26,28 @@ def test_leveraged_etf_maps_into_same_underlying():
 
 def test_short_call_is_not_counted_as_protection():
     exp = build_private_exposure(_positions())
-    # Only the long put contributes protective notional; short call does not.
-    # long put: 90 * 100 * 5 = 45,000 protective
-    assert exp["protective_notional"] == 45000.0
+    # Only the long put is a protective position; the short call is delta offset.
+    assert exp["protective_position_count"] == 1
     assert "delta offset" in exp["hedge_contract"].lower()
+
+
+def test_hedge_coverage_ratio_is_unavailable_without_greeks():
+    # Strike notional must NOT be turned into a fake coverage ratio.
+    exp = build_private_exposure(_positions())
+    assert exp["hedge_coverage_ratio"] is None
+    assert exp["hedge_coverage_status"] == "unavailable_no_greeks"
+
+
+def test_short_stock_is_recognized_as_protective():
+    positions = {
+        "stocks": [
+            {"symbol": "NVDA", "shares": 100, "last_price": 100.0},
+            {"symbol": "NVDA", "shares": -50, "last_price": 100.0},  # short stock hedge
+        ],
+        "options": [],
+    }
+    exp = build_private_exposure(positions)
+    assert exp["protective_position_count"] == 1
 
 
 def test_unmapped_instrument_is_flagged_not_zeroed():
@@ -77,9 +95,14 @@ def test_public_summary_bands_are_categorical():
     exp = build_private_exposure(_positions())
     summary = public_exposure_summary(exp)
     assert summary["max_theme_concentration_band"] in {"low", "medium", "high", "unknown"}
-    assert summary["hedge_coverage_band"] in {"none", "light", "material", "unknown"}
-
-
-def test_hedge_coverage_ratio_present_when_long_exposure():
-    exp = build_private_exposure(_positions())
-    assert exp["hedge_coverage_ratio"] is not None
+    assert summary["hedge_coverage_band"] in {
+        "none",
+        "light",
+        "material",
+        "no_protection",
+        "has_protection_uncomputed",
+    }
+    # With a long put present but no Greeks, coverage is honestly uncomputed.
+    assert summary["hedge_coverage_band"] == "has_protection_uncomputed"
+    assert summary["hedge_coverage_status"] == "unavailable_no_greeks"
+    assert summary["has_protective_position"] is True

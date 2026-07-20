@@ -30,9 +30,9 @@ from src.focus.trend import compute_trend_frame
 from src.focus.universe import (
     BENCHMARK_BROAD,
     BENCHMARK_SEMI,
-    THEME_GROUPS,
+    THEME_CONSTITUENTS,
     map_instrument,
-    runtime_focus_symbols,
+    static_focus_symbols,
 )
 
 OUTPUT_FILE = "focus_engine_state.json"
@@ -56,53 +56,66 @@ _ALLOWED_CARD_KEYS = frozenset(
 
 def _theme_member_symbols() -> list[str]:
     seen: list[str] = []
-    for names in THEME_GROUPS.values():
+    for names in THEME_CONSTITUENTS.values():
         for sym in names:
             if sym not in seen:
                 seen.append(sym)
     return seen
 
 
-def _load_frames(symbols: list[str], fetch) -> dict[str, Any]:
+def _load_frames(symbols: list[str], fetch) -> tuple[dict[str, Any], list[str]]:
     frames: dict[str, Any] = {}
+    unavailable: list[str] = []
     for sym in symbols:
         try:
-            frames[sym] = fetch(sym, period="1y", interval="1d")
+            frame = fetch(sym, period="1y", interval="1d")
         except Exception as exc:
             logger.warning(f"focus shadow: price fetch failed for {sym}: {type(exc).__name__}")
-            frames[sym] = None
-    return frames
+            frame = None
+        if frame is None or getattr(frame, "empty", True):
+            unavailable.append(sym)
+        frames[sym] = frame
+    return frames, unavailable
 
 
 def build_shadow_state(
     holdings: list[str] | None = None,
     positions: dict[str, Any] | None = None,
+    positions_status: str = "unknown",
     fetch=None,
+    reference_date=None,
 ) -> dict[str, Any]:
-    """Build the public-safe focus engine state (dependency-injectable for tests)."""
+    """Build the public-safe focus engine state (dependency-injectable for tests).
+
+    P0 privacy: public focus cards come ONLY from ``static_focus_symbols()``.
+    ``holdings`` never adds a public symbol — it may only influence private
+    ordering/aggregate exposure (which is redacted to bands/counts before output).
+    """
     if fetch is None:
         from src.data.price_data import fetch_history as fetch
+    if reference_date is None:
+        reference_date = datetime.now(timezone.utc).date()
 
-    focus_rows = runtime_focus_symbols(holdings=holdings)
-    focus_symbols = [row["symbol"] for row in focus_rows]
+    # Public card universe is static and public — independent of private holdings.
+    card_symbols = static_focus_symbols()
 
     benchmark_syms = [BENCHMARK_BROAD, BENCHMARK_SEMI]
     member_syms = _theme_member_symbols()
-    all_syms = sorted(set(focus_symbols) | set(member_syms) | set(benchmark_syms))
-    frames = _load_frames(all_syms, fetch)
+    all_syms = sorted(set(card_symbols) | set(member_syms) | set(benchmark_syms))
+    frames, unavailable = _load_frames(all_syms, fetch)
     benchmark_frames = {name: frames.get(name) for name in benchmark_syms}
+    benchmark_missing = [s for s in benchmark_syms if s in unavailable]
 
     def _theme_basket_close(theme: str | None):
         if not theme:
             return None
         from src.focus.rotation import _basket_close
 
-        return _basket_close(frames, THEME_GROUPS.get(theme, []))
+        return _basket_close(frames, THEME_CONSTITUENTS.get(theme, []))
 
     options_provider = YFinanceFocusOptionsProvider()
     cards: list[dict[str, Any]] = []
-    for row in focus_rows:
-        symbol = row["symbol"]
+    for symbol in card_symbols:
         mapping = map_instrument(symbol)
         trend = compute_trend_frame(
             frames.get(symbol),
@@ -116,6 +129,7 @@ def build_shadow_state(
             thesis_state="watch",  # thesis 來源未接;honest default,不假裝 intact
             options_capability=capability,
             valuation_status="not_connected",
+            reference_date=reference_date,
         )
         cards.append({k: v for k, v in card.items() if k in _ALLOWED_CARD_KEYS})
 
@@ -126,18 +140,73 @@ def build_shadow_state(
         private_exposure = build_private_exposure(positions)
         exposure_summary = public_exposure_summary(private_exposure)
 
+    volatility_available = True
     try:
         volatility_state = PublicVolatilityIndexProvider().get_volatility_state()
+        if volatility_state.get("vix") is None:
+            volatility_available = False
     except Exception as exc:
         logger.warning(f"focus shadow: volatility fetch failed: {type(exc).__name__}")
         volatility_state = None
+        volatility_available = False
+
+    health = _build_health(
+        total_symbols=len(all_syms),
+        unavailable=unavailable,
+        benchmark_missing=benchmark_missing,
+        positions_status=positions_status,
+        volatility_available=volatility_available,
+    )
 
     return build_focus_payload(
         cards=cards,
         rotation_panel=rotation_panel,
         exposure_summary=exposure_summary,
         volatility_state=volatility_state,
+        health=health,
     )
+
+
+def _build_health(
+    total_symbols: int,
+    unavailable: list[str],
+    benchmark_missing: list[str],
+    positions_status: str,
+    volatility_available: bool,
+) -> dict[str, Any]:
+    """Compute a public-safe workflow health status (generic codes, no symbols).
+
+    A shadow run must not disguise partial/stale/provider failures as success:
+    any degradation surfaces here and drives the runner's non-zero exit.
+    """
+    error_codes: list[str] = []
+    if benchmark_missing:
+        error_codes.append("benchmark_price_unavailable")
+    if unavailable:
+        error_codes.append("partial_price_coverage")
+    if not volatility_available:
+        error_codes.append("volatility_index_unavailable")
+    if positions_status == "malformed":
+        error_codes.append("positions_input_malformed")
+    elif positions_status == "unconfigured":
+        error_codes.append("positions_unconfigured")
+
+    if benchmark_missing or positions_status == "malformed":
+        workflow_status = "degraded"
+    elif error_codes:
+        workflow_status = "partial"
+    else:
+        workflow_status = "healthy"
+
+    return {
+        "workflow_status": workflow_status,
+        "degraded": workflow_status in {"degraded", "partial"},
+        "error_codes": error_codes,
+        "unavailable_symbol_count": len(unavailable),
+        "total_symbol_count": total_symbols,
+        "positions_status": positions_status,
+        "privacy": "generic_codes_no_identifiers",
+    }
 
 
 def _assert_public_safe(state: dict[str, Any]) -> None:
@@ -149,6 +218,44 @@ def _assert_public_safe(state: dict[str, Any]) -> None:
             raise ValueError(f"focus card would leak non-public keys: {sorted(leaked)}")
 
 
+def _positions_status() -> tuple[dict[str, Any] | None, list[str], str]:
+    """Load private positions and classify input health without leaking contents.
+
+    Returns (positions, holdings, status) where status is one of
+    unconfigured / malformed / ok. Malformed present input must not be silently
+    treated as an empty portfolio success.
+    """
+    import json
+    import os
+
+    from src.management.current_positions import (
+        POSITIONS_ENV,
+        _validate_positions,
+        get_holdings_symbols,
+        load_positions,
+    )
+
+    raw = os.getenv(POSITIONS_ENV, "").strip()
+    if raw:
+        try:
+            _validate_positions(json.loads(raw))
+        except Exception:
+            # Present but malformed: surface as degraded, do not fake empty success.
+            return None, [], "malformed"
+    try:
+        positions = load_positions()
+        holdings = get_holdings_symbols()
+    except Exception as exc:
+        logger.warning(f"focus shadow: private positions unavailable: {type(exc).__name__}")
+        return None, [], "malformed"
+
+    from src.management.current_positions import _is_positions_empty
+
+    if not raw and _is_positions_empty(positions):
+        return positions, holdings, "unconfigured"
+    return positions, holdings, "ok"
+
+
 def main() -> int:
     from src.storage.state_manager import write_json
 
@@ -158,26 +265,37 @@ def main() -> int:
         return 0
 
     logger.info(f"focus shadow: running in {focus_engine_mode()} mode")
-    try:
-        from src.management.current_positions import get_holdings_symbols, load_positions
+    positions, holdings, positions_status = _positions_status()
 
-        holdings = get_holdings_symbols()
-        positions = load_positions()
-    except Exception as exc:
-        logger.warning(f"focus shadow: private positions unavailable: {type(exc).__name__}")
-        holdings, positions = [], None
-
-    state = build_shadow_state(holdings=holdings, positions=positions)
+    state = build_shadow_state(
+        holdings=holdings,
+        positions=positions,
+        positions_status=positions_status,
+    )
     _assert_public_safe(state)
     if not write_json(OUTPUT_FILE, state):
         logger.error("focus shadow: failed to write state")
         return 1
+
+    health = state.get("health") or {}
     data = state.get("data") or {}
     logger.info(
-        "focus shadow: wrote %d focus cards, mode=%s"
-        % (len(data.get("focus_securities") or []), state.get("mode"))
+        "focus shadow: wrote %d cards, mode=%s, workflow_status=%s, codes=%s"
+        % (
+            len(data.get("focus_securities") or []),
+            state.get("mode"),
+            health.get("workflow_status"),
+            health.get("error_codes"),
+        )
     )
-    # Shadow-only: never escalate to a non-zero "degraded" exit that would page.
+    # Fail closed: an enabled run that is degraded/partial must be operationally
+    # visible (non-zero), not disguised as success. Paging itself is controlled by
+    # alert routing, not by this exit code.
+    if health.get("degraded"):
+        logger.warning(
+            f"focus shadow: degraded run, workflow_status={health.get('workflow_status')}"
+        )
+        return 1
     return 0
 
 

@@ -25,6 +25,30 @@ def test_options_capabilities_flags_match_supported():
     assert caps["estimated_dealer_gex"] is False
 
 
+class _FakeBaseProvider:
+    def get_iv_metrics(self, symbol):
+        return {"current_iv": 0.42, "ivr": 55.0, "ivp": 60.0, "samples": 252}
+
+    def get_options_snapshot(self, symbol):
+        return {"put_call_volume_ratio": 0.9}
+
+
+def test_capability_true_fields_are_actually_populated():
+    # Consistency regression: every capability=True field is sourced from the
+    # underlying provider (no capability=true + always-None contradiction), and
+    # every capability=False field stays None.
+    provider = YFinanceFocusOptionsProvider()
+    snap = provider.get_capability_snapshot("NVDA", base_provider=_FakeBaseProvider())
+    caps = provider.capabilities()
+    for field, supported in caps.items():
+        if supported:
+            assert snap[field] is not None, f"{field} claimed supported but None"
+        else:
+            assert snap[field] is None, f"{field} not supported but populated"
+    assert snap["current_atm_iv"] == 0.42
+    assert snap["put_call_volume_ratio"] == 0.9
+
+
 def test_estimated_gex_includes_assumption_and_confidence():
     provider = YFinanceFocusOptionsProvider()
     gex = provider.estimate_dealer_gex("NVDA", available=False)

@@ -340,6 +340,79 @@ def _theses_section(data: dict[str, Any]) -> str:
     )
 
 
+def _focus_section(data: dict[str, Any]) -> str:
+    """Render the Focus Trading Engine block (shadow/display-only).
+
+    When the feature flag is off the block honestly shows a disabled state; when
+    on it renders Market Regime, Portfolio Exceptions, Theme Rotation and Focus
+    Securities with source/readiness blockers visible (contract §8 first screen).
+    """
+    focus = data.get("focus_engine") or {}
+    if not focus.get("enabled"):
+        return (
+            '<section id="focus"><div class="section-head">'
+            "<h2>Focus Engine (shadow)</h2>"
+            "<p>Holdings-first thesis/timing/exposure overlay.</p></div>"
+            '<div class="ok-state">Focus Engine is disabled '
+            "(FOCUS_ENGINE_ENABLED != 1); existing Decision Engine is authoritative."
+            "</div></section>"
+        )
+    fdata = focus.get("data") or {}
+    health = focus.get("health") or {}
+    regime = fdata.get("market_regime") or {}
+    exceptions = fdata.get("portfolio_exceptions") or {}
+    rotation = fdata.get("theme_rotation") or {}
+    cards = fdata.get("focus_securities") or []
+
+    regime_strip = (
+        '<div class="account-strip">'
+        f'<span>Mode <strong>{_e(focus.get("mode"))}</strong></span>'
+        f'<span>Workflow <strong>{_badge(health.get("workflow_status"))}</strong></span>'
+        f'<span>Error codes <strong>{_e(health.get("error_codes") or [])}</strong></span>'
+        f'<span>VIX regime <strong>{_e(regime.get("regime"))}</strong></span>'
+        f'<span>Hedge <strong>{_e(exceptions.get("hedge_coverage_band"))}</strong></span>'
+        f'<span>Theme concentration <strong>{_e(exceptions.get("max_theme_concentration_band"))}</strong></span>'
+        "</div>"
+    )
+    rotation_rows = rotation.get("rows") or []
+    rotation_html = _table(
+        rotation_rows,
+        [
+            ("theme", "Theme"),
+            ("status", "Status"),
+            ("rs_vs_qqq_20", "RS20 vs QQQ"),
+            ("rs_acceleration", "RS accel"),
+            ("breakout_20d_share", "20D breakout share"),
+        ],
+    )
+    focus_rows = _table(
+        cards,
+        [
+            ("symbol", "Symbol"),
+            ("company_thesis_state", "Thesis"),
+            ("timing_state", "Timing"),
+            ("exposure_posture", "Posture"),
+            ("rs20_vs_qqq", "RS20"),
+            ("valuation_status", "Valuation"),
+            ("options_capability_status", "Options"),
+            ("readiness_blockers", "Blockers"),
+            ("as_of", "As of"),
+        ],
+    )
+    return (
+        '<section id="focus"><div class="section-head">'
+        "<h2>Focus Engine (shadow)</h2>"
+        "<p>Static public focus universe; timing paces exposure, never the thesis. "
+        "Not a trade signal.</p></div>"
+        + regime_strip
+        + "<h3>Theme rotation (price-return proxy, not fund flow)</h3>"
+        + rotation_html
+        + "<h3>Focus securities</h3>"
+        + focus_rows
+        + "</section>"
+    )
+
+
 def _market_context(payloads: dict[str, Any]) -> str:
     option_rows = [
         row
@@ -412,6 +485,7 @@ def render_html(payloads: dict[str, Any]) -> str:
             _trump_section(data),
             _theme_section(data),
             _allocation_section(data),
+            _focus_section(data),
             _positions_section(data),
             _theses_section(data),
             _market_context(payloads),
@@ -423,7 +497,7 @@ def render_html(payloads: dict[str, Any]) -> str:
 <header><div class="kicker">Personal capital allocation / thesis monitor</div><h1>Kevin Trading Mission Control</h1>
 <div class="subtitle">Exceptions, source honesty, theses and opportunity context first. Telegram carries urgent alerts, every new Trump post and private portfolio risk.</div>
 <div class="meta">generated_at {_e(mission.get('generated_at'))} · repo is the source of truth · decision support only · no automated trading</div></header>
-<nav><a href="#attention">Attention</a><a href="#trump">Trump source</a><a href="#themes">Themes</a><a href="#allocation">Allocation</a><a href="#positions">Portfolio health</a><a href="#theses">Theses</a><a href="#context">Market context</a></nav>
+<nav><a href="#attention">Attention</a><a href="#trump">Trump source</a><a href="#themes">Themes</a><a href="#allocation">Allocation</a><a href="#focus">Focus engine</a><a href="#positions">Portfolio health</a><a href="#theses">Theses</a><a href="#context">Market context</a></nav>
 <main>{sections}<p class="meta">{_e(data.get('disclaimer'))}</p></main></body></html>"""
 
 

@@ -104,12 +104,18 @@ def build_private_exposure(positions: dict[str, Any]) -> dict[str, Any]:
                 protective_by_underlying.get(underlying, 0.0) + abs(signed_notional * leverage)
             )
 
+    protective_position_count = 0
     for stock in stocks:
         symbol = stock.get("symbol")
         notional = _stock_notional(stock)
         if not symbol or notional is None:
             continue
-        _record(symbol, notional, is_protective=False)
+        shares = stock.get("shares")
+        # 負 shares = short stock,屬下檔保護(§3.2);認列其 short notional。
+        is_short_stock = isinstance(shares, (int, float)) and not isinstance(shares, bool) and shares < 0
+        if is_short_stock:
+            protective_position_count += 1
+        _record(symbol, notional, is_protective=is_short_stock)
 
     for option in options:
         symbol = option.get("symbol")
@@ -118,11 +124,10 @@ def build_private_exposure(positions: dict[str, Any]) -> dict[str, Any]:
         if not symbol or notional is None:
             continue
         signed = _signed(option_type, notional)
-        _record(
-            symbol,
-            signed,
-            is_protective=option_type in PROTECTIVE_OPTION_TYPES,
-        )
+        is_protective = option_type in PROTECTIVE_OPTION_TYPES
+        if is_protective:
+            protective_position_count += 1
+        _record(symbol, signed, is_protective=is_protective)
 
     # theme 集中度:單一 theme 的 |net| 佔總 long 的比例。
     for theme, bucket in by_theme.items():
@@ -132,21 +137,25 @@ def build_private_exposure(positions: dict[str, Any]) -> dict[str, Any]:
             else None
         )
 
-    total_protective = sum(protective_by_underlying.values())
-    hedge_coverage_ratio = (
-        round(total_protective / long_notional, 4) if long_notional > 0 else None
-    )
+    # Hedge coverage(finding P1):沒有 option delta / Greeks 時,strike notional
+    # 會把遠 OTM put 高估成接近全額保護。因此 coverage ratio 一律標 unavailable,
+    # 不用 strike notional 偽造覆蓋率;只誠實回報是否存在 protective 部位與其 proxy 名目。
+    total_protective_proxy = sum(protective_by_underlying.values())
 
     return {
         "by_underlying": by_underlying,
         "by_theme": by_theme,
         "unmapped_instruments": sorted(set(unmapped)),
         "long_notional": round(long_notional, 2),
-        "protective_notional": round(total_protective, 2),
-        "hedge_coverage_ratio": hedge_coverage_ratio,
+        "protective_position_count": protective_position_count,
+        "protective_notional_strike_proxy": round(total_protective_proxy, 2),
+        "hedge_coverage_ratio": None,
+        "hedge_coverage_status": "unavailable_no_greeks",
         "hedge_contract": (
             "Only long puts / short stock count as downside protection. "
-            "Short calls are delta offset, not protection."
+            "Short calls are delta offset, not protection. Coverage ratio needs "
+            "option delta; without Greeks it stays unavailable rather than being "
+            "faked from strike notional."
         ),
         "notional_basis": "strike/last-price notional proxy; not live Greeks",
     }
@@ -163,6 +172,7 @@ def public_exposure_summary(private_exposure: dict[str, Any]) -> dict[str, Any]:
     by_underlying = private_exposure.get("by_underlying", {})
     unmapped = private_exposure.get("unmapped_instruments", [])
     coverage = private_exposure.get("hedge_coverage_ratio")
+    protective_count = private_exposure.get("protective_position_count", 0)
 
     concentrations = [
         bucket.get("concentration_of_long")
@@ -179,8 +189,10 @@ def public_exposure_summary(private_exposure: dict[str, Any]) -> dict[str, Any]:
     else:
         concentration_band = "low"
 
+    # Coverage ratio 沒有 Greeks 就是 unavailable(不偽造);public 只誠實回報
+    # 「保護部位是否存在」與「覆蓋率無法量化」,不給假的 material/none 分級。
     if coverage is None:
-        hedge_band = "unknown"
+        hedge_band = "has_protection_uncomputed" if protective_count else "no_protection"
     elif coverage <= 0.0:
         hedge_band = "none"
     elif coverage < 0.25:
@@ -193,6 +205,10 @@ def public_exposure_summary(private_exposure: dict[str, Any]) -> dict[str, Any]:
         "underlying_count": len(by_underlying),
         "max_theme_concentration_band": concentration_band,
         "hedge_coverage_band": hedge_band,
+        "hedge_coverage_status": private_exposure.get(
+            "hedge_coverage_status", "unavailable_no_greeks"
+        ),
+        "has_protective_position": bool(protective_count),
         "unmapped_instrument_count": len(unmapped),
         "has_unmapped_risk_gap": bool(unmapped),
         "privacy": "aggregate_only_no_identifiers",

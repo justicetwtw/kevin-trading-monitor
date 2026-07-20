@@ -75,11 +75,40 @@
   本 PR 不新增自動排程 workflow(避免在未核准前消耗資源 / 改變 production 行為)。
 - 尚未接 Telegram private focus brief(display-only,待 Kevin 核准觀察窗)。
 
-## 7. 驗證
+## 7. Review round 1 — 已修正 findings
+
+針對 PR #10 的 fresh-context `CHANGES_REQUIRED`(1 P0 + 7 P1),以 code + regression 修正:
+
+- **P0 private-holding leak**:public focus cards 改為只來自
+  `static_focus_symbols()`(純公開靜態名單);private holdings 不再進入 public symbol 集合,
+  只影響 private aggregate。regression:不在公開名單的私有 symbol 不出現在任何 public payload。
+- **P1 fail-green runner**:runner 區分 unconfigured / malformed / partial / stale /
+  provider failure,寫 public-safe `workflow_status` + generic error codes,enabled degraded
+  run 回 non-zero(paging 由 alert routing 控制,不靠假綠燈)。
+- **P1 add gate / reclaim**:`classify_timing` 納入 benchmark RS(available/leadership/improving);
+  缺 RS 或 RS 未領先不得升 add-ready;breakout 需真實 volume 確認(None ≠ OK);
+  `reclaim_confirmed` 以 `reclaim_state()` 的 confirmation window 變為可達且可測。
+- **P1 hedge honesty**:沒有 option Greeks 時 `hedge_coverage_ratio` 一律 `None` +
+  `unavailable_no_greeks`,不用 strike notional 偽造覆蓋率;short stock(負 shares)認列為保護,
+  short call 仍只算 delta offset。
+- **P1 options capability consistency**:`YFinanceFocusOptionsProvider` 實際接上既有
+  `options_provider` / iv history 填 current IV / IV rank / IV percentile / put-call ratio;
+  supported flag 與是否取數一致,regression 檢查 capability=true 欄位確實有取數路徑。
+- **P1 backtest**:修正 next-bar 執行語意(賺報酬的部位=計入 time-in-market 的部位,消除
+  off-by-one);RS 改為 benchmark-relative(未給 benchmark 標 `benchmark_required`,不用自身動能冒充);
+  `dma50_rs_breakout_atr` 誠實改名;walk-forward / OOS / regime split / ATR sizing 列 `not_implemented`。
+- **P1 theme rotation**:`THEME_CONSTITUENTS`(純成分股)與 ETF proxy / benchmark 分離,
+  basket 不再混入 SMH/SOXX 再跟 SMH 比較;補 `rs_acceleration`、`breakout_20d_share`,
+  其餘 leadership 欄位列 `not_produced`。
+- **P1 as-of / render**:`compute_trend_frame` 輸出 `as_of`;card 缺 as_of 或超過
+  `MAX_CARD_AGE_DAYS` 標 `as_of_missing` / `price_stale`;Mission Control 新增可見的
+  Focus Engine render section,含 snapshot regression。
+
+## 8. 驗證
 
 ```bash
-python -m pytest -q                                   # 535 passed, 1 skipped
-python -m pytest -q tests/test_focus_*.py             # 68 focus tests
+python -m pytest -q                                   # 556 passed, 1 skipped
+python -m pytest -q tests/test_focus_*.py             # 89 focus tests
 python scripts/verify_agent_workflow_contract.py      # passed
 python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline  # ok
 ```

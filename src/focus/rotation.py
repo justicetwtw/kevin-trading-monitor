@@ -13,7 +13,11 @@ from typing import Any
 import pandas as pd
 
 from src.focus.trend import relative_strength
-from src.focus.universe import BENCHMARK_BROAD, BENCHMARK_SEMI, THEME_GROUPS
+from src.focus.universe import (
+    BENCHMARK_BROAD,
+    BENCHMARK_SEMI,
+    THEME_CONSTITUENTS,
+)
 
 ROTATION_WINDOWS = (5, 20, 63)
 
@@ -55,8 +59,12 @@ def theme_rotation_row(
     member_frames: dict[str, pd.DataFrame],
     benchmark_frames: dict[str, pd.DataFrame],
 ) -> dict[str, Any]:
-    """單一 theme 的輪動 proxy row。"""
-    symbols = THEME_GROUPS.get(theme, [])
+    """單一 theme 的輪動 proxy row。
+
+    basket 只用 THEME_CONSTITUENTS(單一成分股),不混入該 theme 的 ETF proxy,
+    以免對相同風險重複加權、又拿含 SMH 的 basket 去跟 SMH 比較。
+    """
+    symbols = THEME_CONSTITUENTS.get(theme, [])
     basket = _basket_close(member_frames, symbols)
     if basket is None:
         return {
@@ -72,8 +80,34 @@ def theme_rotation_row(
     smh_close = smh["Close"].dropna() if smh is not None and "Close" in smh else None
 
     returns = {f"return_{w}d": _period_return(basket, w) for w in ROTATION_WINDOWS}
-    rs_qqq = relative_strength(basket, qqq_close, 20)
+    rs_qqq_20 = relative_strength(basket, qqq_close, 20)
+    rs_qqq_63 = relative_strength(basket, qqq_close, 63)
     rs_smh = relative_strength(basket, smh_close, 20)
+
+    # leadership acceleration proxy:RS20 - RS63(vs QQQ),兩者都可得才計算。
+    if rs_qqq_20.get("value") is not None and rs_qqq_63.get("value") is not None:
+        rs_acceleration = round(rs_qqq_20["value"] - rs_qqq_63["value"], 6)
+    else:
+        rs_acceleration = None
+
+    # breakout share:成分股中處於 Donchian-20 上破的比例(no look-ahead)。
+    from src.focus.trend import donchian_state
+
+    breakout_up = 0
+    breakout_counted = 0
+    for sym in symbols:
+        frame = member_frames.get(sym)
+        if frame is None or getattr(frame, "empty", True):
+            continue
+        state = donchian_state(frame, 20)
+        if state.get("status") == "insufficient_data":
+            continue
+        breakout_counted += 1
+        if state.get("status") == "breakout_up":
+            breakout_up += 1
+    breakout_20d_share = (
+        round(breakout_up / breakout_counted, 4) if breakout_counted else None
+    )
 
     # breadth:成員中價格在各自 20/50/200DMA 之上的比例。
     breadth: dict[str, float | None] = {}
@@ -100,9 +134,14 @@ def theme_rotation_row(
         "metric_kind": "price_return_proxy",
         "member_count": len(symbols),
         **returns,
-        "rs_vs_qqq_20": rs_qqq.get("value"),
+        "rs_vs_qqq_20": rs_qqq_20.get("value"),
+        "rs_vs_qqq_63": rs_qqq_63.get("value"),
         "rs_vs_smh_20": rs_smh.get("value"),
+        "rs_acceleration": rs_acceleration,
+        "breakout_20d_share": breakout_20d_share,
         "breadth": breadth,
+        # 契約其餘 leadership 欄位尚未產出,明確標記不假裝已完成(§9 honesty)。
+        "not_produced": ["theme_percentile_rank", "55d_breakout_share"],
     }
 
 
@@ -113,8 +152,7 @@ def build_rotation_panel(
     """所有 theme 的輪動 panel(依 20D RS vs QQQ 排序,None 排最後)。"""
     rows = [
         theme_rotation_row(theme, member_frames, benchmark_frames)
-        for theme in THEME_GROUPS
-        if theme != "portfolio_hedge"
+        for theme in THEME_CONSTITUENTS
     ]
     rows.sort(
         key=lambda row: (

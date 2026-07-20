@@ -13,6 +13,13 @@ from src.focus.state_machine import (
 )
 
 
+def _rs_block(value):
+    """RS dict for a given 20/63 value (value=None => benchmark unavailable)."""
+    if value is None:
+        return {w: {"value": None, "status": "benchmark_unavailable"} for w in (20, 63, 126)}
+    return {w: {"value": value, "status": "ok"} for w in (20, 63, 126)}
+
+
 def _trend(
     close,
     sma20,
@@ -26,7 +33,17 @@ def _trend(
     donch20="inside",
     donch55="inside",
     volume_percentile=0.6,
+    rs20=0.05,
+    rs63=0.03,
+    reclaimed=False,
 ):
+    def _rs(v20, v63):
+        return {
+            20: {"value": v20, "status": "ok" if v20 is not None else "benchmark_unavailable"},
+            63: {"value": v63, "status": "ok" if v63 is not None else "benchmark_unavailable"},
+            126: {"value": v63, "status": "ok" if v63 is not None else "benchmark_unavailable"},
+        }
+
     return {
         "status": "ok",
         "close": close,
@@ -47,7 +64,11 @@ def _trend(
             20: {"status": donch20},
             55: {"status": donch55},
         },
+        "reclaim": {"reclaimed": reclaimed, "status": "ok"},
         "volume_percentile": volume_percentile,
+        "rs_vs_qqq": _rs(rs20, rs63),
+        "rs_vs_smh": _rs(rs20, rs63),
+        "rs_vs_theme": _rs(rs20, rs63),
     }
 
 
@@ -128,6 +149,49 @@ def test_overheated_extended_not_eligible():
     timing = classify_timing(trend)
     assert timing["state"] == "overheated"
     assert timing["long_entry_eligible"] is False
+
+
+def test_healthy_trend_without_rs_is_not_add_eligible():
+    # Same healthy structure but RS benchmark unavailable → add gate must close.
+    trend = _trend(
+        102.0, 101.0, 98.0, 90.0, slope50=0.02, slope20=0.02, rsi=55.0, rs20=None, rs63=None
+    )
+    timing = classify_timing(trend)
+    assert timing["state"] == "trend_healthy"
+    assert timing["long_entry_eligible"] is False
+    assert "rs_unavailable_add_gate_closed" in timing["flags"]
+
+
+def test_healthy_trend_with_lagging_rs_is_not_add_eligible():
+    # RS present but not leading (negative) → not eligible.
+    trend = _trend(
+        102.0, 101.0, 98.0, 90.0, slope50=0.02, slope20=0.02, rsi=55.0, rs20=-0.04, rs63=-0.02
+    )
+    timing = classify_timing(trend)
+    assert timing["state"] == "trend_healthy"
+    assert timing["long_entry_eligible"] is False
+    assert "rs_not_leading_add_gate_closed" in timing["flags"]
+
+
+def test_reclaim_confirmed_is_reachable():
+    trend = _trend(
+        100.0, 99.0, 98.0, 95.0, slope50=0.01, slope20=0.01, rsi=55.0,
+        rs20=0.05, rs63=0.03, reclaimed=True,
+    )
+    timing = classify_timing(trend)
+    assert timing["state"] == "reclaim_confirmed"
+    assert timing["long_entry_eligible"] is True
+
+
+def test_breakout_volume_none_is_not_confirmed():
+    trend = _trend(
+        120.0, 110.0, 105.0, 95.0, slope50=0.03, slope20=0.03, rsi=62.0,
+        donch20="breakout_up", volume_percentile=None,
+    )
+    timing = classify_timing(trend)
+    assert timing["state"] == "breakout_confirmed"
+    assert timing["long_entry_eligible"] is False
+    assert "breakout_volume_unconfirmed" in timing["flags"]
 
 
 def test_missing_50dma_fails_closed():

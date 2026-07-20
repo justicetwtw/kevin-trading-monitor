@@ -12,7 +12,7 @@ focus payload,供 Mission Control 以 shadow / display-only 呈現。
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 from src.focus.config import focus_engine_enabled, focus_engine_mode
@@ -20,6 +20,17 @@ from src.focus.state_machine import evaluate_symbol
 from src.focus.universe import map_instrument
 
 SCHEMA_VERSION = 1
+#: 價格 as-of 超過這個日曆天數(含長假)即視為 stale,card fail closed。
+MAX_CARD_AGE_DAYS = 5
+
+
+def _as_of_date(value: Any) -> date | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return date.fromisoformat(value[:10])
+    except ValueError:
+        return None
 
 
 def build_focus_card(
@@ -32,6 +43,7 @@ def build_focus_card(
     valuation_status: str | None = None,
     source: str = "yfinance_delayed_public_market_data",
     as_of: str | None = None,
+    reference_date: date | None = None,
 ) -> dict[str, Any]:
     """組出單一 focus card(§8 每張卡最低欄位)。"""
     mapping = map_instrument(symbol)
@@ -50,6 +62,8 @@ def build_focus_card(
     bb = trend.get("bollinger", {}) if isinstance(trend, dict) else {}
     donchian = trend.get("donchian", {}) if isinstance(trend, dict) else {}
 
+    card_as_of = as_of or (trend.get("as_of") if isinstance(trend, dict) else None)
+
     blockers: list[str] = []
     if not isinstance(trend, dict) or trend.get("status") != "ok":
         blockers.append("price_trend_unavailable")
@@ -59,6 +73,13 @@ def build_focus_card(
         blockers.append("valuation_not_connected")
     if options_capability is None:
         blockers.append("options_capability_unknown")
+    # as-of / staleness fail-closed:缺 as_of 或超過 MAX_CARD_AGE_DAYS 都標 blocker。
+    as_of_date = _as_of_date(card_as_of)
+    if isinstance(trend, dict) and trend.get("status") == "ok":
+        if as_of_date is None:
+            blockers.append("as_of_missing")
+        elif reference_date is not None and (reference_date - as_of_date).days > MAX_CARD_AGE_DAYS:
+            blockers.append("price_stale")
 
     def _rs(block: dict[str, Any], window: int) -> Any:
         item = block.get(window) if isinstance(block, dict) else None
@@ -95,7 +116,7 @@ def build_focus_card(
         "exposure_reasons": states["exposure_reasons"],
         "readiness_blockers": blockers,
         "source": source,
-        "as_of": as_of or (trend.get("as_of") if isinstance(trend, dict) else None),
+        "as_of": card_as_of,
         "not_a_trade_signal": True,
     }
 
@@ -105,6 +126,7 @@ def build_focus_payload(
     rotation_panel: dict[str, Any] | None = None,
     exposure_summary: dict[str, Any] | None = None,
     volatility_state: dict[str, Any] | None = None,
+    health: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """組出完整 focus payload envelope。flag OFF 時回 disabled envelope。"""
     generated_at = datetime.now(timezone.utc).isoformat()
@@ -128,6 +150,8 @@ def build_focus_payload(
             "Shadow/display-only. Does not override existing Decision Engine "
             "alerts and never places an order."
         ),
+        "health": health
+        or {"workflow_status": "unknown", "error_codes": [], "degraded": False},
         "data": {
             "market_regime": volatility_state,
             "portfolio_exceptions": exposure_summary,
@@ -140,9 +164,9 @@ def build_focus_payload(
                 ),
             },
             "disclaimer": (
-                "Holdings-first thesis/timing/exposure monitor. Decision support "
-                "only. Timing state controls exposure pacing, not the thesis, and "
-                "never becomes an automatic trade instruction."
+                "Static public focus universe (not private holdings). Decision "
+                "support only. Timing state controls exposure pacing, not the "
+                "thesis, and never becomes an automatic trade instruction."
             ),
         },
     }

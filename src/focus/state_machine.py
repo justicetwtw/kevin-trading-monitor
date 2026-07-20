@@ -66,6 +66,30 @@ def _slope_not_declining(slope: float | None) -> bool:
     return slope is not None and slope >= 0
 
 
+def _rs_reading(trend: dict[str, Any]) -> dict[str, Any]:
+    """從 trend 讀出 benchmark RS 狀態(add gate 依此判斷,不再只看均線)。
+
+    available:RS20 vs QQQ 是否算得出(benchmark 在且長度足夠)。
+    leadership:RS20 vs QQQ 為正(期間內跑贏大盤)。
+    improving:RS20 >= RS63(近月相對強度不弱於中期),兩者都可得才判定。
+    """
+    rs_qqq = trend.get("rs_vs_qqq", {}) if isinstance(trend, dict) else {}
+    r20 = rs_qqq.get(20) if isinstance(rs_qqq, dict) else None
+    r63 = rs_qqq.get(63) if isinstance(rs_qqq, dict) else None
+    v20 = r20.get("value") if isinstance(r20, dict) and r20.get("status") == "ok" else None
+    v63 = r63.get("value") if isinstance(r63, dict) and r63.get("status") == "ok" else None
+    available = v20 is not None
+    leadership = available and v20 > 0
+    improving = v20 is not None and v63 is not None and v20 >= v63
+    return {
+        "available": available,
+        "leadership": leadership,
+        "improving": improving,
+        "rs20": v20,
+        "rs63": v63,
+    }
+
+
 def classify_timing(
     trend: dict[str, Any],
     options_pressure: dict[str, Any] | None = None,
@@ -121,6 +145,8 @@ def classify_timing(
     breakout_down = donch20.get("status") == "breakout_down" or donch55.get("status") == "breakout_down"
 
     options_worsening = bool(options_pressure.get("downside_pressure_worsening"))
+    options_confirmed = bool(options_pressure.get("downside_pressure_confirmed_ok"))
+    rs = _rs_reading(trend)
 
     # -- 決策順序:先處理下降趨勢(避免 falling knife 被當抄底) --
 
@@ -185,38 +211,73 @@ def classify_timing(
 
     if breakout_up:
         vol_pct = trend.get("volume_percentile")
-        volume_ok = vol_pct is None or vol_pct >= 0.5
+        # 缺 volume 不得視為確認(finding P1):None → 不 eligible 且標 blocker。
+        volume_confirmed = vol_pct is not None and vol_pct >= 0.5
         reasons.append("donchian_breakout_up")
-        if not volume_ok:
+        if vol_pct is None:
+            flags.append("breakout_volume_unconfirmed")
+        elif not volume_confirmed:
             flags.append("breakout_low_volume")
+        if not rs["leadership"]:
+            flags.append("breakout_rs_not_leading")
+        # 突破要成為 add-ready,需 volume 確認 + RS 領先(不只是價格新高)。
+        eligible = volume_confirmed and rs["leadership"]
         return {
             "state": "breakout_confirmed",
             "reasons": reasons,
-            "long_entry_eligible": bool(volume_ok),
+            "long_entry_eligible": bool(eligible),
             "flags": flags,
         }
 
-    # 站上 50DMA、50DMA 未下降:若剛從下方站回視為 reclaim,否則 healthy。
     rising_50 = _slope_not_declining(slope50)
     rising_20 = _slope_not_declining(slope20)
+
+    # -- reclaim_confirmed(§6):剛站回 50DMA + 50DMA 未惡化 + RS 改善 +
+    #    options 下檔壓力未惡化。可達且可測試(依 trend["reclaim"])。 --
+    reclaim = trend.get("reclaim", {}) if isinstance(trend, dict) else {}
+    if (
+        reclaim.get("reclaimed")
+        and rising_50
+        and rs["improving"]
+        and not options_worsening
+    ):
+        reasons.append("reclaimed_50dma_with_rs_improving")
+        if not rs["leadership"]:
+            flags.append("reclaim_rs_positive_but_not_leading")
+        # add-ready 需 RS 領先;RS 僅改善但未領先時確認 state 但不放行加碼。
+        eligible = rs["leadership"] and (options_confirmed or not options_worsening)
+        return {
+            "state": "reclaim_confirmed",
+            "reasons": reasons,
+            "long_entry_eligible": bool(eligible),
+            "flags": flags,
+        }
+
+    # 站上上升 50DMA/20DMA → trend_healthy;但 add-ready 需 RS 可得且領先。
     if rising_50 and rising_20:
         reasons.append("above_rising_50dma")
+        if not rs["available"]:
+            flags.append("rs_unavailable_add_gate_closed")
+        elif not rs["leadership"]:
+            flags.append("rs_not_leading_add_gate_closed")
         return {
             "state": "trend_healthy",
             "reasons": reasons,
-            "long_entry_eligible": True,
+            "long_entry_eligible": bool(rs["leadership"]),
             "flags": flags,
         }
 
-    # 站上 50DMA 但短期節奏未完全轉正 → pullback_test(健康回檔),
-    # 允許在趨勢方向的加碼但需 proof。
+    # 站上 50DMA 但短期節奏未完全轉正 → pullback_test(健康回檔);
+    # add-ready 需 50DMA 未下降 + RS 領先。
     reasons.append("above_50dma_pullback")
     if bb.get("touch_lower"):
         flags.append("healthy_pullback_lower_band")
+    if not rs["leadership"]:
+        flags.append("pullback_rs_not_leading")
     return {
         "state": "pullback_test",
         "reasons": reasons,
-        "long_entry_eligible": bool(rising_50),
+        "long_entry_eligible": bool(rising_50 and rs["leadership"]),
         "flags": flags,
     }
 

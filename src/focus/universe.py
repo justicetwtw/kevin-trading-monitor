@@ -40,6 +40,39 @@ MEMORY_SUBTHEMES = {
 }
 
 # ============================================
+# Theme constituents vs tradable proxies(§5 Layer C rotation)。
+#
+# rotation basket 只能用「單一成分股」計算,不得把 ETF proxy(SMH/SOXX...)或
+# basket pseudo-ticker(DRAM/DISK...)混進成分再拿去跟同一支 ETF 比較 —— 那會
+# 對相同風險重複加權。THEME_CONSTITUENTS 只含 clean single-name;ETF proxy 與
+# benchmark 分開列在 THEME_PROXIES。
+# ============================================
+
+THEME_CONSTITUENTS: dict[str, list[str]] = {
+    "ai_compute": ["NVDA", "AMD", "TSM", "AVGO"],
+    "memory_hbm_dram": ["MU"],
+    "memory_nand_storage": ["SNDK", "WDC", "STX"],
+    "optical_interconnect": [
+        "LITE", "COHR", "AAOI", "MRVL", "CRDO", "ALAB", "AXTI", "GLW",
+    ],
+    "semi_equipment_upstream": ["ASML", "AMAT", "LRCX", "KLAC", "TSEM", "GFS"],
+    "ai_power_energy": ["VRT", "ETN", "GEV", "VST", "CEG", "BE"],
+}
+
+#: 各 theme 的可交易 ETF proxy(僅供對照/工具映射,不進 rotation basket 計算)。
+THEME_PROXIES: dict[str, list[str]] = {
+    "ai_compute": ["SMH", "SOXX"],
+    "memory_hbm_dram": [],
+    "memory_nand_storage": [],
+    "optical_interconnect": [],
+    "semi_equipment_upstream": [],
+    "ai_power_energy": [],
+}
+
+#: 公開 ETF proxy / benchmark(可安全進 public card universe)。
+PUBLIC_ETF_PROXIES = ["SMH", "SOXX", "QQQ", "SPY"]
+
+# ============================================
 # Benchmarks(RS 計算基準,§5 Layer C)
 # ============================================
 
@@ -194,6 +227,28 @@ def normalize_to_underlying(symbol: str, notional: float) -> dict[str, Any]:
         "raw_notional": float(notional),
         "underlying_notional": float(notional) * leverage,
     }
+
+
+def static_focus_symbols() -> list[str]:
+    """公開的 focus card universe —— **只**來自靜態公開名單。
+
+    P0 privacy(review finding):public focus cards 的 symbol 集合絕不能受私有
+    持倉影響,否則不在公開名單的私有持倉會變成可識別的 public card。因此 public
+    cards 一律從這個純靜態、純公開的清單建立;holdings 只能影響 private 排序與
+    aggregate exception,不得改變 public symbol 集合。
+    """
+    ordered: list[str] = []
+    for theme, names in THEME_CONSTITUENTS.items():
+        for sym in names:
+            if sym not in ordered:
+                ordered.append(sym)
+    for sym in PUBLIC_ETF_PROXIES:
+        if sym not in ordered:
+            ordered.append(sym)
+    for sym in LEVERAGED_SINGLE_NAME:
+        if sym not in ordered:
+            ordered.append(sym)
+    return ordered
 
 
 def runtime_focus_symbols(

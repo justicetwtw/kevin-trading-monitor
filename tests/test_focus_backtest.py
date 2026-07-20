@@ -33,7 +33,7 @@ def test_baselines_all_present():
     assert out["status"] == "ok"
     assert set(out["results"]) == set(BASELINE_SIGNALS)
     assert out["no_look_ahead"] is True
-    assert out["execution"] == "next_bar"
+    assert out["execution"] == "next_bar_close_to_close"
 
 
 def test_buy_and_hold_matches_price_return_on_uptrend():
@@ -77,3 +77,34 @@ def test_metrics_shape_complete():
 
 def test_min_history_constant_covers_200dma():
     assert MIN_HISTORY_BARS > 200
+
+
+def test_rs_baselines_require_benchmark():
+    # Without a benchmark, RS baselines must NOT silently use self-momentum.
+    out = run_baselines(_uptrend(), benchmark=None)
+    for name in ("dma50_rs", "dma50_rs_breakout", "full_model"):
+        assert out["results"][name]["status"] == "benchmark_required"
+    assert out["rs_basis"] == "benchmark_not_provided"
+
+
+def test_rs_baselines_run_with_benchmark():
+    prices = _uptrend(n=300, start=10.0, end=40.0)
+    weaker_bench = _uptrend(n=300, start=10.0, end=15.0)  # symbol outperforms
+    out = run_baselines(prices, benchmark=weaker_bench)
+    assert out["rs_basis"] == "relative_to_benchmark"
+    assert out["results"]["dma50_rs"]["status"] == "ok"
+    # downside_capture is computed only when a benchmark is present
+    assert "downside_capture" in out["results"]["dma50_rs"]
+
+
+def test_execution_time_in_market_consistent():
+    # time_in_market must reflect the positions that actually earn the returns.
+    out = run_strategy(_uptrend(), BASELINE_SIGNALS["buy_and_hold"], cost_bps=0.0)
+    # buy-and-hold is long every day after the first → time_in_market == 1.0
+    assert out["time_in_market"] == 1.0
+
+
+def test_not_implemented_robustness_is_honest():
+    out = run_baselines(_uptrend())
+    assert "walk_forward" in out["not_implemented"]
+    assert "atr_position_sizing" in out["not_implemented"]

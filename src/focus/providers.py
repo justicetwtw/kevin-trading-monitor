@@ -137,15 +137,40 @@ class FocusOptionsProvider(CapabilityProvider):
 
 
 class YFinanceFocusOptionsProvider(FocusOptionsProvider):
-    """免費 fallback:只有 yfinance chain 能算的 put/call volume ratio;
-    skew / OI history / gamma / GEX 皆為付費資料 → None + capability_gap。
+    """免費 fallback:current IV / IV rank / IV percentile 來自自建 iv_history,
+    put/call volume ratio 來自 yfinance chain;skew / OI history / gamma / GEX
+    皆為付費資料 → None + capability_gap。
+
+    Capability/value consistency(finding P1):supported_fields 宣稱支援的欄位,
+    snapshot 一定會實際呼叫底層 provider 去填(runtime 缺資料才是 None);未宣稱
+    支援的欄位固定 None,不會出現 capability=true 卻永遠 None 的矛盾。
     """
 
     provider_name = "yfinance_delayed"
-    supported_fields = frozenset({"put_call_volume_ratio", "current_atm_iv"})
+    supported_fields = frozenset(
+        {"current_atm_iv", "iv_rank", "iv_percentile", "put_call_volume_ratio"}
+    )
 
-    def get_capability_snapshot(self, symbol: str) -> dict[str, Any]:
+    def get_capability_snapshot(self, symbol: str, base_provider: Any = None) -> dict[str, Any]:
         payload = self._null_payload(symbol, status="screen_grade")
+        if base_provider is None:
+            from src.data.options_provider import YFinanceOptionsProvider
+
+            base_provider = YFinanceOptionsProvider()
+        try:
+            iv = base_provider.get_iv_metrics(symbol) or {}
+        except Exception:
+            iv = {}
+        try:
+            snap = base_provider.get_options_snapshot(symbol) or {}
+        except Exception:
+            snap = {}
+        # 只填 supported_fields;值可能仍為 None(runtime 缺資料),但一定經過取數。
+        payload["current_atm_iv"] = iv.get("current_iv")
+        payload["iv_rank"] = iv.get("ivr")
+        payload["iv_percentile"] = iv.get("ivp")
+        payload["put_call_volume_ratio"] = snap.get("put_call_volume_ratio")
+        payload["populated_fields"] = sorted(self.supported_fields)
         payload["limitations"] = [
             "delayed/unofficial chain",
             "no paid skew/OI history/GEX; those fields stay None",

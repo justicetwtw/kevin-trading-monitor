@@ -27,6 +27,10 @@ BB_WINDOW = 20
 BB_STD = 2.0
 #: 判定 slope 方向所需的回看天數(20DMA 的近月斜率)。
 SLOPE_LOOKBACK = 10
+#: reclaim 偵測:近 RECLAIM_LOOKBACK 日內曾收在 50DMA 之下,
+#: 且最近 RECLAIM_CONFIRM 日連續收在 50DMA 之上,才算完成一次 reclaim。
+RECLAIM_LOOKBACK = 15
+RECLAIM_CONFIRM = 3
 
 
 def _close(df: pd.DataFrame) -> pd.Series | None:
@@ -155,6 +159,44 @@ def donchian_state(df: pd.DataFrame, window: int) -> dict[str, Any]:
     }
 
 
+def _as_of(df: pd.DataFrame) -> str | None:
+    """回傳最後一根 bar 的日期字串(no look-ahead 的 data as-of)。無法判定回 None。"""
+    if df is None or getattr(df, "empty", True):
+        return None
+    try:
+        last = df.index[-1]
+    except (IndexError, TypeError):
+        return None
+    if hasattr(last, "isoformat"):
+        return last.isoformat()
+    return str(last)
+
+
+def reclaim_state(df: pd.DataFrame) -> dict[str, Any]:
+    """偵測價格是否剛完成一次 50DMA reclaim(no look-ahead)。
+
+    條件:近 RECLAIM_LOOKBACK 日內至少一根收在 50DMA 之下,且最後 RECLAIM_CONFIRM
+    根連續收在 50DMA 之上。資料不足回 {"reclaimed": False, "status": "insufficient_data"}。
+    """
+    close = _close(df)
+    if close is None or len(close) < 50 + RECLAIM_LOOKBACK:
+        return {"reclaimed": False, "status": "insufficient_data"}
+    sma50 = close.rolling(50).mean()
+    above = (close > sma50)
+    recent = above.tail(RECLAIM_LOOKBACK)
+    if recent.isna().any():
+        return {"reclaimed": False, "status": "insufficient_data"}
+    confirmed_above = bool(above.tail(RECLAIM_CONFIRM).all())
+    was_below = bool((~above.tail(RECLAIM_LOOKBACK)).any())
+    reclaimed = confirmed_above and was_below
+    return {
+        "reclaimed": reclaimed,
+        "status": "ok",
+        "confirm_bars": RECLAIM_CONFIRM,
+        "lookback": RECLAIM_LOOKBACK,
+    }
+
+
 def relative_strength(
     close: pd.Series,
     benchmark_close: pd.Series | None,
@@ -229,6 +271,7 @@ def compute_trend_frame(
 
     return {
         "status": "ok",
+        "as_of": _as_of(df),
         "close": round(last, 6),
         "sma": {n: smas[n] for n in SMA_WINDOWS},
         "sma_slope": {n: slopes[n] for n in SMA_WINDOWS},
@@ -241,6 +284,7 @@ def compute_trend_frame(
         "bollinger": bollinger(close),
         "atr": atr(df),
         "donchian": {n: donchian_state(df, n) for n in DONCHIAN_WINDOWS},
+        "reclaim": reclaim_state(df),
         "volume_percentile": volume_percentile(df),
         "rs_vs_qqq": rs_qqq,
         "rs_vs_smh": rs_smh,
