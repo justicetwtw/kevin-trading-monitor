@@ -24,6 +24,7 @@ from src.focus.payload import build_focus_card, build_focus_payload
 from src.focus.providers import (
     PublicVolatilityIndexProvider,
     YFinanceFocusOptionsProvider,
+    build_options_pressure,
 )
 from src.focus.rotation import build_rotation_panel
 from src.focus.trend import compute_trend_frame
@@ -128,36 +129,9 @@ def build_shadow_state(
             return None
         from src.focus.rotation import _basket_close
 
-        return _basket_close(frames, THEME_CONSTITUENTS.get(theme, []))
+        return _basket_close(frames, THEME_CONSTITUENTS.get(theme, []), reference_date=reference_date)
 
-    options_provider = YFinanceFocusOptionsProvider()
-    cards: list[dict[str, Any]] = []
-    for symbol in card_symbols:
-        mapping = map_instrument(symbol)
-        trend = compute_trend_frame(
-            frames.get(symbol),
-            benchmark_frames=benchmark_frames,
-            theme_basket_close=_theme_basket_close(mapping["theme"]),
-        )
-        capability = options_provider.get_capability_snapshot(symbol)
-        card = build_focus_card(
-            symbol,
-            trend,
-            thesis_state="watch",  # thesis 來源未接;honest default,不假裝 intact
-            options_capability=capability,
-            valuation_status="not_connected",
-            reference_date=reference_date,
-            benchmark_freshness=primary_bench_freshness,
-        )
-        cards.append({k: v for k, v in card.items() if k in _ALLOWED_CARD_KEYS})
-
-    rotation_panel = build_rotation_panel(frames, benchmark_frames)
-
-    exposure_summary = None
-    if positions is not None:
-        private_exposure = build_private_exposure(positions)
-        exposure_summary = public_exposure_summary(private_exposure)
-
+    # Market regime is computed BEFORE cards so its exposure cap can gate add-ready.
     volatility_available = True
     try:
         volatility_state = PublicVolatilityIndexProvider().get_volatility_state(
@@ -170,6 +144,53 @@ def build_shadow_state(
         logger.warning(f"focus shadow: volatility fetch failed: {type(exc).__name__}")
         volatility_state = None
         volatility_available = False
+
+    market_exposure_cap = (volatility_state or {}).get("exposure_cap") if volatility_available else None
+    if market_exposure_cap is None:
+        # No usable regime → fail closed: cap new exposure.
+        market_exposure_cap = {"max_exposure_multiplier": 0.0, "blocks_new_exposure": True,
+                               "regime": None, "basis": "regime_unavailable_fail_closed"}
+    # Broad/semi trend + focus breadth for the Market Regime block.
+    market_trend = _market_trend_breadth(frames, card_symbols, reference_date)
+    if isinstance(volatility_state, dict):
+        volatility_state = {**volatility_state, "trend": market_trend}
+    else:
+        volatility_state = {"regime": None, "trend": market_trend,
+                            "status": "insufficient_data"}
+
+    options_provider = YFinanceFocusOptionsProvider()
+    cards: list[dict[str, Any]] = []
+    for symbol in card_symbols:
+        mapping = map_instrument(symbol)
+        trend = compute_trend_frame(
+            frames.get(symbol),
+            benchmark_frames=benchmark_frames,
+            theme_basket_close=_theme_basket_close(mapping["theme"]),
+        )
+        capability = options_provider.get_capability_snapshot(symbol)
+        # Derive options downside-pressure from the available snapshot via a
+        # documented adapter; screen-grade data has no skew/gamma → unavailable
+        # (not "not worsening"), which blocks add-ready by omission-safe default.
+        options_pressure = build_options_pressure(capability)
+        card = build_focus_card(
+            symbol,
+            trend,
+            thesis_state="watch",  # thesis 來源未接;honest default,不假裝 intact
+            options_capability=capability,
+            options_pressure=options_pressure,
+            valuation_status="not_connected",
+            reference_date=reference_date,
+            benchmark_freshness=primary_bench_freshness,
+            market_exposure_cap=market_exposure_cap,
+        )
+        cards.append({k: v for k, v in card.items() if k in _ALLOWED_CARD_KEYS})
+
+    rotation_panel = build_rotation_panel(frames, benchmark_frames, reference_date=reference_date)
+
+    exposure_summary = None
+    if positions is not None:
+        private_exposure = build_private_exposure(positions)
+        exposure_summary = public_exposure_summary(private_exposure)
 
     health = _build_health(
         total_symbols=len(all_syms),
@@ -187,6 +208,53 @@ def build_shadow_state(
         volatility_state=volatility_state,
         health=health,
     )
+
+
+def _market_trend_breadth(frames, card_symbols, reference_date) -> dict[str, Any]:
+    """Broad/semi trend(QQQ/SMH/SOXX vs 50/200DMA)+ focus breadth。
+
+    缺資料的 index 標 None(不假裝),breadth 只計有效成員。
+    """
+    import pandas as pd
+
+    from src.focus.freshness import is_frame_fresh
+
+    def _trend(sym: str):
+        frame = frames.get(sym)
+        if not is_frame_fresh(frame, reference_date):
+            return {"symbol": sym, "status": "unavailable_or_stale",
+                    "above_50dma": None, "above_200dma": None}
+        close = frame["Close"].dropna()
+        last = float(close.iloc[-1])
+        sma50 = float(close.tail(50).mean()) if len(close) >= 50 else None
+        sma200 = float(close.tail(200).mean()) if len(close) >= 200 else None
+        return {
+            "symbol": sym,
+            "status": "ok",
+            "above_50dma": (last > sma50) if sma50 is not None else None,
+            "above_200dma": (last > sma200) if sma200 is not None else None,
+        }
+
+    def _breadth(window: int):
+        above = counted = 0
+        for sym in card_symbols:
+            frame = frames.get(sym)
+            if not is_frame_fresh(frame, reference_date):
+                continue
+            close = frame["Close"].dropna()
+            if len(close) < window:
+                continue
+            counted += 1
+            if float(close.iloc[-1]) > float(close.tail(window).mean()):
+                above += 1
+        return round(above / counted, 4) if counted else None
+
+    return {
+        "index_trend": {sym: _trend(sym) for sym in ("QQQ", "SMH", "SOXX")},
+        "breadth_above_50dma": _breadth(50),
+        "breadth_above_200dma": _breadth(200),
+        "note": "trend/breadth are fresh-filtered; missing indices marked, not assumed",
+    }
 
 
 def _build_health(

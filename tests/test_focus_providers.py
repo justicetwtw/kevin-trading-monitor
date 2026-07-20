@@ -114,3 +114,26 @@ def test_volatility_stale_as_of_flagged(monkeypatch):
     monkeypatch.setattr(vs, "fetch_vix_asof", lambda: "2026-06-01")
     state = PublicVolatilityIndexProvider().get_volatility_state(reference_date=date(2026, 7, 20))
     assert state["freshness"]["status"] == "stale"
+
+
+def test_regime_exposure_cap_bands():
+    from src.focus.providers import regime_exposure_cap
+    assert regime_exposure_cap("calm")["max_exposure_multiplier"] == 1.0
+    assert regime_exposure_cap("elevated")["max_exposure_multiplier"] == 0.5
+    assert regime_exposure_cap("stress")["blocks_new_exposure"] is True
+    # unknown/missing regime fails closed (blocks new exposure)
+    assert regime_exposure_cap(None)["blocks_new_exposure"] is True
+
+
+def test_volatility_state_computes_regime_and_preserves_none_inversion(monkeypatch):
+    from datetime import date
+    import src.data.vix_structure as vs
+    from src.focus.providers import PublicVolatilityIndexProvider
+
+    # stress VIX, and vix9d_inverted missing (None) → must stay None, not False
+    monkeypatch.setattr(vs, "fetch_vix_term_structure", lambda: {"vix": 33.0, "vix9d": None})
+    monkeypatch.setattr(vs, "fetch_vix_asof", lambda: "2026-07-18")
+    state = PublicVolatilityIndexProvider().get_volatility_state(reference_date=date(2026, 7, 20))
+    assert state["regime"] == "stress"
+    assert state["term_inversion"] is None  # preserved, not coerced to False
+    assert state["exposure_cap"]["blocks_new_exposure"] is True

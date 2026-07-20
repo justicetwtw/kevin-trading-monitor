@@ -70,3 +70,45 @@ def test_panel_marks_price_return_proxy():
     panel = build_rotation_panel(members, benchmarks)
     assert panel["metric_kind"] == "price_return_proxy"
     assert "fund flow" in panel["disclaimer"].lower()
+
+
+def _dated(n, start_date, level):
+    idx = pd.date_range(start_date, periods=n, freq="B")
+    c = np.linspace(level, level + 5, n)
+    return pd.DataFrame({"Close": c, "High": c * 1.01, "Low": c * 0.99, "Volume": [1e6] * n}, index=idx)
+
+
+def test_rotation_row_carries_as_of_and_coverage():
+    from src.focus.universe import THEME_CONSTITUENTS
+    syms = THEME_CONSTITUENTS["ai_compute"]
+    members = {s: _dated(300, "2024-06-03", i + 10) for i, s in enumerate(syms)}
+    benchmarks = {"QQQ": _dated(300, "2024-06-03", 20), "SMH": _dated(300, "2024-06-03", 30)}
+    row = theme_rotation_row("ai_compute", members, benchmarks)
+    assert row["status"] == "ok"
+    assert row["as_of"] is not None
+    assert row["member_coverage"] == 1.0
+    assert row["valid_member_count"] == len(syms)
+
+
+def test_rotation_refuses_rank_when_coverage_low_via_stale_members():
+    from datetime import date
+    from src.focus.universe import THEME_CONSTITUENTS
+    syms = THEME_CONSTITUENTS["ai_compute"]
+    # all members are old (2024) → stale vs a 2026 reference → coverage 0
+    members = {s: _dated(300, "2024-06-03", i + 10) for i, s in enumerate(syms)}
+    benchmarks = {"QQQ": _dated(300, "2024-06-03", 20), "SMH": _dated(300, "2024-06-03", 30)}
+    row = theme_rotation_row("ai_compute", members, benchmarks, reference_date=date(2026, 7, 20))
+    assert row["status"] in {"insufficient_coverage", "insufficient_data"}
+    assert row.get("rs_vs_qqq_20") is None  # no rank/RS when coverage insufficient
+
+
+def test_basket_date_aligned_with_mixed_listing_starts():
+    from src.focus.rotation import _basket_close
+    # one member lists later and one has a gap; basket must still align on dates
+    a = _dated(300, "2024-01-01", 10)
+    b = _dated(200, "2024-04-01", 12)  # later listing start
+    frames = {"A": a, "B": b}
+    basket = _basket_close(frames, ["A", "B"])
+    assert basket is not None
+    # basket starts at the common aligned date, not A's first date
+    assert basket.index[0] >= b.index[0]

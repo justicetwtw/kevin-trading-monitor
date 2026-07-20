@@ -22,6 +22,10 @@ from src.focus.universe import map_instrument
 SCHEMA_VERSION = 1
 #: 價格 as-of 超過這個日曆天數(含長假)即視為 stale,card fail closed。
 MAX_CARD_AGE_DAYS = 5
+#: 只有經核准的估值/價值帶狀態才可放行 add;其餘(含 not_connected)一律擋 add。
+APPROVED_VALUATIONS = frozenset(
+    {"approved", "approved_by_kevin", "value_band_confirmed"}
+)
 
 
 def _as_of_date(value: Any) -> date | None:
@@ -45,6 +49,7 @@ def build_focus_card(
     as_of: str | None = None,
     reference_date: date | None = None,
     benchmark_freshness: dict[str, Any] | None = None,
+    market_exposure_cap: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """組出單一 focus card(§8 每張卡最低欄位)。"""
     from src.focus.freshness import freshness as _freshness
@@ -88,12 +93,35 @@ def build_focus_card(
         "as_of_missing", "price_stale",
     }
     data_blocked = bool(_blocking & set(blockers))
+
+    # Fundamentals/options proof gate(finding P1):missing valuation approval 或
+    # required options 確認 unavailable/worsening 都不得放行 add —— missing ≠ 可加碼。
+    add_block_reasons: list[str] = []
+    if valuation_status not in APPROVED_VALUATIONS:
+        add_block_reasons.append("valuation_not_approved")
+        if "valuation_not_approved" not in blockers:
+            blockers.append("valuation_not_approved")
+    opt_status = (options_pressure or {}).get("status")
+    if options_pressure is None or opt_status == "unavailable":
+        add_block_reasons.append("options_confirmation_unavailable")
+        if "options_confirmation_unavailable" not in blockers:
+            blockers.append("options_confirmation_unavailable")
+    elif opt_status == "worsening":
+        add_block_reasons.append("options_pressure_worsening")
+
+    # Market regime exposure cap(§ Layer B):stress / 未知 regime 封頂新增曝險。
+    if market_exposure_cap is not None and market_exposure_cap.get("blocks_new_exposure"):
+        add_block_reasons.append("market_regime_caps_exposure")
+        if "market_regime_caps_exposure" not in blockers:
+            blockers.append("market_regime_caps_exposure")
+
     states = evaluate_symbol(
         trend,
         thesis_state,
         options_pressure=options_pressure,
         has_leverage=has_leverage,
         data_blocked=data_blocked,
+        add_block_reasons=add_block_reasons,
     )
 
     def _rs(block: dict[str, Any], window: int) -> Any:

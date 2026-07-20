@@ -20,29 +20,60 @@ from src.focus.universe import (
 )
 
 ROTATION_WINDOWS = (5, 20, 63)
+#: rank/percentile 需要的最低有效成員覆蓋率;不足即拒絕排名(不給假名次)。
+MIN_MEMBER_COVERAGE = 0.6
 
 
-def _basket_close(frames: dict[str, pd.DataFrame], symbols: list[str]) -> pd.Series | None:
-    """把一組 symbol 的收盤標準化後等權平均,合成 theme basket 收盤序列。
+def _valid_members(frames: dict[str, pd.DataFrame], symbols: list[str], reference_date=None) -> list[str]:
+    """回傳有價量、且(給定 reference_date 時)未 stale 的成員。"""
+    from src.focus.freshness import is_frame_fresh
 
-    每個成員先除以自身首值(rebase=1.0),對齊索引後取平均;
-    有效成員 < 2 或無共同索引回 None。
-    """
-    series: list[pd.Series] = []
+    out: list[str] = []
     for sym in symbols:
         frame = frames.get(sym)
         if frame is None or getattr(frame, "empty", True) or "Close" not in frame:
             continue
-        close = frame["Close"].dropna()
-        if close.empty or float(close.iloc[0]) == 0:
+        if reference_date is not None and not is_frame_fresh(frame, reference_date):
             continue
-        series.append(close / float(close.iloc[0]))
-    if len(series) < 2:
+        out.append(sym)
+    return out
+
+
+def _basket_close(
+    frames: dict[str, pd.DataFrame],
+    symbols: list[str],
+    reference_date=None,
+) -> pd.Series | None:
+    """合成 theme basket 收盤序列:先「依日期對齊」到共同交易日,再在共同起點 rebase
+    等權平均。避免 later-listed / 短史成員因各自 rebase 而扭曲權重與跨期比較。
+
+    stale 成員(給 reference_date 時)先剔除;有效成員 < 2 或無共同交易日回 None。
+    """
+    cols: list[pd.Series] = []
+    for sym in _valid_members(frames, symbols, reference_date):
+        close = frames[sym]["Close"].dropna()
+        if not close.empty:
+            cols.append(close.rename(sym))
+    if len(cols) < 2:
         return None
-    combined = pd.concat(series, axis=1).dropna()
+    combined = pd.concat(cols, axis=1).dropna()  # align on common trading dates first
     if combined.empty or len(combined) < 2:
         return None
-    return combined.mean(axis=1)
+    first = combined.iloc[0]
+    if (first == 0).any():
+        return None
+    rebased = combined / first  # rebase at the common aligned start → truly equal-weight
+    return rebased.mean(axis=1)
+
+
+def _align_two(a: pd.Series | None, b: pd.Series | None) -> tuple[pd.Series | None, pd.Series | None]:
+    """把兩條序列依日期對齊到共同 index(供 RS 端點對齊);任一為 None 回 (None, None)。"""
+    if a is None or b is None:
+        return None, None
+    joined = pd.concat([a.rename("a"), b.rename("b")], axis=1).dropna()
+    if joined.empty or len(joined) < 2:
+        return None, None
+    return joined["a"], joined["b"]
 
 
 def _period_return(close: pd.Series, lookback: int) -> float | None:
@@ -58,31 +89,47 @@ def theme_rotation_row(
     theme: str,
     member_frames: dict[str, pd.DataFrame],
     benchmark_frames: dict[str, pd.DataFrame],
+    reference_date=None,
 ) -> dict[str, Any]:
     """單一 theme 的輪動 proxy row。
 
-    basket 只用 THEME_CONSTITUENTS(單一成分股),不混入該 theme 的 ETF proxy,
-    以免對相同風險重複加權、又拿含 SMH 的 basket 去跟 SMH 比較。
+    basket 只用 THEME_CONSTITUENTS(單一成分股),不混入該 theme 的 ETF proxy;
+    stale 成員先剔除,依日期對齊後在共同起點 rebase;coverage 不足時拒絕 rank/percentile。
     """
+    from src.focus.freshness import frame_as_of, freshness
+
     symbols = THEME_CONSTITUENTS.get(theme, [])
-    basket = _basket_close(member_frames, symbols)
-    if basket is None:
+    configured = len(symbols)
+    valid = _valid_members(member_frames, symbols, reference_date)
+    coverage = round(len(valid) / configured, 4) if configured else None
+    basket = _basket_close(member_frames, symbols, reference_date=reference_date)
+
+    # Coverage / freshness gate:成員覆蓋不足或無 basket → 拒絕給 RS/rank(不假裝當前)。
+    if basket is None or coverage is None or coverage < MIN_MEMBER_COVERAGE:
         return {
             "theme": theme,
-            "status": "insufficient_data",
+            "status": "insufficient_coverage" if basket is not None else "insufficient_data",
             "metric_kind": "price_return_proxy",
-            "member_count": len(symbols),
+            "member_count": configured,
+            "valid_member_count": len(valid),
+            "member_coverage": coverage,
+            "as_of": frame_as_of(basket) if basket is not None else None,
         }
 
+    basket_as_of = frame_as_of(basket)
     qqq = benchmark_frames.get(BENCHMARK_BROAD)
     smh = benchmark_frames.get(BENCHMARK_SEMI)
     qqq_close = qqq["Close"].dropna() if qqq is not None and "Close" in qqq else None
     smh_close = smh["Close"].dropna() if smh is not None and "Close" in smh else None
 
+    # RS:先把 basket 與 benchmark 依「日期」對齊端點,再算相對強度(避免 positional 錯期)。
+    basket_q, qqq_a = _align_two(basket, qqq_close)
+    basket_s, smh_a = _align_two(basket, smh_close)
+
     returns = {f"return_{w}d": _period_return(basket, w) for w in ROTATION_WINDOWS}
-    rs_qqq_20 = relative_strength(basket, qqq_close, 20)
-    rs_qqq_63 = relative_strength(basket, qqq_close, 63)
-    rs_smh = relative_strength(basket, smh_close, 20)
+    rs_qqq_20 = relative_strength(basket_q, qqq_a, 20)
+    rs_qqq_63 = relative_strength(basket_q, qqq_a, 63)
+    rs_smh = relative_strength(basket_s, smh_a, 20)
 
     # leadership acceleration proxy:RS20 - RS63(vs QQQ),兩者都可得才計算。
     if rs_qqq_20.get("value") is not None and rs_qqq_63.get("value") is not None:
@@ -144,7 +191,10 @@ def theme_rotation_row(
         "theme": theme,
         "status": "ok",
         "metric_kind": "price_return_proxy",
-        "member_count": len(symbols),
+        "member_count": configured,
+        "valid_member_count": len(valid),
+        "member_coverage": coverage,
+        "as_of": basket_as_of,
         **returns,
         "rs_vs_qqq_20": rs_qqq_20.get("value"),
         "rs_vs_qqq_63": rs_qqq_63.get("value"),
@@ -161,10 +211,11 @@ def theme_rotation_row(
 def build_rotation_panel(
     member_frames: dict[str, pd.DataFrame],
     benchmark_frames: dict[str, pd.DataFrame],
+    reference_date=None,
 ) -> dict[str, Any]:
     """所有 theme 的輪動 panel(依 20D RS vs QQQ 排序,None 排最後)。"""
     rows = [
-        theme_rotation_row(theme, member_frames, benchmark_frames)
+        theme_rotation_row(theme, member_frames, benchmark_frames, reference_date=reference_date)
         for theme in THEME_CONSTITUENTS
     ]
 

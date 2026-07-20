@@ -178,3 +178,34 @@ def test_regime_splits_predeclared_and_insufficient_marked():
 def test_regime_splits_requires_datetime_index():
     out = regime_splits(pd.Series(np.linspace(10, 40, 300)), _signal_dma50)
     assert out["status"] == "requires_datetime_index"
+
+
+def test_walk_forward_oos_isolated_from_pre_window_returns():
+    # Changing returns strictly before the OOS window must NOT change that
+    # window's metrics (proves OOS-only accounting, not whole-prefix).
+    base = _frame_hl(n=600)
+    perturbed = base.copy()
+    perturbed.iloc[:200, perturbed.columns.get_loc("Close")] = np.linspace(3, 6, 200)
+    wf_base = walk_forward(base, _signal_dma50, train_bars=252, test_bars=63)
+    wf_pert = walk_forward(perturbed, _signal_dma50, train_bars=252, test_bars=63)
+    # last segment is well after the perturbed region
+    assert wf_base["segments"][-1]["total_return"] == wf_pert["segments"][-1]["total_return"]
+
+
+def test_walk_forward_rs_trades_with_benchmark():
+    prices = _frame_hl(n=600, start=10, end=40)      # strong up
+    bench = pd.Series(np.linspace(10, 13, 600), index=prices.index)  # weaker
+    wf = walk_forward(prices, _signal_dma50_rs, benchmark=bench, train_bars=252, test_bars=63)
+    # benchmark alignment preserved → RS actually takes exposure in OOS segments
+    assert any((s.get("time_in_market") or 0) > 0 for s in wf["segments"])
+    assert wf["oos_aggregate"]["oos_bars"] > 0
+
+
+def test_trade_level_metrics_distinct_from_daily():
+    out = run_strategy(_choppy(), _signal_dma50, cost_bps=0.0)
+    # both families present and named honestly
+    for k in ("daily_hit_rate", "avg_daily_win", "avg_daily_loss",
+              "trade_hit_rate", "avg_trade_win", "avg_trade_loss", "closed_trade_count"):
+        assert k in out
+    # closed trades are runs of in-market days, not rebalance events
+    assert out["closed_trade_count"] <= out["trade_count"] + 1

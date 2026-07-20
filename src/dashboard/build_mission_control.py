@@ -371,15 +371,30 @@ def _focus_section(data: dict[str, Any]) -> str:
         regime_blockers.append("market_regime_unavailable")
     if vol_fresh.get("status") in ("stale", "missing"):
         regime_blockers.append(f"volatility_{vol_fresh.get('status')}")
+    cap = (regime.get("exposure_cap") or {}) if isinstance(regime, dict) else {}
+    mtrend = (regime.get("trend") or {}) if isinstance(regime, dict) else {}
+    idx_trend = mtrend.get("index_trend") or {}
     market_regime_html = (
         "<h3>Market Regime</h3>"
         '<div class="account-strip">'
         f'<span>Workflow <strong>{_badge(health.get("workflow_status"))}</strong></span>'
         f'<span>Error codes <strong>{_e(health.get("error_codes") or [])}</strong></span>'
-        f'<span>VIX regime <strong>{_e(regime.get("regime"))}</strong></span>'
+        f'<span>Regime <strong>{_badge(regime.get("regime"))}</strong></span>'
         f'<span>VIX <strong>{_e(regime.get("vix"))}</strong></span>'
         f'<span>VIX as-of <strong>{_e(vol_fresh.get("as_of"))}</strong></span>'
         f'<span>Freshness <strong>{_badge(vol_fresh.get("status"))}</strong></span>'
+        f'<span>Exposure cap <strong>{_e(cap.get("max_exposure_multiplier"))}</strong></span>'
+        f'<span>Term inversion <strong>{_e(regime.get("term_inversion"))}</strong></span>'
+        "</div>"
+        '<div class="account-strip">'
+        f'<span>QQQ &gt;50/200DMA <strong>{_e(idx_trend.get("QQQ", {}).get("above_50dma"))}/'
+        f'{_e(idx_trend.get("QQQ", {}).get("above_200dma"))}</strong></span>'
+        f'<span>SMH &gt;50/200DMA <strong>{_e(idx_trend.get("SMH", {}).get("above_50dma"))}/'
+        f'{_e(idx_trend.get("SMH", {}).get("above_200dma"))}</strong></span>'
+        f'<span>SOXX &gt;50/200DMA <strong>{_e(idx_trend.get("SOXX", {}).get("above_50dma"))}/'
+        f'{_e(idx_trend.get("SOXX", {}).get("above_200dma"))}</strong></span>'
+        f'<span>Breadth &gt;50/200DMA <strong>{_e(mtrend.get("breadth_above_50dma"))}/'
+        f'{_e(mtrend.get("breadth_above_200dma"))}</strong></span>'
         "</div>"
         + (
             f'<div class="privacy-note"><strong>Blockers:</strong> {_e(regime_blockers)}. '
@@ -417,6 +432,8 @@ def _focus_section(data: dict[str, Any]) -> str:
             [
                 ("theme", "Theme"),
                 ("status", "Status"),
+                ("member_coverage", "Coverage"),
+                ("as_of", "As of"),
                 ("theme_rank", "Rank"),
                 ("theme_percentile_rank", "Percentile"),
                 ("rs_vs_qqq_20", "RS20 vs QQQ"),

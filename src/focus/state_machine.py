@@ -393,26 +393,33 @@ def evaluate_symbol(
     options_pressure: dict[str, Any] | None = None,
     has_leverage: bool = False,
     data_blocked: bool = False,
+    add_block_reasons: list[str] | None = None,
 ) -> dict[str, Any]:
     """把 trend + thesis + options 綜合成一張 focus card 的狀態組合。
 
     三個狀態各自獨立輸出,便於 dashboard 與測試分別檢查。
-    data_blocked=True(stale/partial/unavailable 資料)時強制關閉 add-ready 與 long
-    eligibility,並把 add-ready 姿態降級為 wait_for_proof(fail closed)。
+    data_blocked=True 或 add_block_reasons 非空(stale/partial 資料、缺 valuation 核准、
+    required options 確認 unavailable/worsening)時強制關閉 add-ready 與 long eligibility,
+    並把 add-ready 姿態降級為 wait_for_proof(fail closed:缺 proof 不等於可加碼)。
+    timing_state 仍照常顯示。
     """
     timing = classify_timing(trend, options_pressure)
     exposure = derive_exposure_posture(thesis_state, timing, has_leverage=has_leverage)
+
+    block_reasons = list(add_block_reasons or [])
+    if data_blocked and "data_blocked_stale_or_partial" not in block_reasons:
+        block_reasons.append("data_blocked_stale_or_partial")
 
     long_eligible = bool(timing["long_entry_eligible"])
     add_allowed = bool(exposure["add_allowed"])
     posture = exposure["posture"]
     exposure_reasons = list(exposure["reasons"])
-    if data_blocked:
+    if block_reasons:
         long_eligible = False
         if add_allowed:
             add_allowed = False
             posture = "wait_for_proof"
-            exposure_reasons.append("data_blocked_stale_or_partial")
+        exposure_reasons.extend(block_reasons)
 
     return {
         "company_thesis_state": (

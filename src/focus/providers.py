@@ -71,6 +71,64 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+#: 用來「確認」下檔壓力方向所需的欄位(付費資料)。全缺 → required options 確認 unavailable。
+REQUIRED_PRESSURE_FIELDS = ("put_skew_25d", "gamma_flip_proxy", "strike_oi_concentration")
+
+#: Market regime → 曝險上限倍數(只限制上限,不預測隔日方向,§ Layer B)。
+#: 未知/資料不足 → 0.0 fail closed(無法確認 regime 就不放行新增曝險)。
+REGIME_EXPOSURE_CAPS = {"calm": 1.0, "elevated": 0.5, "stress": 0.0}
+
+
+def regime_exposure_cap(regime: str | None) -> dict[str, Any]:
+    """把 regime 轉成 auditable 的曝險上限倍數。未知 regime → 0.0(fail closed)。"""
+    cap = REGIME_EXPOSURE_CAPS.get(regime or "", 0.0)
+    return {
+        "regime": regime,
+        "max_exposure_multiplier": cap,
+        "blocks_new_exposure": cap <= 0.0,
+        "basis": "caps exposure only; not a next-day direction forecast",
+    }
+
+
+def build_options_pressure(capability: dict[str, Any] | None) -> dict[str, Any]:
+    """從 options capability snapshot 導出一個「下檔壓力」adapter,三態分明:
+
+      - unavailable :確認所需的付費欄位(skew / gamma / OI 集中度)全缺 → 無法確認方向。
+      - worsening   :put skew 惡化 / gamma flip 轉負等(需付費資料才判得出)。
+      - confirmed_ok:壓力未惡化且資料足以確認。
+
+    紅線:missing ≠ 「壓力未惡化」。unavailable 不會被當成 confirmed_ok,也不放行 add。
+    只有 screen-grade(current IV / put-call ratio)時,required 欄位全缺 → unavailable。
+    """
+    cap = capability or {}
+    have = {f: cap.get(f) for f in REQUIRED_PRESSURE_FIELDS}
+    if all(v is None for v in have.values()):
+        return {
+            "status": "unavailable",
+            "downside_pressure_worsening": False,
+            "downside_pressure_confirmed_ok": False,
+            "reasons": ["required_options_confirmation_unavailable"],
+            "source": cap.get("source"),
+            "as_of": cap.get("as_of"),
+        }
+    skew = cap.get("put_skew_25d")
+    skew_chg = cap.get("put_skew_change_5d")
+    gamma_flip = cap.get("gamma_flip_proxy")
+    worsening = bool(
+        (isinstance(skew_chg, (int, float)) and skew_chg > 0)
+        or (isinstance(gamma_flip, (int, float)) and gamma_flip < 0)
+    )
+    return {
+        "status": "worsening" if worsening else "confirmed_ok",
+        "downside_pressure_worsening": worsening,
+        "downside_pressure_confirmed_ok": not worsening,
+        "reasons": [],
+        "source": cap.get("source"),
+        "as_of": cap.get("as_of"),
+        "put_skew_25d": skew,
+    }
+
+
 class CapabilityProvider(ABC):
     """共用:以 capability flags 表達「哪些欄位真的支援」。"""
 
@@ -255,7 +313,9 @@ class PublicVolatilityIndexProvider(VolatilityIndexProvider):
             "vix9d_inverted": term.get("vix9d_inverted"),
             "vix3m_inverted": term.get("vix3m_inverted"),
         }
-        payload["term_inversion"] = bool(term.get("vix9d_inverted"))
+        # Preserve None for unavailable inversion evidence — do NOT coerce to False
+        # ("not inverted") when the underlying VIX9D/VIX is missing.
+        payload["term_inversion"] = term.get("vix9d_inverted")
         # 真實 as-of / freshness:VIX bar 日期 vs reference_date。stale/missing 可見。
         try:
             as_of = fetch_vix_asof()
@@ -263,5 +323,10 @@ class PublicVolatilityIndexProvider(VolatilityIndexProvider):
             as_of = None
         payload["as_of"] = as_of
         payload["freshness"] = freshness(as_of, reference_date, MAX_VOL_AGE_DAYS)
+        # 真正的 regime 判定(VVIX/COR1M 未接時仍以 VIX 分級,並標其為 gap)。
+        joint = self.joint_state(payload["vix"], payload.get("vvix"), payload.get("cor1m"))
+        payload["regime"] = joint.get("regime")
+        payload["regime_state"] = joint
+        payload["exposure_cap"] = regime_exposure_cap(payload.get("regime"))
         payload["limitations"] = ["VVIX and COR1M require a source not yet connected"]
         return payload

@@ -131,11 +131,33 @@
 仍為 honest capability gap(未新增付費源):historical skew/OI/gamma/GEX、COR1M/VVIX、
 estimate history。
 
-## 9. 驗證
+## 9. Review round 2(incremental)— 已修正 findings
+
+針對第二次 incremental `CHANGES_REQUIRED`(4 P1)以 code + regression 修正:
+
+- **walk_forward 真正 OOS**:`run_strategy(metrics_start_index=)` 讓訊號用全序列暖身、但
+  equity/報酬/turnover 只從 OOS 起結算;benchmark 依「日期」對齊到 window(不再被二次
+  reindex 成 None,RS 會實際交易);sequential OOS 另外彙總(`oos_aggregate`)。並區分
+  daily-bar 口徑(`daily_hit_rate` 等)與 trade-level 口徑(`trade_hit_rate`、
+  `avg_trade_win/loss`、`closed_trade_count`)。
+- **缺 valuation/options 不得放行 add**:`build_options_pressure` 三態(confirmed_ok /
+  worsening / **unavailable**),不把 missing 當「未惡化」;screen-grade(無 skew/gamma)→
+  unavailable。`build_focus_card` 將 valuation 未核准、options unavailable/worsening 全列為
+  add-block,`evaluate_symbol(add_block_reasons=)` 強制降 `wait_for_proof`。runner 以 adapter
+  把 snapshot 導成 pressure 傳入。
+- **Market Regime 可操作**:`get_volatility_state` 以 `joint_state` 產出 `regime`,保留 None
+  的 inversion(不 coerce False);`regime_exposure_cap` 把 regime 轉成 auditable 曝險上限
+  (calm 1.0 / elevated 0.5 / stress 0 / 未知 0 fail-closed),stress/未知 regime 會擋 card add;
+  Market Regime block 補 QQQ/SMH/SOXX vs 50/200DMA 與 focus breadth(缺者標記,不假裝)。
+- **Rotation 對齊 + coverage**:basket 先依「日期」對齊到共同交易日再於共同起點 rebase(真正等權);
+  剔除 stale 成員;輸出 theme `as_of`、valid/configured 成員與 `member_coverage`;coverage 低於
+  門檻(0.6)拒絕給 RS/rank/percentile;RS 端點依日期對齊。
+
+## 10. 驗證
 
 ```bash
-python -m pytest -q                                   # 573 passed, 1 skipped
-python -m pytest -q tests/test_focus_*.py             # focus 測試(含 round 2 regression)
+python -m pytest -q                                   # 584 passed, 1 skipped
+python -m pytest -q tests/test_focus_*.py             # 117 focus 測試(含 round 2/3 regression)
 python scripts/verify_agent_workflow_contract.py      # passed
 python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline  # ok
 ```

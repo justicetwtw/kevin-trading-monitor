@@ -269,14 +269,22 @@ def _metrics(
 
     calmar = (cagr / abs(max_dd)) if (cagr is not None and max_dd < 0) else None
 
-    # in-market 日的命中率與盈虧比(以日報酬為口徑,已與 time-in-market 對齊)。
+    # Daily-bar 口徑(誠實命名,非 trade-level):in-market 日的命中率與盈虧比。
     in_market_returns = [r for r, flag in zip(strat_returns, in_market_flags) if flag]
-    wins = [r for r in in_market_returns if r > 0]
-    losses = [r for r in in_market_returns if r < 0]
-    hit_rate = round(len(wins) / len(in_market_returns), 4) if in_market_returns else None
-    avg_win = round(sum(wins) / len(wins), 6) if wins else None
-    avg_loss = round(sum(losses) / len(losses), 6) if losses else None
+    d_wins = [r for r in in_market_returns if r > 0]
+    d_losses = [r for r in in_market_returns if r < 0]
+    daily_hit_rate = round(len(d_wins) / len(in_market_returns), 4) if in_market_returns else None
+    avg_daily_win = round(sum(d_wins) / len(d_wins), 6) if d_wins else None
+    avg_daily_loss = round(sum(d_losses) / len(d_losses), 6) if d_losses else None
     days_in_market = sum(in_market_flags)
+
+    # Trade-level 口徑:一筆 trade = 連續 in-market 的持有期,報酬為期間複利。
+    trade_returns = _trade_returns(strat_returns, in_market_flags)
+    t_wins = [r for r in trade_returns if r > 0]
+    t_losses = [r for r in trade_returns if r < 0]
+    trade_hit_rate = round(len(t_wins) / len(trade_returns), 4) if trade_returns else None
+    avg_trade_win = round(sum(t_wins) / len(t_wins), 6) if t_wins else None
+    avg_trade_loss = round(sum(t_losses) / len(t_losses), 6) if t_losses else None
 
     downside_capture = None
     if bench_returns is not None and len(bench_returns) == n:
@@ -296,13 +304,35 @@ def _metrics(
         "calmar": round(calmar, 4) if calmar is not None else None,
         "time_in_market": round(days_in_market / n, 4) if n else 0.0,
         "trade_count": turnover,
-        "hit_rate": hit_rate,
-        "avg_win": avg_win,
-        "avg_loss": avg_loss,
+        "closed_trade_count": len(trade_returns),
+        "daily_hit_rate": daily_hit_rate,
+        "avg_daily_win": avg_daily_win,
+        "avg_daily_loss": avg_daily_loss,
+        "trade_hit_rate": trade_hit_rate,
+        "avg_trade_win": avg_trade_win,
+        "avg_trade_loss": avg_trade_loss,
         "downside_capture": downside_capture,
         "recovery_bars": _recovery_bars(equity),
         "bars": n,
     }
+
+
+def _trade_returns(strat_returns: list[float], in_market_flags: list[int]) -> list[float]:
+    """把連續 in-market 的持有期複利成一筆 trade 報酬(trade-level 口徑)。"""
+    trades: list[float] = []
+    holding = False
+    equity = 1.0
+    for r, flag in zip(strat_returns, in_market_flags):
+        if flag:
+            equity *= (1.0 + r)
+            holding = True
+        elif holding:
+            trades.append(equity - 1.0)
+            equity = 1.0
+            holding = False
+    if holding:
+        trades.append(equity - 1.0)
+    return trades
 
 
 #: 倉位變動小於此值不計為一次 trade(避免 ATR sizing 每日微調灌爆 turnover)。
@@ -315,12 +345,16 @@ def run_strategy(
     cost_bps: float = DEFAULT_COST_BPS,
     benchmark: pd.Series | pd.DataFrame | None = None,
     sizer: Sizer | None = None,
+    metrics_start_index: int | None = None,
 ) -> dict[str, Any]:
     """對單一標的跑 long/flat(或 ATR-sized)策略,next-bar 執行且語意一致。
 
     第 t 日:``in = signal(frame, t-1, bench)`` 決定是否持有,``sizer`` 決定倉位比例;
     該倉位賺取 ``close[t]/close[t-1]-1``,並依實際倉位計入 time-in-market;倉位變動時
     依 |Δfraction| 扣單邊成本。賺報酬的倉位與計入 time-in-market 的倉位一致(無 off-by-one)。
+
+    metrics_start_index:訊號/部位仍用全序列暖身,但 equity/報酬/turnover 只從此索引起結算
+    (walk-forward 的 out-of-sample 專用);None = 全序列結算。
     """
     sizer = sizer or _unit_sizer
     frame = _prepare(prices)
@@ -330,6 +364,7 @@ def run_strategy(
     bench = _align_benchmark(benchmark, frame)
     frame = frame.reset_index(drop=True)
     close = frame["Close"]
+    start_rec = metrics_start_index if metrics_start_index is not None else 1
 
     equity = [1.0]
     strat_returns: list[float] = []
@@ -345,12 +380,16 @@ def run_strategy(
         delta = abs(target - position)
         traded = delta >= REBALANCE_THRESHOLD or (target == 0.0 and position != 0.0)
         if traded:
-            turnover += 1
             trade_cost = cost_rate * delta
             position = target  # establish target at t-1 close, earns t-1->t return
         else:
             trade_cost = 0.0  # keep current position; no rebalance
         day_ret = position * ret - trade_cost
+        # Warm-up bars (t < start_rec) move the position but are excluded from metrics.
+        if t < start_rec:
+            continue
+        if traded:
+            turnover += 1
         in_market_flags.append(1 if position > 0 else 0)
         strat_returns.append(day_ret)
         if bench_returns is not None:
@@ -361,6 +400,8 @@ def run_strategy(
 
     result = _metrics(equity, strat_returns, in_market_flags, bench_returns, turnover)
     result["equity_final"] = round(equity[-1], 6)
+    if metrics_start_index is not None:
+        result["_oos_returns"] = strat_returns  # internal: for sequential OOS aggregation
     return result
 
 
@@ -424,39 +465,59 @@ def walk_forward(
     if frame is None:
         return {"status": "insufficient_history", "segments": []}
     total = len(frame)
+    is_series = isinstance(prices, pd.Series)
     segments: list[dict[str, Any]] = []
+    oos_stream: list[float] = []
     start = train_bars
     while start + test_bars <= total:
-        # 每段餵入「暖身 + 該段」的價格,績效只在該 out-of-sample 段結算。
+        # 暖身 + 該段的價格;績效只在該段的 out-of-sample 索引 [start, start+test_bars) 結算。
         window = frame.iloc[: start + test_bars]
-        seg_prices = window["Close"] if isinstance(prices, pd.Series) else window
+        seg_prices = window["Close"] if is_series else window
+        # Benchmark 依「日期」對齊到 window(保留 DatetimeIndex),避免 RangeIndex reindex 成 None。
         seg_bench = None
         if benchmark is not None:
-            b = _align_benchmark(benchmark, frame)
-            if b is not None:
-                seg_bench = b.iloc[: start + test_bars]
-        # 只結算最後 test_bars(out-of-sample)—以整段跑,再取尾段報酬。
-        full = run_strategy(seg_prices, signal, cost_bps=cost_bps, benchmark=seg_bench, sizer=sizer)
+            b_full = benchmark["Close"] if isinstance(benchmark, pd.DataFrame) else benchmark
+            try:
+                seg_bench = b_full.reindex(window.index)
+            except Exception:
+                seg_bench = None
+        seg = run_strategy(
+            seg_prices, signal, cost_bps=cost_bps, benchmark=seg_bench, sizer=sizer,
+            metrics_start_index=start,
+        )
+        oos_stream.extend(seg.get("_oos_returns") or [])
         segments.append(
             {
                 "oos_start_index": start,
                 "oos_end_index": start + test_bars,
-                "status": full.get("status"),
-                "total_return": full.get("total_return"),
-                "sharpe": full.get("sharpe"),
-                "max_drawdown": full.get("max_drawdown"),
+                "status": seg.get("status"),
+                "total_return": seg.get("total_return"),
+                "sharpe": seg.get("sharpe"),
+                "max_drawdown": seg.get("max_drawdown"),
+                "time_in_market": seg.get("time_in_market"),
+                "trade_count": seg.get("trade_count"),
             }
         )
         start += test_bars
+
     positive = [s for s in segments if isinstance(s.get("total_return"), (int, float)) and s["total_return"] > 0]
+    # Aggregate the concatenated OOS return stream separately from per-window results.
+    agg_equity = 1.0
+    for r in oos_stream:
+        agg_equity *= (1.0 + r)
+    aggregate = {
+        "oos_bars": len(oos_stream),
+        "compounded_return": round(agg_equity - 1.0, 6) if oos_stream else None,
+    }
     return {
         "status": "ok" if segments else "insufficient_history",
         "train_bars": train_bars,
         "test_bars": test_bars,
         "segment_count": len(segments),
         "positive_segment_share": round(len(positive) / len(segments), 4) if segments else None,
+        "oos_aggregate": aggregate,
         "segments": segments,
-        "note": "fixed-parameter model; OOS segments are non-overlapping and sequential",
+        "note": "fixed-parameter model; OOS-only metrics; non-overlapping sequential windows",
     }
 
 

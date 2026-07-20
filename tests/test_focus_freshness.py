@@ -77,7 +77,9 @@ def test_stale_price_blocks_add_ready():
     assert card["add_allowed"] is False
 
 
-def test_fresh_data_allows_add_ready():
+def test_fresh_price_but_missing_valuation_and_options_is_not_add_ready():
+    # Fresh price/benchmark alone is NOT permission to add: missing valuation
+    # approval and unavailable options confirmation must block add-ready.
     trend = _ok_trend()
     fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
     card = build_focus_card(
@@ -86,7 +88,46 @@ def test_fresh_data_allows_add_ready():
     )
     assert "rs_benchmark_stale" not in card["readiness_blockers"]
     assert "price_stale" not in card["readiness_blockers"]
+    assert "valuation_not_approved" in card["readiness_blockers"]
+    assert "options_confirmation_unavailable" in card["readiness_blockers"]
+    assert card["add_allowed"] is False
+
+
+def test_approved_valuation_and_confirmed_options_allow_add():
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    confirmed = {
+        "status": "confirmed_ok",
+        "downside_pressure_worsening": False,
+        "downside_pressure_confirmed_ok": True,
+    }
+    card = build_focus_card(
+        "NVDA", trend, thesis_state="intact",
+        valuation_status="approved",
+        options_pressure=confirmed,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+    )
+    assert "valuation_not_approved" not in card["readiness_blockers"]
+    assert "options_confirmation_unavailable" not in card["readiness_blockers"]
     assert card["add_allowed"] is True
+
+
+def test_options_unavailable_keeps_wait_for_proof():
+    from src.focus.providers import build_options_pressure
+
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    # screen-grade snapshot: no skew/gamma/OI → pressure status unavailable
+    pressure = build_options_pressure({"current_atm_iv": 0.4, "put_call_volume_ratio": 0.9})
+    assert pressure["status"] == "unavailable"
+    card = build_focus_card(
+        "NVDA", trend, thesis_state="intact",
+        valuation_status="approved",  # valuation ok, but options unavailable
+        options_pressure=pressure,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+    )
+    assert card["add_allowed"] is False
+    assert card["exposure_posture"] == "wait_for_proof"
 
 
 def test_evaluate_symbol_data_blocked_downgrades():
@@ -106,3 +147,21 @@ def test_options_pressure_worsening_blocks_add():
     assert clean["long_entry_eligible"] is True
     assert worsening["long_entry_eligible"] is False
     assert "options_pressure_worsening" in worsening["flags"]
+
+
+def test_stress_regime_exposure_cap_blocks_add():
+    # Even fresh + approved-valuation + confirmed-options cannot add if the
+    # market regime caps new exposure (stress / unknown regime).
+    trend = _ok_trend()
+    fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
+    confirmed = {"status": "confirmed_ok", "downside_pressure_worsening": False,
+                 "downside_pressure_confirmed_ok": True}
+    cap = {"max_exposure_multiplier": 0.0, "blocks_new_exposure": True, "regime": "stress"}
+    card = build_focus_card(
+        "NVDA", trend, thesis_state="intact",
+        valuation_status="approved", options_pressure=confirmed,
+        benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
+        market_exposure_cap=cap,
+    )
+    assert "market_regime_caps_exposure" in card["readiness_blockers"]
+    assert card["add_allowed"] is False
