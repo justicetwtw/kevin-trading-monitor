@@ -41,6 +41,7 @@
     "us_eod": true
   },
   "2026-07-20": {
-    "tw_open": true
+    "tw_open": true,
+    "tw_close": true
   }
 }
