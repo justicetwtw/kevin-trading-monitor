@@ -40,6 +40,20 @@ def fetch_vix_term_structure() -> dict:
     return out
 
 
+def fetch_vix_asof() -> Optional[str]:
+    """回傳最新 ^VIX bar 的日期(ISO 字串),供 freshness 判斷;失敗回 None。"""
+    try:
+        ticker = yf.Ticker("^VIX")
+        df = ticker.history(period="5d")
+        if df.empty:
+            return None
+        last = df.index[-1]
+        return last.isoformat() if hasattr(last, "isoformat") else str(last)
+    except Exception as e:
+        logger.error(f"fetch_vix_asof failed: {e}")
+        return None
+
+
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def is_vix_consecutive_above(threshold: float = 30, n_days: int = 3) -> bool:
     """檢查 VIX 是否連續 N 天 > threshold(學習鎖第 4 條)"""

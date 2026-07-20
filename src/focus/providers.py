@@ -239,8 +239,9 @@ class PublicVolatilityIndexProvider(VolatilityIndexProvider):
     provider_name = "yfinance_delayed_vix"
     supported_fields = frozenset({"vix", "vix9d", "vix3m", "term_structure", "term_inversion"})
 
-    def get_volatility_state(self) -> dict[str, Any]:
-        from src.data.vix_structure import fetch_vix_term_structure
+    def get_volatility_state(self, reference_date=None) -> dict[str, Any]:
+        from src.data.vix_structure import fetch_vix_asof, fetch_vix_term_structure
+        from src.focus.freshness import MAX_VOL_AGE_DAYS, freshness
 
         payload = self._null_payload("MARKET", status="screen_grade")
         try:
@@ -255,5 +256,12 @@ class PublicVolatilityIndexProvider(VolatilityIndexProvider):
             "vix3m_inverted": term.get("vix3m_inverted"),
         }
         payload["term_inversion"] = bool(term.get("vix9d_inverted"))
+        # 真實 as-of / freshness:VIX bar 日期 vs reference_date。stale/missing 可見。
+        try:
+            as_of = fetch_vix_asof()
+        except Exception:
+            as_of = None
+        payload["as_of"] = as_of
+        payload["freshness"] = freshness(as_of, reference_date, MAX_VOL_AGE_DAYS)
         payload["limitations"] = ["VVIX and COR1M require a source not yet connected"]
         return payload

@@ -49,7 +49,8 @@ _ALLOWED_CARD_KEYS = frozenset(
         "rsi", "bb_pct_b", "donchian20", "donchian55",
         "valuation_status", "options_capability_status",
         "timing_flags", "timing_reasons", "exposure_reasons",
-        "readiness_blockers", "source", "as_of", "not_a_trade_signal",
+        "readiness_blockers", "source", "as_of",
+        "security_freshness", "benchmark_freshness", "not_a_trade_signal",
     }
 )
 
@@ -103,8 +104,24 @@ def build_shadow_state(
     member_syms = _theme_member_symbols()
     all_syms = sorted(set(card_symbols) | set(member_syms) | set(benchmark_syms))
     frames, unavailable = _load_frames(all_syms, fetch)
-    benchmark_frames = {name: frames.get(name) for name in benchmark_syms}
     benchmark_missing = [s for s in benchmark_syms if s in unavailable]
+
+    # Benchmark freshness: a stale/missing benchmark must not feed RS. Only fresh
+    # benchmarks are passed to trend/RS; the primary benchmark's freshness is
+    # surfaced on each card so stale RS is visible and blocks add-ready.
+    from src.focus.freshness import frame_as_of, freshness, is_frame_fresh
+
+    benchmark_frames = {
+        name: (frames.get(name) if is_frame_fresh(frames.get(name), reference_date) else None)
+        for name in benchmark_syms
+    }
+    benchmark_stale = [
+        s for s in benchmark_syms
+        if s not in benchmark_missing and benchmark_frames.get(s) is None
+    ]
+    primary_bench_freshness = freshness(
+        frame_as_of(frames.get(BENCHMARK_BROAD)), reference_date
+    )
 
     def _theme_basket_close(theme: str | None):
         if not theme:
@@ -130,6 +147,7 @@ def build_shadow_state(
             options_capability=capability,
             valuation_status="not_connected",
             reference_date=reference_date,
+            benchmark_freshness=primary_bench_freshness,
         )
         cards.append({k: v for k, v in card.items() if k in _ALLOWED_CARD_KEYS})
 
@@ -142,8 +160,11 @@ def build_shadow_state(
 
     volatility_available = True
     try:
-        volatility_state = PublicVolatilityIndexProvider().get_volatility_state()
-        if volatility_state.get("vix") is None:
+        volatility_state = PublicVolatilityIndexProvider().get_volatility_state(
+            reference_date=reference_date
+        )
+        vol_fresh = (volatility_state.get("freshness") or {}).get("status")
+        if volatility_state.get("vix") is None or vol_fresh in ("stale", "missing"):
             volatility_available = False
     except Exception as exc:
         logger.warning(f"focus shadow: volatility fetch failed: {type(exc).__name__}")
@@ -154,6 +175,7 @@ def build_shadow_state(
         total_symbols=len(all_syms),
         unavailable=unavailable,
         benchmark_missing=benchmark_missing,
+        benchmark_stale=benchmark_stale,
         positions_status=positions_status,
         volatility_available=volatility_available,
     )
@@ -173,15 +195,19 @@ def _build_health(
     benchmark_missing: list[str],
     positions_status: str,
     volatility_available: bool,
+    benchmark_stale: list[str] | None = None,
 ) -> dict[str, Any]:
     """Compute a public-safe workflow health status (generic codes, no symbols).
 
     A shadow run must not disguise partial/stale/provider failures as success:
     any degradation surfaces here and drives the runner's non-zero exit.
     """
+    benchmark_stale = benchmark_stale or []
     error_codes: list[str] = []
     if benchmark_missing:
         error_codes.append("benchmark_price_unavailable")
+    if benchmark_stale:
+        error_codes.append("benchmark_price_stale")
     if unavailable:
         error_codes.append("partial_price_coverage")
     if not volatility_available:
@@ -191,7 +217,7 @@ def _build_health(
     elif positions_status == "unconfigured":
         error_codes.append("positions_unconfigured")
 
-    if benchmark_missing or positions_status == "malformed":
+    if benchmark_missing or benchmark_stale or positions_status == "malformed":
         workflow_status = "degraded"
     elif error_codes:
         workflow_status = "partial"

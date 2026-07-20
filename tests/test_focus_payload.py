@@ -126,9 +126,13 @@ def test_focus_section_renders_when_enabled():
     }
     html = _focus_section(data)
     assert "Focus Engine (shadow)" in html
-    assert "Theme rotation" in html
-    assert "Focus securities" in html
+    # All four first-screen sections must render.
+    assert "Market Regime" in html
+    assert "Portfolio Exceptions" in html
+    assert "Theme Rotation" in html
+    assert "Focus Securities" in html
     assert "ai_compute" in html
+    # Blockers are visible on the securities cards.
     assert "valuation_not_connected" in html
 
 

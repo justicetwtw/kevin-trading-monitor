@@ -88,3 +88,29 @@ def test_volatility_vvix_cor1m_unsupported():
     caps = provider.capabilities()
     assert caps["vvix"] is False
     assert caps["cor1m"] is False
+
+
+def test_volatility_state_carries_as_of_and_freshness(monkeypatch):
+    from datetime import date
+
+    import src.data.vix_structure as vs
+    from src.focus.providers import PublicVolatilityIndexProvider
+
+    monkeypatch.setattr(vs, "fetch_vix_term_structure", lambda: {"vix": 17.0, "vix9d": 16.0, "vix3m": 18.0})
+    monkeypatch.setattr(vs, "fetch_vix_asof", lambda: "2026-07-18")
+    state = PublicVolatilityIndexProvider().get_volatility_state(reference_date=date(2026, 7, 20))
+    assert state["vix"] == 17.0
+    assert state["as_of"] == "2026-07-18"
+    assert state["freshness"]["status"] == "fresh"
+
+
+def test_volatility_stale_as_of_flagged(monkeypatch):
+    from datetime import date
+
+    import src.data.vix_structure as vs
+    from src.focus.providers import PublicVolatilityIndexProvider
+
+    monkeypatch.setattr(vs, "fetch_vix_term_structure", lambda: {"vix": 17.0})
+    monkeypatch.setattr(vs, "fetch_vix_asof", lambda: "2026-06-01")
+    state = PublicVolatilityIndexProvider().get_volatility_state(reference_date=date(2026, 7, 20))
+    assert state["freshness"]["status"] == "stale"

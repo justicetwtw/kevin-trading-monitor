@@ -44,16 +44,13 @@ def build_focus_card(
     source: str = "yfinance_delayed_public_market_data",
     as_of: str | None = None,
     reference_date: date | None = None,
+    benchmark_freshness: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """組出單一 focus card(§8 每張卡最低欄位)。"""
+    from src.focus.freshness import freshness as _freshness
+
     mapping = map_instrument(symbol)
     has_leverage = mapping["kind"] == "leveraged_single"
-    states = evaluate_symbol(
-        trend,
-        thesis_state,
-        options_pressure=options_pressure,
-        has_leverage=has_leverage,
-    )
 
     sma = trend.get("sma", {}) if isinstance(trend, dict) else {}
     slope = trend.get("sma_slope", {}) if isinstance(trend, dict) else {}
@@ -63,6 +60,7 @@ def build_focus_card(
     donchian = trend.get("donchian", {}) if isinstance(trend, dict) else {}
 
     card_as_of = as_of or (trend.get("as_of") if isinstance(trend, dict) else None)
+    security_freshness = _freshness(card_as_of, reference_date, MAX_CARD_AGE_DAYS)
 
     blockers: list[str] = []
     if not isinstance(trend, dict) or trend.get("status") != "ok":
@@ -73,13 +71,30 @@ def build_focus_card(
         blockers.append("valuation_not_connected")
     if options_capability is None:
         blockers.append("options_capability_unknown")
-    # as-of / staleness fail-closed:缺 as_of 或超過 MAX_CARD_AGE_DAYS 都標 blocker。
-    as_of_date = _as_of_date(card_as_of)
+    # security as-of / staleness fail-closed。
     if isinstance(trend, dict) and trend.get("status") == "ok":
-        if as_of_date is None:
+        if security_freshness["status"] == "missing":
             blockers.append("as_of_missing")
-        elif reference_date is not None and (reference_date - as_of_date).days > MAX_CARD_AGE_DAYS:
+        elif security_freshness["status"] == "stale":
             blockers.append("price_stale")
+    # benchmark freshness:benchmark stale/missing → RS 不可信,擋 add(§ freshness gate)。
+    if benchmark_freshness is not None and benchmark_freshness.get("status") in ("stale", "missing"):
+        blockers.append("rs_benchmark_stale")
+
+    # 任一 stale/missing/incomplete blocker 存在時,強制關閉 add-ready 與 long eligibility
+    # (fail closed:資料不可信不得升 add-ready)。
+    _blocking = {
+        "price_trend_unavailable", "rs_benchmark_incomplete", "rs_benchmark_stale",
+        "as_of_missing", "price_stale",
+    }
+    data_blocked = bool(_blocking & set(blockers))
+    states = evaluate_symbol(
+        trend,
+        thesis_state,
+        options_pressure=options_pressure,
+        has_leverage=has_leverage,
+        data_blocked=data_blocked,
+    )
 
     def _rs(block: dict[str, Any], window: int) -> Any:
         item = block.get(window) if isinstance(block, dict) else None
@@ -117,6 +132,8 @@ def build_focus_card(
         "readiness_blockers": blockers,
         "source": source,
         "as_of": card_as_of,
+        "security_freshness": security_freshness,
+        "benchmark_freshness": benchmark_freshness,
         "not_a_trade_signal": True,
     }
 

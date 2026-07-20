@@ -220,8 +220,10 @@ def classify_timing(
             flags.append("breakout_low_volume")
         if not rs["leadership"]:
             flags.append("breakout_rs_not_leading")
-        # 突破要成為 add-ready,需 volume 確認 + RS 領先(不只是價格新高)。
-        eligible = volume_confirmed and rs["leadership"]
+        if options_worsening:
+            flags.append("breakout_options_pressure_worsening")
+        # 突破要成為 add-ready,需 volume 確認 + RS 領先 + options 下檔壓力未惡化。
+        eligible = volume_confirmed and rs["leadership"] and not options_worsening
         return {
             "state": "breakout_confirmed",
             "reasons": reasons,
@@ -253,31 +255,35 @@ def classify_timing(
             "flags": flags,
         }
 
-    # 站上上升 50DMA/20DMA → trend_healthy;但 add-ready 需 RS 可得且領先。
+    # 站上上升 50DMA/20DMA → trend_healthy;但 add-ready 需 RS 可得且領先、options 未惡化。
     if rising_50 and rising_20:
         reasons.append("above_rising_50dma")
         if not rs["available"]:
             flags.append("rs_unavailable_add_gate_closed")
         elif not rs["leadership"]:
             flags.append("rs_not_leading_add_gate_closed")
+        if options_worsening:
+            flags.append("options_pressure_worsening")
         return {
             "state": "trend_healthy",
             "reasons": reasons,
-            "long_entry_eligible": bool(rs["leadership"]),
+            "long_entry_eligible": bool(rs["leadership"] and not options_worsening),
             "flags": flags,
         }
 
     # 站上 50DMA 但短期節奏未完全轉正 → pullback_test(健康回檔);
-    # add-ready 需 50DMA 未下降 + RS 領先。
+    # add-ready 需 50DMA 未下降 + RS 領先 + options 未惡化。
     reasons.append("above_50dma_pullback")
     if bb.get("touch_lower"):
         flags.append("healthy_pullback_lower_band")
     if not rs["leadership"]:
         flags.append("pullback_rs_not_leading")
+    if options_worsening:
+        flags.append("options_pressure_worsening")
     return {
         "state": "pullback_test",
         "reasons": reasons,
-        "long_entry_eligible": bool(rising_50 and rs["leadership"]),
+        "long_entry_eligible": bool(rising_50 and rs["leadership"] and not options_worsening),
         "flags": flags,
     }
 
@@ -386,23 +392,38 @@ def evaluate_symbol(
     thesis_state: str,
     options_pressure: dict[str, Any] | None = None,
     has_leverage: bool = False,
+    data_blocked: bool = False,
 ) -> dict[str, Any]:
     """把 trend + thesis + options 綜合成一張 focus card 的狀態組合。
 
     三個狀態各自獨立輸出,便於 dashboard 與測試分別檢查。
+    data_blocked=True(stale/partial/unavailable 資料)時強制關閉 add-ready 與 long
+    eligibility,並把 add-ready 姿態降級為 wait_for_proof(fail closed)。
     """
     timing = classify_timing(trend, options_pressure)
     exposure = derive_exposure_posture(thesis_state, timing, has_leverage=has_leverage)
+
+    long_eligible = bool(timing["long_entry_eligible"])
+    add_allowed = bool(exposure["add_allowed"])
+    posture = exposure["posture"]
+    exposure_reasons = list(exposure["reasons"])
+    if data_blocked:
+        long_eligible = False
+        if add_allowed:
+            add_allowed = False
+            posture = "wait_for_proof"
+            exposure_reasons.append("data_blocked_stale_or_partial")
+
     return {
         "company_thesis_state": (
             thesis_state if thesis_state in COMPANY_THESIS_STATES else "watch"
         ),
         "timing_state": timing["state"],
-        "exposure_posture": exposure["posture"],
-        "long_entry_eligible": timing["long_entry_eligible"],
-        "add_allowed": exposure["add_allowed"],
+        "exposure_posture": posture,
+        "long_entry_eligible": long_eligible,
+        "add_allowed": add_allowed,
         "timing_reasons": timing["reasons"],
         "timing_flags": timing["flags"],
-        "exposure_reasons": exposure["reasons"],
+        "exposure_reasons": exposure_reasons,
         "not_a_trade_signal": True,
     }

@@ -15,7 +15,10 @@ def _offline_providers(monkeypatch):
     monkeypatch.setattr(
         providers.PublicVolatilityIndexProvider,
         "get_volatility_state",
-        lambda self: {"vix": 18.0, "status": "screen_grade"},
+        lambda self, reference_date=None: {
+            "vix": 18.0, "status": "screen_grade",
+            "freshness": {"status": "fresh", "as_of": "2026-07-18"},
+        },
     )
     monkeypatch.setattr(
         providers.YFinanceFocusOptionsProvider,
@@ -165,3 +168,20 @@ def test_main_flag_off_writes_disabled_envelope(monkeypatch):
     rc = run_focus_shadow.main()
     assert rc == 0
     assert writes["focus_engine_state.json"]["enabled"] is False
+
+
+def test_stale_benchmark_makes_run_degraded(monkeypatch):
+    # Fake fetch returns frames whose last bar is far in the past; with a current
+    # reference date the benchmark is stale → RS unavailable, run degraded.
+    import datetime as _dt
+
+    monkeypatch.setenv("FOCUS_ENGINE_ENABLED", "1")
+    state = run_focus_shadow.build_shadow_state(
+        holdings=[], positions=None, positions_status="ok",
+        fetch=_fake_fetch, reference_date=_dt.date(2026, 7, 20),
+    )
+    health = state["health"]
+    assert "benchmark_price_stale" in health["error_codes"]
+    assert health["workflow_status"] == "degraded"
+    # Every card's RS-based add gate is closed because the benchmark is stale.
+    assert all(c["add_allowed"] is False for c in state["data"]["focus_securities"])

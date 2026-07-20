@@ -38,14 +38,30 @@ def test_rotation_row_uses_constituents_not_proxy():
     assert row_without_smh_in_members["return_20d"] == row_with_smh_available["return_20d"]
 
 
-def test_rotation_row_reports_leadership_fields_and_not_produced():
+def test_rotation_row_reports_leadership_fields():
     members = {sym: _frame(i + 1) for i, sym in enumerate(THEME_CONSTITUENTS["ai_compute"])}
     benchmarks = {"QQQ": _frame(3), "SMH": _frame(4)}
     row = theme_rotation_row("ai_compute", members, benchmarks)
     assert row["status"] == "ok"
     assert "rs_acceleration" in row
+    assert row["leadership_direction"] in {"accelerating", "deteriorating", "flat", "unknown"}
     assert "breakout_20d_share" in row
-    assert "theme_percentile_rank" in row["not_produced"]
+    assert "breakout_55d_share" in row
+
+
+def test_panel_produces_theme_percentile_and_rank():
+    # theme_percentile_rank / theme_rank are now produced across themes.
+    members = {}
+    for theme, syms in THEME_CONSTITUENTS.items():
+        for i, s in enumerate(syms):
+            members[s] = _frame(i + 1)
+    benchmarks = {"QQQ": _frame(3), "SMH": _frame(4)}
+    panel = build_rotation_panel(members, benchmarks)
+    ranked = [r for r in panel["rows"] if r.get("theme_rank") is not None]
+    assert ranked, "at least one theme should be ranked"
+    for r in ranked:
+        assert 0.0 <= r["theme_percentile_rank"] <= 1.0
+        assert 1 <= r["theme_rank"] <= r["theme_count_ranked"]
 
 
 def test_panel_marks_price_return_proxy():

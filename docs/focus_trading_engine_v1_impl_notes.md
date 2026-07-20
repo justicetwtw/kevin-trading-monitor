@@ -104,11 +104,38 @@
   `MAX_CARD_AGE_DAYS` 標 `as_of_missing` / `price_stale`;Mission Control 新增可見的
   Focus Engine render section,含 snapshot regression。
 
-## 8. 驗證
+## 8. Round 2 — 完成不需付費資料源的剩餘項目
+
+依 Kevin 的 Round 2 continuation,完成以下(仍不新增付費 API／secret／provider):
+
+- **ATR / N-style sizing**:`backtest.atr_sizer` 以波動目標(`TARGET_ATR_PCT`)反向縮放倉位,
+  低波放大、高波縮小;新增 `dma50_rs_atr_sized` baseline。`run_strategy` 支援分數倉位、
+  rebalance threshold 與 |Δfraction| 成本,執行語意仍一致(no look-ahead)。
+- **Walk-forward / OOS + regime split**:`backtest.walk_forward`(連續、不重疊 OOS 段)與
+  `backtest.regime_splits`(pre-2020 / 2020–2022 / 2023+ 預先宣告邊界,避免 data snooping;
+  樣本不足標 insufficient)。
+- **完整 metrics**:recovery_bars、downside_capture、hit_rate、avg_win/avg_loss 皆已輸出。
+  `not_implemented` 只剩真正未做的 `paid_options_history_validation`、`monte_carlo_resampling`。
+- **Rotation leadership**:新增 theme_rank / theme_percentile_rank(跨 theme)、
+  leadership_direction、breakout_20d_share / breakout_55d_share;仍只用 constituents,不混 ETF proxy。
+- **Freshness(`src/focus/freshness.py`)**:security / benchmark / volatility 皆有 as-of + stale 檢查。
+  benchmark stale/missing → 不餵 RS(RS unavailable),card 標 `rs_benchmark_stale`;
+  volatility stale → market regime 降級;runner health 新增 `benchmark_price_stale`。
+- **Stale/partial 擋 add-ready**:`evaluate_symbol(data_blocked=True)` 強制關閉 add-ready 並降為
+  `wait_for_proof`;card 只要有 stale/missing/incomplete blocker 就 data_blocked。
+- **Options-pressure 成為真正 gate**:`downside_pressure_worsening` 在 breakout / trend_healthy /
+  pullback 也會擋掉 add eligibility。
+- **First-screen render**:Mission Control 明確渲染 Market Regime、Portfolio Exceptions、
+  Theme Rotation、Focus Securities 四個 sub-section,含 source/as-of/blockers。
+
+仍為 honest capability gap(未新增付費源):historical skew/OI/gamma/GEX、COR1M/VVIX、
+estimate history。
+
+## 9. 驗證
 
 ```bash
-python -m pytest -q                                   # 556 passed, 1 skipped
-python -m pytest -q tests/test_focus_*.py             # 89 focus tests
+python -m pytest -q                                   # 573 passed, 1 skipped
+python -m pytest -q tests/test_focus_*.py             # focus 測試(含 round 2 regression)
 python scripts/verify_agent_workflow_contract.py      # passed
 python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline  # ok
 ```

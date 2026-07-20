@@ -6,9 +6,14 @@ import pandas as pd
 from src.focus.backtest import (
     BASELINE_SIGNALS,
     MIN_HISTORY_BARS,
+    atr_sizer,
+    regime_splits,
     run_baselines,
     run_strategy,
+    walk_forward,
+    _atr_pct,
     _signal_dma50,
+    _signal_dma50_rs,
 )
 
 
@@ -104,7 +109,72 @@ def test_execution_time_in_market_consistent():
     assert out["time_in_market"] == 1.0
 
 
-def test_not_implemented_robustness_is_honest():
+def test_not_implemented_lists_only_genuinely_missing():
+    # walk-forward / OOS / regime / ATR sizing are now implemented and must NOT
+    # be listed as not_implemented; only genuinely-missing items remain.
     out = run_baselines(_uptrend())
-    assert "walk_forward" in out["not_implemented"]
-    assert "atr_position_sizing" in out["not_implemented"]
+    assert "walk_forward" not in out["not_implemented"]
+    assert "atr_position_sizing" not in out["not_implemented"]
+    assert "regime_split" not in out["not_implemented"]
+    assert "paid_options_history_validation" in out["not_implemented"]
+    assert out["atr_sizing"]["target_atr_pct"] > 0
+
+
+def _frame_hl(n=400, start=10.0, end=40.0, seed=1):
+    idx = pd.date_range("2019-06-03", periods=n, freq="B")
+    c = np.linspace(start, end, n)
+    return pd.DataFrame(
+        {"Close": c, "High": c * 1.01, "Low": c * 0.99, "Volume": [1e6] * n}, index=idx
+    )
+
+
+def test_atr_pct_scales_and_sizer_inverse_to_vol():
+    calm = _frame_hl()
+    # atr% is positive and the sizer yields a fraction in [0, 1]
+    atrp = _atr_pct(calm, len(calm) - 1)
+    assert atrp is not None and atrp > 0
+    frac = atr_sizer()(calm, len(calm) - 1, None)
+    assert 0.0 <= frac <= 1.0
+
+
+def test_atr_sizer_bigger_when_lower_vol():
+    low_vol = _frame_hl(end=13.0)   # gentle slope → low ATR%
+    high_vol = _frame_hl(end=80.0)  # steep slope → high ATR%
+    f_low = atr_sizer()(low_vol, len(low_vol) - 1, None)
+    f_high = atr_sizer()(high_vol, len(high_vol) - 1, None)
+    assert f_low >= f_high
+
+
+def test_atr_sized_baseline_runs_with_benchmark():
+    prices = _frame_hl(n=400, start=10.0, end=40.0)
+    bench = pd.Series(np.linspace(10, 15, 400), index=prices.index)
+    out = run_baselines(prices, benchmark=bench)
+    assert out["results"]["dma50_rs_atr_sized"]["status"] == "ok"
+
+
+def test_walk_forward_segments_non_overlapping():
+    prices = _frame_hl(n=600)
+    bench = pd.Series(np.linspace(10, 15, 600), index=prices.index)
+    wf = walk_forward(prices, _signal_dma50_rs, benchmark=bench, train_bars=252, test_bars=63)
+    assert wf["status"] == "ok"
+    assert wf["segment_count"] >= 1
+    ends = [s["oos_end_index"] for s in wf["segments"]]
+    starts = [s["oos_start_index"] for s in wf["segments"]]
+    # each OOS window advances by test_bars → strictly increasing, non-overlapping
+    assert starts == sorted(starts)
+    assert all(b - a == 63 for a, b in zip(starts, ends))
+
+
+def test_regime_splits_predeclared_and_insufficient_marked():
+    prices = _frame_hl(n=1300, start=10, end=50)  # spans 2019->~2024
+    out = regime_splits(prices, _signal_dma50)
+    assert out["predeclared"] is True
+    assert set(out["regimes"]) == {"pre_2020", "covid_2020_2022", "post_2023"}
+    # regimes with < MIN_HISTORY_BARS are marked, not force-computed
+    for name, res in out["regimes"].items():
+        assert res["status"] in {"ok", "insufficient_history"}
+
+
+def test_regime_splits_requires_datetime_index():
+    out = regime_splits(pd.Series(np.linspace(10, 40, 300)), _signal_dma50)
+    assert out["status"] == "requires_datetime_index"

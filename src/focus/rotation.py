@@ -90,24 +90,36 @@ def theme_rotation_row(
     else:
         rs_acceleration = None
 
-    # breakout share:成分股中處於 Donchian-20 上破的比例(no look-ahead)。
+    # breakout share:成分股中處於 Donchian 上破的比例(no look-ahead),20D 與 55D 分開。
     from src.focus.trend import donchian_state
 
-    breakout_up = 0
-    breakout_counted = 0
-    for sym in symbols:
-        frame = member_frames.get(sym)
-        if frame is None or getattr(frame, "empty", True):
-            continue
-        state = donchian_state(frame, 20)
-        if state.get("status") == "insufficient_data":
-            continue
-        breakout_counted += 1
-        if state.get("status") == "breakout_up":
-            breakout_up += 1
-    breakout_20d_share = (
-        round(breakout_up / breakout_counted, 4) if breakout_counted else None
-    )
+    def _breakout_share(window: int) -> float | None:
+        up = 0
+        counted = 0
+        for sym in symbols:
+            frame = member_frames.get(sym)
+            if frame is None or getattr(frame, "empty", True):
+                continue
+            state = donchian_state(frame, window)
+            if state.get("status") == "insufficient_data":
+                continue
+            counted += 1
+            if state.get("status") == "breakout_up":
+                up += 1
+        return round(up / counted, 4) if counted else None
+
+    breakout_20d_share = _breakout_share(20)
+    breakout_55d_share = _breakout_share(55)
+
+    # leadership 方向:RS20 相對 RS63 加速(>0)或惡化(<0)。
+    if rs_acceleration is None:
+        leadership_direction = "unknown"
+    elif rs_acceleration > 0:
+        leadership_direction = "accelerating"
+    elif rs_acceleration < 0:
+        leadership_direction = "deteriorating"
+    else:
+        leadership_direction = "flat"
 
     # breadth:成員中價格在各自 20/50/200DMA 之上的比例。
     breadth: dict[str, float | None] = {}
@@ -138,10 +150,11 @@ def theme_rotation_row(
         "rs_vs_qqq_63": rs_qqq_63.get("value"),
         "rs_vs_smh_20": rs_smh.get("value"),
         "rs_acceleration": rs_acceleration,
+        "leadership_direction": leadership_direction,
         "breakout_20d_share": breakout_20d_share,
+        "breakout_55d_share": breakout_55d_share,
         "breadth": breadth,
-        # 契約其餘 leadership 欄位尚未產出,明確標記不假裝已完成(§9 honesty)。
-        "not_produced": ["theme_percentile_rank", "55d_breakout_share"],
+        # theme_percentile_rank 由 panel 跨 theme 計算後補上(見 build_rotation_panel)。
     }
 
 
@@ -154,6 +167,22 @@ def build_rotation_panel(
         theme_rotation_row(theme, member_frames, benchmark_frames)
         for theme in THEME_CONSTITUENTS
     ]
+
+    # 跨 theme percentile / rank(依 RS20 vs QQQ);只有算得出 RS 的 theme 參與排名,
+    # 缺 RS 的 theme percentile/rank 為 None(不硬給名次)。
+    ranked = [r for r in rows if isinstance(r.get("rs_vs_qqq_20"), (int, float))]
+    ranked.sort(key=lambda r: r["rs_vs_qqq_20"], reverse=True)
+    n = len(ranked)
+    for position, row in enumerate(ranked):
+        row["theme_rank"] = position + 1
+        row["theme_count_ranked"] = n
+        # percentile:最強=1.0,最弱→接近 0(n=1 時給 1.0)。
+        row["theme_percentile_rank"] = round(1.0 - position / (n - 1), 4) if n > 1 else 1.0
+    for row in rows:
+        if "theme_percentile_rank" not in row:
+            row["theme_percentile_rank"] = None
+            row["theme_rank"] = None
+
     rows.sort(
         key=lambda row: (
             row.get("rs_vs_qqq_20") is None,

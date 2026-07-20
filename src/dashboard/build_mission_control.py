@@ -364,51 +364,97 @@ def _focus_section(data: dict[str, Any]) -> str:
     rotation = fdata.get("theme_rotation") or {}
     cards = fdata.get("focus_securities") or []
 
-    regime_strip = (
+    # 1. Market Regime — VIX complex, freshness, workflow health, blockers visible.
+    vol_fresh = (regime.get("freshness") or {}) if isinstance(regime, dict) else {}
+    regime_blockers = []
+    if not regime:
+        regime_blockers.append("market_regime_unavailable")
+    if vol_fresh.get("status") in ("stale", "missing"):
+        regime_blockers.append(f"volatility_{vol_fresh.get('status')}")
+    market_regime_html = (
+        "<h3>Market Regime</h3>"
         '<div class="account-strip">'
-        f'<span>Mode <strong>{_e(focus.get("mode"))}</strong></span>'
         f'<span>Workflow <strong>{_badge(health.get("workflow_status"))}</strong></span>'
         f'<span>Error codes <strong>{_e(health.get("error_codes") or [])}</strong></span>'
         f'<span>VIX regime <strong>{_e(regime.get("regime"))}</strong></span>'
-        f'<span>Hedge <strong>{_e(exceptions.get("hedge_coverage_band"))}</strong></span>'
-        f'<span>Theme concentration <strong>{_e(exceptions.get("max_theme_concentration_band"))}</strong></span>'
+        f'<span>VIX <strong>{_e(regime.get("vix"))}</strong></span>'
+        f'<span>VIX as-of <strong>{_e(vol_fresh.get("as_of"))}</strong></span>'
+        f'<span>Freshness <strong>{_badge(vol_fresh.get("status"))}</strong></span>'
         "</div>"
+        + (
+            f'<div class="privacy-note"><strong>Blockers:</strong> {_e(regime_blockers)}. '
+            "VVIX/COR1M remain capability gaps (paid source not connected).</div>"
+            if regime_blockers
+            else '<div class="privacy-note">VVIX/COR1M remain capability gaps '
+            "(paid source not connected).</div>"
+        )
     )
+
+    # 2. Portfolio Exceptions — aggregate-only private risk (no identifiers).
+    portfolio_html = (
+        "<h3>Portfolio Exceptions</h3>"
+        + (
+            '<div class="account-strip">'
+            f'<span>Hedge coverage <strong>{_badge(exceptions.get("hedge_coverage_band"))}</strong></span>'
+            f'<span>Coverage status <strong>{_e(exceptions.get("hedge_coverage_status"))}</strong></span>'
+            f'<span>Max theme concentration <strong>{_badge(exceptions.get("max_theme_concentration_band"))}</strong></span>'
+            f'<span>Unmapped risk gap <strong>{_e(exceptions.get("has_unmapped_risk_gap"))}</strong></span>'
+            "</div>"
+            '<div class="privacy-note">Aggregate bands/counts only; no symbols, '
+            "strikes, contracts, costs or account value.</div>"
+            if exceptions
+            else '<div class="empty">No private position input configured '
+            "(aggregate exceptions unavailable).</div>"
+        )
+    )
+
+    # 3. Theme Rotation — constituents-only proxy with rank/percentile + blockers.
     rotation_rows = rotation.get("rows") or []
-    rotation_html = _table(
-        rotation_rows,
-        [
-            ("theme", "Theme"),
-            ("status", "Status"),
-            ("rs_vs_qqq_20", "RS20 vs QQQ"),
-            ("rs_acceleration", "RS accel"),
-            ("breakout_20d_share", "20D breakout share"),
-        ],
+    rotation_html = (
+        "<h3>Theme Rotation (price-return proxy, not fund flow)</h3>"
+        + _table(
+            rotation_rows,
+            [
+                ("theme", "Theme"),
+                ("status", "Status"),
+                ("theme_rank", "Rank"),
+                ("theme_percentile_rank", "Percentile"),
+                ("rs_vs_qqq_20", "RS20 vs QQQ"),
+                ("leadership_direction", "Leadership"),
+                ("breakout_20d_share", "20D breakout"),
+                ("breakout_55d_share", "55D breakout"),
+            ],
+        )
     )
-    focus_rows = _table(
-        cards,
-        [
-            ("symbol", "Symbol"),
-            ("company_thesis_state", "Thesis"),
-            ("timing_state", "Timing"),
-            ("exposure_posture", "Posture"),
-            ("rs20_vs_qqq", "RS20"),
-            ("valuation_status", "Valuation"),
-            ("options_capability_status", "Options"),
-            ("readiness_blockers", "Blockers"),
-            ("as_of", "As of"),
-        ],
+
+    # 4. Focus Securities — holdings-first cards with source/as-of/blockers visible.
+    focus_html = (
+        "<h3>Focus Securities</h3>"
+        + _table(
+            cards,
+            [
+                ("symbol", "Symbol"),
+                ("company_thesis_state", "Thesis"),
+                ("timing_state", "Timing"),
+                ("exposure_posture", "Posture"),
+                ("add_allowed", "Add ready"),
+                ("rs20_vs_qqq", "RS20"),
+                ("valuation_status", "Valuation"),
+                ("options_capability_status", "Options"),
+                ("readiness_blockers", "Blockers"),
+                ("as_of", "As of"),
+            ],
+        )
     )
     return (
         '<section id="focus"><div class="section-head">'
         "<h2>Focus Engine (shadow)</h2>"
         "<p>Static public focus universe; timing paces exposure, never the thesis. "
         "Not a trade signal.</p></div>"
-        + regime_strip
-        + "<h3>Theme rotation (price-return proxy, not fund flow)</h3>"
+        + market_regime_html
+        + portfolio_html
         + rotation_html
-        + "<h3>Focus securities</h3>"
-        + focus_rows
+        + focus_html
         + "</section>"
     )
 
