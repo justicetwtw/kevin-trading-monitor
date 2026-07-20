@@ -43,6 +43,7 @@
   "2026-07-20": {
     "tw_open": true,
     "tw_close": true,
-    "us_premarket": true
+    "us_premarket": true,
+    "us_open": true
   }
 }
