@@ -21789,5 +21789,96 @@
       "tier2": {}
     },
     "captured_at": "2026-07-19T19:43:09.240119+00:00"
+  },
+  "116949957911190936": {
+    "id": "116949957911190936",
+    "created_at": "2026-07-20T02:32:18.636Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116949957911190936",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116949957118811451",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-20T03:59:42.105215+00:00"
+  },
+  "116949957118811451": {
+    "id": "116949957118811451",
+    "created_at": "2026-07-20T02:32:06.541Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116949957118811451",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-20T03:59:42.105250+00:00"
+  },
+  "116949510224898590": {
+    "id": "116949510224898590",
+    "created_at": "2026-07-20T00:38:27.481Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116949510224898590",
+    "text": "Christopher Macchio, the Great Opera Singer, was AMAZING at the World Cup today — He\"took the house down!\" President DONALD J.TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-20T03:59:42.105389+00:00"
+  },
+  "116949495681903940": {
+    "id": "116949495681903940",
+    "created_at": "2026-07-20T00:34:45.576Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116949495681903940",
+    "text": "Wonderful news! I have just been informed that Giant Eagle, a GREAT American Grocery Company, will be lowering Prices, by a lot, across more than 300 products this Summer, through Labor Day, to help hardworking American families.Giant Eagle, like Walmart, is stepping up in a big and bold way to answer my call to lower costs for working families. We will continue to bring Prices DOWN, just like Oil, Gas, Eggs, and Prescription Drugs, all of which are dropping FAST after the disaster we inherited from Sleepy Joe Biden. Other Grocery Chains must immediately follow the lead of these absolute Patriots at Giant Eagle and Walmart. Together, we will make America stronger and more affordable than ever before, and get rid of the stench and Inflation perpetrated on us by the Dumocrats and the Sleepy Joe Biden Administration! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-20T03:59:42.105515+00:00"
+  },
+  "116949428377514667": {
+    "id": "116949428377514667",
+    "created_at": "2026-07-20T00:17:38.592Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116949428377514667",
+    "text": "The National Academy of Sciences has historically published analytical Scientific Manuals expressly for our Federal Judiciary. Of course, the Academy has been run by Radical Left Dumocrats who, it turns out, published fraudulent, biased, and misleading Manuals on Climate Change. These bogus Manuals were used by Judges to decide massive \"Climate Change\" Cases, and have created huge losses across our Country. These Manuals have been totally DISCREDITED. Our Nation's Federal Judges deserve Facts and Science, not Political Fraud and False Science on Climate. With this TRUTH, I hereby order Federal Suspension and Debarment Officials to review this conduct. Our Taxpayers should not be funding Climate Fraud, and Judges should never have relied upon it. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-07-20T03:59:42.105624+00:00"
   }
 }
