@@ -8468,5 +8468,20 @@
     "seen_at": "2026-07-20T16:08:31.645574+00:00",
     "created_at": "2026-07-20T15:38:54.753Z",
     "source": "cnn_historical_archive"
+  },
+  "116953279157877523": {
+    "seen_at": "2026-07-20T18:16:03.297143+00:00",
+    "created_at": "2026-07-20T16:36:56.834Z",
+    "source": "cnn_historical_archive"
+  },
+  "116953296612438865": {
+    "seen_at": "2026-07-20T18:16:03.297143+00:00",
+    "created_at": "2026-07-20T16:41:23.173Z",
+    "source": "cnn_historical_archive"
+  },
+  "116953334292806992": {
+    "seen_at": "2026-07-20T18:16:03.297143+00:00",
+    "created_at": "2026-07-20T16:50:58.129Z",
+    "source": "cnn_historical_archive"
   }
 }
