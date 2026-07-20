@@ -251,6 +251,21 @@ def static_focus_symbols() -> list[str]:
     return ordered
 
 
+def breadth_universe() -> list[str]:
+    """市場 breadth 用的乾淨、去重「單一成分股」宇宙(finding P1 round 5)。
+
+    只含 THEME_CONSTITUENTS 的 clean single-name underlyings;明確排除 ETF proxy /
+    benchmark(SMH/SOXX/QQQ/SPY)與所有槓桿/交易工具(NVDL/MUU/TSLL/... 等),
+    避免同一因子被 ETF 或 2x 工具重複計數而扭曲 market-regime 升級。
+    """
+    out: list[str] = []
+    for names in THEME_CONSTITUENTS.values():
+        for sym in names:
+            if sym not in out:
+                out.append(sym)
+    return out
+
+
 def runtime_focus_symbols(
     holdings: list[str] | None = None,
     kevin_focus: list[str] | None = None,

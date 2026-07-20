@@ -135,19 +135,27 @@ def build_options_pressure(
     coverage = round(len(present) / len(REQUIRED_PRESSURE_FIELDS), 4)
 
     as_of = cap.get("as_of")
-    fresh = freshness(as_of, reference_date, MAX_PRICE_AGE_DAYS) if as_of is not None else {"status": "unknown_age"}
-    stale = fresh.get("status") in ("stale", "missing")
+    fresh = freshness(as_of, reference_date, MAX_PRICE_AGE_DAYS) if as_of is not None else {"status": "missing"}
+    fresh_ok = fresh.get("status") == "fresh"
 
+    source = cap.get("source")
+    have_source = isinstance(source, str) and source.strip() != ""
+
+    # 方向確認需同時滿足:gamma flip + skew 變化皆在、有具名 source、as_of 新鮮
+    # (finding P1 round 5:as_of=None / unknown_age / 缺 source 不得 fall through 成 confirmed_ok)。
     have_direction = gamma_flip is not None and skew_change is not None
-    if not have_direction or stale:
+    if not (have_direction and have_source and fresh_ok):
         missing: list[str] = []
         if gamma_flip is None:
             missing.append("gamma_flip_proxy")
         if skew_change is None:
             missing.append("put_skew_change")
         reasons = ["required_options_confirmation_unavailable"]
-        if stale and as_of is not None:
-            reasons.append("options_evidence_stale")
+        if not have_source:
+            reasons.append("options_source_missing")
+        if not fresh_ok:
+            # covers as_of missing, unknown_age (no reference_date), and stale
+            reasons.append(f"options_evidence_{fresh.get('status', 'not_fresh')}")
         return {
             "status": "unavailable",
             "downside_pressure_worsening": False,
@@ -155,7 +163,7 @@ def build_options_pressure(
             "reasons": reasons,
             "missing_fields": missing,
             "coverage": coverage,
-            "source": cap.get("source"),
+            "source": source,
             "as_of": as_of,
             "freshness": fresh,
         }

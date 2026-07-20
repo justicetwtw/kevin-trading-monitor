@@ -257,3 +257,31 @@ def test_open_terminal_trade_not_counted_as_closed():
     assert out["open_terminal_trade"] is not None
     assert out["closed_trade_count"] == 0
     assert out["closed_trades"] == []
+
+
+def test_carry_in_trade_excluded_from_closed_stats():
+    # finding P1 round 5: a position opened before the OOS window (carry-in) that
+    # exits inside the window is recorded as carry-in, NOT a clean closed trade.
+    n = 300
+    closes = list(np.linspace(100.0, 130.0, n))
+
+    def sig(frame, i, bench):
+        return i < 200                  # long from the start, exits mid-sample
+
+    out = run_strategy(_controlled_frame(closes), sig, cost_bps=0.0, metrics_start_index=150)
+    assert out["carry_in_trade_count"] == 1
+    assert out["closed_trade_count"] == 0   # carry-in trade is excluded from clean stats
+
+
+def test_walk_forward_spanning_trade_not_double_counted_as_closed():
+    # finding P1 round 5: a single continuous long position spanning multiple OOS
+    # windows must not be booked as a clean closed trade in each window; every
+    # window sees it as carry-in and/or carry-out, so clean closed_trade_count is 0.
+    prices = _frame_hl(n=700)           # continuous uptrend → dma50 stays long
+    wf = walk_forward(prices, _signal_dma50, train_bars=252, test_bars=63)
+    assert wf["segment_count"] >= 2
+    total_clean_closed = sum((s.get("closed_trade_count") or 0) for s in wf["segments"])
+    assert total_clean_closed == 0
+    # and at least one window carries the position across its boundary
+    assert any(s.get("has_open_terminal_trade") or (s.get("carry_in_trade_count") or 0) > 0
+               for s in wf["segments"])

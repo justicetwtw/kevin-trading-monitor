@@ -465,7 +465,7 @@ def _focus_section(data: dict[str, Any]) -> str:
                 ("timing_state", "Timing"),
                 ("exposure_posture", "Posture"),
                 ("add_allowed", "Add ready"),
-                ("proposed_size_multiplier", "Size mult"),
+                ("regime_exposure_cap_multiplier", "Regime cap x"),
                 ("rs20_vs_qqq", "RS20"),
                 ("valuation_status", "Valuation"),
                 ("valuation_decision_grade", "Val OK"),

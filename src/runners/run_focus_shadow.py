@@ -33,6 +33,7 @@ from src.focus.universe import (
     BENCHMARK_BROAD,
     BENCHMARK_SEMI,
     THEME_CONSTITUENTS,
+    breadth_universe,
     map_instrument,
     static_focus_symbols,
 )
@@ -50,7 +51,7 @@ _ALLOWED_CARD_KEYS = frozenset(
         "rs20_vs_qqq", "rs63_vs_qqq", "rs20_vs_smh",
         "rsi", "bb_pct_b", "donchian20", "donchian55",
         "valuation_status", "valuation_decision_grade", "options_capability_status",
-        "proposed_size_multiplier", "market_regime",
+        "regime_exposure_cap_multiplier", "market_regime",
         "timing_flags", "timing_reasons", "exposure_reasons",
         "readiness_blockers", "source", "as_of",
         "security_freshness", "benchmark_freshness", "not_a_trade_signal",
@@ -148,8 +149,10 @@ def build_shadow_state(
         volatility_available = False
 
     # Broad/semi trend + focus breadth (computed BEFORE the regime so trend/breadth
-    # actually drive the composite regime, not just the display block).
-    market_trend = _market_trend_breadth(frames, card_symbols, reference_date)
+    # actually drive the composite regime, not just the display block). Breadth uses a
+    # clean, unique single-name constituent universe — NOT card_symbols, which include
+    # benchmarks and leveraged tools that would double-count the same factor.
+    market_trend = _market_trend_breadth(frames, breadth_universe(), reference_date)
 
     # Composite regime = VIX regime escalated by damaged QQQ/SMH trend + breadth
     # (fail toward caution). A low VIX alone cannot keep the regime calm when the
@@ -269,13 +272,21 @@ def _market_trend_breadth(frames, card_symbols, reference_date) -> dict[str, Any
             counted += 1
             if float(close.iloc[-1]) > float(close.tail(window).mean()):
                 above += 1
-        return round(above / counted, 4) if counted else None
+        return (round(above / counted, 4) if counted else None), counted
 
+    b50, b50_n = _breadth(50)
+    b200, b200_n = _breadth(200)
     return {
         "index_trend": {sym: _trend(sym) for sym in ("QQQ", "SMH", "SOXX")},
-        "breadth_above_50dma": _breadth(50),
-        "breadth_above_200dma": _breadth(200),
-        "note": "trend/breadth are fresh-filtered; missing indices marked, not assumed",
+        "breadth_above_50dma": b50,
+        "breadth_above_200dma": b200,
+        "breadth_counted_50dma": b50_n,
+        "breadth_counted_200dma": b200_n,
+        "breadth_universe_size": len(card_symbols),
+        "note": (
+            "trend/breadth are fresh-filtered over a clean unique single-name "
+            "constituent universe (no benchmarks or leveraged tools); denominators exposed"
+        ),
     }
 
 

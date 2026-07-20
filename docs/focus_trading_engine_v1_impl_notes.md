@@ -166,7 +166,7 @@ estimate history。
   QQQ/SMH/SOXX 趨勢 + breadth 併算,兩大領先指標同破 200DMA 或 breadth 受損時「向上升級」
   regime(即使 VIX 低),缺資料標 capability gap;runner 先算 trend/breadth 再定 regime,
   cap 由 composite 決定。`elevated=0.5` 不再只顯示:`build_focus_card` 依 cap 產出
-  `proposed_size_multiplier`(leveraged 依槓桿收斂 gross 曝險),stress/未知封頂擋 add。
+  `regime_exposure_cap_multiplier`(leveraged 依槓桿收斂 gross 曝險),stress/未知封頂擋 add。
 - **trade-level metrics 顯式 ledger**:`run_strategy` 以進出場 ledger 計 trade,entry/
   rebalance/**exit 成本**都併入「當筆」trade;未平倉的 terminal trade 另計
   `open_terminal_trade`,不計入 `closed_trade_count`;walk-forward 段界不再把一筆連續持有
@@ -178,11 +178,35 @@ estimate history。
   source + 新鮮 as_of + coverage + value_band/approved_scenarios + approved 狀態;單一字串
   不再解鎖 add,缺/過期一律擋(fail closed)。
 
-## 11. 驗證
+## 11. Review round 4(第三次 incremental)— 已修正 findings
+
+針對第三次 incremental review(HEAD `b379796`)的 4 個 P1 + 1 個 non-blocking label 以
+code + regression 修正:
+
+- **options 不再因缺 provenance fail-open**:`build_options_pressure` 進一步要求方向確認
+  必須有具名 `source` 且 as_of **新鮮**(`fresh`);`as_of=None` / `unknown_age`(無
+  reference_date)/ 缺 source 一律 `unavailable`,不會 fall through 成 confirmed_ok。
+- **valuation 改為重用 Decision Engine validator**:`valuation_approved` 不再自建較弱路徑,
+  改用 `src/decision/opportunity_ranker.validate_scenario`(current_price/as_of/source/
+  機率 (0,1] 且合計 100%/價格為正)+ `_scenario_market_anchor_errors`(current-price
+  drift ≤5%、as_of gap ≤3 天)+ Decision Engine 核准集合 + approval actor + 標的/thesis
+  identity。malformed band、current-price 不符、錯 symbol、機率不合、任意 truthy object 都
+  無法解鎖 add。
+- **composite breadth 用乾淨去重 underlying 宇宙**:新增 `breadth_universe()`(只含
+  THEME_CONSTITUENTS 單一成分股),runner 以此餵 `_market_trend_breadth`,排除
+  benchmark(SMH/SOXX/QQQ/SPY)與所有槓桿工具(避免同因子被 ETF/2x 重複計數),並公開
+  breadth 分母。
+- **walk-forward 排除 carry-in/carry-out partial trade**:trade ledger 標記 window 起點
+  就已持有的 carry-in trade 與 window 結束仍持有的 carry-out;clean `closed_trade_count`
+  只計「window 內完整開倉且平倉」的 trade,段界不再把一筆連續持有灌成多筆假 closed。
+- **label 誠實化(non-blocking)**:`proposed_size_multiplier` → `regime_exposure_cap_multiplier`,
+  明確標示這只是 regime 曝險上限倍數,尚未併入 ATR sizing / 當前曝險 / core-tactical 分層。
+
+## 12. 驗證
 
 ```bash
-python -m pytest -q                                   # 598 passed, 1 skipped
-python -m pytest -q tests/test_focus_*.py             # 131 focus 測試(含 round 2/3/4 regression)
+python -m pytest -q                                   # 603 passed, 1 skipped
+python -m pytest -q tests/test_focus_*.py             # 136 focus 測試(含 round 2/3/4/5 regression)
 python scripts/verify_agent_workflow_contract.py      # passed
 python scripts/agent_capability_watch.py --config .github/agent-capability-watch.json --offline  # ok
 ```

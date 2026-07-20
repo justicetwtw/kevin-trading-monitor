@@ -242,6 +242,7 @@ def _metrics(
     turnover: int,
     closed_trades: list[float],
     open_terminal_trade: float | None,
+    carry_in_trades: list[float],
 ) -> dict[str, Any]:
     if len(equity) < 2:
         return {"status": "insufficient_history"}
@@ -281,7 +282,9 @@ def _metrics(
     days_in_market = sum(in_market_flags)
 
     # Trade-level 口徑:由 run_strategy 的顯式 trade ledger 傳入(含 entry/rebalance/exit
-    # 成本,且已關閉的 trade 與尚未平倉的 terminal trade 分開)。只用「已關閉」的 trade 計統計。
+    # 成本)。只用「window 內完整開倉且平倉」的 clean closed trade 計統計 —— carry-in
+    # (window 前就持有)與 carry-out(window 結束仍持有)的 partial trade 一律排除,
+    # 避免 walk-forward 段界把一筆連續持有拆成多筆假 closed trade(finding P1 round 5)。
     t_wins = [r for r in closed_trades if r > 0]
     t_losses = [r for r in closed_trades if r < 0]
     trade_hit_rate = round(len(t_wins) / len(closed_trades), 4) if closed_trades else None
@@ -308,6 +311,8 @@ def _metrics(
         "trade_count": turnover,
         "closed_trade_count": len(closed_trades),
         "closed_trades": [round(x, 6) for x in closed_trades],
+        "carry_in_trade_count": len(carry_in_trades),
+        "carry_in_trades": [round(x, 6) for x in carry_in_trades],
         "open_terminal_trade": (round(open_terminal_trade, 6) if open_terminal_trade is not None else None),
         "has_open_terminal_trade": open_terminal_trade is not None,
         "daily_hit_rate": daily_hit_rate,
@@ -363,9 +368,14 @@ def run_strategy(
 
     # 顯式 trade ledger(finding P1 修正):以「持有→平倉」為一筆 trade,把 entry、
     # rebalance、exit 的成本都複利進「當筆」trade;平倉當根(倉位歸零、僅剩 exit 成本)
-    # 也計入該筆。尚未平倉的 terminal trade 另計 open_terminal_trade,不當成 closed。
+    # 也計入該筆。
+    #   - clean closed trade:在結算 window 內「完整開倉且平倉」→ 進 closed_trades(計統計)。
+    #   - carry-in:window 起點就已持有(訊號在暖身期開倉)→ 平倉時進 carry_in_trades,排除。
+    #   - carry-out:window 結束仍持有 → open_terminal_trade,不當 closed。
     closed_trades: list[float] = []
+    carry_in_trades: list[float] = []
     open_trade: float | None = None  # 進行中 trade 的複利 equity(1.0 起算)
+    open_is_carry_in = False
 
     for t in range(1, len(close)):
         prev_position = position
@@ -396,22 +406,27 @@ def run_strategy(
         if position > 0:
             # entry 或 hold/rebalance bar:報酬(含當根成本)累進進行中 trade。
             if open_trade is None:
+                # 若此 recorded window 的第一根就已持有(prev_position>0),代表這筆是
+                # 暖身期就開倉的 carry-in trade,而非 window 內的乾淨開倉。
                 open_trade = 1.0
+                open_is_carry_in = prev_position > 0
             open_trade *= (1.0 + day_ret)
         elif prev_position > 0:
             # exit bar:倉位歸零、day_ret 僅含 exit 成本 → 併入該筆 trade 後關閉。
             if open_trade is None:
                 open_trade = 1.0
+                open_is_carry_in = True  # 開倉在 window 之前,現在才平倉
             open_trade *= (1.0 + day_ret)
-            closed_trades.append(open_trade - 1.0)
+            (carry_in_trades if open_is_carry_in else closed_trades).append(open_trade - 1.0)
             open_trade = None
+            open_is_carry_in = False
         # 否則(flat bar):不屬於任何 trade,略過。
 
     open_terminal_trade = (open_trade - 1.0) if open_trade is not None else None
 
     result = _metrics(
         equity, strat_returns, in_market_flags, bench_returns, turnover,
-        closed_trades, open_terminal_trade,
+        closed_trades, open_terminal_trade, carry_in_trades,
     )
     result["equity_final"] = round(equity[-1], 6)
     if metrics_start_index is not None:
@@ -510,6 +525,10 @@ def walk_forward(
                 "max_drawdown": seg.get("max_drawdown"),
                 "time_in_market": seg.get("time_in_market"),
                 "trade_count": seg.get("trade_count"),
+                # clean = opened & closed inside this OOS window; carry-in/out excluded.
+                "closed_trade_count": seg.get("closed_trade_count"),
+                "carry_in_trade_count": seg.get("carry_in_trade_count"),
+                "has_open_terminal_trade": seg.get("has_open_terminal_trade"),
             }
         )
         start += test_bars

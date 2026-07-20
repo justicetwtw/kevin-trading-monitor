@@ -174,6 +174,34 @@ def test_options_pressure_confirmed_requires_direction_and_freshness():
     assert worse_res["status"] == "worsening"
 
 
+def test_options_pressure_requires_source_and_fresh_asof():
+    # finding P1 round 5: directional evidence with no source or no/unknown-age
+    # as_of must stay unavailable, not fall through to confirmed_ok.
+    from datetime import date
+
+    from src.focus.providers import build_options_pressure
+
+    directional = {"gamma_flip_proxy": 1.0, "put_skew_change_5d": -0.01, "as_of": "2026-07-18"}
+
+    # no source
+    no_src = build_options_pressure(directional, reference_date=date(2026, 7, 20))
+    assert no_src["status"] == "unavailable"
+    assert "options_source_missing" in no_src["reasons"]
+
+    # source present but no as_of → not fresh → unavailable
+    no_asof = build_options_pressure(
+        {"gamma_flip_proxy": 1.0, "put_skew_change_5d": -0.01, "source": "paid"},
+        reference_date=date(2026, 7, 20),
+    )
+    assert no_asof["status"] == "unavailable"
+
+    # source + as_of present but no reference_date → unknown age → unavailable (not confirmed)
+    unknown_age = build_options_pressure(
+        {"gamma_flip_proxy": 1.0, "put_skew_change_5d": -0.01, "source": "paid", "as_of": "2026-07-18"}
+    )
+    assert unknown_age["status"] == "unavailable"
+
+
 def test_composite_regime_low_vix_but_damaged_trend_escalates():
     # finding P1: a low VIX (calm base) must NOT keep the regime calm when both
     # leaders are below 200DMA and breadth is broken — escalate + cap exposure.
@@ -212,6 +240,30 @@ def test_composite_regime_unknown_when_no_evidence_fails_closed():
     comp = composite_market_regime(None, {}, {}, vix_available=False)
     assert comp["regime"] is None
     assert comp["exposure_cap"]["blocks_new_exposure"] is True
+
+
+def test_breadth_universe_excludes_benchmarks_and_leveraged():
+    # finding P1 round 5: breadth must use a clean, unique single-name universe —
+    # no benchmarks/ETF proxies, no leveraged/trading tools (which double-count factors).
+    from src.focus.universe import (
+        LEVERAGED_SINGLE_NAME,
+        PUBLIC_ETF_PROXIES,
+        THEME_CONSTITUENTS,
+        breadth_universe,
+    )
+
+    uni = breadth_universe()
+    assert len(uni) == len(set(uni))  # unique
+    for etf in PUBLIC_ETF_PROXIES:            # SMH/SOXX/QQQ/SPY excluded
+        assert etf not in uni
+    for lev in LEVERAGED_SINGLE_NAME:         # NVDL/MUU/TSLL/... excluded
+        assert lev not in uni
+    # every member is a declared clean constituent
+    all_constituents = {s for names in THEME_CONSTITUENTS.values() for s in names}
+    assert set(uni) == all_constituents
+    # the contaminated static_focus_symbols() would have been strictly larger
+    from src.focus.universe import static_focus_symbols
+    assert len(uni) < len(static_focus_symbols())
 
 
 def test_volatility_state_computes_regime_and_preserves_none_inversion(monkeypatch):

@@ -93,14 +93,25 @@ def test_fresh_price_but_missing_valuation_and_options_is_not_add_ready():
     assert card["add_allowed"] is False
 
 
-def _approved_valuation_evidence():
-    # Decision-grade valuation evidence: source + fresh as_of + coverage + value band.
+def _approved_valuation_evidence(symbol="NVDA", as_of="2026-07-18", current_price=102.0):
+    # Decision-grade valuation evidence: a source-backed probability scenario (validated
+    # by the Decision Engine validator) + approval actor + symbol/thesis identity.
+    # current_price must anchor to the security close (_ok_trend close == 102.0).
     return {
         "approval_status": "approved",
-        "source": "kevin_manual_review",
-        "as_of": "2026-07-10",
-        "coverage": 0.8,
-        "value_band": {"bear": 90.0, "base": 130.0, "bull": 170.0},
+        "approved_by": "kevin",
+        "symbol": symbol,
+        "thesis_id": "nvda-ai-compute-2026",
+        "scenario": {
+            "current_price": current_price,
+            "as_of": as_of,
+            "source": "kevin_manual_review",
+            "cases": [
+                {"name": "bear", "probability": 0.25, "price": 80.0},
+                {"name": "base", "probability": 0.50, "price": 130.0},
+                {"name": "bull", "probability": 0.25, "price": 180.0},
+            ],
+        },
     }
 
 
@@ -143,16 +154,12 @@ def test_bare_approved_string_without_evidence_cannot_add():
 
 
 def test_stale_valuation_evidence_cannot_add():
-    # Approved status but the supporting evidence as_of is far stale → blocked.
+    # Approved status but the supporting scenario as_of is far stale → blocked.
     trend = _ok_trend()
     fresh_bench = {"status": "fresh", "as_of": "2026-07-18", "age_days": 2}
     confirmed = {"status": "confirmed_ok", "downside_pressure_worsening": False,
                  "downside_pressure_confirmed_ok": True}
-    stale_evidence = {
-        "approval_status": "approved", "source": "kevin_manual_review",
-        "as_of": "2026-01-01", "coverage": 0.8,   # >45d before 2026-07-20
-        "value_band": {"bear": 90.0, "base": 130.0, "bull": 170.0},
-    }
+    stale_evidence = _approved_valuation_evidence(as_of="2026-01-01")  # >45d before 2026-07-20
     card = build_focus_card(
         "NVDA", trend, thesis_state="intact",
         valuation_status="approved", valuation_evidence=stale_evidence,
@@ -162,6 +169,57 @@ def test_stale_valuation_evidence_cannot_add():
     assert card["valuation_decision_grade"] is False
     assert "valuation_not_approved" in card["readiness_blockers"]
     assert card["add_allowed"] is False
+
+
+def test_valuation_evidence_adversarial_cannot_unlock_add():
+    # finding P1 round 5: reuse the Decision Engine scenario validator — malformed
+    # bands, current-price mismatch, wrong symbol, invalid probabilities and an
+    # arbitrary truthy object must all fail to unlock add.
+    from src.focus.payload import valuation_approved
+
+    ref = date(2026, 7, 20)
+    close = 102.0
+
+    def _ok():
+        return _approved_valuation_evidence()
+
+    # sanity: the well-formed evidence is approved
+    assert valuation_approved(_ok(), ref, symbol="NVDA", current_price=close,
+                              market_as_of="2026-07-18")["approved"] is True
+
+    # arbitrary truthy object (old weak shape) → scenario missing
+    weak = {"approval_status": "approved", "approved_by": "kevin", "symbol": "NVDA",
+            "thesis_id": "t", "value_band": True}
+    assert valuation_approved(weak, ref, symbol="NVDA", current_price=close)["approved"] is False
+
+    # current-price mismatch (scenario anchored at 300 vs security close 102) → stale anchor
+    mism = _approved_valuation_evidence(current_price=300.0)
+    r = valuation_approved(mism, ref, symbol="NVDA", current_price=close, market_as_of="2026-07-18")
+    assert r["approved"] is False
+    assert "scenario_price_anchor_stale" in r["reasons"]
+
+    # wrong symbol identity
+    wrong_sym = _approved_valuation_evidence(symbol="AMD")
+    r = valuation_approved(wrong_sym, ref, symbol="NVDA", current_price=close, market_as_of="2026-07-18")
+    assert r["approved"] is False
+    assert "valuation_symbol_mismatch" in r["reasons"]
+
+    # invalid probabilities (do not sum to 1)
+    badp = _approved_valuation_evidence()
+    badp["scenario"]["cases"] = [
+        {"name": "bear", "probability": 0.5, "price": 80.0},
+        {"name": "bull", "probability": 0.9, "price": 180.0},
+    ]
+    r = valuation_approved(badp, ref, symbol="NVDA", current_price=close, market_as_of="2026-07-18")
+    assert r["approved"] is False
+    assert any("probabilit" in reason for reason in r["reasons"])
+
+    # missing approval actor
+    no_actor = _approved_valuation_evidence()
+    no_actor.pop("approved_by")
+    r = valuation_approved(no_actor, ref, symbol="NVDA", current_price=close, market_as_of="2026-07-18")
+    assert r["approved"] is False
+    assert "valuation_approval_actor_missing" in r["reasons"]
 
 
 def test_options_unavailable_keeps_wait_for_proof():
@@ -218,7 +276,7 @@ def test_stress_regime_exposure_cap_blocks_add():
     )
     assert "market_regime_caps_exposure" in card["readiness_blockers"]
     assert card["add_allowed"] is False
-    assert card["proposed_size_multiplier"] == 0.0
+    assert card["regime_exposure_cap_multiplier"] == 0.0
 
 
 def test_elevated_regime_materially_reduces_proposed_size():
@@ -238,7 +296,7 @@ def test_elevated_regime_materially_reduces_proposed_size():
         market_exposure_cap=elevated,
     )
     assert card["add_allowed"] is True
-    assert card["proposed_size_multiplier"] == 0.5  # materially reduced vs 1.0
+    assert card["regime_exposure_cap_multiplier"] == 0.5  # materially reduced vs 1.0
 
 
 def test_elevated_regime_reduces_leveraged_gross_further():
@@ -257,4 +315,4 @@ def test_elevated_regime_reduces_leveraged_gross_further():
         benchmark_freshness=fresh_bench, reference_date=date(2026, 7, 20),
         market_exposure_cap=elevated,
     )
-    assert card["proposed_size_multiplier"] == 0.25  # 0.5 / 2x leverage
+    assert card["regime_exposure_cap_multiplier"] == 0.25  # 0.5 / 2x leverage
