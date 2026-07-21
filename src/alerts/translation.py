@@ -260,8 +260,9 @@ class GeminiTranslator:
     """Thin Gemini adapter behind the provider-neutral ``Translator`` contract.
 
     The fixed injection-resistant system instruction is always sent separately
-    from the post text, which is passed only as delimited data. ``generate_fn``
-    is injectable for deterministic testing without the live SDK.
+    from the post text, which is passed only as a collision-safe JSON data
+    field. ``generate_fn`` is injectable for deterministic testing without the
+    live SDK.
     """
 
     name = "gemini"
