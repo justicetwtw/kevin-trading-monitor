@@ -117,13 +117,23 @@ class UsOpenDeliveryStore:
             ) from exc
         if not isinstance(data, dict):
             raise StateReadError(f"{self.path} is not a JSON object")
+        schema = data.get("schema_version", STATE_SCHEMA_VERSION)
+        if not isinstance(schema, int) or schema > STATE_SCHEMA_VERSION:
+            # An unsupported/newer schema must not be interpreted as empty.
+            raise StateReadError(
+                f"{self.path} has unsupported schema_version {schema!r}"
+            )
+        # A present file must carry a valid `sessions` object. A missing or
+        # wrong-typed `sessions` (e.g. `[]`) is structurally corrupt and must
+        # fail closed, never be silently replaced with an empty map that could
+        # erase a prior sent record and license a duplicate send. Only a truly
+        # *missing file* (handled above) is a legitimate empty state.
         sessions = data.get("sessions")
         if not isinstance(sessions, dict):
-            sessions = {}
-        return {
-            "schema_version": data.get("schema_version", STATE_SCHEMA_VERSION),
-            "sessions": sessions,
-        }
+            raise StateReadError(
+                f"{self.path} has a missing/invalid 'sessions' object"
+            )
+        return {"schema_version": schema, "sessions": sessions}
 
     def _write_raw(self, data: dict[str, Any]) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -299,12 +309,38 @@ def _parse_iso_date(value: Any) -> date | None:
         return None
 
 
-def record_attempt(record: dict, outcome: str, stage_code: str | None) -> None:
-    """Append a compact, bounded attempt-outcome entry for durable telemetry."""
+def record_attempt(
+    record: dict,
+    outcome: str,
+    stage_code: str | None,
+    *,
+    at: str | None = None,
+    workflow_run_id: str | None = None,
+    schedule_source: str | None = None,
+    workflow_started_at: str | None = None,
+    status: str | None = None,
+    lateness_minutes: int | None = None,
+) -> None:
+    """Append a compact, bounded, *attributable* attempt entry.
+
+    Each entry carries public-safe timing/run/source fields so that after a
+    late success the state shows which watchdog ran, when, from which schedule,
+    and how it resolved — the incident-analysis the feature exists for. Never
+    includes Telegram content, chat IDs, tokens or portfolio data.
+    """
     log = record.get("observed_attempts")
     if not isinstance(log, list):
         log = []
-    log.append({"outcome": outcome, "stage_code": stage_code})
+    log.append({
+        "at": at,
+        "outcome": outcome,
+        "stage_code": stage_code,
+        "status": status,
+        "lateness_minutes": lateness_minutes,
+        "workflow_run_id": workflow_run_id,
+        "schedule_source": schedule_source,
+        "workflow_started_at": workflow_started_at,
+    })
     record["observed_attempts"] = log[-MAX_ATTEMPT_LOG:]
 
 

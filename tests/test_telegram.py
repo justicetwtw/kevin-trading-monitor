@@ -95,6 +95,24 @@ def test_detailed_timeout_is_ambiguous():
     assert result["outcome"] == "ambiguous"
 
 
+def test_detailed_sensitive_keeps_body_out_of_logs():
+    """The us_open runner sends with sensitive=True; body must not reach logs."""
+    from loguru import logger
+
+    captured = []
+    sink_id = logger.add(captured.append, level="INFO", format="{message}")
+    try:
+        patcher, _ = _patch_httpx(post_status_code=200)
+        with patcher:
+            notifier = TelegramNotifier(token="t", chat_ids=["111"])
+            notifier.send_message_detailed("SUPER-SECRET-BODY-42", sensitive=True)
+    finally:
+        logger.remove(sink_id)
+    blob = "".join(str(m) for m in captured)
+    assert "SUPER-SECRET-BODY-42" not in blob
+    assert "redacted" in blob.lower()
+
+
 def test_detailed_partial_delivery_is_ambiguous():
     """Some recipients delivered, others rejected: ambiguous (message went out)."""
     responses = [

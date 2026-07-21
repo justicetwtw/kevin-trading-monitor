@@ -89,27 +89,37 @@ def _generate_body(brief_type: str) -> str:
 
 
 def _send_detailed(message: str) -> dict:
-    """Tri-state Telegram send: {'outcome': 'sent'|'failed'|'ambiguous', ...}."""
+    """Tri-state Telegram send: {'outcome': 'sent'|'failed'|'ambiguous', ...}.
+
+    ``sensitive=True`` keeps the brief body (which may include portfolio health
+    and translated content) out of the public Actions logs.
+    """
     from src.alerts.telegram_bot import send_telegram_detailed
 
     # The opening brief is a foreground notification (never silent).
     return send_telegram_detailed(
-        message, parse_mode="HTML", disable_notification=False
+        message, parse_mode="HTML", disable_notification=False, sensitive=True
     )
 
 
-def _durable_push(message: str) -> bool:
-    """Commit + push the delivery state to shared state (main) mid-run.
+# Durable-push outcomes.
+PUSH_DISABLED = "disabled"  # durable mode off (local/tests): rely on commit-state
+PUSH_OK = "pushed"  # claim is durable on shared state
+PUSH_FAILED = "failed"  # durable mode on but the claim could not be persisted
 
-    Enabled only in CI (``US_OPEN_DURABLE_STATE=1``); a no-op locally/in tests,
-    where the trailing ``commit-state`` step provides durability. Used to make
-    the *claim* durable before the outbound send so a post-send crash surfaces
-    ambiguity instead of licensing a duplicate. Best-effort: a transient push
-    failure still leaves the commit for the trailing ``commit-state`` to flush,
-    so a git hiccup never blocks the brief.
+
+def _durable_push(message: str) -> str:
+    """Commit + push the delivery state to shared state (main) before the send.
+
+    Returns ``PUSH_DISABLED`` when durable mode is off (a no-op used locally / in
+    tests, where the trailing ``commit-state`` provides durability), ``PUSH_OK``
+    when the claim is durable on shared state, or ``PUSH_FAILED`` when durable
+    mode is on but the claim could not be persisted. A ``PUSH_FAILED`` is a hard
+    pre-send failure in the caller: the trailing ``commit-state`` cannot
+    retroactively satisfy "durable before send".
     """
     if os.getenv("US_OPEN_DURABLE_STATE") != "1":
-        return False
+        return PUSH_DISABLED
     import subprocess
     import time
 
@@ -128,20 +138,30 @@ def _durable_push(message: str) -> bool:
     )
     _git("add", str(STATE_PATH))
     if _git("diff", "--staged", "--quiet").returncode == 0:
-        return False  # nothing to persist
+        # Nothing to commit means the claim is already on shared state (durable).
+        return PUSH_OK
     _git("commit", "-m", message)
     for attempt in range(1, 5):
         _git("pull", "--rebase", "origin", branch)
         if _git("push", "origin", f"HEAD:{branch}").returncode == 0:
-            return True
+            return PUSH_OK
         time.sleep(attempt * 2)
-    logger.error("us_open durable claim push failed; leaving for commit-state")
-    return False
+    logger.error("us_open durable claim push failed; not sending without a claim")
+    return PUSH_FAILED
 
 
-def _telemetry_only(store, record, outcome, stage_code) -> None:
-    """Append a durable attempt entry to an existing record without re-sending."""
-    record_attempt(record, outcome, stage_code)
+def _telemetry_only(store, record, outcome, stage_code, env, *,
+                    status=None, lateness=None) -> None:
+    """Append an attributable attempt entry and persist, without (re)sending."""
+    record_attempt(
+        record, outcome, stage_code,
+        at=_now_taipei().isoformat(),
+        workflow_run_id=env["workflow_run_id"],
+        schedule_source=env["schedule_source"],
+        workflow_started_at=env.get("workflow_started_at"),
+        status=status,
+        lateness_minutes=lateness,
+    )
     store.upsert(record)
 
 
@@ -173,8 +193,10 @@ def main() -> int:
 
     delivery_action = resolve_delivery_action(existing)
 
+    lateness = decision.lateness_minutes
+
     def _fresh(delivery_state, status=None, lateness=None):
-        return new_record(
+        record = new_record(
             session,
             status=status,
             lateness_minutes=lateness,
@@ -184,6 +206,12 @@ def main() -> int:
             runner_started_at=runner_started.isoformat(),
             delivery_state=delivery_state,
         )
+        # Carry the bounded attempt history forward across every state
+        # transition so an early wrong-DST attempt or a prior failed attempt
+        # remains visible after a later attempt sends.
+        if existing and isinstance(existing.get("observed_attempts"), list):
+            record["observed_attempts"] = list(existing["observed_attempts"])
+        return record
 
     # Before the open: durable "observing" telemetry, then wait for a later
     # attempt. Never overwrite a claim/sent/failed/ambiguous record.
@@ -195,13 +223,13 @@ def main() -> int:
         ):
             record = dict(existing) if existing else _fresh(DELIVERY_OBSERVING)
             record["delivery_state"] = DELIVERY_OBSERVING
-            _telemetry_only(store, record, "early", None)
+            _telemetry_only(store, record, "early", None, env)
         logger.info(f"us_open early: {decision.reason}")
         return 0
 
     # Already delivered this session: durable telemetry, no resend (green).
     if delivery_action == DO_SKIP_DUPLICATE:
-        _telemetry_only(store, dict(existing), "duplicate", None)
+        _telemetry_only(store, dict(existing), "duplicate", None, env)
         logger.info(
             f"us_open already delivered {session.session_key}; skip duplicate"
         )
@@ -211,7 +239,7 @@ def main() -> int:
     # (contract section 6 — not green while delivery is in doubt).
     if delivery_action == DO_SKIP_AMBIGUOUS:
         _telemetry_only(
-            store, dict(existing), "ambiguous_repeat", "ambiguous_delivery"
+            store, dict(existing), "ambiguous_repeat", "ambiguous_delivery", env
         )
         logger.warning(
             f"us_open {session.session_key} still ambiguous; not resending, "
@@ -225,7 +253,9 @@ def main() -> int:
         record = dict(existing)
         record["delivery_state"] = DELIVERY_AMBIGUOUS
         record["stage_code"] = "ambiguous_delivery"
-        _telemetry_only(store, record, "ambiguous_from_claim", "ambiguous_delivery")
+        _telemetry_only(
+            store, record, "ambiguous_from_claim", "ambiguous_delivery", env
+        )
         logger.error(
             f"us_open {session.session_key}: prior claim unresolved; "
             "marking ambiguous_delivery and not auto-duplicating"
@@ -240,26 +270,22 @@ def main() -> int:
             record = dict(existing)
             record["status"] = STATUS_EXPIRED
             _telemetry_only(
-                store,
-                record,
-                "expired_after_failure",
-                record.get("stage_code") or "telegram_send_failed",
+                store, record, "expired_after_failure",
+                record.get("stage_code") or "telegram_send_failed", env,
+                status=STATUS_EXPIRED, lateness=lateness,
             )
         else:
             record = _fresh(
-                DELIVERY_SKIPPED,
-                status=STATUS_EXPIRED,
-                lateness=decision.lateness_minutes,
+                DELIVERY_SKIPPED, status=STATUS_EXPIRED, lateness=lateness
             )
             record["stage_code"] = "schedule_delay"
-            if existing:
-                record["observed_attempts"] = existing.get(
-                    "observed_attempts", []
-                )
-            _telemetry_only(store, record, "expired_miss", "schedule_delay")
+            _telemetry_only(
+                store, record, "expired_miss", "schedule_delay", env,
+                status=STATUS_EXPIRED, lateness=lateness,
+            )
         logger.warning(
             f"us_open {session.session_key} expired "
-            f"(+{decision.lateness_minutes}m, session closed); recorded miss"
+            f"(+{lateness}m, session closed); recorded miss"
         )
         return 1
 
@@ -268,26 +294,39 @@ def main() -> int:
         return 1
 
     # ACTION_SEND (proceed / retry): generate -> claim durably -> send.
-    record = _fresh(
-        "claimed", status=decision.status, lateness=decision.lateness_minutes
-    )
+    record = _fresh("claimed", status=decision.status, lateness=lateness)
     record["generation_started_at"] = _now_taipei().isoformat()
     try:
         body = _generate_body(body_brief_type(decision.status))
     except Exception as exc:  # noqa: BLE001 - generation must fail closed
         record["delivery_state"] = DELIVERY_FAILED
         record["stage_code"] = "generation_failed"
-        _telemetry_only(store, record, "generation_failed", "generation_failed")
+        _telemetry_only(store, record, "generation_failed", "generation_failed",
+                        env, status=decision.status, lateness=lateness)
         logger.error(f"us_open generation failed: {type(exc).__name__}")
         return 1
 
     record["generation_finished_at"] = _now_taipei().isoformat()
     message = render_us_open_message(body, decision)
 
-    # Persist the claim locally and durably push it BEFORE the outbound send,
-    # so the only unresolved-'claimed' window is a crash during the send itself.
+    # Persist the claim locally and durably push it BEFORE the outbound send.
     store.upsert(record)
-    _durable_push(f"us_open claim {session.session_key} [skip ci]")
+    push = _durable_push(f"us_open claim {session.session_key} [skip ci]")
+    if push == PUSH_FAILED:
+        # Durable mode is on but the claim could not be persisted to shared
+        # state. Sending now would risk a duplicate (a later attempt would see
+        # no claim). Fail closed BEFORE Telegram; the trailing commit-state
+        # cannot retroactively satisfy "durable before send".
+        record["delivery_state"] = DELIVERY_FAILED
+        record["stage_code"] = "claim_persist_failed"
+        _telemetry_only(store, record, "claim_persist_failed",
+                        "claim_persist_failed", env,
+                        status=decision.status, lateness=lateness)
+        logger.error(
+            f"us_open claim not durably persisted for {session.session_key}; "
+            "not sending (retryable in-window)"
+        )
+        return 1
 
     outcome = _send_detailed(message)
     result = outcome.get("outcome")
@@ -296,10 +335,11 @@ def main() -> int:
         record["delivery_state"] = DELIVERY_SENT
         record["sent_at"] = _now_taipei().isoformat()
         record["stage_code"] = None
-        _telemetry_only(store, record, "sent", None)
+        _telemetry_only(store, record, "sent", None, env,
+                        status=decision.status, lateness=lateness)
         logger.info(
             f"us_open delivered {session.session_key} status={decision.status} "
-            f"lateness={decision.lateness_minutes}m"
+            f"lateness={lateness}m"
         )
         return 0
 
@@ -308,7 +348,8 @@ def main() -> int:
         # auto-retry; surface ambiguity so it is not silently duplicated.
         record["delivery_state"] = DELIVERY_AMBIGUOUS
         record["stage_code"] = "ambiguous_delivery"
-        _telemetry_only(store, record, "send_ambiguous", "ambiguous_delivery")
+        _telemetry_only(store, record, "send_ambiguous", "ambiguous_delivery",
+                        env, status=decision.status, lateness=lateness)
         logger.error(
             f"us_open send ambiguous for {session.session_key} "
             f"(delivered {outcome.get('delivered')}/{outcome.get('total')}); "
@@ -319,7 +360,8 @@ def main() -> int:
     # Definitive rejection: certainly not delivered; retryable in-window.
     record["delivery_state"] = DELIVERY_FAILED
     record["stage_code"] = "telegram_send_failed"
-    _telemetry_only(store, record, "send_failed", "telegram_send_failed")
+    _telemetry_only(store, record, "send_failed", "telegram_send_failed", env,
+                    status=decision.status, lateness=lateness)
     logger.error(
         f"us_open send failed for {session.session_key} "
         f"(status={decision.status}); state=failed, retryable in-window"

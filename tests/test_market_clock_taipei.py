@@ -119,6 +119,8 @@ def test_us_open_moved_to_isolated_dedicated_workflow():
     start_idx = us_open.index("US_OPEN_WORKFLOW_STARTED_AT")
     install_idx = us_open.index("Install dependencies")
     assert start_idx < install_idx
+    # a hung run must not starve backups: the job is time-bounded.
+    assert "timeout-minutes:" in us_open
 
 
 def test_tuesday_late_sanity_checks_overnight_and_local_briefs():

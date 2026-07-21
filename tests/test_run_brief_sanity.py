@@ -162,6 +162,14 @@ def test_us_open_missing_in_both_states_is_flagged(tmp_dedup):
     assert sent.get("us_open") is not True
 
 
+def test_us_open_corrupt_state_degrades_without_crashing(tmp_dedup):
+    """A corrupt us_open delivery state must not crash the sanity check."""
+    rbs.US_OPEN_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    rbs.US_OPEN_STATE_PATH.write_text('{"sessions": []}', encoding="utf-8")
+    sent = rbs._load_sent_today()  # must not raise
+    assert sent.get("us_open") is not True  # reported as not-delivered (degraded)
+
+
 def test_main_sends_alert_when_missing(tmp_dedup, monkeypatch):
     """Friday late sanity reports every missing brief, including us_midday."""
     friday = _taipei(2026, 5, 8, 23, 45)

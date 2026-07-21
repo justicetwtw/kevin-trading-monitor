@@ -49,8 +49,8 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setenv("GITHUB_RUN_ID", "run-42")
     monkeypatch.delenv("US_OPEN_WORKFLOW_STARTED_AT", raising=False)
     monkeypatch.setattr(rub, "_generate_body", lambda bt: _LEGACY_BODY)
-    # Durable push is a CI-only git op; keep it inert and observable in tests.
-    monkeypatch.setattr(rub, "_durable_push", lambda msg: False)
+    # Durable push is a CI-only git op; default to the disabled (local) no-op.
+    monkeypatch.setattr(rub, "_durable_push", lambda msg: rub.PUSH_DISABLED)
     return state_path
 
 
@@ -333,6 +333,31 @@ def test_corrupt_state_fails_closed_without_sending(env, monkeypatch):
     assert env.read_text(encoding="utf-8") == "{not valid json"
 
 
+def test_structurally_corrupt_sessions_fails_closed(env, monkeypatch):
+    # Parseable JSON but a wrong-typed `sessions` must not be read as empty.
+    env.write_text('{"schema_version": 1, "sessions": []}', encoding="utf-8")
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
+
+    rc = rub.main()
+
+    assert rc == 1
+    assert env.read_text(encoding="utf-8") == '{"schema_version": 1, "sessions": []}'
+
+
+def test_durable_claim_push_failure_is_red_and_does_not_send(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    monkeypatch.setattr(rub, "_durable_push", lambda msg: rub.PUSH_FAILED)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
+
+    rc = rub.main()
+
+    assert rc == 1  # a claim that isn't durable must not send (dup risk)
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_FAILED
+    assert rec["stage_code"] == "claim_persist_failed"
+
+
 # --- ordering / durability / regeneration / privacy -------------------------
 
 def test_claim_is_durably_pushed_before_send(env, monkeypatch):
@@ -370,6 +395,42 @@ def test_body_is_regenerated_at_execution_time(env, monkeypatch):
     rub.main()
 
     assert calls["n"] == 1
+
+
+def test_telemetry_carries_forward_early_then_send(env, monkeypatch):
+    # 1) an early (pre-open) attempt records durable observing telemetry
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 0))
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
+    rub.main()
+    assert _read(env)["delivery_state"] == DELIVERY_OBSERVING
+
+    # 2) the on-time send must not erase the earlier attempt from history
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    rub.main()
+
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_SENT
+    outcomes = [a["outcome"] for a in rec["observed_attempts"]]
+    assert "early" in outcomes and "sent" in outcomes
+    # every entry is independently attributable with public-safe fields
+    for a in rec["observed_attempts"]:
+        assert "at" in a and "workflow_run_id" in a and "schedule_source" in a
+
+
+def test_telemetry_carries_forward_failed_then_sent(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    monkeypatch.setattr(rub, "_send_detailed", _sender("failed", delivered=0))
+    rub.main()
+    assert _read(env)["delivery_state"] == DELIVERY_FAILED
+
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 35))
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
+    rub.main()
+
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_SENT
+    outcomes = [a["outcome"] for a in rec["observed_attempts"]]
+    assert "send_failed" in outcomes and "sent" in outcomes  # failure stays visible
 
 
 def test_public_state_leaks_no_message_or_secret(env, monkeypatch):

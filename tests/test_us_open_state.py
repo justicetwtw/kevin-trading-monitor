@@ -245,6 +245,23 @@ def test_missing_file_is_empty_not_corrupt(tmp_path):
     assert store.get("us_open:2026-07-20") is None  # legitimate empty
 
 
+def test_structurally_corrupt_sessions_fails_closed(tmp_path):
+    """Parseable JSON with a wrong-typed `sessions` must not read as empty."""
+    path = tmp_path / "us_open_delivery_state.json"
+    path.write_text('{"schema_version": 1, "sessions": []}', encoding="utf-8")
+    store = UsOpenDeliveryStore(path)
+    with pytest.raises(StateReadError):
+        store.get("us_open:2026-07-20")
+
+
+def test_unsupported_schema_fails_closed(tmp_path):
+    path = tmp_path / "us_open_delivery_state.json"
+    path.write_text('{"schema_version": 99, "sessions": {}}', encoding="utf-8")
+    store = UsOpenDeliveryStore(path)
+    with pytest.raises(StateReadError):
+        store.get("us_open:2026-07-20")
+
+
 def test_write_is_atomic_leaves_no_temp_file(tmp_path):
     store = _store(tmp_path)
     store.upsert(_record(_session(2026, 7, 20, 21, 32)))

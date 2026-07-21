@@ -37,6 +37,11 @@ permissions:
 jobs:
   us_open:
     runs-on: ubuntu-latest
+    # Bound the whole job well below the watchdog spacing so a hung
+    # checkout/install/generate/send cannot hold the concurrency group and
+    # starve later backups: a hang releases the group within this window and
+    # the next staggered attempt still recovers the session.
+    timeout-minutes: 8
     steps:
       - name: Record workflow start (before setup — separates queue vs setup delay)
         run: |
@@ -49,10 +54,12 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
       - name: Install dependencies
+        timeout-minutes: 5
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run U.S. open brief (session-aware, delay-resilient)
+        timeout-minutes: 5
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

@@ -16,6 +16,7 @@ from src.config.settings import TIMEZONE_USER
 from src.runners.us_open_state import (
     DELIVERY_SENT,
     STATE_PATH as US_OPEN_STATE_PATH,
+    StateReadError,
     UsOpenDeliveryStore,
 )
 
@@ -47,9 +48,15 @@ def _load_sent_today() -> dict:
 
     # us_open moved to the dedicated SLA delivery state. Treat it as sent when
     # either the new session-keyed store or the legacy boolean says so (the ET
-    # session date equals today's Taipei date at the open).
+    # session date equals today's Taipei date at the open). A corrupt delivery
+    # state must not crash the sanity check: leave us_open unmarked so it is
+    # reported as a degraded/missing delivery rather than swallowing the error.
     store = UsOpenDeliveryStore(US_OPEN_STATE_PATH, legacy_path=None)
-    record = store.get(f"us_open:{today_str}")
+    try:
+        record = store.get(f"us_open:{today_str}")
+    except StateReadError as exc:
+        logger.error(f"us_open delivery state unreadable ({exc}); reporting degraded")
+        record = None
     if record and record.get("delivery_state") == DELIVERY_SENT:
         sent["us_open"] = True
     return sent
