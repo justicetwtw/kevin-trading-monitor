@@ -139,40 +139,55 @@ _SCALE_CJK_MULT = {
     "百": 100, "千": 1000, "萬": 10 ** 4, "万": 10 ** 4,
     "億": 10 ** 8, "亿": 10 ** 8, "兆": 10 ** 12,
 }
-# Direction / negation markers, English source and accepted zh-TW equivalents.
-_SRC_UP_RE = re.compile(
-    r"(?<![\d.])\+\s?\d|\b(?:up|rise|rises|rose|risen|gain|gains|gained|"
-    r"increase|increases|increased|grow|grows|grew|surge|surged|jump|jumped|"
-    r"higher|climb|climbed)\b",
+# Direction words (English + zh-TW) used to tag a nearby quantity's polarity and
+# to build standalone directional claims. Bare "up"/"down" appear here (used only
+# next to a number) but NOT in the claim regexes below (too ambiguous in prose).
+_UPWORD_RE = re.compile(
+    r"\b(?:up|higher|rise|rises|rose|risen|gain|gains|gained|increase|increases|"
+    r"increased|grow|grows|grew|surge|surged|jump|jumped|climb|climbed|soar|"
+    r"soared|rally|rallied)\b|上漲|上升|上調|調升|提升|增加|提高|成長|走高|攀升|"
+    r"走揚|上揚|漲|升",
     re.IGNORECASE,
 )
-_SRC_DOWN_RE = re.compile(
-    r"(?<![\d.])[\-−]\s?\d|\b(?:down|fall|falls|fell|fallen|drop|drops|dropped|"
-    r"decrease|decreases|decreased|decline|declines|declined|plunge|plunged|"
-    r"lower|cut|cuts|sink|sank|tumble|tumbled)\b",
+_DOWNWORD_RE = re.compile(
+    r"\b(?:down|lower|fall|falls|fell|fallen|drop|drops|dropped|decrease|"
+    r"decreases|decreased|decline|declines|declined|plunge|plunged|sink|sank|"
+    r"tumble|tumbled|slump|slumped|cut|cuts|crash|crashed)\b|下跌|下降|下調|調降|"
+    r"減少|降低|下滑|衰退|縮減|走低|下修|跌",
     re.IGNORECASE,
 )
-_SRC_NEG_RE = re.compile(
+# Directional motion VERBS only, for standalone claim extraction. Noun-ambiguous
+# words (increase/growth/成長/增加/提高/減少) are deliberately excluded to avoid
+# asymmetric double-counting; they are still tagged onto an adjacent quantity.
+_CLAIM_UP_RE = re.compile(
+    r"\b(?:rise|rises|rose|risen|surge|surges|surged|jump|jumps|jumped|climb|"
+    r"climbs|climbed|soar|soars|soared|rally|rallies|rallied)\b|"
+    r"上漲|上升|攀升|走高|上揚",
+    re.IGNORECASE,
+)
+_CLAIM_DOWN_RE = re.compile(
+    r"\b(?:fall|falls|fell|fallen|drop|drops|dropped|decline|declines|declined|"
+    r"plunge|plunges|plunged|sink|sinks|sank|tumble|tumbles|tumbled|slump|"
+    r"slumps|slumped|crash|crashes|crashed)\b|下跌|下降|下滑|走低|重挫",
+    re.IGNORECASE,
+)
+_NEG_RE = re.compile(
     r"\b(?:not|no|never|without|cannot|can't|won't|wont|don't|dont|doesn't|"
-    r"didn't|isn't|aren't|neither|nor|none|deny|denies|denied|refuse|refuses)\b",
+    r"didn't|isn't|aren't|neither|nor|none|deny|denies|denied|refuse|refuses|"
+    r"refused)\b|不|未|無|沒有|沒|並非|否認|拒絕|勿|毫無",
     re.IGNORECASE,
 )
-_ZH_UP_RE = re.compile(
-    r"\+\s?\d|上漲|上升|增加|提高|成長|走高|攀升|漲|升|擴大|走揚|上揚"
+# Clause delimiters (punctuation + coordinating conjunctions, English + zh-TW).
+# Direction/negation are scoped to a clause so a marker never binds across it.
+_CLAUSE_DELIM_RE = re.compile(
+    r"[，。；;,.:!?、\n]|\b(?:while|and|but|or|whereas|although|though|yet)\b|"
+    r"而|但|並且|以及|然而|同時",
+    re.IGNORECASE,
 )
-_ZH_DOWN_RE = re.compile(
-    r"(?<![\d.])[\-−]\s?\d|下跌|下降|減少|降低|下滑|衰退|縮減|走低|下修|調降|跌|負"
-)
-_ZH_NEG_RE = re.compile(r"不|未|無|沒有|沒|並非|非|否認|拒絕|別|勿|毫無")
-# Currency / percentage source and accepted-marker forms.
-_USD_SRC_RE = re.compile(r"\$|\bUSD\b|\bdollars?\b", re.IGNORECASE)
-_USD_MARK_RE = re.compile(r"美元|美金|\$|\bUSD\b|\bdollars?\b", re.IGNORECASE)
-_FOREIGN_CURRENCY_RE = re.compile(
-    r"日圓|日元|歐元|英鎊|人民幣|韓元|韓圜|港幣|港元|盧布|盧比|加元|澳元|瑞郎|"
-    r"新台幣|新臺幣|台幣"
-)
-_PCT_SRC_RE = re.compile(r"%|％|\bpercent\b|\bpercentage\b|\bpct\b", re.IGNORECASE)
-_PERCENT_MARK_RE = re.compile(r"%|％|百分|趴|個百分點")
+# Currency / percentage markers used to type a quantity by its adjacent context.
+_USD_AFTER_RE = re.compile(r"(?:美元|美金|dollars?|usd)\b", re.IGNORECASE)
+_USD_BEFORE_RE = re.compile(r"(?:USD|dollars?)\s*$", re.IGNORECASE)
+_PCT_AFTER_RE = re.compile(r"(?:percent|percentage|pct)\b", re.IGNORECASE)
 _UPPER_WORD_RE = re.compile(r"\b[A-Z]{2,6}\b")
 # All-caps English that is also a ticker symbol but is overwhelmingly prose in a
 # Trump post; never treat these as bare tickers (cashtags like $ALL still count).
@@ -224,14 +239,71 @@ def _known_tickers() -> frozenset:
     return cached
 
 
-def _extract_value_tokens(text: str) -> tuple[Counter, str]:
-    """Typed multiset of URLs, dates (y, m, d) and exact numeric values.
+def _quantity_type(before: str, after: str) -> str:
+    """Classify a number by its adjacent context: percent, USD currency, or bare.
 
-    Returns the token multiset and the URL/date-stripped working text (used for
-    polarity checks so an ISO date's own hyphen is never read as a minus sign).
-    Extraction order removes each matched span before the next pattern so a
-    URL's or date's own digits are never re-counted as bare numbers. Scale-word
-    magnitudes and ordinals are skipped.
+    The unit travels with the value, so a value cannot silently change units
+    (25% -> 25 美元) or a currency swap another value's slot.
+    """
+    tail = after.lstrip()
+    head = before.rstrip()
+    if tail[:1] in ("%",) or _PCT_AFTER_RE.match(tail) or head.endswith("百分之") or (
+        "百分之" in before[-5:]
+    ):
+        return "percent"
+    if (
+        head[-1:] == "$"
+        or tail[:2] in ("美元", "美金")
+        or _USD_AFTER_RE.match(tail)
+        or _USD_BEFORE_RE.search(before)
+    ):
+        return "currency_usd"
+    return "number"
+
+
+def _clause_start(text: str, pos: int) -> int:
+    """Index just after the last clause delimiter before ``pos`` (or 0)."""
+    last = 0
+    for match in _CLAUSE_DELIM_RE.finditer(text[:pos]):
+        last = match.end()
+    return last
+
+
+def _clause_end(text: str, pos: int) -> int:
+    """Index of the next clause delimiter at/after ``pos`` (or end of text)."""
+    match = _CLAUSE_DELIM_RE.search(text, pos)
+    return match.start() if match else len(text)
+
+
+def _quantity_direction(work: str, start: int, floor: int = 0) -> str:
+    """Polarity of the value at ``start``: an explicit +/- sign, else an up/down
+    word between it and the previous number *within the same clause*, else
+    neutral. Bounding by both the clause start and the previous number stops a
+    marker that belongs to an earlier value (``rise 25% ... $1,000``) from
+    binding here."""
+    pre = work[:start]
+    sign = re.search(r"(?<![\d.])([+\-−])\s*$", pre)
+    if sign:
+        return "up" if sign.group(1) == "+" else "down"
+    window = work[max(_clause_start(work, start), floor):start]
+    down = bool(_DOWNWORD_RE.search(window))
+    up = bool(_UPWORD_RE.search(window))
+    if down and not up:
+        return "down"
+    if up and not down:
+        return "up"
+    return "neutral"
+
+
+def _extract_value_tokens(text: str) -> tuple[Counter, str]:
+    """Typed multiset of URLs, dates and quantities.
+
+    Each quantity is ``(kind, canonical_value, direction)`` where ``kind`` is
+    ``percent`` / ``currency_usd`` / ``number`` (unit bound to the value),
+    the value is canonicalized (scaled quantities like ``100 million`` / ``1 億``
+    collapse to a base value), and ``direction`` is up / down / neutral.
+    Cashtags are stripped before quantity typing so ``$NVDA`` is never a USD
+    amount. Returns the tokens and the URL/date-stripped working text.
     """
     tokens: Counter = Counter()
     work = text or ""
@@ -242,6 +314,7 @@ def _extract_value_tokens(text: str) -> tuple[Counter, str]:
 
     work = _URL_TOKEN_RE.sub(_url_repl, work)
     work = _normalize_for_match(work)
+    work = _CASHTAG_RE.sub(" ", work)  # $NVDA is a ticker, not a USD amount
 
     def _date_repl(match: re.Match) -> str:
         y, m, d = (int(match.group(i)) for i in (1, 2, 3))
@@ -251,20 +324,56 @@ def _extract_value_tokens(text: str) -> tuple[Counter, str]:
     work = _ISO_DATE_RE.sub(_date_repl, work)
     work = _CJK_DATE_RE.sub(_date_repl, work)
 
+    prev_end = 0
     for match in _NUMBER_RE.finditer(work):
-        tail = work[match.end():match.end() + 16]
-        stripped_tail = tail.lstrip()
+        after = work[match.end():match.end() + 16]
+        stripped_tail = after.lstrip()
         if _ORDINAL_RE.match(stripped_tail):
+            prev_end = match.end()
             continue  # "1st" -> "第一" legitimately drops the digit
         multiplier = 1
-        scale_en = _SCALE_EN_RE.match(tail)
+        after_unit = after
+        scale_en = _SCALE_EN_RE.match(after)
         cjk_next = stripped_tail[:1]
         if scale_en:
             multiplier = _SCALE_EN_MULT[scale_en.group(1).lower()]
+            after_unit = after[scale_en.end():]
         elif cjk_next in _SCALE_CJK_MULT:
             multiplier = _SCALE_CJK_MULT[cjk_next]
-        tokens[("number", _canonical_number(match.group(0), multiplier))] += 1
+            after_unit = stripped_tail[1:]
+        value = _canonical_number(match.group(0), multiplier)
+        before = work[max(0, match.start() - 16):match.start()]
+        kind = _quantity_type(before, after_unit)
+        direction = _quantity_direction(work, match.start(), prev_end)
+        tokens[(kind, value, direction)] += 1
+        prev_end = match.end()
     return tokens, work
+
+
+def _direction_claims(text: str) -> Counter:
+    """Multiset of *negated* standalone directional claims ``(direction,)``.
+
+    Only negated directional verbs in a number-free clause are counted: numbered
+    directions are already bound to their quantity token, and a non-negated bare
+    direction ("is up today" vs "上漲") is intentionally not compared to avoid an
+    English/zh vocabulary asymmetry. This still catches a negation reversal or
+    drop such as ``not rise ... fall`` -> ``上升 ... 不會下降``.
+    """
+    claims: Counter = Counter()
+    body = text or ""
+
+    def _collect(pattern: re.Pattern, direction: str) -> None:
+        for match in pattern.finditer(body):
+            clause = body[_clause_start(body, match.start()):_clause_end(body, match.end())]
+            if any(ch.isdigit() for ch in clause):
+                continue  # numbered direction -> handled by the quantity token
+            window = body[_clause_start(body, match.start()):match.start()]
+            if _NEG_RE.search(window):
+                claims[(direction,)] += 1
+
+    _collect(_CLAIM_UP_RE, "up")
+    _collect(_CLAIM_DOWN_RE, "down")
+    return claims
 
 
 def _ticker_counts(text: str) -> Counter:
@@ -288,112 +397,66 @@ def _looks_untranslated(source: str, output: str) -> bool:
     """True when the output is an English echo / wrapper, not a translation.
 
     ``translate_text`` only invokes the provider for substantive non-Chinese
-    input, so a clean zh-TW translation is dominated by Han script. Rejects
-    output with no Han, output equal to or containing the normalized source
-    (a Chinese-prefixed/suffixed or JSON/markdown wrapper), and output whose
-    non-ticker English words still overlap most of the source (a paraphrased
-    English echo carrying one or two Han characters).
+    input, so a clean zh-TW translation is dominated by Han script. After
+    removing protected Latin tokens (URLs, tickers) — which a faithful mixed
+    translation may keep — Han content must dominate Latin content; otherwise the
+    output is an English echo / paraphrase / wrapper. An output equal to or
+    containing the normalized source is also an echo.
     """
     stripped = (output or "").strip()
     if not stripped:
-        return True
-    if not _HAN_RE.search(stripped):
         return True
     src_norm = " ".join((source or "").split()).lower()
     out_norm = " ".join(stripped.split()).lower()
     if src_norm and (out_norm == src_norm or src_norm in out_norm):
         return True
 
-    tickers = set(_ticker_counts(source))
-
-    def _content_words(text: str) -> list[str]:
-        return [
-            word.lower()
-            for word in re.findall(r"[A-Za-z]{3,}", text or "")
-            if word.upper() not in tickers
-        ]
-
-    source_words = _content_words(source)
-    if len(source_words) >= 3:
-        output_words = set(_content_words(stripped))
-        overlap = sum(1 for word in source_words if word in output_words)
-        if overlap >= max(3, int(0.6 * len(source_words))):
-            return True
-    return False
-
-
-def _has_up(text: str, zh: bool) -> bool:
-    pattern = _ZH_UP_RE if zh else _SRC_UP_RE
-    return bool(pattern.search(text or ""))
-
-
-def _has_down(text: str, zh: bool) -> bool:
-    pattern = _ZH_DOWN_RE if zh else _SRC_DOWN_RE
-    return bool(pattern.search(text or ""))
+    cleaned = _URL_TOKEN_RE.sub(" ", stripped)
+    cleaned = _CASHTAG_RE.sub(" ", cleaned)
+    known = _known_tickers()
+    cleaned = _UPPER_WORD_RE.sub(
+        lambda m: " " if m.group(0) in known else m.group(0), cleaned
+    )
+    han = len(_HAN_RE.findall(cleaned))
+    latin = len(re.findall(r"[A-Za-z]", cleaned))
+    if han == 0:
+        return True
+    return latin > han  # Chinese content must dominate a real translation
 
 
 def fidelity_error(source: str, translation: str) -> str | None:
     """Return an error code when protected source values are corrupted.
 
-    Symmetric multiset comparison rejects both dropped/changed and invented
-    URLs, dates and numeric values (scaled quantities canonicalized to a base
-    value) and tickers; direction/negation reversal, currency substitution and
-    percentage type loss are rejected too. Returns ``None`` when fidelity holds
-    or neither side carries a protected value.
+    Compares typed multisets symmetrically: quantities carry their unit
+    (percent / USD / bare) and per-value direction, so unit swaps, value
+    changes, scaled-rescale errors, invented/dropped values and numbered-
+    direction reversals are all caught; a separate directional-claim multiset
+    catches clause-swapped direction/negation reversals; tickers are compared
+    too. Returns ``None`` when fidelity holds or neither side carries anything
+    protected.
     """
-    source_values, source_work = _extract_value_tokens(source)
-    translation_values, translation_work = _extract_value_tokens(translation)
+    source_values, _ = _extract_value_tokens(source)
+    translation_values, _ = _extract_value_tokens(translation)
     source_tickers = _ticker_counts(source)
     translation_tickers = _ticker_counts(translation)
-    directional = (
-        _has_up(source_work, False)
-        or _has_down(source_work, False)
-        or _SRC_NEG_RE.search(source or "")
-    )
+    source_claims = _direction_claims(source)
+    translation_claims = _direction_claims(translation)
     if not any(
         (
             source_values,
             translation_values,
             source_tickers,
             translation_tickers,
-            directional,
+            source_claims,
+            translation_claims,
         )
     ):
         return None
-
-    # Symmetric: preservation AND no invented values, in both directions.
     if source_values != translation_values:
         return "fidelity_mismatch"
     if source_tickers != translation_tickers:
         return "fidelity_mismatch"
-
-    # Direction: a clearly-up (or down) source must not be rendered as the
-    # opposite; catches +3% -> 下跌 3%, rose -> 下跌, fell -> 上漲.
-    src_up = _has_up(source_work, False)
-    src_down = _has_down(source_work, False)
-    tr_up = _has_up(translation_work, True)
-    tr_down = _has_down(translation_work, True)
-    if src_up and not src_down and tr_down and not tr_up:
-        return "fidelity_mismatch"
-    if src_down and not src_up and tr_up and not tr_down:
-        return "fidelity_mismatch"
-
-    # Negation: a negated source must keep an explicit zh negation.
-    if _SRC_NEG_RE.search(source or "") and not _ZH_NEG_RE.search(translation or ""):
-        return "fidelity_mismatch"
-
-    # Currency: a USD source must be rendered with a USD marker, not a foreign
-    # currency (catches $100 -> 100 日圓, and a silent unit drop).
-    if _USD_SRC_RE.search(source or "") and not _FOREIGN_CURRENCY_RE.search(source or ""):
-        if _FOREIGN_CURRENCY_RE.search(translation or "") or not _USD_MARK_RE.search(
-            translation or ""
-        ):
-            return "fidelity_mismatch"
-
-    # Percentage must not silently become a non-percentage (e.g. currency).
-    if _PCT_SRC_RE.search(source or "") and not _PERCENT_MARK_RE.search(
-        _normalize_for_match(translation)
-    ):
+    if source_claims != translation_claims:
         return "fidelity_mismatch"
     return None
 

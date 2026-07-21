@@ -626,10 +626,11 @@ def test_extract_value_tokens_are_typed_and_boundary_aware():
     tokens, _ = translation._extract_value_tokens(_FIDELITY_SOURCE)
     assert tokens[("url", "https://t.co/xY")] == 1
     assert tokens[("date", (2026, 7, 21))] == 1
-    assert tokens[("number", "1000")] == 1  # $1,000 -> value 1000
-    assert tokens[("number", "25")] == 1  # 25% -> value 25
+    # The unit travels with the value: $1,000 is USD, 25% is a percentage.
+    assert tokens[("currency_usd", "1000", "neutral")] == 1
+    assert tokens[("percent", "25", "up")] == 1  # "rise 25%" -> up
     # The date's own digits are consumed and never recounted as bare numbers.
-    assert tokens[("number", "2026")] == 0
+    assert not any(key[0] == "number" and key[1] == "2026" for key in tokens)
     assert translation._ticker_counts(_FIDELITY_SOURCE)["NVDA"] == 1
 
 
@@ -772,6 +773,85 @@ def test_english_echo_and_wrapper_are_rejected_as_invalid_response():
         assert result.status == "failed"
         assert result.error_code == "invalid_response"
         assert result.text is None
+
+
+def test_unit_is_bound_to_value_not_a_global_marker():
+    # Re-review 4743569049: two quantities cannot exchange their units even when
+    # the output still contains one USD marker and one percent marker.
+    assert (
+        translation.fidelity_error("Margin 25% and price $100", "利潤 25 美元，價格 100%")
+        == "fidelity_mismatch"
+    )
+    # A cashtag is a ticker, not a USD amount: no USD marker is required.
+    assert translation.fidelity_error("$NVDA is up 3%", "NVDA 上漲 3%") is None
+    # A faithful scaled USD amount stays valid.
+    assert translation.fidelity_error("paid $100 million", "支付 1 億美元") is None
+
+
+def test_clause_local_direction_and_negation_reversals():
+    # Multi-clause reversals must be caught even though global markers all appear.
+    assert (
+        translation.fidelity_error(
+            "Revenue rose 3% while costs fell 5%", "營收下跌 3%，成本上漲 5%"
+        )
+        == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error(
+            "Tariffs will not rise and taxes will fall", "關稅將上升，稅不會下降"
+        )
+        == "fidelity_mismatch"
+    )
+    # Faithful clause-local direction / negation stays valid.
+    assert (
+        translation.fidelity_error(
+            "Revenue rose 3% while costs fell 5%", "營收上漲 3%，成本下跌 5%"
+        )
+        is None
+    )
+    assert (
+        translation.fidelity_error(
+            "Tariffs will not rise and taxes will fall", "關稅將不會上升，稅將下降"
+        )
+        is None
+    )
+    # Two same-direction values with one negated clause: dropping the negation
+    # is a mismatch; keeping it is valid.
+    assert (
+        translation.fidelity_error(
+            "Growth rose and inflation did not rise", "成長上升，通膨也上升"
+        )
+        == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error(
+            "Growth rose and inflation did not rise", "成長上升，通膨並未上升"
+        )
+        is None
+    )
+
+
+def test_echo_guard_uses_han_dominance_and_preserves_urls():
+    src = "Massive new tariffs on all imports starting Monday"
+    # Paraphrased English carrying a Chinese prefix is still an echo.
+    assert translation._looks_untranslated(
+        src, "翻譯：Huge duties begin next week for every foreign product"
+    )
+    # A faithful zh-TW translation that preserves a long URL stays valid.
+    assert not translation._looks_untranslated(
+        "Watch https://rumble.com/c/DonaldTrump", "觀看 https://rumble.com/c/DonaldTrump"
+    )
+    # Valid zh-TW keeping a ticker is not falsely rejected.
+    assert not translation._looks_untranslated("NVDA is up 3%", "NVDA 今天上漲 3%")
+
+
+def test_paraphrase_echo_with_han_prefix_is_invalid_response():
+    source = "Massive new tariffs on all imports starting Monday"
+    paraphrase = "翻譯：Huge duties begin next week for every foreign product here"
+    translator = GeminiTranslator("K", "m", generate_fn=lambda **k: paraphrase)
+    result = translator.translate(source)
+    assert result.status == "failed"
+    assert result.error_code == "invalid_response"
 
 
 def test_fullwidth_percent_and_digits_still_match():
