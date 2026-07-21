@@ -1,9 +1,12 @@
 """Trump monitor must capture every current post and never fake health."""
 
+import os
+import tempfile
 from datetime import datetime, timedelta, timezone
 
 from src.data import trump_truth
 from src.runners import run_trump_monitor
+from src.storage.trump_delivery_state import TrumpDeliveryStore
 
 
 def _post(
@@ -43,21 +46,63 @@ def _healthy_result(posts, source="truth_social_official_api"):
     }
 
 
-def _patch_successful_runner(monkeypatch, posts, previous=None):
+def _temp_ledger_path():
+    return os.path.join(tempfile.mkdtemp(), "trump_delivery_state.json")
+
+
+def _fresh_store(state):
+    """A fresh store over the same temp ledger — models a new process/run."""
+    return TrumpDeliveryStore(path=state["ledger_path"], legacy_path=None)
+
+
+def _delivered_ids(state):
+    posts = _fresh_store(state)._read_raw()["posts"]
+    return sorted(
+        pid
+        for pid, rec in posts.items()
+        if rec.get("delivery_state") == "sent"
+    )
+
+
+def _ledger_state(state, post_id):
+    rec = _fresh_store(state).get(post_id)
+    return rec.get("delivery_state") if rec else None
+
+
+def _patch_successful_runner(monkeypatch, posts, *, checkpoint=None, outcome="sent"):
+    ledger_path = _temp_ledger_path()
+    state = {"sent": [], "writes": {}, "ledger_path": ledger_path}
+    if checkpoint is not None:
+        TrumpDeliveryStore(
+            path=ledger_path, legacy_path=None
+        ).set_capture_started_at(checkpoint)
     monkeypatch.setattr(
         run_trump_monitor,
         "fetch_recent_posts_with_health",
         lambda: _healthy_result(posts),
     )
-    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda value: value)
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
-    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda value: None)
-    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
     monkeypatch.setattr(
         run_trump_monitor,
-        "read_json",
-        lambda *a, **k: previous or {},
+        "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "send_telegram_detailed",
+        lambda message, **kwargs: state["sent"].append((message, kwargs))
+        or {"outcome": outcome, "delivered": 1, "total": 1},
+    )
+    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
+    monkeypatch.setattr(run_trump_monitor, "get_default_translator", lambda: None)
+    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "write_json",
+        lambda filename, value: state["writes"].__setitem__(filename, value)
+        or True,
+    )
+    return state
 
 
 def test_official_current_source_wins_without_using_stale_mirror(monkeypatch):
@@ -184,93 +229,50 @@ def test_tier1_and_tier3_both_delivered_and_completeness_not_overstated(
         _post("low", "Apparently unrelated post", tier="tier3"),
         _post("high", "New tariff policy", tier="tier1"),
     ]
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "fetch_recent_posts_with_health",
-        lambda: _healthy_result(posts),
-    )
-    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda value: value)
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
-    seen = []
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "mark_posts_seen",
-        lambda value: seen.extend(item["id"] for item in value),
-    )
-    sent = []
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "send_telegram",
-        lambda message, **kwargs: sent.append((message, kwargs)) or True,
-    )
-    health = {}
-    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "write_json",
-        lambda filename, value: health.setdefault(filename, value) is value,
-    )
+    state = _patch_successful_runner(monkeypatch, posts)
 
     assert run_trump_monitor.main() == 0
-    joined = "\n".join(message for message, _ in sent)
+    joined = "\n".join(message for message, _ in state["sent"])
     assert "Apparently unrelated post" in joined
     assert "New tariff policy" in joined
-    assert sorted(seen) == ["high", "low"]
-    state = health["trump_monitor_health.json"]
-    assert state["delivery_status"] == "delivered_all"
-    assert state["capture_policy"].startswith("all_posts")
-    assert state["source_completeness_verified"] is False
-    assert state["delivery_requires_all_recipients"] is True
-    assert "unverified" in state["source_completeness_note"]
+    assert _delivered_ids(state) == ["high", "low"]
+    health = state["writes"]["trump_monitor_health.json"]
+    assert health["delivery_status"] == "delivered_all"
+    assert health["capture_policy"].startswith("all_posts")
+    assert health["source_completeness_verified"] is False
+    assert health["delivery_requires_all_recipients"] is True
+    assert "unverified" in health["source_completeness_note"]
 
 
 def test_first_activation_backfills_24h_but_not_history(monkeypatch):
     recent = _post("recent", "current policy", hours_ago=2)
     historical = _post("old", "historical post", hours_ago=48)
     posts = [historical, recent]
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "fetch_recent_posts_with_health",
-        lambda: _healthy_result(posts),
-    )
-    captured = []
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "get_unseen_posts",
-        lambda value: captured.extend(value) or value,
-    )
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
-    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda value: None)
-    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
-    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
-    writes = {}
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "write_json",
-        lambda filename, value: writes.setdefault(filename, value) is value,
-    )
+    state = _patch_successful_runner(monkeypatch, posts)
 
     assert run_trump_monitor.main() == 0
-    assert [post["id"] for post in captured] == ["recent"]
-    assert writes["trump_monitor_health.json"]["initial_backfill_hours"] == 24
+    # A first activation backfills only 24h: the 48h historical post is not
+    # eligible, so only the recent post is captured and delivered.
+    assert _delivered_ids(state) == ["recent"]
+    health = state["writes"]["trump_monitor_health.json"]
+    assert health["initial_backfill_hours"] == 24
+    assert health["eligible_count"] == 1
 
 
 def test_existing_capture_checkpoint_is_reused(monkeypatch):
     checkpoint = datetime.now(timezone.utc) - timedelta(days=3)
     posts = [_post("two-days", "missed during downtime", hours_ago=48)]
-    previous = {"capture_started_at": checkpoint.isoformat()}
-    _patch_successful_runner(monkeypatch, posts, previous=previous)
-    writes = {}
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "write_json",
-        lambda filename, value: writes.setdefault(filename, value) is value,
+    # The checkpoint now lives in the fail-closed delivery ledger, not the
+    # fail-open health file; seed it there and confirm it is reused (a 48h post
+    # remains eligible because the checkpoint is 3 days back, not 24h).
+    state = _patch_successful_runner(
+        monkeypatch, posts, checkpoint=checkpoint.isoformat()
     )
 
     assert run_trump_monitor.main() == 0
-    state = writes["trump_monitor_health.json"]
-    assert state["eligible_count"] == 1
-    assert state["capture_started_at"] == checkpoint.isoformat()
+    health = state["writes"]["trump_monitor_health.json"]
+    assert health["eligible_count"] == 1
+    assert health["capture_started_at"] == checkpoint.isoformat()
 
 
 def test_source_unavailable_is_explicit_failure(monkeypatch):
@@ -321,28 +323,35 @@ def test_long_post_is_split_without_truncation_or_early_seen():
 
 def test_failed_middle_of_long_post_does_not_mark_seen(monkeypatch):
     post = _post("long-fail", "內容 " * 3000)
+    ledger_path = _temp_ledger_path()
+    state = {"sent": [], "writes": {}, "ledger_path": ledger_path}
     monkeypatch.setattr(
         run_trump_monitor,
         "fetch_recent_posts_with_health",
         lambda: _healthy_result([post]),
     )
-    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda value: value)
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
-    marked = []
     monkeypatch.setattr(
         run_trump_monitor,
-        "mark_posts_seen",
-        lambda value: marked.extend(value),
+        "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    monkeypatch.setattr(run_trump_monitor, "get_default_translator", lambda: None)
     calls = {"count": 0}
 
-    def _send(*args, **kwargs):
+    def _detailed(message, **kwargs):
         calls["count"] += 1
-        return calls["count"] == 1
+        state["sent"].append((message, kwargs))
+        # First fragment reaches recipients, a later fragment definitively
+        # fails: some content already went out, so the post is a partial
+        # (ambiguous) outbound — quarantined, never marked sent, never retried.
+        outcome = "sent" if calls["count"] == 1 else "failed"
+        return {"outcome": outcome, "delivered": 1, "total": 1}
 
-    monkeypatch.setattr(run_trump_monitor, "send_telegram", _send)
+    monkeypatch.setattr(run_trump_monitor, "send_telegram_detailed", _detailed)
     monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
     monkeypatch.setattr(run_trump_monitor, "write_json", lambda *a, **k: True)
 
     assert run_trump_monitor.main() == 1
-    assert marked == []
+    assert _delivered_ids(state) == []
+    assert _ledger_state(state, "long-fail") == "ambiguous"

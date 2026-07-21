@@ -10,8 +10,11 @@ health or logs).
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from datetime import datetime, timedelta, timezone
 
+from src.storage.trump_delivery_state import TrumpDeliveryStore
 from src.alerts import translation
 from src.alerts.translation import (
     GeminiTranslator,
@@ -74,8 +77,30 @@ class _RecLogger:
     info = error = warning = debug = success = _rec
 
 
-def _patch_runner(monkeypatch, posts, translator, *, send_ok=True):
-    state = {"sent": [], "seen": [], "writes": {}}
+def _fresh_store(state):
+    """A fresh store over the same temp ledger — models a new process/checkout."""
+    return TrumpDeliveryStore(path=state["ledger_path"], legacy_path=None)
+
+
+def _delivered_ids(state):
+    posts = _fresh_store(state)._read_raw()["posts"]
+    return sorted(pid for pid, rec in posts.items() if rec.get("delivery_state") == "sent")
+
+
+def _ledger_state(state, post_id):
+    rec = _fresh_store(state).get(post_id)
+    return rec.get("delivery_state") if rec else None
+
+
+def _sent_text(state):
+    return "\n".join(message for message, _ in state["sent"])
+
+
+def _patch_runner(monkeypatch, posts, translator, *, send_ok=True, outcome=None):
+    resolved_outcome = outcome or ("sent" if send_ok else "failed")
+    ledger_path = os.path.join(tempfile.mkdtemp(), "trump_delivery_state.json")
+    state = {"sent": [], "writes": {}, "ledger_path": ledger_path,
+             "send_kwargs": []}
     monkeypatch.setattr(
         run_trump_monitor,
         "fetch_recent_posts_with_health",
@@ -90,19 +115,23 @@ def _patch_runner(monkeypatch, posts, translator, *, send_ok=True):
             "source_limit": 1000,
         },
     )
-    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda v: v)
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
+    # Real, atomic, fail-closed delivery ledger on a temp file (not mocked).
     monkeypatch.setattr(
         run_trump_monitor,
-        "mark_posts_seen",
-        lambda v: state["seen"].extend(item["id"] for item in v),
+        "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
+
+    def _fake_detailed(message, **kwargs):
+        state["sent"].append((message, kwargs))
+        return {"outcome": resolved_outcome, "delivered": 1, "total": 1}
+
+    monkeypatch.setattr(run_trump_monitor, "send_telegram_detailed", _fake_detailed)
     monkeypatch.setattr(
         run_trump_monitor,
         "send_telegram",
-        lambda message, **kwargs: (
-            state["sent"].append(message) or send_ok
-        ),
+        lambda message, **kwargs: state["sent"].append((message, kwargs)) or send_ok,
     )
     monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
     monkeypatch.setattr(
@@ -129,6 +158,32 @@ def test_noop_detection_matrix():
     assert is_noop_text("New tariff policy on China") is False
     # short embedded English (Fed/FOMC) inside Chinese still counts as Chinese.
     assert is_noop_text("聯準會 Fed 今天升息") is True
+
+
+def test_already_chinese_with_verbatim_tokens_is_still_noop():
+    # A Chinese post that merely contains a link, an @handle, a $cashtag or an
+    # embedded proper noun must NOT be re-sent to the provider: those are
+    # verbatim-kept tokens, not translatable English. Previously any 4+ letter
+    # run forced a provider call (wasting budget) and risked a fidelity-fail
+    # fallback to English on text that was already Chinese.
+    assert is_noop_text("川普剛剛發文 https://t.co/abcdEFG 談論關稅") is True
+    assert is_noop_text("川普點名 @realDonaldTrump 並提到 $NVDA 的財報") is True
+    assert is_noop_text("台積電 TSMC 今天在法說會上表示產能滿載") is True
+    assert is_noop_text("川普提到 Nvidia 與輝達的 AI 佈局") is True
+    # Genuinely English-dominant text (even with some Chinese) is still sent.
+    assert (
+        is_noop_text("China responds but Trump insists tariffs stay in place 中國")
+        is False
+    )
+
+
+def test_already_chinese_url_and_handle_do_not_trigger_translation():
+    zh = "川普發文，連結為 https://truthsocial.com/@realDonaldTrump/12345"
+    tr = FakeTranslator()
+    reset_translation_cache()
+    result = translate_text(zh, tr)
+    assert result.status == "noop"
+    assert tr.calls == []  # deterministic no-op: no model call
 
 
 def test_already_chinese_is_not_sent_to_provider_and_rendered_once():
@@ -245,10 +300,10 @@ def test_provider_failure_still_delivers_english_and_marks_degraded(monkeypatch)
     state = _patch_runner(monkeypatch, [post], translator)
 
     assert run_trump_monitor.main() == 0  # translation failure is not fatal
-    joined = "\n".join(state["sent"])
+    joined = _sent_text(state)
     assert "New policy statement about tariffs" in joined  # English preserved
     assert "中文翻譯暫時失敗" in joined
-    assert state["seen"] == ["f1"]  # still marked seen; post not lost
+    assert _delivered_ids(state) == ["f1"]  # durably delivered; post not lost
 
     health = state["writes"]["trump_monitor_health.json"]
     assert health["translation_status"] == "degraded"
@@ -343,14 +398,22 @@ def test_archive_runs_before_translation(monkeypatch):
             "source_limit": 1000,
         },
     )
-    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda v: v)
+    ledger_path = os.path.join(tempfile.mkdtemp(), "trump_delivery_state.json")
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
+    )
     monkeypatch.setattr(
         run_trump_monitor,
         "archive_posts",
         lambda v: order.append("archive") or len(v),
     )
-    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda v: None)
-    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "send_telegram_detailed",
+        lambda *a, **k: {"outcome": "sent", "delivered": 1, "total": 1},
+    )
     monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
     monkeypatch.setattr(run_trump_monitor, "write_json", lambda *a, **k: True)
     monkeypatch.setattr(
@@ -396,10 +459,10 @@ def test_multi_post_delivery_marks_each_only_on_final_fragment(monkeypatch):
     state = _patch_runner(monkeypatch, posts, translator)
 
     assert run_trump_monitor.main() == 0
-    joined = "\n".join(state["sent"])
+    joined = _sent_text(state)
     assert "第一則關稅公告" in joined and "First tariff announcement" in joined
     assert "第二則無關貼文" in joined and "Second unrelated post" in joined
-    assert sorted(state["seen"]) == ["a", "b"]
+    assert _delivered_ids(state) == ["a", "b"]
 
 
 # --- caching: one translation per post per process --------------------------
@@ -432,10 +495,85 @@ def test_runner_translates_each_post_once_even_with_duplicate_text(monkeypatch):
 def test_telegram_failure_keeps_post_unseen_and_returns_nonzero(monkeypatch):
     post = _post("t1", "Policy that fails to deliver")
     translator = FakeTranslator()
-    state = _patch_runner(monkeypatch, [post], translator, send_ok=False)
+    # Every recipient definitively rejects -> nothing delivered -> retryable.
+    state = _patch_runner(monkeypatch, [post], translator, outcome="failed")
 
     assert run_trump_monitor.main() == 1
-    assert state["seen"] == []  # not marked seen when delivery fails
+    assert _delivered_ids(state) == []  # not delivered when send fails
+    assert _ledger_state(state, "t1") == "failed"  # retryable, not lost
+
+
+def test_ambiguous_delivery_is_quarantined_not_retried(monkeypatch):
+    # A partial/transport-unknown outbound must be quarantined (never resent).
+    post = _post("q1", "Policy with an ambiguous partial send")
+    translator = FakeTranslator()
+    state = _patch_runner(monkeypatch, [post], translator, outcome="ambiguous")
+
+    assert run_trump_monitor.main() == 1
+    assert _delivered_ids(state) == []
+    assert _ledger_state(state, "q1") == "ambiguous"
+
+    # A second, fresh process must NOT re-deliver the quarantined post.
+    state["sent"].clear()
+    assert run_trump_monitor.main() == 0  # nothing new to do
+    assert state["sent"] == []
+
+
+def test_sent_post_is_never_redelivered_on_a_fresh_run(monkeypatch):
+    # Exactly-once core: a durably 'sent' post is skipped by every later run,
+    # even though the same source post is still returned by the live source.
+    post = _post("s1", "Delivered exactly once")
+    translator = FakeTranslator()
+    state = _patch_runner(monkeypatch, [post], translator)  # outcome "sent"
+
+    assert run_trump_monitor.main() == 0
+    assert _delivered_ids(state) == ["s1"]
+    assert len(state["sent"]) >= 1
+
+    state["sent"].clear()
+    assert run_trump_monitor.main() == 0  # fresh process, same ledger
+    assert state["sent"] == []  # not resent
+    assert _ledger_state(state, "s1") == "sent"
+
+
+def test_definitively_failed_post_is_retried_next_run(monkeypatch):
+    # A definitive rejection delivered NOTHING, so the whole post is safe to
+    # retry: the ledger records 'failed' (not 'ambiguous') and a later run
+    # re-sends it.
+    post = _post("f1", "Policy that first fails then succeeds")
+    translator = FakeTranslator()
+    state = _patch_runner(monkeypatch, [post], translator, outcome="failed")
+
+    assert run_trump_monitor.main() == 1
+    assert _delivered_ids(state) == []
+    assert _ledger_state(state, "f1") == "failed"
+
+    state["sent"].clear()
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "send_telegram_detailed",
+        lambda message, **k: state["sent"].append((message, k))
+        or {"outcome": "sent", "delivered": 1, "total": 1},
+    )
+    assert run_trump_monitor.main() == 0
+    assert _delivered_ids(state) == ["f1"]  # retried and delivered
+    assert state["sent"]
+
+
+def test_corrupt_ledger_fails_closed_without_reblast(monkeypatch):
+    # A corrupt ledger must NOT be read as empty (which would re-blast the whole
+    # checkpoint window). Fail closed: send nothing, exit non-zero, mark health.
+    post = _post("c9", "Post that must not be re-blasted on corrupt state")
+    translator = FakeTranslator()
+    state = _patch_runner(monkeypatch, [post], translator)
+    with open(state["ledger_path"], "w", encoding="utf-8") as fh:
+        fh.write("{ not valid json ")
+
+    assert run_trump_monitor.main() == 1
+    assert state["sent"] == []  # never sent on unreadable state
+    health = state["writes"]["trump_monitor_health.json"]
+    assert health["delivery_status"] == "state_unreadable_fail_closed"
+    assert health["source_completeness_verified"] is False
 
 
 # --- disabled / unavailable translation -------------------------------------
@@ -446,7 +584,7 @@ def test_disabled_translator_preserves_english_only_notification(monkeypatch):
     state = _patch_runner(monkeypatch, [post], None)
 
     assert run_trump_monitor.main() == 0
-    joined = "\n".join(state["sent"])
+    joined = _sent_text(state)
     assert "Plain English notice" in joined
     assert "【繁體中文】" not in joined
     health = state["writes"]["trump_monitor_health.json"]
@@ -499,9 +637,13 @@ def test_post_delivery_is_marked_sensitive_to_redact_log_preview(monkeypatch):
             "source_limit": 1000,
         },
     )
-    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda v: v)
+    ledger_path = os.path.join(tempfile.mkdtemp(), "trump_delivery_state.json")
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
+    )
     monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
-    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda v: None)
     monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
     monkeypatch.setattr(run_trump_monitor, "write_json", lambda *a, **k: True)
     monkeypatch.setattr(
@@ -509,8 +651,9 @@ def test_post_delivery_is_marked_sensitive_to_redact_log_preview(monkeypatch):
     )
     monkeypatch.setattr(
         run_trump_monitor,
-        "send_telegram",
-        lambda message, **kwargs: captured_kwargs.append(kwargs) or True,
+        "send_telegram_detailed",
+        lambda message, **kwargs: captured_kwargs.append(kwargs)
+        or {"outcome": "sent", "delivered": 1, "total": 1},
     )
     reset_translation_cache()
 
@@ -541,6 +684,16 @@ def test_get_default_translator_returns_gemini_when_configured(monkeypatch):
     resolved = get_default_translator()
     assert isinstance(resolved, GeminiTranslator)
     assert resolved.name == "gemini"
+
+
+def test_get_default_translator_none_when_model_blank(monkeypatch):
+    # A blank model must cleanly disable translation (English-only), never
+    # construct an adapter that fails late on every call.
+    monkeypatch.setenv("TRUMP_TRANSLATION_ENABLED", "1")
+    monkeypatch.setattr(translation, "GEMINI_API_KEY", "some-key")
+    for blank in ("", "   "):
+        monkeypatch.setattr(translation, "GEMINI_MODEL", blank)
+        assert get_default_translator() is None
 
 
 # --- collision-safe JSON prompt serialization (P1c) -------------------------
@@ -880,6 +1033,63 @@ def test_build_translations_budget_boundary_with_injected_clock(monkeypatch):
     assert health["translation_ok_count"] == 2
     assert health["translation_budget_exhausted_count"] == 3
     assert health["translation_status"] == "degraded"
+    # attempted == provider calls actually made (2), never the budget-skipped 3.
+    assert health["translation_attempted_count"] == 2
+    assert health["translation_provider_call_count"] == 2
+
+
+def test_all_budget_exhausted_is_degraded_but_zero_provider_calls(monkeypatch):
+    # Every post is budget-exhausted -> NO provider call is ever made, yet each
+    # post degraded to English fallback, so status is "degraded". The key fix:
+    # the attempted/provider-call counts exclude the budget-skips (which made no
+    # call), so a reader cannot mistake budget starvation for real provider work.
+    posts = [_post(f"n{i}", f"Untranslated post {i}") for i in range(3)]
+    translator = FakeTranslator()
+    ticks = iter([0, 100, 200, 300])  # first read already past the 60s budget
+    monkeypatch.setattr(run_trump_monitor, "_monotonic", lambda: next(ticks))
+    reset_translation_cache()
+
+    translations, health = run_trump_monitor._build_translations(posts, translator)
+
+    assert all(t.error_code == "budget_exhausted" for t in translations.values())
+    assert health["translation_status"] == "degraded"
+    assert health["translation_attempted_count"] == 0
+    assert health["translation_provider_call_count"] == 0
+    assert health["translation_ok_count"] == 0
+    assert health["translation_budget_exhausted_count"] == 3
+
+
+def test_all_noop_batch_reports_not_run_not_healthy(monkeypatch):
+    # A batch with nothing to translate (already-Chinese / URL-only) makes zero
+    # provider calls and zero failures -> "not_run", never a fake "healthy".
+    posts = [
+        _post("zh", "這是一則已經是繁體中文的貼文"),
+        _post("url", "https://truthsocial.com/@realDonaldTrump/1"),
+    ]
+    translator = FakeTranslator()
+    monkeypatch.setattr(run_trump_monitor, "_monotonic", lambda: 0)
+    reset_translation_cache()
+
+    _, health = run_trump_monitor._build_translations(posts, translator)
+
+    assert health["translation_status"] == "not_run"
+    assert health["translation_attempted_count"] == 0
+    assert health["translation_provider_call_count"] == 0
+    assert health["translation_noop_count"] == 2
+    assert translator.calls == []  # no provider call for a no-op batch
+
+
+def test_all_ok_reports_healthy_with_provider_call_count(monkeypatch):
+    posts = [_post(f"h{i}", f"Real translatable post {i}") for i in range(2)]
+    translator = FakeTranslator()
+    monkeypatch.setattr(run_trump_monitor, "_monotonic", lambda: 0)
+    reset_translation_cache()
+
+    _, health = run_trump_monitor._build_translations(posts, translator)
+
+    assert health["translation_status"] == "healthy"
+    assert health["translation_provider_call_count"] == 2
+    assert health["translation_attempted_count"] == 2
 
 
 def test_slow_provider_budget_still_archives_and_delivers_every_post(monkeypatch):
@@ -893,9 +1103,9 @@ def test_slow_provider_budget_still_archives_and_delivers_every_post(monkeypatch
     state = _patch_runner(monkeypatch, posts, translator)
 
     assert run_trump_monitor.main() == 0
-    # Every post archived+delivered+seen regardless of translation budget.
-    assert sorted(state["seen"]) == sorted(p["id"] for p in posts)
-    joined = "\n".join(state["sent"])
+    # Every post archived+delivered regardless of translation budget.
+    assert _delivered_ids(state) == sorted(p["id"] for p in posts)
+    joined = _sent_text(state)
     for post in posts:
         assert post["text"] in joined  # complete English always present
 
@@ -909,9 +1119,9 @@ def test_slow_provider_budget_still_archives_and_delivers_every_post(monkeypatch
     ) == 20
 
 
-def test_budget_exhausted_still_marks_seen_only_on_final_fragment(monkeypatch):
-    # A budget-exhausted long post still splits and marks seen only after the
-    # last fragment is delivered.
+def test_budget_exhausted_long_post_delivers_all_fragments(monkeypatch):
+    # A budget-exhausted long post is split and delivered (English) across all
+    # fragments; it is durably 'sent' only when every fragment succeeded.
     long_post = _post("long", "word " * 2000)
     ticks = iter([0, 100, 200])  # first read already past the 60s budget
     monkeypatch.setattr(run_trump_monitor, "_monotonic", lambda: next(ticks))
@@ -919,7 +1129,8 @@ def test_budget_exhausted_still_marks_seen_only_on_final_fragment(monkeypatch):
     state = _patch_runner(monkeypatch, [long_post], translator)
 
     assert run_trump_monitor.main() == 0
-    assert state["seen"] == ["long"]
+    assert _delivered_ids(state) == ["long"]
+    assert len(state["sent"]) > 1  # long post spanned multiple fragments
     health = state["writes"]["trump_monitor_health.json"]
     assert health["translation_budget_exhausted_count"] == 1
 

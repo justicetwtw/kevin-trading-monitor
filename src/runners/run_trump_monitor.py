@@ -8,6 +8,7 @@ fragment reaches every configured Telegram recipient.
 
 from __future__ import annotations
 
+import os
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -16,7 +17,7 @@ from typing import Any
 from dateutil.parser import isoparse
 from loguru import logger
 
-from src.alerts.telegram_bot import send_telegram
+from src.alerts.telegram_bot import send_telegram, send_telegram_detailed
 from src.alerts.translation import (
     TranslationResult,
     get_default_translator,
@@ -29,10 +30,15 @@ from src.config.market_clock import TAIPEI
 from src.data.trump_truth import (
     archive_posts,
     fetch_recent_posts_with_health,
-    get_unseen_posts,
-    mark_posts_seen,
 )
 from src.storage.state_manager import read_json, write_json
+from src.storage.trump_delivery_state import (
+    DO_PROCEED,
+    DO_RETRY,
+    StateReadError,
+    TrumpDeliveryStore,
+    resolve_delivery_action,
+)
 
 HEALTH_FILE = "trump_monitor_health.json"
 MAX_TELEGRAM_CHARS = 3600
@@ -56,11 +62,23 @@ def _parse_time(value: Any) -> datetime | None:
         return None
 
 
-def _capture_started_at(previous: dict[str, Any]) -> datetime:
-    existing = _parse_time(previous.get("capture_started_at"))
+def _capture_started_at(
+    store: TrumpDeliveryStore, previous: dict[str, Any]
+) -> datetime:
+    """Resolve the capture checkpoint from the fail-closed delivery ledger.
+
+    The checkpoint used to live only in the fail-*open* health file, so a
+    corrupt health file silently reset it to now-24h and widened the eligible
+    window. It now lives in the atomic, fail-closed delivery store; the legacy
+    health value is adopted once (best-effort) then persisted durably.
+    """
+    existing = _parse_time(store.capture_started_at())
     if existing is not None:
         return existing
-    return datetime.now(timezone.utc) - INITIAL_BACKFILL_WINDOW
+    legacy = _parse_time(previous.get("capture_started_at"))
+    started = legacy or (datetime.now(timezone.utc) - INITIAL_BACKFILL_WINDOW)
+    store.set_capture_started_at(started.isoformat())
+    return started
 
 
 def _eligible_since_checkpoint(
@@ -304,12 +322,23 @@ def _build_translations(
                 elif result.error_code == "fidelity_mismatch":
                     counts["fidelity_mismatch"] += 1
 
+    # Separate "configured but not exercised" from "actually exercised": a
+    # budget-exhausted post makes NO provider call, so it must not count as an
+    # attempt, and a run that made zero provider calls is not "healthy" — it is
+    # "not_run" (nothing was translated).
+    provider_calls = counts["attempted"] - counts["budget_exhausted"]
+    if counts["failed"]:
+        status = "degraded"
+    elif provider_calls > 0:
+        status = "healthy"
+    else:
+        status = "not_run"
     health = {
-        # Degraded means at least one post fell back to English-only; the post
-        # is still delivered and marked seen — translation never blocks it.
-        "translation_status": "degraded" if counts["failed"] else "healthy",
+        "translation_status": status,
         "translation_provider": getattr(translator, "name", "unknown"),
-        "translation_attempted_count": counts["attempted"],
+        # attempted == provider calls actually made (excludes budget-skips).
+        "translation_attempted_count": provider_calls,
+        "translation_provider_call_count": provider_calls,
         "translation_ok_count": counts["ok"],
         "translation_noop_count": counts["noop"],
         "translation_failed_count": counts["failed"],
@@ -353,6 +382,7 @@ def _write_health(
     delivery_status: str,
     last_notice_at: str | None = None,
     translation_health: dict[str, Any] | None = None,
+    delivery_health: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     raw_count = result.get("raw_count")
     returned_count = result.get("returned_count")
@@ -410,8 +440,62 @@ def _write_health(
             "translation_fidelity_mismatch_count": 0,
         }
     )
+    # Public-safe delivery aggregates: per-run ambiguous/failed counts and the
+    # durable ledger state counts (post IDs/states only, no text or chat IDs).
+    if delivery_health:
+        health.update(delivery_health)
     write_json(HEALTH_FILE, health)
     return health
+
+
+def _deliver_post(
+    post: dict[str, Any],
+    translation: TranslationResult | None,
+) -> str:
+    """Send one post's fragments and return a durable delivery outcome.
+
+    ``"sent"``      — every fragment reached every recipient.
+    ``"failed"``    — nothing was delivered and every failure was a definitive
+                      rejection, so re-sending the whole post is safe.
+    ``"ambiguous"`` — a partial/unknown outbound (some recipients/fragments may
+                      have gone out); the caller must quarantine it, never
+                      blindly auto-retry (that would duplicate).
+    """
+    fragments = _split_long_block(_post_block(post, translation))
+    audible = post.get("tier") in {"tier1", "tier2"}
+    any_sent = False
+    for fragment in fragments:
+        outcome = send_telegram_detailed(
+            fragment,
+            parse_mode=None,
+            disable_notification=not audible,
+            # The message carries the translation + full English; redact the
+            # Actions-log preview so neither is ever logged (§7).
+            sensitive=True,
+        ).get("outcome")
+        if outcome == "sent":
+            any_sent = True
+            continue
+        if outcome == "failed":
+            # This fragment certainly did not go out. If earlier fragments did,
+            # the post is partially delivered (ambiguous); otherwise nothing
+            # went out and the whole post is safe to retry next run.
+            return "ambiguous" if any_sent else "failed"
+        return "ambiguous"  # partial across recipients / transport-unknown
+    return "sent"
+
+
+def _fail_closed_health(reason: str) -> None:
+    """Write a minimal degraded health record without licensing a re-send."""
+    write_json(
+        HEALTH_FILE,
+        {
+            "status": "state_unreadable",
+            "delivery_status": reason,
+            "checked_at": datetime.now(timezone.utc).isoformat(),
+            "source_completeness_verified": False,
+        },
+    )
 
 
 def main() -> int:
@@ -419,8 +503,21 @@ def main() -> int:
     previous = read_json(HEALTH_FILE, default={})
     if not isinstance(previous, dict):
         previous = {}
-    capture_started_at = _capture_started_at(previous)
     translator = get_default_translator()
+    run_id = os.getenv("GITHUB_RUN_ID") or None
+
+    store = TrumpDeliveryStore()
+    try:
+        store.migrate_legacy_seen()
+        capture_started_at = _capture_started_at(store, previous)
+    except StateReadError as exc:
+        # A corrupt delivery ledger must NOT be read as empty (which would
+        # re-blast the whole checkpoint window). Fail closed and exit non-zero.
+        logger.error(
+            f"Trump delivery ledger unreadable; failing closed: {type(exc).__name__}"
+        )
+        _fail_closed_health("state_unreadable_fail_closed")
+        return 1
 
     result = fetch_recent_posts_with_health()
     if result.get("status") != "healthy":
@@ -459,7 +556,23 @@ def main() -> int:
         source_posts,
         capture_started_at,
     )
-    new_posts = get_unseen_posts(eligible)
+    try:
+        # A post is delivered now only if the ledger says PROCEED (never tried)
+        # or RETRY (previously definitively failed). SENT is skipped (done) and
+        # AMBIGUOUS/CLAIMED are quarantined — never blindly resent.
+        new_posts = [
+            post
+            for post in eligible
+            if resolve_delivery_action(store.get(str(post.get("id") or "")))
+            in (DO_PROCEED, DO_RETRY)
+        ]
+    except StateReadError as exc:
+        logger.error(
+            f"Trump delivery ledger unreadable; failing closed: {type(exc).__name__}"
+        )
+        _fail_closed_health("state_unreadable_fail_closed")
+        return 1
+
     if not new_posts:
         _, translation_health = _build_translations([], translator)
         _write_health(
@@ -473,6 +586,7 @@ def main() -> int:
             delivery_status="no_new_posts",
             last_notice_at=previous.get("last_unavailable_notice_at"),
             translation_health=translation_health,
+            delivery_health={"delivery_ledger_counts": store.health_counts()},
         )
         logger.info("=== run_trump_monitor done: healthy, no new posts ===")
         return 0
@@ -481,28 +595,38 @@ def main() -> int:
     # translation: capture the original posts first, then translate for render.
     archived_count = archive_posts(new_posts)
     translations, translation_health = _build_translations(new_posts, translator)
-    delivered_count = 0
-    failed = False
-    for chunk in build_delivery_chunks(new_posts, translations):
-        ok = send_telegram(
-            chunk["message"],
-            parse_mode=None,
-            disable_notification=not bool(chunk["audible"]),
-            # The message now carries the translation and full English text;
-            # redact the Actions-log preview so neither is ever logged (§7).
-            sensitive=True,
-        )
-        if not ok:
-            failed = True
-            break
-        completed_posts = chunk["mark_posts"]
-        if completed_posts:
-            mark_posts_seen(completed_posts)
-            delivered_count += len(completed_posts)
 
-    delivery_status = (
-        "delivered_all" if not failed else "delivery_failed_partial"
+    ordered = sorted(
+        new_posts,
+        key=lambda item: _parse_time(item.get("created_at"))
+        or datetime.min.replace(tzinfo=timezone.utc),
     )
+    delivered_count = ambiguous_count = failed_count = 0
+    for post in ordered:
+        post_id = str(post.get("id") or "")
+        if not post_id:
+            continue
+        # Durable claim BEFORE the non-idempotent send. If the run is cancelled
+        # between here and the resolve, the post is left 'claimed' and the next
+        # run treats it as ambiguous (quarantine), never an auto-retry.
+        if store.claim(post, run_id=run_id) is None:
+            continue  # already 'sent' (raced) — do not resend
+        outcome = _deliver_post(post, translations.get(post_id))
+        store.resolve(post_id, outcome, run_id=run_id)
+        if outcome == "sent":
+            delivered_count += 1
+        elif outcome == "ambiguous":
+            ambiguous_count += 1
+        else:
+            failed_count += 1
+
+    if failed_count or ambiguous_count:
+        if ambiguous_count:
+            delivery_status = "delivery_ambiguous"
+        else:
+            delivery_status = "delivery_failed_partial"
+    else:
+        delivery_status = "delivered_all"
     _write_health(
         result,
         capture_started_at=capture_started_at,
@@ -514,10 +638,19 @@ def main() -> int:
         delivery_status=delivery_status,
         last_notice_at=previous.get("last_unavailable_notice_at"),
         translation_health=translation_health,
+        delivery_health={
+            "delivery_ambiguous_count": ambiguous_count,
+            "delivery_failed_count": failed_count,
+            "delivery_requires_all_recipients": True,
+            "delivery_ledger_counts": store.health_counts(),
+        },
     )
 
-    if failed:
-        logger.error("Trump delivery failed; incomplete posts remain unseen")
+    if failed_count or ambiguous_count:
+        logger.error(
+            f"Trump delivery incomplete: {failed_count} failed (retry), "
+            f"{ambiguous_count} ambiguous (quarantined)"
+        )
         return 1
 
     logger.info(

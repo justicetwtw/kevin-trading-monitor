@@ -58,9 +58,12 @@ class Translator(Protocol):
 _URL_RE = re.compile(r"https?://\S+", re.IGNORECASE)
 # CJK Unified Ideographs (basic block); enough to detect already-Chinese text.
 _HAN_RE = re.compile("[一-鿿]")
-# A "substantial" English word: 4+ consecutive ASCII letters. Short tokens like
-# Fed / FOMC embedded in Chinese text should not force a translation call.
-_LATIN_WORD_RE = re.compile(r"[A-Za-z]{4,}")
+# Social handles are verbatim-kept tokens (like URLs/cashtags), so they must be
+# stripped before deciding whether translatable English remains.
+_HANDLE_RE = re.compile(r"@\w+")
+# ASCII letters that still count as *translatable* text after protected tokens
+# (URLs, @handles, $cashtags) are removed.
+_ASCII_LETTER_RE = re.compile(r"[A-Za-z]")
 
 
 def _is_url_only(text: str) -> bool:
@@ -70,8 +73,27 @@ def _is_url_only(text: str) -> bool:
 
 
 def _is_already_chinese(text: str) -> bool:
-    """True when the text is Chinese with no substantial English to translate."""
-    return bool(_HAN_RE.search(text)) and not _LATIN_WORD_RE.search(text)
+    """True when the text is Chinese with no substantial English to translate.
+
+    URLs, @handles and $cashtags are protected tokens a faithful zh-TW rendering
+    keeps verbatim, so they are stripped before measuring residual English.
+    Earlier logic flagged *any* 4+ letter run as "needs translation", which sent
+    an already-Chinese post that merely contained a link, a handle or a proper
+    noun (``川普提到 Nvidia`` / ``發文連結 https://…``) to the provider — wasting
+    the run budget and risking a fidelity-fail fallback to English on text that
+    was already Chinese. After stripping protected tokens, the post counts as
+    already-Chinese when it has Han script and Han characters are at least as
+    numerous as the residual ASCII letters, so a short embedded acronym or name
+    (``Fed`` / ``Nvidia``) inside Chinese prose no longer forces a call.
+    """
+    if not _HAN_RE.search(text):
+        return False
+    cleaned = _URL_RE.sub(" ", text)
+    cleaned = _HANDLE_RE.sub(" ", cleaned)
+    cleaned = _CASHTAG_RE.sub(" ", cleaned)
+    han = len(_HAN_RE.findall(cleaned))
+    latin = len(_ASCII_LETTER_RE.findall(cleaned))
+    return han >= latin
 
 
 def is_noop_text(text: str) -> bool:
@@ -434,6 +456,17 @@ def fidelity_error(source: str, translation: str) -> str | None:
     catches clause-swapped direction/negation reversals; tickers are compared
     too. Returns ``None`` when fidelity holds or neither side carries anything
     protected.
+
+    Deliberately NOT enforced: a pure entity↔value *permutation* that leaves
+    both the value and ticker multisets individually balanced (``NVDA 25%, AMD
+    30%`` -> ``NVDA 30%, AMD 25%``). Binding a value to its owning ticker
+    reliably needs clause parity between English and zh-TW, which does not hold
+    (English runs multiple facts together where zh-TW inserts commas), so a
+    clause-scoped binding gate degrades many *faithful* translations to
+    English-only. Because the complete English original is always delivered
+    alongside the translation, such a permutation stays visible to the reader;
+    a fragile gate would trade that visible, rare case for frequent false
+    fallbacks. See ``docs/trump_truth_zh_tw_translation_v1.md``.
     """
     source_values, _ = _extract_value_tokens(source)
     translation_values, _ = _extract_value_tokens(translation)
@@ -648,4 +681,10 @@ def get_default_translator() -> Translator | None:
         return None
     if not GEMINI_API_KEY:
         return None
-    return GeminiTranslator(GEMINI_API_KEY, GEMINI_MODEL)
+    # Defence in depth: settings already coalesces an empty env to a default,
+    # but never construct an adapter with a blank model — a blank model name
+    # would make every call fail late instead of cleanly disabling translation.
+    model = (GEMINI_MODEL or "").strip()
+    if not model:
+        return None
+    return GeminiTranslator(GEMINI_API_KEY, model)

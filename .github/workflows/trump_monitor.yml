@@ -5,10 +5,13 @@ on:
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
-# A slow/retrying source check must not create overlapping five-minute runs.
+# All-post delivery must never be interrupted mid-flight: a delayed/manual run
+# must QUEUE behind the in-progress run, not cancel it (which could kill a
+# provider call or a partial Telegram/seen-state write). cancel-in-progress:
+# false keeps the running job and queues at most one pending run.
 concurrency:
   group: trump-monitor
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -34,9 +37,12 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           # Reuse the already-approved Gemini product path for zh-TW translation.
-          # If the secret is unset the runner falls back to English-only delivery.
+          # If the API key is unset the runner falls back to English-only. The
+          # model falls back to a code default (settings.GEMINI_MODEL) rather
+          # than an empty override, so a missing GEMINI_MODEL secret cannot make
+          # every call use an empty model and silently degrade.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
         run: python -m src.runners.run_trump_monitor
       - name: Commit archive and explicit source health
         if: always()

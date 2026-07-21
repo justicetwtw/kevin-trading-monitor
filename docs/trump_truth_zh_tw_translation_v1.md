@@ -96,11 +96,17 @@ Truth Social 內容一律視為不可信輸入。固定 system instruction 必�
 
 僅記錄 public-safe aggregate：
 
-- `translation_status`: `healthy | degraded | unavailable`
-- `translation_attempted_count`
+- `translation_status`: `healthy | degraded | not_run | unavailable`
+  - `unavailable`：未設定 translator（未配置或關閉）。
+  - `not_run`：有 translator，但整批皆為 no-op（已是中文／URL-only／空），未實際呼叫 provider。
+  - `healthy`：至少一次 provider 呼叫成功且無失敗。
+  - `degraded`：有任何翻譯失敗（含 budget 耗盡而 fallback 英文者）。
+- `translation_attempted_count`：**實際 provider 呼叫次數**，不含 budget 耗盡而跳過者。
+- `translation_provider_call_count`：同上，明示「真正呼叫 provider」的次數，避免把 budget starvation 誤讀為健康。
 - `translation_ok_count`
 - `translation_noop_count`
 - `translation_failed_count`
+- `translation_budget_exhausted_count`
 - generic error codes
 - provider capability name，不含 credential 或 response
 
@@ -112,6 +118,31 @@ Truth Social 內容一律視為不可信輸入。固定 system instruction 必�
 - model response
 - credential
 -完整 URL query 或任何可能含個資／token 的字串
+
+## 7b. Fidelity 保護範圍與已知限制
+
+Fidelity 檢查以 typed multiset 對稱比對「高訊號、逐字保留」的 token；命中即
+fallback 英文（絕不放行被改動的譯文）。**保護**：
+
+- URL、$cashtag／已知 ticker；
+- 數值（百分比、USD 金額、裸數字）連同其單位與 per-value 方向（`rise 25%` 的 up／down），
+  故單位互換（`25%`→`25 美元`）、值變動（`25%`→`125%`）、憑空新增或漏掉、scale 換算錯誤
+  （`100 million`→`9 億`）、以及帶數字的方向反轉都會被擋；
+- ISO／CJK 日期（`2026-07-21` ↔ `2026 年 7 月 21 日`）；
+- clause 內「被否定的方向性主張」反轉／漏失。
+
+**刻意不強制（依賴永遠隨附的完整英文原文，而非脆弱 heuristic）**：
+
+- **Entity↔value 純排列**：兩檔股票各自數值都保留、只是張冠李戴
+  （`NVDA 25%, AMD 30%` → `NVDA 30%, AMD 25%`）。要可靠地把數值綁回其 entity，需仰賴
+  英文與 zh-TW 的 clause 切分一致，但兩者結構不同（英文常把多個事實併在無分隔的一句，
+  zh-TW 則以逗號斷句），clause-scoped 綁定會把大量**忠實**譯文誤降為英文-only，得不償失。
+  由於完整英文原文一律隨譯文送出，此類排列對讀者仍可見。
+- **一般散文否定**（非方向性主張的 `not/未/沒有` 語氣）：語意否定範圍難以無誤界定，不做硬性 gate。
+- **拼寫數字／中文數字／非 ISO 日期**（`twenty-five percent`、`兩千`、`July 21, 2026`）：
+  canonical 化易誤判，維持不保證、以英文原文為準。
+
+以上未保護項一律 fail-to-English（安全降級），不得宣稱「已驗證」。
 
 ## 8. Acceptance tests
 
