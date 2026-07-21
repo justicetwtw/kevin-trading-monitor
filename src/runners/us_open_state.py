@@ -54,6 +54,15 @@ DELIVERY_FAILED = "failed"
 DELIVERY_AMBIGUOUS = "ambiguous"
 DELIVERY_SKIPPED = "skipped"
 
+SUPPORTED_DELIVERY_STATES = frozenset({
+    DELIVERY_OBSERVING,
+    DELIVERY_CLAIMED,
+    DELIVERY_SENT,
+    DELIVERY_FAILED,
+    DELIVERY_AMBIGUOUS,
+    DELIVERY_SKIPPED,
+})
+
 # resolve_delivery_action outcomes.
 DO_PROCEED = "proceed"  # no prior success; send now
 DO_RETRY = "retry"  # prior attempt definitively failed; safe to resend
@@ -133,6 +142,24 @@ class UsOpenDeliveryStore:
             raise StateReadError(
                 f"{self.path} has a missing/invalid 'sessions' object"
             )
+        # Validate every stored record so a malformed individual entry fails
+        # closed here rather than crashing a later `.get()`/`.get('...')` call
+        # in the runner or the sanity check.
+        for key, record in sessions.items():
+            if not isinstance(record, dict):
+                raise StateReadError(
+                    f"{self.path} session {key!r} is not an object"
+                )
+            if record.get("session_key") != key:
+                raise StateReadError(
+                    f"{self.path} session {key!r} has mismatched session_key "
+                    f"{record.get('session_key')!r}"
+                )
+            if record.get("delivery_state") not in SUPPORTED_DELIVERY_STATES:
+                raise StateReadError(
+                    f"{self.path} session {key!r} has unsupported "
+                    f"delivery_state {record.get('delivery_state')!r}"
+                )
         return {"schema_version": schema, "sessions": sessions}
 
     def _write_raw(self, data: dict[str, Any]) -> None:

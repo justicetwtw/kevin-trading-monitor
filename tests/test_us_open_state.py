@@ -262,6 +262,39 @@ def test_unsupported_schema_fails_closed(tmp_path):
         store.get("us_open:2026-07-20")
 
 
+def test_malformed_session_record_value_fails_closed(tmp_path):
+    """A non-dict session value must fail closed, not crash a later .get()."""
+    path = tmp_path / "us_open_delivery_state.json"
+    path.write_text('{"sessions": {"us_open:2026-07-20": []}}', encoding="utf-8")
+    store = UsOpenDeliveryStore(path)
+    with pytest.raises(StateReadError):
+        store.get("us_open:2026-07-20")
+
+
+def test_mismatched_session_key_fails_closed(tmp_path):
+    path = tmp_path / "us_open_delivery_state.json"
+    path.write_text(
+        '{"sessions": {"us_open:2026-07-20": '
+        '{"session_key": "us_open:2026-07-19", "delivery_state": "sent"}}}',
+        encoding="utf-8",
+    )
+    store = UsOpenDeliveryStore(path)
+    with pytest.raises(StateReadError):
+        store.get("us_open:2026-07-20")
+
+
+def test_unsupported_delivery_state_fails_closed(tmp_path):
+    path = tmp_path / "us_open_delivery_state.json"
+    path.write_text(
+        '{"sessions": {"us_open:2026-07-20": '
+        '{"session_key": "us_open:2026-07-20", "delivery_state": "bogus"}}}',
+        encoding="utf-8",
+    )
+    store = UsOpenDeliveryStore(path)
+    with pytest.raises(StateReadError):
+        store.get("us_open:2026-07-20")
+
+
 def test_write_is_atomic_leaves_no_temp_file(tmp_path):
     store = _store(tmp_path)
     store.upsert(_record(_session(2026, 7, 20, 21, 32)))

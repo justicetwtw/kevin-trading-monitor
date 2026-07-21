@@ -58,6 +58,21 @@ def _freeze(monkeypatch, dt):
     monkeypatch.setattr(rub, "_now_taipei", lambda: dt)
 
 
+def _stepped_clock(monkeypatch, early, late, switch_after=4):
+    """Advance the runner clock from `early` to `late` after N _now calls.
+
+    The first `switch_after` calls (runner start, gen recompute, gen timestamps)
+    return `early`; the send recompute / sent_at / telemetry return `late`.
+    """
+    calls = {"n": 0}
+
+    def _now():
+        calls["n"] += 1
+        return early if calls["n"] <= switch_after else late
+
+    monkeypatch.setattr(rub, "_now_taipei", _now)
+
+
 def _sender(outcome, delivered=1, total=1, sink=None):
     def _send(message):
         if sink is not None:
@@ -395,6 +410,82 @@ def test_body_is_regenerated_at_execution_time(env, monkeypatch):
     rub.main()
 
     assert calls["n"] == 1
+
+
+def test_advancing_clock_crosses_on_time_to_late_at_send(env, monkeypatch):
+    # starts at +9 (on_time) but the send lands at +11 (late).
+    _stepped_clock(monkeypatch, _tpe(2026, 7, 20, 21, 39), _tpe(2026, 7, 20, 21, 41))
+    captured = []
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
+
+    rc = rub.main()
+
+    assert rc == 0
+    rec = _read(env)
+    assert rec["status"] == "late"  # decided at delivery time, not runner start
+    assert rec["lateness_minutes"] == 11
+    assert "延遲補發（晚 11 分鐘）" in captured[0]
+
+
+def test_advancing_clock_crosses_late_to_recovery_regenerates_body(env, monkeypatch):
+    # starts at +29 (late, us_open body) but crosses +30 to intraday_recovery.
+    _stepped_clock(monkeypatch, _tpe(2026, 7, 20, 21, 59), _tpe(2026, 7, 20, 22, 1))
+    captured = []
+    body_types = []
+    monkeypatch.setattr(rub, "_generate_body",
+                        lambda bt: body_types.append(bt) or _LEGACY_BODY)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
+
+    rc = rub.main()
+
+    assert rc == 0
+    assert _read(env)["status"] == "intraday_recovery"
+    assert "盤中補發" in captured[0]
+    # the body was regenerated with the intraday template at the new phase.
+    assert body_types == ["us_open", "us_midday"]
+
+
+def test_terminal_outcome_is_durably_pushed(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    pushes = []
+    monkeypatch.setattr(rub, "_durable_push",
+                        lambda msg: pushes.append(msg) or rub.PUSH_OK)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
+
+    rub.main()
+
+    assert len(pushes) == 2  # claim, then the terminal result
+    assert "claim" in pushes[0] and "sent" in pushes[1]
+
+
+def test_terminal_persist_failure_is_red_even_when_delivered(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    calls = {"n": 0}
+
+    def _push(_msg):
+        calls["n"] += 1
+        return rub.PUSH_OK if calls["n"] == 1 else rub.PUSH_FAILED  # claim ok, result fails
+
+    monkeypatch.setattr(rub, "_durable_push", _push)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
+
+    rc = rub.main()
+
+    assert rc == 1  # delivered, but the final state isn't durable -> surface red
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_SENT
+    assert any(a["outcome"] == "state_persist_failed"
+               for a in rec["observed_attempts"])
+
+
+def test_malformed_record_fails_closed_without_sending(env, monkeypatch):
+    env.write_text('{"sessions": {"us_open:2026-07-20": []}}', encoding="utf-8")
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
+
+    rc = rub.main()
+
+    assert rc == 1  # a malformed record must not crash into a send
 
 
 def test_telemetry_carries_forward_early_then_send(env, monkeypatch):

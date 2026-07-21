@@ -139,7 +139,8 @@ class TelegramNotifier:
                     payload["parse_mode"] = parse_mode
                 try:
                     response = await client.post(url, json=payload)
-                    if response.status_code == 200:
+                    status_code = response.status_code
+                    if status_code == 200:
                         preview = (
                             "<sensitive message redacted>"
                             if sensitive
@@ -147,14 +148,24 @@ class TelegramNotifier:
                         )
                         logger.info(f"Telegram sent to {destination}: {preview}")
                         delivered += 1
-                    else:
-                        # A received response means Telegram rejected it; the
-                        # message certainly did not go out to this recipient.
+                    elif 400 <= status_code < 500 and status_code != 429:
+                        # A definitive client-side rejection (bad request / auth /
+                        # chat-not-found): the send certainly did not occur, so a
+                        # retry is safe. 429 (rate limit) is deliberately excluded.
                         logger.error(
                             f"Telegram rejected for {destination}: "
-                            f"HTTP {response.status_code}"
+                            f"HTTP {status_code}"
                         )
                         rejected += 1
+                    else:
+                        # 5xx / 429 / other: a server-side or rate response on a
+                        # non-idempotent POST does not prove non-delivery, so an
+                        # automatic retry could duplicate. Treat as unknown.
+                        logger.error(
+                            f"Telegram unknown outcome for {destination}: "
+                            f"HTTP {status_code}"
+                        )
+                        unknown += 1
                 except httpx.HTTPError as exc:
                     # Transport/timeout: the request may already have reached
                     # Telegram, so delivery is unknown, not a definitive failure.

@@ -83,6 +83,31 @@ def test_detailed_all_rejected_is_failed_retryable():
     assert result["delivered"] == 0
 
 
+def test_detailed_5xx_is_ambiguous_not_retryable():
+    """A 5xx on a non-idempotent POST doesn't prove non-delivery: ambiguous."""
+    patcher, _ = _patch_httpx(post_status_code=500)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "ambiguous"
+
+
+def test_detailed_429_rate_limit_is_ambiguous():
+    patcher, _ = _patch_httpx(post_status_code=429)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "ambiguous"
+
+
+def test_detailed_403_client_error_is_definitive_failed():
+    patcher, _ = _patch_httpx(post_status_code=403)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "failed"
+
+
 def test_detailed_timeout_is_ambiguous():
     """A transport/timeout error may have reached Telegram: ambiguous, no retry."""
     async def boom(*_, **__):

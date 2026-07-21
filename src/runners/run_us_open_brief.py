@@ -165,6 +165,32 @@ def _telemetry_only(store, record, outcome, stage_code, env, *,
     store.upsert(record)
 
 
+def _persist_terminal(store, record, env, outcome_label, session, *, base_exit):
+    """Record a terminal outcome locally AND durably persist it before return.
+
+    Contract §4 requires the Telegram result to be persisted immediately. If the
+    post-send durable push fails, the durable claim stays on shared state; we
+    surface red with a generic ``state_persist_failed`` rather than let a
+    delivered brief later read as a false ambiguous, or a failure lose its
+    safe-retry state, on the next watchdog.
+    """
+    _telemetry_only(store, record, outcome_label, record.get("stage_code"), env,
+                    status=record.get("status"),
+                    lateness=record.get("lateness_minutes"))
+    push = _durable_push(
+        f"us_open {record['delivery_state']} {session.session_key} [skip ci]"
+    )
+    if push == PUSH_FAILED:
+        _telemetry_only(store, record, "state_persist_failed",
+                        "state_persist_failed", env)
+        logger.error(
+            f"us_open terminal state not durably persisted for "
+            f"{session.session_key}; workflow red"
+        )
+        return 1
+    return base_exit
+
+
 def main() -> int:
     runner_started = _now_taipei()
     env = _env()
@@ -294,34 +320,73 @@ def main() -> int:
         return 1
 
     # ACTION_SEND (proceed / retry): generate -> claim durably -> send.
-    record = _fresh("claimed", status=decision.status, lateness=lateness)
+    # Recompute the phase as late as possible before generating, so the body
+    # and title reflect the *actual* delivery phase, never the (possibly
+    # minutes-old) runner-start phase (generation, claim push and transport all
+    # take time, and the step allows several minutes).
+    def _sendable(d):
+        return (
+            d.action == ACTION_SEND
+            and d.session is not None
+            and d.session.session_key == session.session_key
+        )
+
+    def _abort_window_closed(recomputed):
+        # The window closed (or the ET session rolled over) while generating /
+        # pushing: never fabricate a stale opening brief; record a red miss.
+        rec = _fresh(DELIVERY_SKIPPED, status=STATUS_EXPIRED,
+                     lateness=recomputed.lateness_minutes)
+        rec["stage_code"] = "schedule_delay"
+        logger.warning(
+            f"us_open {session.session_key} window closed mid-run; not sending"
+        )
+        return _persist_terminal(store, rec, env, "expired_miss", session,
+                                 base_exit=1)
+
+    gen_decision = classify_us_open(_now_taipei())
+    if not _sendable(gen_decision):
+        return _abort_window_closed(gen_decision)
+
+    record = _fresh("claimed", status=gen_decision.status,
+                    lateness=gen_decision.lateness_minutes)
     record["generation_started_at"] = _now_taipei().isoformat()
     try:
-        body = _generate_body(body_brief_type(decision.status))
+        body = _generate_body(body_brief_type(gen_decision.status))
     except Exception as exc:  # noqa: BLE001 - generation must fail closed
         record["delivery_state"] = DELIVERY_FAILED
         record["stage_code"] = "generation_failed"
-        _telemetry_only(store, record, "generation_failed", "generation_failed",
-                        env, status=decision.status, lateness=lateness)
-        logger.error(f"us_open generation failed: {type(exc).__name__}")
-        return 1
+        return _persist_terminal(store, record, env, "generation_failed",
+                                 session, base_exit=1)
 
     record["generation_finished_at"] = _now_taipei().isoformat()
-    message = render_us_open_message(body, decision)
+
+    # Recompute immediately before the send; regenerate the body if the phase
+    # crossed a body-type boundary (late -> intraday_recovery) meanwhile.
+    send_decision = classify_us_open(_now_taipei())
+    if not _sendable(send_decision):
+        return _abort_window_closed(send_decision)
+    if body_brief_type(send_decision.status) != body_brief_type(
+        gen_decision.status
+    ):
+        body = _generate_body(body_brief_type(send_decision.status))
+    record["status"] = send_decision.status
+    record["lateness_minutes"] = send_decision.lateness_minutes
+    message = render_us_open_message(body, send_decision)
 
     # Persist the claim locally and durably push it BEFORE the outbound send.
     store.upsert(record)
-    push = _durable_push(f"us_open claim {session.session_key} [skip ci]")
-    if push == PUSH_FAILED:
-        # Durable mode is on but the claim could not be persisted to shared
-        # state. Sending now would risk a duplicate (a later attempt would see
-        # no claim). Fail closed BEFORE Telegram; the trailing commit-state
-        # cannot retroactively satisfy "durable before send".
+    if _durable_push(
+        f"us_open claim {session.session_key} [skip ci]"
+    ) == PUSH_FAILED:
+        # Durable mode on but the claim could not be persisted. Sending now would
+        # risk a duplicate (a later attempt would see no claim). Fail closed
+        # BEFORE Telegram; the trailing commit-state cannot satisfy this after.
         record["delivery_state"] = DELIVERY_FAILED
         record["stage_code"] = "claim_persist_failed"
         _telemetry_only(store, record, "claim_persist_failed",
                         "claim_persist_failed", env,
-                        status=decision.status, lateness=lateness)
+                        status=send_decision.status,
+                        lateness=send_decision.lateness_minutes)
         logger.error(
             f"us_open claim not durably persisted for {session.session_key}; "
             "not sending (retryable in-window)"
@@ -332,41 +397,49 @@ def main() -> int:
     result = outcome.get("outcome")
 
     if result == "sent":
+        sent_at = _now_taipei()
         record["delivery_state"] = DELIVERY_SENT
-        record["sent_at"] = _now_taipei().isoformat()
+        record["sent_at"] = sent_at.isoformat()
         record["stage_code"] = None
-        _telemetry_only(store, record, "sent", None, env,
-                        status=decision.status, lateness=lateness)
+        # Final status/lateness from the actual delivery timestamp.
+        final = classify_us_open(sent_at)
+        if (
+            final.session is not None
+            and final.session.session_key == session.session_key
+            and final.lateness_minutes is not None
+        ):
+            record["lateness_minutes"] = final.lateness_minutes
+            if final.action == ACTION_SEND:
+                record["status"] = final.status
         logger.info(
-            f"us_open delivered {session.session_key} status={decision.status} "
-            f"lateness={lateness}m"
+            f"us_open delivered {session.session_key} "
+            f"status={record['status']} lateness={record['lateness_minutes']}m"
         )
-        return 0
+        return _persist_terminal(store, record, env, "sent", session,
+                                 base_exit=0)
 
     if result == "ambiguous":
-        # Timeout / partial delivery: the message may have gone out. Do NOT
+        # Timeout / partial / server-side: the message may have gone out. Do NOT
         # auto-retry; surface ambiguity so it is not silently duplicated.
         record["delivery_state"] = DELIVERY_AMBIGUOUS
         record["stage_code"] = "ambiguous_delivery"
-        _telemetry_only(store, record, "send_ambiguous", "ambiguous_delivery",
-                        env, status=decision.status, lateness=lateness)
         logger.error(
             f"us_open send ambiguous for {session.session_key} "
             f"(delivered {outcome.get('delivered')}/{outcome.get('total')}); "
             "not auto-retrying"
         )
-        return 1
+        return _persist_terminal(store, record, env, "send_ambiguous", session,
+                                 base_exit=1)
 
     # Definitive rejection: certainly not delivered; retryable in-window.
     record["delivery_state"] = DELIVERY_FAILED
     record["stage_code"] = "telegram_send_failed"
-    _telemetry_only(store, record, "send_failed", "telegram_send_failed", env,
-                    status=decision.status, lateness=lateness)
     logger.error(
         f"us_open send failed for {session.session_key} "
-        f"(status={decision.status}); state=failed, retryable in-window"
+        f"(status={send_decision.status}); state=failed, retryable in-window"
     )
-    return 1
+    return _persist_terminal(store, record, env, "send_failed", session,
+                             base_exit=1)
 
 
 if __name__ == "__main__":
