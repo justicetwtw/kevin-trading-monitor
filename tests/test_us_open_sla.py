@@ -20,6 +20,7 @@ from src.runners.us_open_sla import (
     STATUS_INTRADAY_RECOVERY,
     STATUS_LATE,
     STATUS_ON_TIME,
+    body_brief_type,
     classify_us_open,
     render_us_open_message,
     resolve_us_open_session,
@@ -195,6 +196,18 @@ def test_intraday_recovery_title_is_midday_makeup():
     title = us_open_title(STATUS_INTRADAY_RECOVERY, 115)
     assert "盤中補發" in title
     assert "115" in title
+
+
+# --- phase-aware body selection ---------------------------------------------
+
+def test_body_type_on_time_and_late_use_us_open():
+    assert body_brief_type(STATUS_ON_TIME) == "us_open"
+    assert body_brief_type(STATUS_LATE) == "us_open"
+
+
+def test_body_type_intraday_recovery_uses_midday():
+    # >30 min late is well into the session; the premarket/open body is stale.
+    assert body_brief_type(STATUS_INTRADAY_RECOVERY) == "us_midday"
 
 
 # --- message rendering ------------------------------------------------------

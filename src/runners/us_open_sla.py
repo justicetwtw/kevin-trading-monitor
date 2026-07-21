@@ -171,6 +171,20 @@ def classify_us_open(now: datetime) -> UsOpenDecision:
 _ON_TIME_TITLE = "🚀 美股開盤 brief"
 
 
+def body_brief_type(status: str) -> str:
+    """Which BriefGenerator body matches the actual delivery phase.
+
+    ``intraday_recovery`` (>30 min late, e.g. the +115 min incident) is well
+    into the session, so it must use the intraday (``us_midday``) body — the
+    ``us_open`` body carries pre-market movers and an opening plan that would be
+    stale and misleading mid-session (contract section 5). ``on_time``/``late``
+    are still at/near the open, so they keep the ``us_open`` body.
+    """
+    if status == STATUS_INTRADAY_RECOVERY:
+        return "us_midday"
+    return "us_open"
+
+
 def us_open_title(status: str, lateness_minutes: int | None) -> str:
     """Title that reflects the *actual* delivery phase (contract section 5)."""
     late = lateness_minutes if lateness_minutes is not None else 0

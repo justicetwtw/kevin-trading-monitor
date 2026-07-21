@@ -21,10 +21,12 @@ on:
     - cron: '3 15 * * 1-5'    # ~open +33
   workflow_dispatch: {}
 
-# Dedicated queue isolated from `market-brief`. cancel-in-progress is false so
-# an in-flight send is never interrupted; attempts are spaced wider than a run
-# so a pending attempt never silently replaces an earlier one. Concurrency
-# semantics are documented in docs/market_brief_sla_v1.md.
+# The dedicated group serializes attempts (no two send concurrently). At-most-
+# once does NOT rely on the queue surviving: the runner reads durable state and
+# durably pushes its claim BEFORE sending, so a dropped/replaced pending attempt
+# can cause neither a duplicate (serialization + durable claim) nor a miss
+# (later staggered crons re-cover from the durable state). See
+# docs/market_brief_sla_v1.md §10 for the concurrency rationale and residuals.
 concurrency:
   group: us-open-brief
   cancel-in-progress: false
@@ -36,6 +38,9 @@ jobs:
   us_open:
     runs-on: ubuntu-latest
     steps:
+      - name: Record workflow start (before setup — separates queue vs setup delay)
+        run: |
+          echo "US_OPEN_WORKFLOW_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -54,6 +59,9 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           US_OPEN_SCHEDULE_SOURCE: ${{ github.event.schedule || github.event_name }}
           GITHUB_RUN_ID: ${{ github.run_id }}
+          # Enable the runner's durable claim push (commit + push to main before
+          # the outbound send) so a post-send crash surfaces ambiguity.
+          US_OPEN_DURABLE_STATE: '1'
         run: python -m src.runners.run_us_open_brief
       - if: always()
         uses: ./.github/actions/commit-state

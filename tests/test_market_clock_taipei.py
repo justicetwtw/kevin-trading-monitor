@@ -112,6 +112,13 @@ def test_us_open_moved_to_isolated_dedicated_workflow():
         assert dst_attempt in us_open  # daylight open +2/+9/+18
     for std_attempt in ("32 14 * * 1-5", "39 14 * * 1-5", "48 14 * * 1-5"):
         assert std_attempt in us_open  # standard open +2/+9/+18
+    # durable claim before send + real (pre-setup) workflow-start timestamp.
+    assert "US_OPEN_DURABLE_STATE" in us_open
+    assert "US_OPEN_WORKFLOW_STARTED_AT" in us_open
+    # the start timestamp is captured before dependency install.
+    start_idx = us_open.index("US_OPEN_WORKFLOW_STARTED_AT")
+    install_idx = us_open.index("Install dependencies")
+    assert start_idx < install_idx
 
 
 def test_tuesday_late_sanity_checks_overnight_and_local_briefs():

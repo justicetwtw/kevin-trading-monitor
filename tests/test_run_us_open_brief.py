@@ -1,9 +1,10 @@
 """Integration tests for the delay-resilient us_open runner (Issue #13).
 
 The heavy data stack and Telegram transport are stubbed; the attempt clock is
-frozen. These prove the end-to-end delivery contract: claim-before-send,
-at-most-once, honest late/recovery copy, fail-closed exit codes, ambiguity
-surfacing, runtime regeneration and public-state privacy.
+frozen. These prove: claim-durably-before-send, at-most-once, honest phase-aware
+copy, tri-state send handling (sent/failed/ambiguous), fail-closed exit codes,
+expired-miss red, ambiguity surfacing, corrupt-state fail-closed, real
+workflow-start timestamp, runtime regeneration and public-state privacy.
 """
 
 import json
@@ -18,6 +19,7 @@ from src.runners.us_open_state import (
     DELIVERY_AMBIGUOUS,
     DELIVERY_CLAIMED,
     DELIVERY_FAILED,
+    DELIVERY_OBSERVING,
     DELIVERY_SENT,
     DELIVERY_SKIPPED,
     UsOpenDeliveryStore,
@@ -26,8 +28,9 @@ from src.runners.us_open_state import (
 
 TAIPEI = pytz.timezone("Asia/Taipei")
 
+_BODY_MARKER = "SECRET-BODY-MARKER-123"
 _LEGACY_BODY = (
-    "<b>🚀 美股開盤 brief</b>\n\nSECRET-BODY-MARKER-123"
+    f"<b>🚀 美股開盤 brief</b>\n\n{_BODY_MARKER}"
     "\n\n<i>下次 brief: 美股盤中</i>"
 )
 
@@ -44,12 +47,24 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setattr(rub, "LEGACY_DEDUP_PATH", tmp_path / "no_legacy.json")
     monkeypatch.setenv("US_OPEN_SCHEDULE_SOURCE", "cron 32 13 * * 1-5")
     monkeypatch.setenv("GITHUB_RUN_ID", "run-42")
-    monkeypatch.setattr(rub, "_generate_body", lambda: _LEGACY_BODY)
+    monkeypatch.delenv("US_OPEN_WORKFLOW_STARTED_AT", raising=False)
+    monkeypatch.setattr(rub, "_generate_body", lambda bt: _LEGACY_BODY)
+    # Durable push is a CI-only git op; keep it inert and observable in tests.
+    monkeypatch.setattr(rub, "_durable_push", lambda msg: False)
     return state_path
 
 
 def _freeze(monkeypatch, dt):
     monkeypatch.setattr(rub, "_now_taipei", lambda: dt)
+
+
+def _sender(outcome, delivered=1, total=1, sink=None):
+    def _send(message):
+        if sink is not None:
+            sink.append(message)
+        return {"outcome": outcome, "delivered": delivered, "total": total}
+
+    return _send
 
 
 def _read(state_path, key="us_open:2026-07-20"):
@@ -70,12 +85,21 @@ def _preseed(state_path, session, **kw):
     ))
 
 
+class _NeverCalled:
+    called = False
+
+    def __call__(self, *_a, **_k):
+        self.called = True
+        raise AssertionError("send must not be called")
+
+
 # --- happy paths ------------------------------------------------------------
 
 def test_on_time_send_records_sent_and_plain_title(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))  # +2
+    monkeypatch.setenv("US_OPEN_WORKFLOW_STARTED_AT", "2026-07-20T13:31:00Z")
     captured = []
-    monkeypatch.setattr(rub, "_send", lambda m: captured.append(m) or True)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
 
     rc = rub.main()
 
@@ -89,27 +113,37 @@ def test_on_time_send_records_sent_and_plain_title(env, monkeypatch):
     assert rec["generation_finished_at"] is not None
     assert rec["schedule_source"] == "cron 32 13 * * 1-5"
     assert rec["workflow_run_id"] == "run-42"
+    # real workflow-start (before setup) is recorded, separate from runner start.
+    assert rec["workflow_started_at"] == "2026-07-20T13:31:00Z"
+    assert rec["runner_started_at"] is not None
     assert rec["expected_at_taipei"].startswith("2026-07-20T21:30")
     assert captured and captured[0].startswith("<b>🚀 美股開盤 brief</b>")
     assert "延遲補發" not in captured[0]
 
 
-def test_late_send_uses_delayed_title(env, monkeypatch):
+def test_late_send_uses_delayed_title_and_us_open_body(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 50))  # +20
     captured = []
-    monkeypatch.setattr(rub, "_send", lambda m: captured.append(m) or True)
+    body_types = []
+    monkeypatch.setattr(rub, "_generate_body",
+                        lambda bt: body_types.append(bt) or _LEGACY_BODY)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
 
     rc = rub.main()
 
     assert rc == 0
     assert _read(env)["status"] == "late"
     assert "延遲補發（晚 20 分鐘）" in captured[0]
+    assert body_types == ["us_open"]  # still near the open
 
 
-def test_intraday_recovery_uses_makeup_title(env, monkeypatch):
+def test_intraday_recovery_uses_midday_body_and_makeup_title(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 23, 25))  # +115 (the incident)
     captured = []
-    monkeypatch.setattr(rub, "_send", lambda m: captured.append(m) or True)
+    body_types = []
+    monkeypatch.setattr(rub, "_generate_body",
+                        lambda bt: body_types.append(bt) or _LEGACY_BODY)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
 
     rc = rub.main()
 
@@ -117,6 +151,8 @@ def test_intraday_recovery_uses_makeup_title(env, monkeypatch):
     assert _read(env)["status"] == "intraday_recovery"
     assert "盤中補發" in captured[0]
     assert "115" in captured[0]
+    # phase-appropriate body: intraday, NOT the premarket/open template.
+    assert body_types == ["us_midday"]
 
 
 # --- idempotency ------------------------------------------------------------
@@ -124,14 +160,13 @@ def test_intraday_recovery_uses_makeup_title(env, monkeypatch):
 def test_duplicate_session_does_not_resend(env, monkeypatch):
     _preseed(env, resolve_us_open_session(_tpe(2026, 7, 20, 21, 32)),
              delivery_state=DELIVERY_SENT, status="on_time")
-    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 39))  # a later watchdog attempt
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 39))
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
 
     assert rc == 0
-    assert send.called is False
+    assert _read(env)["delivery_state"] == DELIVERY_SENT
 
 
 def test_migrated_legacy_session_dedups(env, monkeypatch, tmp_path):
@@ -140,20 +175,18 @@ def test_migrated_legacy_session_dedups(env, monkeypatch, tmp_path):
                       encoding="utf-8")
     monkeypatch.setattr(rub, "LEGACY_DEDUP_PATH", legacy)
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
 
     assert rc == 0
-    assert send.called is False
 
 
-def test_retry_after_failure_sends(env, monkeypatch):
+def test_retry_after_definitive_failure_sends(env, monkeypatch):
     _preseed(env, resolve_us_open_session(_tpe(2026, 7, 20, 21, 32)),
              delivery_state=DELIVERY_FAILED, status="on_time")
-    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 35))  # still in-window
-    monkeypatch.setattr(rub, "_send", lambda m: True)
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 35))
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
 
     rc = rub.main()
 
@@ -163,49 +196,66 @@ def test_retry_after_failure_sends(env, monkeypatch):
 
 # --- skips ------------------------------------------------------------------
 
-def test_expired_records_miss_and_does_not_send(env, monkeypatch):
+def test_expired_miss_is_red_and_records_miss(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 21, 4, 30))  # after 04:00 close
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
 
-    assert rc == 0
-    assert send.called is False
+    assert rc == 1  # a completely missed opening brief must not be green
     rec = _read(env)
     assert rec["status"] == "expired"
     assert rec["delivery_state"] == DELIVERY_SKIPPED
     assert rec["stage_code"] == "schedule_delay"
 
 
-def test_early_attempt_skips_without_state(env, monkeypatch):
+def test_expired_after_failure_preserves_failure_signal(env, monkeypatch):
+    _preseed(env, resolve_us_open_session(_tpe(2026, 7, 20, 21, 32)),
+             delivery_state=DELIVERY_FAILED, status="late")
+    # bump the prior record's stage_code as the runner would have
+    store = UsOpenDeliveryStore(env)
+    rec = store.get("us_open:2026-07-20")
+    rec["stage_code"] = "telegram_send_failed"
+    store.upsert(rec)
+    _freeze(monkeypatch, _tpe(2026, 7, 21, 4, 30))
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
+
+    rc = rub.main()
+
+    assert rc == 1
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_FAILED  # not downgraded to skipped
+    assert rec["stage_code"] == "telegram_send_failed"  # failure preserved
+    assert rec["status"] == "expired"
+
+
+def test_early_attempt_records_observing_without_send(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 0))  # before open
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
 
     assert rc == 0
-    assert send.called is False
-    assert not env.exists() or _read(env) is None
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_OBSERVING  # durable telemetry
+    assert rec["observed_attempts"][-1]["outcome"] == "early"
 
 
 def test_weekend_attempt_skips(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 18, 21, 32))  # Saturday
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
 
     assert rc == 0
-    assert send.called is False
+    assert not env.exists() or _read(env) is None
 
 
 # --- failure / ambiguity (fail closed) --------------------------------------
 
-def test_telegram_failure_is_red_and_retryable(env, monkeypatch):
+def test_definitive_send_failure_is_red_and_retryable(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-    monkeypatch.setattr(rub, "_send", lambda m: False)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("failed", delivered=0))
 
     rc = rub.main()
 
@@ -215,20 +265,31 @@ def test_telegram_failure_is_red_and_retryable(env, monkeypatch):
     assert rec["stage_code"] == "telegram_send_failed"
 
 
-def test_generation_failure_is_red_and_does_not_send(env, monkeypatch):
+def test_ambiguous_send_is_red_and_not_retryable(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-
-    def _boom():
-        raise RuntimeError("data source down")
-
-    monkeypatch.setattr(rub, "_generate_body", _boom)
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    monkeypatch.setattr(rub, "_send_detailed",
+                        _sender("ambiguous", delivered=0, total=2))
 
     rc = rub.main()
 
     assert rc == 1
-    assert send.called is False
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_AMBIGUOUS
+    assert rec["stage_code"] == "ambiguous_delivery"
+
+
+def test_generation_failure_is_red_and_does_not_send(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+
+    def _boom(_bt):
+        raise RuntimeError("data source down")
+
+    monkeypatch.setattr(rub, "_generate_body", _boom)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
+
+    rc = rub.main()
+
+    assert rc == 1
     rec = _read(env)
     assert rec["delivery_state"] == DELIVERY_FAILED
     assert rec["stage_code"] == "generation_failed"
@@ -238,34 +299,60 @@ def test_prior_unresolved_claim_surfaces_ambiguous_not_duplicate(env, monkeypatc
     _preseed(env, resolve_us_open_session(_tpe(2026, 7, 20, 21, 32)),
              delivery_state=DELIVERY_CLAIMED, status="on_time")
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 39))
-    send = _NeverCalled()
-    monkeypatch.setattr(rub, "_send", send)
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
 
     assert rc == 1
-    assert send.called is False
     rec = _read(env)
     assert rec["delivery_state"] == DELIVERY_AMBIGUOUS
     assert rec["stage_code"] == "ambiguous_delivery"
 
 
-# --- ordering / regeneration / privacy --------------------------------------
+def test_already_ambiguous_stays_red_and_does_not_resend(env, monkeypatch):
+    _preseed(env, resolve_us_open_session(_tpe(2026, 7, 20, 21, 32)),
+             delivery_state=DELIVERY_AMBIGUOUS, status="on_time")
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 39))
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
-def test_claim_is_persisted_before_send(env, monkeypatch):
+    rc = rub.main()
+
+    assert rc == 1  # not green while delivery is in doubt (contract section 6)
+    assert _read(env)["delivery_state"] == DELIVERY_AMBIGUOUS
+
+
+def test_corrupt_state_fails_closed_without_sending(env, monkeypatch):
+    env.write_text("{not valid json", encoding="utf-8")
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-    seen = {}
+    monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
-    def _send_checks_state(_message):
-        seen["at_send"] = _read(env)["delivery_state"]
-        return True
+    rc = rub.main()
 
-    monkeypatch.setattr(rub, "_send", _send_checks_state)
+    assert rc == 1  # corrupt state must not be treated as empty / license a send
+    # the corrupt file is not silently rewritten as empty
+    assert env.read_text(encoding="utf-8") == "{not valid json"
+
+
+# --- ordering / durability / regeneration / privacy -------------------------
+
+def test_claim_is_durably_pushed_before_send(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    order = []
+    monkeypatch.setattr(rub, "_durable_push",
+                        lambda msg: order.append(("push", msg)) or True)
+
+    def _send(_message):
+        order.append(("send", _read(env)["delivery_state"]))
+        return {"outcome": "sent", "delivered": 1, "total": 1}
+
+    monkeypatch.setattr(rub, "_send_detailed", _send)
 
     rc = rub.main()
 
     assert rc == 0
-    assert seen["at_send"] == DELIVERY_CLAIMED  # claim on disk before send
+    assert order[0][0] == "push"       # claim pushed first
+    assert "us_open claim" in order[0][1]
+    assert order[1] == ("send", DELIVERY_CLAIMED)  # claim durable at send time
     assert _read(env)["delivery_state"] == DELIVERY_SENT
 
 
@@ -273,33 +360,25 @@ def test_body_is_regenerated_at_execution_time(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
     calls = {"n": 0}
 
-    def _gen():
+    def _gen(_bt):
         calls["n"] += 1
         return _LEGACY_BODY
 
     monkeypatch.setattr(rub, "_generate_body", _gen)
-    monkeypatch.setattr(rub, "_send", lambda m: True)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
 
     rub.main()
 
-    assert calls["n"] == 1  # regenerated when the workflow actually ran
+    assert calls["n"] == 1
 
 
 def test_public_state_leaks_no_message_or_secret(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-    monkeypatch.setattr(rub, "_send", lambda m: True)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
 
     rub.main()
 
     blob = env.read_text(encoding="utf-8").lower()
-    assert "secret-body-marker-123" not in blob  # Telegram body never persisted
+    assert _BODY_MARKER.lower() not in blob  # Telegram body never persisted
     for forbidden in ("token", "chat_id", "bot", "position"):
         assert forbidden not in blob
-
-
-class _NeverCalled:
-    called = False
-
-    def __call__(self, *_a, **_k):
-        self.called = True
-        raise AssertionError("send must not be called")

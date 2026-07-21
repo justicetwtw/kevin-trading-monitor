@@ -164,48 +164,79 @@ Before requesting review:
 5. report each acceptance item as fixed, intentionally degraded with evidence, or blocked;
 6. keep the PR Draft and stop for an independent incremental review.
 
-## 10. Implementation status (v1)
+## 10. Implementation status (v1, hardened per incremental review)
 
 Delivered on this branch:
 
 - `src/runners/us_open_sla.py` — deterministic session resolution, SLA
   classification (`on_time`/`late`/`intraday_recovery`/`expired`) with named
-  minute thresholds, and honest title/copy rendering.
+  minute thresholds, phase-aware body selection and honest title/copy.
 - `src/runners/us_open_state.py` — session-keyed delivery state machine
-  (`data_store/us_open_delivery_state.json`) with the section-4 schema,
-  claim/sent/failed/ambiguous/skipped states, concurrent-writer merge,
-  no-downgrade-of-`sent`, retention pruning and legacy boolean migration.
+  (`data_store/us_open_delivery_state.json`, section-4 schema) with
+  claim/sent/failed/ambiguous/skipped/observing states, **atomic writes**
+  (temp + fsync + `os.replace`), **fail-closed** reads (a corrupt file is never
+  read as empty), no-downgrade of `sent`, no-erasure of `failed`, bounded
+  per-session attempt telemetry, retention pruning, and **date-gated** legacy
+  migration.
 - `src/runners/run_us_open_brief.py` — the runner: recompute NY session →
-  idempotency/ambiguity check → persist claim → regenerate body at execution
-  time → send → persist outcome, failing closed (exit 1) on send failure,
-  generation failure or ambiguity.
-- `.github/workflows/us_open_brief.yml` — dedicated, isolated watchdog with its
-  own `us-open-brief` concurrency group and staggered attempts.
-- `market_brief.yml` no longer schedules or dispatches `us_open`; the shared
-  `market-brief` queue can no longer drop/reorder the opening brief.
-- `run_brief_sanity.py` reads `us_open` completion from the new state (OR the
+  fail-closed state read → idempotency/ambiguity check → regenerate a
+  phase-appropriate body → **durably push the claim before the send** → send →
+  persist outcome. Fails closed (exit 1) on send failure, ambiguity, expiry
+  miss, generation failure or unreadable state.
+- `src/alerts/telegram_bot.py` — `send_telegram_detailed` returns a tri-state
+  outcome so the runner distinguishes a definitive rejection (retryable) from an
+  ambiguous timeout/partial delivery (surfaced, never auto-retried). The
+  existing `send_telegram` bool contract is unchanged for other briefs.
+- `.github/workflows/us_open_brief.yml` — dedicated, isolated watchdog; captures
+  the real workflow-start time before setup; enables the durable claim push.
+- `market_brief.yml` no longer schedules or dispatches `us_open`.
+- `run_brief_sanity.py` reads `us_open` completion from the new state (or the
   legacy boolean) so the nightly check stays accurate.
 
-### Chosen concurrency semantics (documented, not hidden)
+### Concurrency & at-most-once (documented, not hidden)
 
-- A single dedicated workflow owns the open. `cancel-in-progress: false` and
-  attempts spaced wider than a run mean a pending attempt never silently
-  replaces an earlier valid one.
-- Attempts fire around both DST and standard windows; the runner computes the
-  real NY session, so wrong-DST attempts self-skip (before open) or become a
-  guarded recovery, never a wrong or duplicate send.
-- At-most-once per `session_key` comes from the committed state + serialized
-  execution. A crash between the persisted claim and the send resolution is a
-  genuine exactly-once ambiguity: it is surfaced as `ambiguous_delivery`
-  (workflow red) and never auto-duplicated.
+The dedicated group serializes attempts (no two send concurrently). At-most-once
+does **not** rely on GitHub's pending queue surviving:
 
-### GitHub scheduling honesty
+- The runner reads durable state and **durably commits+pushes its `claimed`
+  record to `main` before the outbound send** (runner git op, retried; a
+  transient failure is flushed by the trailing `commit-state`).
+- Therefore a dropped/replaced pending attempt can cause neither a **duplicate**
+  (serialization + a durable claim that the next attempt observes → ambiguous,
+  no resend) nor a **miss** (later staggered crons re-cover from durable state).
+- Wrong-DST attempts self-skip before open or become a guarded recovery; the
+  runtime NY-session computation, not the cron label, decides.
+- A crash between the durable claim and the send resolution is a genuine
+  exactly-once ambiguity: surfaced as `ambiguous_delivery` (workflow red),
+  never auto-duplicated, and it stays red until the record is cleared.
+- Expiry semantics: a completely missed opening brief exits **red** and records
+  the miss; an expiry after a prior send failure preserves the `failed` state
+  and its stage code rather than overwriting it with a benign skip.
 
-GitHub `schedule` has no punctuality guarantee and can delay or drop runs, so a
-GitHub-only design cannot promise a hard ≤5–10 minute delivery SLA. This PR
-makes late delivery *honest and observable* rather than pretending punctuality.
-A verified tight SLA would need an external scheduler or persistent runner,
-which is **not** added here (no new service/credential without Kevin approval).
+### Observability
+
+`workflow_started_at` is captured by the first workflow step (before Python
+setup/install) so GitHub queue delay is separable from runner/setup delay;
+`runner_started_at`, `generation_started_at/finished_at` and `sent_at` isolate
+the remaining stages. Every attempt — including early/duplicate/expired skips —
+appends a bounded generic entry to `observed_attempts`, so diagnosis is durable,
+not log-only.
+
+### GitHub scheduling honesty & residual limitations
+
+- GitHub `schedule` has no punctuality guarantee and can delay/drop runs, so a
+  GitHub-only design cannot promise a hard ≤5–10 minute delivery SLA. This makes
+  late delivery *honest and observable* rather than pretending punctuality. A
+  verified tight SLA needs an external scheduler / persistent runner — **not**
+  added here (no new service/credential without Kevin approval).
+- **Exchange holidays are not detected** (that needs an exchange-calendar
+  source, deferred as out of scope). Only weekends are treated as non-trading;
+  on a U.S. holiday a scheduled attempt would classify as a normal in-window
+  send.
+- The durable claim narrows, but cannot fully eliminate, the exactly-once
+  window: a crash after the send but before either the runner's claim push or
+  the trailing `commit-state` completes still leaves a small residual, which is
+  by design surfaced as ambiguity rather than silently duplicated.
 
 ### Public-safe health
 

@@ -8,6 +8,18 @@ machine with explicit claim/sent/failed/ambiguous/skipped states, plus the
 public-safe timing fields the incident review needed (expected/started/sent
 timestamps, lateness, schedule source, stage code).
 
+Reliability properties (repair round):
+
+- Writes are atomic (temp file + fsync + ``os.replace``) so a reader never sees
+  a partial file.
+- A *missing* file is an empty state (legitimate first run); a *corrupt* file
+  fails closed (``StateReadError``) so a lost record can never license a
+  re-send.
+- ``sent`` is never downgraded; ``failed`` / ``claimed`` are never silently
+  overwritten by a lateral expiry that would erase the failure signal.
+- Legacy migration is gated to the current ET session date so a legacy send
+  that crossed Taipei midnight can never pre-mark a *future* real session.
+
 The file only ever contains timestamps, session keys, statuses and generic
 stage codes — never Telegram content, chat IDs, tokens or portfolio data — so
 the committed ``data_store/us_open_delivery_state.json`` doubles as a
@@ -17,6 +29,8 @@ public-safe delivery-health surface.
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
@@ -28,8 +42,12 @@ BRIEF_TYPE = "us_open"
 
 # Records older than this many days are pruned to bound file growth.
 RETENTION_DAYS = 21
+# Bounded per-session attempt-outcome telemetry (durable, not log-only).
+MAX_ATTEMPT_LOG = 12
 
-# delivery_state values (contract section 4).
+# delivery_state values (contract section 4, plus 'observing' for durable
+# pre-open attempt telemetry).
+DELIVERY_OBSERVING = "observing"  # pre-open / early attempt; non-terminal
 DELIVERY_CLAIMED = "claimed"
 DELIVERY_SENT = "sent"
 DELIVERY_FAILED = "failed"
@@ -44,13 +62,16 @@ DO_SKIP_AMBIGUOUS = "skip_ambiguous"  # already surfaced as ambiguous; leave it
 DO_AMBIGUOUS = "ambiguous"  # prior unresolved claim; surface, do not resend
 
 
+class StateReadError(Exception):
+    """Raised when an existing state file cannot be parsed (fail closed)."""
+
+
 def resolve_delivery_action(existing: dict | None) -> str:
     """Decide what to do given the persisted record for this session.
 
-    Under the dedicated serialized workflow only one attempt runs at a time, so
-    a persisted ``claimed`` state can only have been left by a *previous* run
-    that crashed between persisting its claim and resolving the send. That is a
-    genuine exactly-once ambiguity: we surface it rather than risk an
+    A persisted ``claimed`` state can only have been left by a *previous* run
+    that crashed between persisting its (durable) claim and resolving the send.
+    That is a genuine exactly-once ambiguity: we surface it rather than risk an
     uncontrolled duplicate (contract section 4).
     """
     if not existing:
@@ -64,12 +85,13 @@ def resolve_delivery_action(existing: dict | None) -> str:
         return DO_AMBIGUOUS
     if state == DELIVERY_FAILED:
         return DO_RETRY
-    # skipped (wrong-session / expired) — a later in-window attempt may still send.
+    # observing (pre-open) / skipped (wrong-session/expired) — a later in-window
+    # attempt may still send.
     return DO_PROCEED
 
 
 class UsOpenDeliveryStore:
-    """Concurrency-tolerant reader/writer for the per-session delivery state."""
+    """Atomic, fail-closed reader/writer for the per-session delivery state."""
 
     def __init__(
         self,
@@ -83,14 +105,18 @@ class UsOpenDeliveryStore:
 
     def _read_raw(self) -> dict[str, Any]:
         if not self.path.exists():
+            # A missing file is a legitimate empty state (first run ever).
             return {"schema_version": STATE_SCHEMA_VERSION, "sessions": {}}
         try:
             data = json.loads(self.path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            # A corrupt file must not wedge delivery; treat as empty and rewrite.
-            return {"schema_version": STATE_SCHEMA_VERSION, "sessions": {}}
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError) as exc:
+            # An *existing* but unreadable file must NOT be treated as empty:
+            # a lost sent-record would license a duplicate send. Fail closed.
+            raise StateReadError(
+                f"{self.path} exists but is unreadable: {type(exc).__name__}"
+            ) from exc
         if not isinstance(data, dict):
-            return {"schema_version": STATE_SCHEMA_VERSION, "sessions": {}}
+            raise StateReadError(f"{self.path} is not a JSON object")
         sessions = data.get("sessions")
         if not isinstance(sessions, dict):
             sessions = {}
@@ -101,10 +127,24 @@ class UsOpenDeliveryStore:
 
     def _write_raw(self, data: dict[str, Any]) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2),
-            encoding="utf-8",
+        payload = json.dumps(data, ensure_ascii=False, indent=2)
+        # Atomic write: fully materialise a temp file, fsync, then rename over
+        # the target so a concurrent reader never observes a partial JSON.
+        fd, tmp_name = tempfile.mkstemp(
+            dir=str(self.path.parent), prefix=".us_open_state.", suffix=".tmp"
         )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(payload)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(tmp_name, self.path)
+        except BaseException:
+            try:
+                os.unlink(tmp_name)
+            except OSError:
+                pass
+            raise
 
     @staticmethod
     def _prune(sessions: dict[str, Any]) -> None:
@@ -131,7 +171,6 @@ class UsOpenDeliveryStore:
                 if isinstance(record, dict)
                 else None
             )
-            # Drop clearly-old records; keep anything undated/unparseable.
             if parsed is not None and parsed < cutoff:
                 sessions.pop(key, None)
 
@@ -157,19 +196,28 @@ class UsOpenDeliveryStore:
 
         The disk is re-read on every write, so concurrent records for *other*
         sessions are never clobbered (models the state-write conflict / rebase
-        case). A durable ``sent`` is never downgraded by a later lower state —
-        a Telegram success that raced a state write is not lost.
+        case). Downgrade protection:
+
+        - a durable ``sent`` is never replaced by a lower state — a Telegram
+          success that raced a state write is not lost;
+        - a ``failed`` or ``claimed`` record is never silently overwritten by an
+          expiry ``skipped`` that would erase the failure/ambiguity signal
+          (callers must set an explicit ``expired_after_*`` stage instead).
         """
         key = record["session_key"]
         data = self._read_raw()
         sessions = data["sessions"]
         disk = sessions.get(key)
-        if (
-            isinstance(disk, dict)
-            and disk.get("delivery_state") == DELIVERY_SENT
-            and record.get("delivery_state") != DELIVERY_SENT
-        ):
-            return disk
+        if isinstance(disk, dict):
+            disk_state = disk.get("delivery_state")
+            new_state = record.get("delivery_state")
+            if disk_state == DELIVERY_SENT and new_state != DELIVERY_SENT:
+                return disk
+            # Defensive: never let an expiry (skipped) silently erase a prior
+            # never-delivered failure. An expired-after-failure must be recorded
+            # as 'failed' (status=expired), keeping the failure stage_code.
+            if disk_state == DELIVERY_FAILED and new_state == DELIVERY_SKIPPED:
+                return disk
         sessions[key] = record
         self._prune(sessions)
         data["schema_version"] = STATE_SCHEMA_VERSION
@@ -178,28 +226,37 @@ class UsOpenDeliveryStore:
 
     # -- legacy migration ----------------------------------------------------
 
-    def migrate_legacy(self) -> int:
+    def migrate_legacy(self, max_session_date_et: str | None = None) -> int:
         """Seed ``sent`` records from the legacy boolean dedup file.
 
-        For ``us_open`` the exchange-open Taipei date equals the ET session
-        date, so a legacy ``brief_sent_today[<date>].us_open == true`` maps
-        directly to session key ``us_open:<date>``. Idempotent: existing keys
-        are left untouched. Prevents a re-send during the cutover.
+        For ``us_open`` the exchange-open Taipei date normally equals the ET
+        session date, so a legacy ``brief_sent_today[<date>].us_open == true``
+        maps to session key ``us_open:<date>``. But the legacy marker keys by
+        *send* time, and a badly delayed send could cross Taipei midnight and be
+        keyed to the next date. To ensure that can never pre-mark a *future*
+        real session as delivered, migration is gated to
+        ``max_session_date_et`` (the current ET session date). Idempotent.
         """
         if not self.legacy_path or not self.legacy_path.exists():
             return 0
         try:
             legacy = json.loads(self.legacy_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError):
             return 0
         if not isinstance(legacy, dict):
             return 0
 
+        max_date = _parse_iso_date(max_session_date_et)
         data = self._read_raw()
         sessions = data["sessions"]
         migrated = 0
         for taipei_date, marks in legacy.items():
             if not isinstance(marks, dict) or not marks.get(BRIEF_TYPE):
+                continue
+            parsed = _parse_iso_date(taipei_date)
+            # Never seed a session dated after the current ET session: a legacy
+            # entry keyed one day past its open must not skip a real future open.
+            if max_date is not None and parsed is not None and parsed > max_date:
                 continue
             key = f"{BRIEF_TYPE}:{taipei_date}"
             if key in sessions:
@@ -211,11 +268,12 @@ class UsOpenDeliveryStore:
                 "session_key": key,
                 "expected_at_taipei": None,
                 "workflow_started_at": None,
+                "runner_started_at": None,
                 "generation_started_at": None,
                 "generation_finished_at": None,
                 "sent_at": None,
-                # Legacy boolean carried no timestamps; do not fabricate an
-                # on_time status. Only the fact of delivery is known.
+                # Legacy boolean carried no timestamps; do not fabricate a
+                # status. Only the fact of delivery is known.
                 "lateness_minutes": None,
                 "schedule_source": "legacy_boolean_migration",
                 "workflow_run_id": None,
@@ -241,6 +299,15 @@ def _parse_iso_date(value: Any) -> date | None:
         return None
 
 
+def record_attempt(record: dict, outcome: str, stage_code: str | None) -> None:
+    """Append a compact, bounded attempt-outcome entry for durable telemetry."""
+    log = record.get("observed_attempts")
+    if not isinstance(log, list):
+        log = []
+    log.append({"outcome": outcome, "stage_code": stage_code})
+    record["observed_attempts"] = log[-MAX_ATTEMPT_LOG:]
+
+
 def new_record(
     session,
     *,
@@ -248,10 +315,16 @@ def new_record(
     lateness_minutes: int | None,
     schedule_source: str,
     workflow_run_id: str,
-    workflow_started_at: str,
+    workflow_started_at: str | None,
+    runner_started_at: str | None = None,
     delivery_state: str = DELIVERY_CLAIMED,
 ) -> dict:
-    """Build a fresh delivery record for a session (contract section 4 schema)."""
+    """Build a fresh delivery record for a session (contract section 4 schema).
+
+    ``workflow_started_at`` is the real workflow first-step time (before Python
+    setup/install) so GitHub queue delay can be separated from runner/setup and
+    generation delay; ``runner_started_at`` is when the Python attempt began.
+    """
     return {
         "schema_version": STATE_SCHEMA_VERSION,
         "brief_type": BRIEF_TYPE,
@@ -259,6 +332,7 @@ def new_record(
         "session_key": session.session_key,
         "expected_at_taipei": session.open_at_taipei.isoformat(),
         "workflow_started_at": workflow_started_at,
+        "runner_started_at": runner_started_at,
         "generation_started_at": None,
         "generation_finished_at": None,
         "sent_at": None,
@@ -268,4 +342,5 @@ def new_record(
         "delivery_state": delivery_state,
         "status": status,
         "stage_code": None,
+        "observed_attempts": [],
     }

@@ -24,6 +24,10 @@ from src.runners import run_brief_sanity as rbs
 def tmp_dedup(tmp_path, monkeypatch):
     path = tmp_path / "data_store" / "brief_sent_today.json"
     monkeypatch.setattr(rbs, "DEDUP_PATH", path)
+    # Isolate the us_open delivery-state reader from the committed real file.
+    monkeypatch.setattr(
+        rbs, "US_OPEN_STATE_PATH", tmp_path / "data_store" / "us_open_state.json"
+    )
     return path
 
 
@@ -104,6 +108,58 @@ def test_main_no_missing_no_alert(tmp_dedup, monkeypatch):
         result = rbs.main()
     assert result == 0
     mock_send.assert_not_called()
+
+
+def _today_session():
+    """Session whose ET date equals today's Taipei date (as at 23:45 sanity)."""
+    from src.runners.us_open_sla import resolve_us_open_session
+
+    base = datetime.now(rbs.TIMEZONE_USER).date()
+    evening = rbs.TIMEZONE_USER.localize(
+        datetime(base.year, base.month, base.day, 22, 0)
+    )
+    return resolve_us_open_session(evening)
+
+
+def test_us_open_sent_via_new_state_is_not_flagged_missing(tmp_dedup):
+    """us_open completion is read from the SLA delivery state, not the boolean."""
+    from src.runners.us_open_state import (
+        DELIVERY_SENT,
+        UsOpenDeliveryStore,
+        new_record,
+    )
+
+    session = _today_session()
+    store = UsOpenDeliveryStore(rbs.US_OPEN_STATE_PATH, legacy_path=None)
+    store.upsert(new_record(
+        session, status="on_time", lateness_minutes=1,
+        schedule_source="cron", workflow_run_id="r",
+        workflow_started_at=session.open_at_taipei.isoformat(),
+        delivery_state=DELIVERY_SENT,
+    ))
+    # No legacy us_open entry at all.
+    sent = rbs._load_sent_today()
+    assert sent.get("us_open") is True
+
+
+def test_us_open_missing_in_both_states_is_flagged(tmp_dedup):
+    from src.runners.us_open_state import (
+        DELIVERY_FAILED,
+        UsOpenDeliveryStore,
+        new_record,
+    )
+
+    session = _today_session()
+    store = UsOpenDeliveryStore(rbs.US_OPEN_STATE_PATH, legacy_path=None)
+    # a failed (not sent) record must NOT count as delivered
+    store.upsert(new_record(
+        session, status="failed", lateness_minutes=None,
+        schedule_source="cron", workflow_run_id="r",
+        workflow_started_at=session.open_at_taipei.isoformat(),
+        delivery_state=DELIVERY_FAILED,
+    ))
+    sent = rbs._load_sent_today()
+    assert sent.get("us_open") is not True
 
 
 def test_main_sends_alert_when_missing(tmp_dedup, monkeypatch):
