@@ -8493,5 +8493,30 @@
     "seen_at": "2026-07-20T23:13:18.305829+00:00",
     "created_at": "2026-07-20T22:18:52.091Z",
     "source": "cnn_historical_archive"
+  },
+  "116957942431800428": {
+    "seen_at": "2026-07-21T14:22:39.814000+00:00",
+    "created_at": "2026-07-21T12:22:52.750Z",
+    "source": "cnn_historical_archive"
+  },
+  "116957959265033006": {
+    "seen_at": "2026-07-21T14:22:39.814000+00:00",
+    "created_at": "2026-07-21T12:27:09.601Z",
+    "source": "cnn_historical_archive"
+  },
+  "116958077127443735": {
+    "seen_at": "2026-07-21T14:22:39.814000+00:00",
+    "created_at": "2026-07-21T12:57:08.044Z",
+    "source": "cnn_historical_archive"
+  },
+  "116958082268222915": {
+    "seen_at": "2026-07-21T14:22:39.814000+00:00",
+    "created_at": "2026-07-21T12:58:26.484Z",
+    "source": "cnn_historical_archive"
+  },
+  "116958082822194064": {
+    "seen_at": "2026-07-21T14:22:39.814000+00:00",
+    "created_at": "2026-07-21T12:58:34.937Z",
+    "source": "cnn_historical_archive"
   }
 }
