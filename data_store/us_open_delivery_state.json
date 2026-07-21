@@ -95,6 +95,26 @@
       "status": null,
       "stage_code": "legacy_boolean_migrated",
       "migrated_from_legacy": true
+    },
+    "us_open:2026-07-21": {
+      "schema_version": 1,
+      "brief_type": "us_open",
+      "session_date_et": "2026-07-21",
+      "session_key": "us_open:2026-07-21",
+      "expected_at_taipei": "2026-07-21T21:30:00+08:00",
+      "workflow_started_at": "2026-07-21T15:23:44Z",
+      "runner_started_at": "2026-07-21T23:24:18.434869+08:00",
+      "generation_started_at": "2026-07-21T23:24:18.695088+08:00",
+      "generation_finished_at": "2026-07-21T23:24:33.629967+08:00",
+      "sent_at": null,
+      "lateness_minutes": 114,
+      "schedule_source": "32 13 * * 1-5",
+      "workflow_run_id": "29843758647",
+      "workflow_attempt_id": "29843758647:1",
+      "delivery_state": "claimed",
+      "status": "intraday_recovery",
+      "stage_code": null,
+      "observed_attempts": []
     }
   }
 }
