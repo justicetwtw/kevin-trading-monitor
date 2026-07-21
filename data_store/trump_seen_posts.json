@@ -8593,5 +8593,10 @@
     "seen_at": "2026-07-21T21:21:44.160972+00:00",
     "created_at": "2026-07-21T20:44:15.444Z",
     "source": "cnn_historical_archive"
+  },
+  "116960425128744506": {
+    "seen_at": "2026-07-21T23:12:35.629201+00:00",
+    "created_at": "2026-07-21T22:54:15.696Z",
+    "source": "cnn_historical_archive"
   }
 }
