@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-21T08:57:04.106758+08:00",
+  "generated_at": "2026-07-21T17:09:34.157492+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -9,7 +9,8 @@
     "capital_allocation.json",
     "layer_macro_regime_state.json",
     "layer_fundamentals_dashboard_state.json",
-    "iv_history.json"
+    "iv_history.json",
+    "focus_engine_state.json"
   ],
   "data": {
     "summary": {
@@ -21,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-21T00:08:32.450826+00:00",
+      "trump_monitor_checked_at": "2026-07-21T08:46:15.824487+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -81,8 +82,8 @@
       "status": "healthy",
       "source": "cnn_historical_archive",
       "latest_post_at": "2026-07-20T22:18:52.091000+00:00",
-      "checked_at": "2026-07-21T00:08:32.450826+00:00",
-      "health_age_hours": 0.8,
+      "checked_at": "2026-07-21T08:46:15.824487+00:00",
+      "health_age_hours": 0.4,
       "attempts": [
         {
           "status": "unavailable",
@@ -357,6 +358,14 @@
         "not_a_trade_signal": true
       }
     ],
+    "focus_engine": {
+      "schema_version": 1,
+      "generated_at": "2026-07-21T09:09:34.157473+00:00",
+      "enabled": false,
+      "mode": "shadow",
+      "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
+      "data": null
+    },
     "disclaimer": "Decision support only. Public dashboard state intentionally excludes exact holdings, strikes, costs and account value. It never creates an order or substitutes for Kevin's judgment."
   }
 }
