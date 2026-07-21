@@ -22,6 +22,7 @@ workflow never finishes green while delivery is unproven (contract section 6).
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 from datetime import datetime
@@ -104,49 +105,96 @@ def _send_detailed(message: str) -> dict:
 
 # Durable-push outcomes.
 PUSH_DISABLED = "disabled"  # durable mode off (local/tests): rely on commit-state
-PUSH_OK = "pushed"  # claim is durable on shared state
-PUSH_FAILED = "failed"  # durable mode on but the claim could not be persisted
+PUSH_OK = "pushed"  # claim is durable and verified on shared state
+PUSH_FAILED = "failed"  # durable mode on but the claim could not be verified
+
+# Bounded phase-stabilization rounds after a verified claim (fail red, not spin).
+_MAX_STABILIZE_ROUNDS = 3
 
 
-def _durable_push(message: str) -> str:
-    """Commit + push the delivery state to shared state (main) before the send.
+def _git_run(*args):
+    """Run one git subprocess (CI-only; patched in tests)."""
+    import subprocess
 
-    Returns ``PUSH_DISABLED`` when durable mode is off (a no-op used locally / in
-    tests, where the trailing ``commit-state`` provides durability), ``PUSH_OK``
-    when the claim is durable on shared state, or ``PUSH_FAILED`` when durable
-    mode is on but the claim could not be persisted. A ``PUSH_FAILED`` is a hard
-    pre-send failure in the caller: the trailing ``commit-state`` cannot
-    retroactively satisfy "durable before send".
+    return subprocess.run(
+        ["git", *args], capture_output=True, text=True, check=False
+    )
+
+
+def _sleep(seconds: float) -> None:
+    import time
+
+    time.sleep(seconds)
+
+
+def _remote_state_has(content: str, expected: dict) -> bool:
+    """True iff the remote state JSON contains the exact expected session record."""
+    try:
+        data = json.loads(content)
+    except (json.JSONDecodeError, ValueError, TypeError):
+        return False
+    if not isinstance(data, dict):
+        return False
+    record = (data.get("sessions") or {}).get(expected["session_key"])
+    if not isinstance(record, dict):
+        return False
+    return (
+        record.get("delivery_state") == expected["delivery_state"]
+        and record.get("workflow_run_id") == expected["workflow_run_id"]
+    )
+
+
+def _durable_push(message: str, *, expected: dict) -> str:
+    """Commit + push the delivery state and VERIFY it on origin before OK.
+
+    ``expected`` = {session_key, delivery_state, workflow_run_id}. Returns
+    ``PUSH_OK`` only after re-fetching origin and confirming the remote
+    ``data_store/us_open_delivery_state.json`` actually contains that exact
+    record — an ``Everything up-to-date`` push without matching remote state is
+    ``PUSH_FAILED``. Every git step is checked (a failed ``add`` is never read as
+    "nothing to commit", a failed ``commit`` never proceeds, a ``pull --rebase``
+    conflict aborts cleanly and fails); the repository is never left uncertain.
     """
     if os.getenv("US_OPEN_DURABLE_STATE") != "1":
         return PUSH_DISABLED
-    import subprocess
-    import time
 
     branch = os.getenv("US_OPEN_STATE_BRANCH", "main")
 
-    def _git(*args) -> subprocess.CompletedProcess:
-        return subprocess.run(
-            ["git", *args], capture_output=True, text=True, check=False
-        )
+    def _ok(*args) -> bool:
+        return _git_run(*args).returncode == 0
 
-    _git("config", "user.name", "github-actions[bot]")
-    _git(
-        "config",
-        "user.email",
-        "github-actions[bot]@users.noreply.github.com",
+    _git_run("config", "user.name", "github-actions[bot]")
+    _git_run(
+        "config", "user.email", "github-actions[bot]@users.noreply.github.com"
     )
-    _git("add", str(STATE_PATH))
-    if _git("diff", "--staged", "--quiet").returncode == 0:
-        # Nothing to commit means the claim is already on shared state (durable).
-        return PUSH_OK
-    _git("commit", "-m", message)
+
     for attempt in range(1, 5):
-        _git("pull", "--rebase", "origin", branch)
-        if _git("push", "origin", f"HEAD:{branch}").returncode == 0:
+        if attempt > 1:
+            _sleep((attempt - 1) * 2)
+        # Refresh the base so we rebase onto the latest shared state.
+        if not _ok("fetch", "origin", branch):
+            continue
+        # A failed `add` must not be read as "nothing to commit".
+        if not _ok("add", str(STATE_PATH)):
+            continue
+        staged_empty = _git_run("diff", "--cached", "--quiet").returncode == 0
+        if not staged_empty:
+            # A real commit must succeed before any push can be durable.
+            if not _ok("commit", "-m", message):
+                continue
+            # Integrate concurrent state commits; abort cleanly on conflict.
+            if not _ok("pull", "--rebase", "origin", branch):
+                _git_run("rebase", "--abort")
+                continue
+        _git_run("push", "origin", f"HEAD:{branch}")
+        # Proof of durability is the REMOTE CONTENT, not the push exit code:
+        # re-fetch and confirm origin's state file has our exact record.
+        if not _ok("fetch", "origin", branch):
+            continue
+        show = _git_run("show", f"origin/{branch}:{STATE_PATH}")
+        if show.returncode == 0 and _remote_state_has(show.stdout or "", expected):
             return PUSH_OK
-        time.sleep(attempt * 2)
-    logger.error("us_open durable claim push failed; not sending without a claim")
+    logger.error("us_open durable push could not verify state on origin")
     return PUSH_FAILED
 
 
@@ -178,7 +226,12 @@ def _persist_terminal(store, record, env, outcome_label, session, *, base_exit):
                     status=record.get("status"),
                     lateness=record.get("lateness_minutes"))
     push = _durable_push(
-        f"us_open {record['delivery_state']} {session.session_key} [skip ci]"
+        f"us_open {record['delivery_state']} {session.session_key} [skip ci]",
+        expected={
+            "session_key": session.session_key,
+            "delivery_state": record["delivery_state"],
+            "workflow_run_id": env["workflow_run_id"],
+        },
     )
     if push == PUSH_FAILED:
         _telemetry_only(store, record, "state_persist_failed",
@@ -319,11 +372,8 @@ def main() -> int:
         logger.error(f"us_open unexpected action {decision.action}")
         return 1
 
-    # ACTION_SEND (proceed / retry): generate -> claim durably -> send.
-    # Recompute the phase as late as possible before generating, so the body
-    # and title reflect the *actual* delivery phase, never the (possibly
-    # minutes-old) runner-start phase (generation, claim push and transport all
-    # take time, and the step allows several minutes).
+    # ACTION_SEND (proceed / retry): generate -> claim durably (remote-verified)
+    # -> stabilize phase -> send.
     def _sendable(d):
         return (
             d.action == ACTION_SEND
@@ -331,21 +381,39 @@ def main() -> int:
             and d.session.session_key == session.session_key
         )
 
-    def _abort_window_closed(recomputed):
-        # The window closed (or the ET session rolled over) while generating /
-        # pushing: never fabricate a stale opening brief; record a red miss.
-        rec = _fresh(DELIVERY_SKIPPED, status=STATUS_EXPIRED,
-                     lateness=recomputed.lateness_minutes)
-        rec["stage_code"] = "schedule_delay"
-        logger.warning(
-            f"us_open {session.session_key} window closed mid-run; not sending"
+    def _expected(state):
+        # Identity the remote state must contain for a push to count as durable.
+        return {
+            "session_key": session.session_key,
+            "delivery_state": state,
+            "workflow_run_id": env["workflow_run_id"],
+        }
+
+    def _claim_persist_failed(dec):
+        # Sending without a remotely-durable claim risks a duplicate; fail closed
+        # before Telegram. The trailing commit-state cannot satisfy this after.
+        record["delivery_state"] = DELIVERY_FAILED
+        record["stage_code"] = "claim_persist_failed"
+        _telemetry_only(store, record, "claim_persist_failed",
+                        "claim_persist_failed", env,
+                        status=dec.status, lateness=dec.lateness_minutes)
+        logger.error(
+            f"us_open claim not durably persisted for {session.session_key}; "
+            "not sending (retryable in-window)"
         )
-        return _persist_terminal(store, rec, env, "expired_miss", session,
+        return 1
+
+    def _closed_mid_run(reason):
+        record["delivery_state"] = DELIVERY_SKIPPED
+        record["status"] = STATUS_EXPIRED
+        record["stage_code"] = "schedule_delay"
+        logger.warning(f"us_open {session.session_key} {reason}; not sending")
+        return _persist_terminal(store, record, env, "expired_miss", session,
                                  base_exit=1)
 
     gen_decision = classify_us_open(_now_taipei())
     if not _sendable(gen_decision):
-        return _abort_window_closed(gen_decision)
+        return _closed_mid_run("window closed before generation")
 
     record = _fresh("claimed", status=gen_decision.status,
                     lateness=gen_decision.lateness_minutes)
@@ -357,41 +425,60 @@ def main() -> int:
         record["stage_code"] = "generation_failed"
         return _persist_terminal(store, record, env, "generation_failed",
                                  session, base_exit=1)
-
     record["generation_finished_at"] = _now_taipei().isoformat()
+    current_body_type = body_brief_type(gen_decision.status)
 
-    # Recompute immediately before the send; regenerate the body if the phase
-    # crossed a body-type boundary (late -> intraday_recovery) meanwhile.
-    send_decision = classify_us_open(_now_taipei())
-    if not _sendable(send_decision):
-        return _abort_window_closed(send_decision)
-    if body_brief_type(send_decision.status) != body_brief_type(
-        gen_decision.status
-    ):
-        body = _generate_body(body_brief_type(send_decision.status))
-    record["status"] = send_decision.status
-    record["lateness_minutes"] = send_decision.lateness_minutes
-    message = render_us_open_message(body, send_decision)
-
-    # Persist the claim locally and durably push it BEFORE the outbound send.
+    # Persist the claim (the delivery lock) locally and durably push it,
+    # verifying the record is actually on origin, BEFORE the outbound send.
+    message = render_us_open_message(body, gen_decision)
     store.upsert(record)
     if _durable_push(
-        f"us_open claim {session.session_key} [skip ci]"
+        f"us_open claim {session.session_key} [skip ci]",
+        expected=_expected("claimed"),
     ) == PUSH_FAILED:
-        # Durable mode on but the claim could not be persisted. Sending now would
-        # risk a duplicate (a later attempt would see no claim). Fail closed
-        # BEFORE Telegram; the trailing commit-state cannot satisfy this after.
+        return _claim_persist_failed(gen_decision)
+
+    # The claim push can take seconds; the phase may have advanced. Stabilize:
+    # recompute -> regenerate body when the type changed -> re-verify the claim,
+    # until status/body-type are stable immediately before the request. Bounded
+    # so a persistently-drifting clock fails red rather than spins.
+    send_decision = gen_decision
+    stabilized = False
+    for _ in range(_MAX_STABILIZE_ROUNDS):
+        deliver_decision = classify_us_open(_now_taipei())
+        if not _sendable(deliver_decision):
+            return _closed_mid_run("window closed during claim push")
+        if (
+            deliver_decision.status == record["status"]
+            and body_brief_type(deliver_decision.status) == current_body_type
+        ):
+            message = render_us_open_message(body, deliver_decision)
+            send_decision = deliver_decision
+            stabilized = True
+            break
+        if body_brief_type(deliver_decision.status) != current_body_type:
+            body = _generate_body(body_brief_type(deliver_decision.status))
+            current_body_type = body_brief_type(deliver_decision.status)
+        record["status"] = deliver_decision.status
+        record["lateness_minutes"] = deliver_decision.lateness_minutes
+        message = render_us_open_message(body, deliver_decision)
+        store.upsert(record)
+        if _durable_push(
+            f"us_open claim {session.session_key} [skip ci]",
+            expected=_expected("claimed"),
+        ) == PUSH_FAILED:
+            return _claim_persist_failed(deliver_decision)
+        send_decision = deliver_decision
+
+    if not stabilized:
         record["delivery_state"] = DELIVERY_FAILED
-        record["stage_code"] = "claim_persist_failed"
-        _telemetry_only(store, record, "claim_persist_failed",
-                        "claim_persist_failed", env,
-                        status=send_decision.status,
-                        lateness=send_decision.lateness_minutes)
+        record["stage_code"] = "phase_unstable"
         logger.error(
-            f"us_open claim not durably persisted for {session.session_key}; "
-            "not sending (retryable in-window)"
+            f"us_open phase did not stabilize for {session.session_key}; "
+            "not sending"
         )
-        return 1
+        return _persist_terminal(store, record, env, "phase_unstable", session,
+                                 base_exit=1)
 
     outcome = _send_detailed(message)
     result = outcome.get("outcome")

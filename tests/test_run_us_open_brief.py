@@ -50,7 +50,8 @@ def env(tmp_path, monkeypatch):
     monkeypatch.delenv("US_OPEN_WORKFLOW_STARTED_AT", raising=False)
     monkeypatch.setattr(rub, "_generate_body", lambda bt: _LEGACY_BODY)
     # Durable push is a CI-only git op; default to the disabled (local) no-op.
-    monkeypatch.setattr(rub, "_durable_push", lambda msg: rub.PUSH_DISABLED)
+    monkeypatch.setattr(rub, "_durable_push",
+                        lambda msg, **kw: rub.PUSH_DISABLED)
     return state_path
 
 
@@ -362,7 +363,7 @@ def test_structurally_corrupt_sessions_fails_closed(env, monkeypatch):
 
 def test_durable_claim_push_failure_is_red_and_does_not_send(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-    monkeypatch.setattr(rub, "_durable_push", lambda msg: rub.PUSH_FAILED)
+    monkeypatch.setattr(rub, "_durable_push", lambda msg, **kw: rub.PUSH_FAILED)
     monkeypatch.setattr(rub, "_send_detailed", _NeverCalled())
 
     rc = rub.main()
@@ -379,7 +380,7 @@ def test_claim_is_durably_pushed_before_send(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
     order = []
     monkeypatch.setattr(rub, "_durable_push",
-                        lambda msg: order.append(("push", msg)) or True)
+                        lambda msg, **kw: order.append(("push", msg)) or True)
 
     def _send(_message):
         order.append(("send", _read(env)["delivery_state"]))
@@ -449,7 +450,7 @@ def test_terminal_outcome_is_durably_pushed(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
     pushes = []
     monkeypatch.setattr(rub, "_durable_push",
-                        lambda msg: pushes.append(msg) or rub.PUSH_OK)
+                        lambda msg, **kw: pushes.append(msg) or rub.PUSH_OK)
     monkeypatch.setattr(rub, "_send_detailed", _sender("sent"))
 
     rub.main()
@@ -462,7 +463,7 @@ def test_terminal_persist_failure_is_red_even_when_delivered(env, monkeypatch):
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
     calls = {"n": 0}
 
-    def _push(_msg):
+    def _push(_msg, **kw):
         calls["n"] += 1
         return rub.PUSH_OK if calls["n"] == 1 else rub.PUSH_FAILED  # claim ok, result fails
 
@@ -476,6 +477,193 @@ def test_terminal_persist_failure_is_red_even_when_delivered(env, monkeypatch):
     assert rec["delivery_state"] == DELIVERY_SENT
     assert any(a["outcome"] == "state_persist_failed"
                for a in rec["observed_attempts"])
+
+
+_EXPECTED = {
+    "session_key": "us_open:2026-07-20",
+    "delivery_state": "claimed",
+    "workflow_run_id": "run-42",
+}
+
+
+def _remote_with(expected):
+    """A remote state file (as `git show` would return) containing `expected`."""
+    return json.dumps({
+        "schema_version": 1,
+        "sessions": {
+            expected["session_key"]: {
+                "session_key": expected["session_key"],
+                "delivery_state": expected["delivery_state"],
+                "workflow_run_id": expected["workflow_run_id"],
+            }
+        },
+    })
+
+
+def _fake_git(fail=(), staged_empty=False, remote_state=None, calls=None):
+    """A fake git runner. `remote_state` is the JSON `git show origin:...` returns."""
+    from types import SimpleNamespace
+
+    content = remote_state if remote_state is not None else '{"sessions": {}}'
+
+    def run(*args):
+        if calls is not None:
+            calls.append(args)
+        sub = args[0]
+        if sub in fail:
+            return SimpleNamespace(returncode=1, stdout="", stderr="")
+        if sub == "diff":  # diff --cached --quiet: rc 0 == nothing staged
+            return SimpleNamespace(returncode=0 if staged_empty else 1,
+                                   stdout="", stderr="")
+        if sub == "show":  # origin/<branch>:<state file>
+            return SimpleNamespace(returncode=0, stdout=content, stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    return run
+
+
+def test_durable_push_disabled_makes_no_git_calls(monkeypatch):
+    monkeypatch.delenv("US_OPEN_DURABLE_STATE", raising=False)
+    calls = []
+    monkeypatch.setattr(rub, "_git_run", _fake_git(calls=calls))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_DISABLED
+    assert calls == []
+
+
+def test_durable_push_ok_only_when_remote_contains_record(monkeypatch):
+    # Independent-checkout model: OK only when origin's state has our exact record.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_OK
+
+
+def test_durable_push_noop_when_remote_missing_record_is_failed(monkeypatch):
+    # push exit 0 but the remote state does not contain the record: NOT durable.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(remote_state='{"sessions": {}}'))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+
+
+def test_durable_push_wrong_run_id_on_remote_is_failed(monkeypatch):
+    # remote has the session but a different attempt's run id: not our claim.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    other = dict(_EXPECTED, workflow_run_id="someone-else")
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(remote_state=_remote_with(other)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+
+
+def test_durable_push_add_failure_is_failed(monkeypatch):
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(fail={"add"}, remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+
+
+def test_durable_push_commit_failure_is_failed(monkeypatch):
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(fail={"commit"}, remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+
+
+def test_durable_push_fetch_failure_is_failed(monkeypatch):
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(fail={"fetch"}, remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+
+
+def test_durable_push_rebase_conflict_aborts_and_fails(monkeypatch):
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    calls = []
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(fail={"pull"}, calls=calls,
+                                  remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+    assert any(a[0] == "rebase" and "--abort" in a for a in calls)
+
+
+def test_durable_push_clean_tree_with_record_already_remote_is_ok(monkeypatch):
+    # Nothing staged (claim already committed), and origin already has our record.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(staged_empty=True,
+                                  remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_OK
+
+
+# --- phase can change DURING the (slow) durable claim push -------------------
+
+def test_clock_advances_during_push_crosses_to_late(env, monkeypatch):
+    clock = {"t": _tpe(2026, 7, 20, 21, 39)}  # +9 on_time
+    monkeypatch.setattr(rub, "_now_taipei", lambda: clock["t"])
+    captured = []
+
+    def _push(_msg, **kw):
+        clock["t"] = _tpe(2026, 7, 20, 21, 41)  # +11 while pushing
+        return rub.PUSH_OK
+
+    monkeypatch.setattr(rub, "_durable_push", _push)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
+
+    rc = rub.main()
+
+    assert rc == 0
+    assert _read(env)["status"] == "late"  # decided AFTER the push
+    assert "延遲補發" in captured[0]
+
+
+def test_clock_advances_during_push_crosses_to_recovery(env, monkeypatch):
+    clock = {"t": _tpe(2026, 7, 20, 21, 59)}  # +29 late
+    monkeypatch.setattr(rub, "_now_taipei", lambda: clock["t"])
+    captured = []
+    body_types = []
+    monkeypatch.setattr(rub, "_generate_body",
+                        lambda bt: body_types.append(bt) or _LEGACY_BODY)
+
+    def _push(_msg, **kw):
+        clock["t"] = _tpe(2026, 7, 20, 22, 1)  # +31 while pushing
+        return rub.PUSH_OK
+
+    monkeypatch.setattr(rub, "_durable_push", _push)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("sent", sink=captured))
+
+    rc = rub.main()
+
+    assert rc == 0
+    assert _read(env)["status"] == "intraday_recovery"
+    assert "盤中補發" in captured[0]
+    assert body_types == ["us_open", "us_midday"]  # body regenerated post-push
+
+
+def test_clock_advances_during_push_crosses_close_aborts(env, monkeypatch):
+    clock = {"t": _tpe(2026, 7, 21, 3, 58)}  # 15:58 ET, intraday_recovery
+    monkeypatch.setattr(rub, "_now_taipei", lambda: clock["t"])
+    send = _NeverCalled()
+
+    def _push(_msg, **kw):
+        clock["t"] = _tpe(2026, 7, 21, 4, 1)  # 16:01 ET, session closed
+        return rub.PUSH_OK
+
+    monkeypatch.setattr(rub, "_durable_push", _push)
+    monkeypatch.setattr(rub, "_send_detailed", send)
+
+    rc = rub.main()
+
+    assert rc == 1  # closed during the push -> do not send, red miss
+    assert send.called is False
+    assert _read(env)["status"] == "expired"
 
 
 def test_malformed_record_fails_closed_without_sending(env, monkeypatch):
