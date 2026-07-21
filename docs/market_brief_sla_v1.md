@@ -163,3 +163,66 @@ Before requesting review:
 4. add an exact-HEAD `agent-routing-report:v1`;
 5. report each acceptance item as fixed, intentionally degraded with evidence, or blocked;
 6. keep the PR Draft and stop for an independent incremental review.
+
+## 10. Implementation status (v1)
+
+Delivered on this branch:
+
+- `src/runners/us_open_sla.py` — deterministic session resolution, SLA
+  classification (`on_time`/`late`/`intraday_recovery`/`expired`) with named
+  minute thresholds, and honest title/copy rendering.
+- `src/runners/us_open_state.py` — session-keyed delivery state machine
+  (`data_store/us_open_delivery_state.json`) with the section-4 schema,
+  claim/sent/failed/ambiguous/skipped states, concurrent-writer merge,
+  no-downgrade-of-`sent`, retention pruning and legacy boolean migration.
+- `src/runners/run_us_open_brief.py` — the runner: recompute NY session →
+  idempotency/ambiguity check → persist claim → regenerate body at execution
+  time → send → persist outcome, failing closed (exit 1) on send failure,
+  generation failure or ambiguity.
+- `.github/workflows/us_open_brief.yml` — dedicated, isolated watchdog with its
+  own `us-open-brief` concurrency group and staggered attempts.
+- `market_brief.yml` no longer schedules or dispatches `us_open`; the shared
+  `market-brief` queue can no longer drop/reorder the opening brief.
+- `run_brief_sanity.py` reads `us_open` completion from the new state (OR the
+  legacy boolean) so the nightly check stays accurate.
+
+### Chosen concurrency semantics (documented, not hidden)
+
+- A single dedicated workflow owns the open. `cancel-in-progress: false` and
+  attempts spaced wider than a run mean a pending attempt never silently
+  replaces an earlier valid one.
+- Attempts fire around both DST and standard windows; the runner computes the
+  real NY session, so wrong-DST attempts self-skip (before open) or become a
+  guarded recovery, never a wrong or duplicate send.
+- At-most-once per `session_key` comes from the committed state + serialized
+  execution. A crash between the persisted claim and the send resolution is a
+  genuine exactly-once ambiguity: it is surfaced as `ambiguous_delivery`
+  (workflow red) and never auto-duplicated.
+
+### GitHub scheduling honesty
+
+GitHub `schedule` has no punctuality guarantee and can delay or drop runs, so a
+GitHub-only design cannot promise a hard ≤5–10 minute delivery SLA. This PR
+makes late delivery *honest and observable* rather than pretending punctuality.
+A verified tight SLA would need an external scheduler or persistent runner,
+which is **not** added here (no new service/credential without Kevin approval).
+
+### Public-safe health
+
+`data_store/us_open_delivery_state.json` contains only timestamps, session
+keys, statuses, lateness and generic stage codes — never Telegram content, chat
+IDs, tokens or portfolio data — so the committed file is itself the public-safe
+delivery-health surface. `UsOpenDeliveryStore.public_health()` exposes it.
+
+### Rollback
+
+To restore the previous behaviour without losing history:
+
+1. Re-add the `us_open` crons (`30 13`/`0 14` daylight, `30 14`/`0 15`
+   standard), the `us_open` DST case branches and the `us_open` dispatch option
+   to `market_brief.yml`.
+2. Delete (or disable) `.github/workflows/us_open_brief.yml`.
+3. Revert `run_brief_sanity.py` to read `us_open` from `brief_sent_today.json`.
+4. `data_store/us_open_delivery_state.json` can be left in place (ignored by the
+   old path) or removed; the legacy `brief_sent_today.json` boolean is never
+   deleted by the new path, so the old reader keeps working.

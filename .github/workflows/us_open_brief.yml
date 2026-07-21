@@ -1,0 +1,59 @@
+name: US Open Brief (SLA)
+
+# Dedicated, delay-resilient U.S. opening-brief path (Issue #13).
+# It is isolated from every other brief so a busy shared queue can never drop
+# or reorder its attempts. GitHub cron is UTC and has no punctuality SLA; the
+# runtime code recomputes the actual New York session, so these staggered
+# attempts only *trigger* the runner and never assert DST or market phase.
+# Offsets below are minutes past the 09:30 ET open.
+
+on:
+  schedule:
+    # ===== U.S. daylight time: 09:30 ET = 13:30 UTC = 21:30 Taipei =====
+    - cron: '32 13 * * 1-5'   # ~open +2   (on_time)
+    - cron: '39 13 * * 1-5'   # ~open +9   (on_time)
+    - cron: '48 13 * * 1-5'   # ~open +18  (late)
+    - cron: '3 14 * * 1-5'    # ~open +33  (intraday_recovery)
+    # ===== U.S. standard time: 09:30 ET = 14:30 UTC = 22:30 Taipei =====
+    - cron: '32 14 * * 1-5'   # ~open +2
+    - cron: '39 14 * * 1-5'   # ~open +9
+    - cron: '48 14 * * 1-5'   # ~open +18
+    - cron: '3 15 * * 1-5'    # ~open +33
+  workflow_dispatch: {}
+
+# Dedicated queue isolated from `market-brief`. cancel-in-progress is false so
+# an in-flight send is never interrupted; attempts are spaced wider than a run
+# so a pending attempt never silently replaces an earlier one. Concurrency
+# semantics are documented in docs/market_brief_sla_v1.md.
+concurrency:
+  group: us-open-brief
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  us_open:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run U.S. open brief (session-aware, delay-resilient)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          US_OPEN_SCHEDULE_SOURCE: ${{ github.event.schedule || github.event_name }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python -m src.runners.run_us_open_brief
+      - if: always()
+        uses: ./.github/actions/commit-state
