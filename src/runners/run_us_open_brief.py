@@ -22,7 +22,6 @@ workflow never finishes green while delivery is unproven (contract section 6).
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 from datetime import datetime
@@ -114,7 +113,8 @@ def _send_detailed(message: str) -> dict:
 PUSH_DISABLED = "disabled"  # durable mode off (local/tests): rely on commit-state
 PUSH_OK = "pushed"  # claim is durable and verified on shared state
 PUSH_FAILED = "failed"  # durable mode on but the claim could not be verified
-PUSH_CONFLICT = "conflict"  # another attempt already owns/delivered this session
+PUSH_CONFLICT_SENT = "conflict_sent"  # another attempt already DELIVERED this session
+PUSH_CONFLICT_CLAIM = "conflict_claim"  # another attempt holds an unresolved claim
 
 # Bounded phase-stabilization rounds after a verified claim (fail red, not spin).
 _MAX_STABILIZE_ROUNDS = 3
@@ -136,13 +136,21 @@ def _sleep(seconds: float) -> None:
 
 
 def _remote_record(content: str, session_key: str) -> dict | None:
-    try:
-        data = json.loads(content)
-    except (json.JSONDecodeError, ValueError, TypeError):
-        return None
-    if not isinstance(data, dict):
-        return None
-    record = (data.get("sessions") or {}).get(session_key)
+    """Look up a session record in remote state via the SHARED fail-closed
+    validator (``UsOpenDeliveryStore.parse_state``), so hydration, the claim
+    compare-and-swap and post-push verification all interpret origin identically.
+
+    Raises ``StateReadError`` when the remote payload is malformed/unreadable
+    (unparsable JSON, non-object root, unsupported schema, missing/invalid
+    ``sessions`` map, or a malformed individual record) — callers map that to a
+    controlled red/no-send rather than letting it throw through to the trailing
+    generic state writer. Returns ``None`` only when the state is valid but has no
+    record for this session.
+    """
+    sessions = UsOpenDeliveryStore.parse_state(
+        content, origin="origin/main state"
+    )["sessions"]
+    record = sessions.get(session_key)
     return record if isinstance(record, dict) else None
 
 
@@ -151,6 +159,10 @@ def _remote_state_has(content: str, expected: dict) -> bool:
 
     Identity is matched on ``workflow_attempt_id`` (run id + run attempt), not the
     reused ``workflow_run_id``, so a re-run cannot verify a prior attempt's record.
+    Raises ``StateReadError`` if the remote payload is malformed (the caller treats
+    an unverifiable remote as not-yet-durable). Note this proves the session's
+    delivery_state + attempt identity, not full claim metadata such as
+    status/lateness.
     """
     record = _remote_record(content, expected["session_key"])
     if record is None:
@@ -161,38 +173,60 @@ def _remote_state_has(content: str, expected: dict) -> bool:
     )
 
 
-def _remote_foreign_unresolved(content: str, expected: dict) -> bool:
-    """True iff origin already has a delivery/unresolved claim from ANOTHER attempt.
+def _remote_conflict_kind(content: str, expected: dict) -> str | None:
+    """Classify a compare-and-swap conflict against origin's validated state.
 
-    A remote ``sent`` (delivered) or a ``claimed``/``ambiguous`` left by a
-    different ``workflow_attempt_id`` means this attempt must not claim or send —
-    a GitHub re-run (same run id, new attempt, stale checkout) must never treat a
-    prior attempt's unresolved claim as its own.
+    Returns ``PUSH_CONFLICT_SENT`` if origin already shows this session delivered
+    (by any attempt), ``PUSH_CONFLICT_CLAIM`` if a *different* attempt holds an
+    unresolved ``claimed``/``ambiguous`` record, else ``None`` (no conflict — a
+    missing record or this attempt's own claim). Raises ``StateReadError`` on a
+    malformed remote payload (the caller fails closed rather than sending on top
+    of an unreadable authoritative record).
     """
     record = _remote_record(content, expected["session_key"])
     if record is None:
-        return False
+        return None
     state = record.get("delivery_state")
     if state == "sent":
-        return True
+        return PUSH_CONFLICT_SENT
     if state in ("claimed", "ambiguous"):
-        return record.get("workflow_attempt_id") != expected.get("workflow_attempt_id")
-    return False
+        if record.get("workflow_attempt_id") != expected.get("workflow_attempt_id"):
+            return PUSH_CONFLICT_CLAIM
+    return None
+
+
+def _remote_path_absent(branch: str) -> bool:
+    """True only if the state file is PROVABLY absent from ``origin/<branch>``.
+
+    ``git ls-tree`` exits 0 with empty output only when the path does not exist in
+    the tree; any non-zero result, or a listed entry, is NOT proof of absence.
+    This lets a genuine first-ever run bootstrap while a transient/unreadable
+    object (which must fail closed) is never mistaken for "no state yet".
+    """
+    result = _git_run("ls-tree", f"origin/{branch}", "--", str(STATE_PATH))
+    return result.returncode == 0 and not (result.stdout or "").strip()
 
 
 def _durable_push(message: str, *, expected: dict, block_foreign_claim: bool = False) -> str:
     """Commit + push the delivery state and VERIFY it on origin before OK.
 
     ``expected`` = {session_key, delivery_state, workflow_attempt_id}. Returns
-    ``PUSH_OK`` only after re-fetching origin and confirming its state file has
-    that exact record (identity = ``workflow_attempt_id``); an
-    ``Everything up-to-date`` push without matching remote state is
-    ``PUSH_FAILED``. When ``block_foreign_claim`` is set (the initial claim), a
-    remote delivery/unresolved claim from another attempt returns ``PUSH_CONFLICT``
-    so a re-run never steals it. Every git step is checked; the local commit is
-    reconciled with a freshly-fetched origin on EVERY retry (even when the index
-    is clean) so a benign non-fast-forward race can recover; a ``pull --rebase``
-    conflict aborts cleanly and fails.
+    ``PUSH_OK`` only after re-fetching origin and confirming its state file has a
+    record for this session with OUR ``delivery_state`` and ``workflow_attempt_id``
+    (identity + state, not full claim metadata); an ``Everything up-to-date`` push
+    without a matching remote record is ``PUSH_FAILED``.
+
+    Every remote payload is read through the shared fail-closed validator, so a
+    malformed authoritative state maps to ``PUSH_FAILED`` (red/no-send), never an
+    uncaught exception. When ``block_foreign_claim`` is set (the initial claim): a
+    remote ``sent`` returns ``PUSH_CONFLICT_SENT`` and a *foreign*
+    ``claimed``/``ambiguous`` returns ``PUSH_CONFLICT_CLAIM`` so a re-run never
+    steals a prior attempt's session; and if the pre-claim remote state cannot be
+    read AND the path is not provably absent, the attempt does not proceed to
+    add/commit/pull/push on a stale base. Every git step is checked; the local
+    commit is reconciled with a freshly-fetched origin on EVERY retry (even when
+    the index is clean) so a benign non-fast-forward race can recover; a
+    ``pull --rebase`` conflict aborts cleanly and fails.
     """
     if os.getenv("US_OPEN_DURABLE_STATE") != "1":
         return PUSH_DISABLED
@@ -214,13 +248,25 @@ def _durable_push(message: str, *, expected: dict, block_foreign_claim: bool = F
         if not _ok("fetch", "origin", branch):
             continue
         # Compare-and-swap gate for the initial claim: never overwrite another
-        # attempt's delivery/unresolved claim.
+        # attempt's delivery/unresolved claim, and never claim on top of an
+        # unreadable authoritative state.
         if block_foreign_claim:
             pre = _git_run("show", f"origin/{branch}:{STATE_PATH}")
-            if pre.returncode == 0 and _remote_foreign_unresolved(
-                pre.stdout or "", expected
-            ):
-                return PUSH_CONFLICT
+            if pre.returncode == 0:
+                try:
+                    conflict = _remote_conflict_kind(pre.stdout or "", expected)
+                except StateReadError:
+                    logger.error(
+                        "us_open CAS pre-read: authoritative remote state is "
+                        "malformed; failing closed (no claim, no send)"
+                    )
+                    return PUSH_FAILED
+                if conflict is not None:
+                    return conflict
+            elif not _remote_path_absent(branch):
+                # Cannot read the pre-claim remote state and the path is not
+                # provably absent: do NOT add/commit/pull/push on a stale base.
+                continue
         # A failed `add` must not be read as "nothing to commit".
         if not _ok("add", str(STATE_PATH)):
             continue
@@ -238,12 +284,18 @@ def _durable_push(message: str, *, expected: dict, block_foreign_claim: bool = F
             continue
         _git_run("push", "origin", f"HEAD:{branch}")
         # Proof of durability is the REMOTE CONTENT, not the push exit code:
-        # re-fetch and confirm origin's state file has our exact record.
+        # re-fetch and confirm origin's state file has our exact record. A
+        # malformed remote here cannot prove durability (retry / fail closed).
         if not _ok("fetch", "origin", branch):
             continue
         show = _git_run("show", f"origin/{branch}:{STATE_PATH}")
-        if show.returncode == 0 and _remote_state_has(show.stdout or "", expected):
-            return PUSH_OK
+        if show.returncode == 0:
+            try:
+                verified = _remote_state_has(show.stdout or "", expected)
+            except StateReadError:
+                verified = False
+            if verified:
+                return PUSH_OK
     logger.error("us_open durable push could not verify state on origin")
     return PUSH_FAILED
 
@@ -256,8 +308,15 @@ def _hydrate_local_from_remote(store) -> bool:
     after a previous watchdog has pushed a newer claim/sent record; a stale local
     file must never license a new claim. Fetches origin, reads
     ``origin/<branch>:data_store/us_open_delivery_state.json`` and validates it
-    with the same fail-closed rules. Raises ``StateReadError`` if origin cannot be
-    fetched or the remote state is malformed.
+    with the same fail-closed rules.
+
+    Fails closed (``StateReadError``, mapped to red/no-send by the caller) if
+    origin cannot be fetched, if the remote object cannot be read while the path
+    is not PROVABLY absent (a transient/unreadable object must never be mistaken
+    for "first run ever" — this PR ships the state file, so after rollout a
+    missing object is not a safe empty-state signal), or if the remote state is
+    malformed. Only an explicitly verified absent path bootstraps a genuine first
+    run.
     """
     if os.getenv("US_OPEN_DURABLE_STATE") != "1":
         return False
@@ -265,11 +324,18 @@ def _hydrate_local_from_remote(store) -> bool:
     if _git_run("fetch", "origin", branch).returncode != 0:
         raise StateReadError("cannot fetch origin to hydrate authoritative state")
     show = _git_run("show", f"origin/{branch}:{STATE_PATH}")
-    if show.returncode != 0:
-        # No state file on origin yet (first run ever): keep the local base.
+    if show.returncode == 0:
+        store.hydrate_from(show.stdout or "")
         return True
-    store.hydrate_from(show.stdout or "")
-    return True
+    # `git show` failed: only a provably-absent path is a legitimate first run.
+    # Any other read failure fails closed so a stale checkout cannot become
+    # authoritative and license a duplicate send.
+    if _remote_path_absent(branch):
+        return True
+    raise StateReadError(
+        "authoritative remote state could not be read (path present but "
+        "unreadable); failing closed"
+    )
 
 
 def _telemetry_only(store, record, outcome, stage_code, env, *,
@@ -468,18 +534,35 @@ def main() -> int:
             "workflow_attempt_id": env["workflow_attempt_id"],
         }
 
-    def _foreign_conflict(dec):
-        # Another attempt already delivered or holds an unresolved claim for this
-        # session (e.g. a GitHub re-run of a crashed attempt, same run id). Never
-        # steal it or re-send: surface ambiguous and stay red until cleared.
-        record["delivery_state"] = DELIVERY_AMBIGUOUS
-        record["stage_code"] = "ambiguous_delivery"
-        _telemetry_only(store, record, "foreign_claim_conflict",
-                        "ambiguous_delivery", env,
-                        status=dec.status, lateness=dec.lateness_minutes)
+    def _foreign_conflict(kind):
+        # A concurrent attempt landed a delivery/claim on origin between our
+        # authoritative hydration and our claim push (e.g. a GitHub re-run of a
+        # crashed attempt). Discard our dirty local claim and restore origin's
+        # authoritative snapshot so the always-run trailing commit-state pushes NO
+        # replacement session record, then classify:
+        #   remote sent      -> clean duplicate (green), remote record preserved;
+        #   remote claimed/   -> red / no-send, foreign record and its owner
+        #   ambiguous            (workflow_attempt_id) preserved exactly.
+        # We deliberately make no current-attempt session mutation here: the
+        # foreign attempt keeps ownership, and a later watchdog resolves any
+        # still-unresolved claim via the hydration path.
+        try:
+            _hydrate_local_from_remote(store)
+        except StateReadError as exc:
+            logger.error(
+                f"us_open {session.session_key}: conflict resync failed "
+                f"({exc}); not sending, workflow red"
+            )
+            return 1
+        if kind == PUSH_CONFLICT_SENT:
+            logger.info(
+                f"us_open {session.session_key}: another attempt already "
+                "delivered; duplicate skip (green), remote record preserved"
+            )
+            return 0
         logger.error(
-            f"us_open {session.session_key}: another attempt owns the claim/"
-            "delivery; not sending, marking ambiguous"
+            f"us_open {session.session_key}: another attempt owns the claim; "
+            "not sending, remote record preserved, workflow red"
         )
         return 1
 
@@ -533,8 +616,8 @@ def main() -> int:
         expected=_expected("claimed"),
         block_foreign_claim=True,
     )
-    if claim_push == PUSH_CONFLICT:
-        return _foreign_conflict(gen_decision)
+    if claim_push in (PUSH_CONFLICT_SENT, PUSH_CONFLICT_CLAIM):
+        return _foreign_conflict(claim_push)
     if claim_push == PUSH_FAILED:
         return _claim_persist_failed(gen_decision)
 

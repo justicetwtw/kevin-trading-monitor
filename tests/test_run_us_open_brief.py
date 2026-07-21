@@ -56,6 +56,24 @@ def env(tmp_path, monkeypatch):
     return state_path
 
 
+@pytest.fixture
+def durable_env(tmp_path, monkeypatch):
+    """Like ``env`` but runs the REAL durable-push / hydration against a mocked
+    ``_git_run`` (``US_OPEN_DURABLE_STATE=1``), so the compare-and-swap and
+    authoritative-hydration git paths are exercised end-to-end via ``main()``.
+    """
+    state_path = tmp_path / "us_open_delivery_state.json"
+    monkeypatch.setattr(rub, "STATE_PATH", state_path)
+    monkeypatch.setattr(rub, "LEGACY_DEDUP_PATH", tmp_path / "no_legacy.json")
+    monkeypatch.setenv("US_OPEN_SCHEDULE_SOURCE", "cron 32 13 * * 1-5")
+    monkeypatch.setenv("GITHUB_RUN_ID", "run-42")
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.delenv("US_OPEN_WORKFLOW_STARTED_AT", raising=False)
+    monkeypatch.setattr(rub, "_generate_body", lambda bt: _LEGACY_BODY)
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    return state_path
+
+
 def _freeze(monkeypatch, dt):
     monkeypatch.setattr(rub, "_now_taipei", lambda: dt)
 
@@ -561,7 +579,7 @@ def test_durable_push_wrong_attempt_id_on_remote_is_failed(monkeypatch):
 
 def test_durable_push_blocks_foreign_unresolved_claim_as_conflict(monkeypatch):
     # A re-run (same run id, new attempt, stale checkout) must not steal attempt
-    # 1's unresolved claim: block_foreign_claim -> PUSH_CONFLICT, no overwrite.
+    # 1's unresolved claim: block_foreign_claim -> PUSH_CONFLICT_CLAIM, no overwrite.
     monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
     monkeypatch.setattr(rub, "_sleep", lambda s: None)
     foreign = _remote_with(_EXPECTED, delivery_state="claimed",
@@ -569,7 +587,7 @@ def test_durable_push_blocks_foreign_unresolved_claim_as_conflict(monkeypatch):
     mine = dict(_EXPECTED, workflow_attempt_id="run-42:2")
     monkeypatch.setattr(rub, "_git_run", _fake_git(remote_state=foreign))
     assert rub._durable_push("m", expected=mine, block_foreign_claim=True) == (
-        rub.PUSH_CONFLICT
+        rub.PUSH_CONFLICT_CLAIM
     )
 
 
@@ -581,8 +599,76 @@ def test_durable_push_blocks_foreign_sent_as_conflict(monkeypatch):
                              attempt_id="run-9:1")
     monkeypatch.setattr(rub, "_git_run", _fake_git(remote_state=delivered))
     assert rub._durable_push("m", expected=_EXPECTED, block_foreign_claim=True) == (
-        rub.PUSH_CONFLICT
+        rub.PUSH_CONFLICT_SENT
     )
+
+
+def test_durable_push_cas_malformed_remote_is_failed_not_raise(monkeypatch):
+    # A structurally-malformed pre-claim remote (`sessions` is a list) must map to
+    # a controlled PUSH_FAILED via the shared validator — never an uncaught throw
+    # that would reach the trailing generic state writer, and never a send.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(remote_state='{"sessions": [{}]}'))
+    assert rub._durable_push("m", expected=_EXPECTED,
+                             block_foreign_claim=True) == rub.PUSH_FAILED
+
+
+def test_durable_push_cas_unreadable_present_path_never_proceeds(monkeypatch):
+    # `git show` fails generically while the path IS present in the tree: the CAS
+    # must NOT proceed to add/commit/pull/push on a stale base, and returns FAILED.
+    from types import SimpleNamespace
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    calls = []
+
+    def fake(*args):
+        calls.append(args)
+        sub = args[0]
+        if sub == "show":
+            return SimpleNamespace(returncode=128, stdout="", stderr="bad object")
+        if sub == "ls-tree":  # path present but unreadable -> not absence
+            return SimpleNamespace(
+                returncode=0,
+                stdout="100644 blob dead\tdata_store/us_open_delivery_state.json\n",
+                stderr="",
+            )
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    assert rub._durable_push("m", expected=_EXPECTED,
+                             block_foreign_claim=True) == rub.PUSH_FAILED
+    assert not any(a[0] == "commit" for a in calls)  # never committed on stale base
+    assert not any(a[0] == "push" for a in calls)
+
+
+def test_durable_push_cas_verified_absent_path_allows_first_claim(monkeypatch):
+    # Only a PROVABLY absent path (ls-tree empty) bootstraps a genuine first
+    # claim: the push proceeds and verifies our record on origin.
+    from types import SimpleNamespace
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    calls = []
+
+    def fake(*args):
+        calls.append(args)
+        sub = args[0]
+        if sub == "show":
+            if any(a[0] == "push" for a in calls):  # post-push verify: our record
+                return SimpleNamespace(returncode=0,
+                                       stdout=_remote_with(_EXPECTED), stderr="")
+            return SimpleNamespace(returncode=128, stdout="", stderr="absent")
+        if sub == "ls-tree":  # empty output -> path provably absent
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+        if sub == "diff":  # something staged
+            return SimpleNamespace(returncode=1, stdout="", stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    assert rub._durable_push("m", expected=_EXPECTED,
+                             block_foreign_claim=True) == rub.PUSH_OK
+    assert any(a[0] == "push" for a in calls)  # DID proceed to a real push
 
 
 def test_durable_push_own_claim_is_not_foreign(monkeypatch):
@@ -734,15 +820,39 @@ def test_clock_advances_during_push_crosses_close_aborts(env, monkeypatch):
     assert _read(env)["status"] == "expired"
 
 
-def test_rerun_does_not_steal_foreign_claim_or_send(env, monkeypatch):
-    # GitHub re-run: local (stale) state has no claim, but the durable claim push
-    # reports a foreign unresolved claim from the original attempt. Never send.
+def _race_git(hydration_content, cas_content):
+    """A fake git where the first `git show` (top-of-main hydration) returns
+    `hydration_content` and every later `git show` (CAS pre-read + conflict
+    resync) returns `cas_content` — modelling a foreign attempt that lands between
+    our hydration and our claim push.
+    """
+    from types import SimpleNamespace
+    shows = {"n": 0}
+
+    def fake(*args):
+        sub = args[0]
+        if sub == "show":
+            shows["n"] += 1
+            content = hydration_content if shows["n"] == 1 else cas_content
+            return SimpleNamespace(returncode=0, stdout=content, stderr="")
+        if sub == "diff":  # claim is staged
+            return SimpleNamespace(returncode=1, stdout="", stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    return fake
+
+
+def test_rerun_does_not_steal_foreign_claim_or_send(durable_env, monkeypatch):
+    # GitHub re-run (run-42:2): origin is empty at hydration, but a foreign
+    # unresolved claim from attempt run-42:1 lands before our claim push. The CAS
+    # must refuse (red, no send) and PRESERVE the foreign record and its owner —
+    # no current-attempt replacement for the trailing commit-state to push.
+    monkeypatch.setenv("GITHUB_RUN_ATTEMPT", "2")  # our attempt id = run-42:2
     _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
-    monkeypatch.setattr(
-        rub, "_durable_push",
-        lambda msg, **kw: rub.PUSH_CONFLICT if kw.get("block_foreign_claim")
-        else rub.PUSH_OK,
-    )
+    foreign = _remote_with(_EXPECTED, delivery_state="claimed",
+                           attempt_id="run-42:1")
+    monkeypatch.setattr(rub, "_git_run",
+                        _race_git('{"sessions": {}}', foreign))
     send = _NeverCalled()
     monkeypatch.setattr(rub, "_send_detailed", send)
 
@@ -750,9 +860,31 @@ def test_rerun_does_not_steal_foreign_claim_or_send(env, monkeypatch):
 
     assert rc == 1
     assert send.called is False
-    rec = _read(env)
-    assert rec["delivery_state"] == DELIVERY_AMBIGUOUS
-    assert rec["stage_code"] == "ambiguous_delivery"
+    rec = _read(durable_env)
+    # Foreign owner preserved exactly; NOT replaced by our attempt or 'ambiguous'.
+    assert rec["delivery_state"] == "claimed"
+    assert rec["workflow_attempt_id"] == "run-42:1"
+
+
+def test_race_remote_sent_after_hydration_is_duplicate_green(durable_env, monkeypatch):
+    # A foreign attempt DELIVERS between our hydration and our claim push. The CAS
+    # sees remote 'sent' -> clean duplicate (green), no send, remote sent record
+    # preserved (no current-attempt replacement).
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    delivered = _remote_with(_EXPECTED, delivery_state="sent",
+                             attempt_id="run-9:1")
+    monkeypatch.setattr(rub, "_git_run",
+                        _race_git('{"sessions": {}}', delivered))
+    send = _NeverCalled()
+    monkeypatch.setattr(rub, "_send_detailed", send)
+
+    rc = rub.main()
+
+    assert rc == 0  # duplicate green
+    assert send.called is False
+    rec = _read(durable_env)
+    assert rec["delivery_state"] == "sent"
+    assert rec["workflow_attempt_id"] == "run-9:1"  # foreign delivery preserved
 
 
 def test_stabilization_regen_failure_is_red_and_retryable(env, monkeypatch):
@@ -864,6 +996,52 @@ def test_hydrate_local_from_remote_writes_origin_content(tmp_path, monkeypatch):
     store = UsOpenDeliveryStore(tmp_path / "s.json")
     assert rub._hydrate_local_from_remote(store) is True
     assert store.get("us_open:2026-07-20")["delivery_state"] == "sent"
+
+
+def test_hydration_generic_show_failure_with_present_path_fails_closed(
+    tmp_path, monkeypatch
+):
+    # `git show` fails generically but the path IS present in origin's tree: a
+    # transient/unreadable object must fail closed, NOT be read as an empty first
+    # run, so a stale checkout can never become authoritative.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    from types import SimpleNamespace
+
+    def fake(*args):
+        sub = args[0]
+        if sub == "show":
+            return SimpleNamespace(returncode=128, stdout="", stderr="bad object")
+        if sub == "ls-tree":
+            return SimpleNamespace(
+                returncode=0,
+                stdout="100644 blob abc\tdata_store/us_open_delivery_state.json\n",
+                stderr="",
+            )
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    store = UsOpenDeliveryStore(tmp_path / "s.json")
+    with pytest.raises(StateReadError):
+        rub._hydrate_local_from_remote(store)
+
+
+def test_hydration_verified_absent_path_bootstraps(tmp_path, monkeypatch):
+    # Only a PROVABLY absent path (ls-tree empty output) is a legitimate first
+    # run: hydration keeps the local base and returns True without failing closed.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    from types import SimpleNamespace
+
+    def fake(*args):
+        sub = args[0]
+        if sub == "show":
+            return SimpleNamespace(returncode=128, stdout="", stderr="no such path")
+        if sub == "ls-tree":
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    store = UsOpenDeliveryStore(tmp_path / "s.json")
+    assert rub._hydrate_local_from_remote(store) is True
 
 
 def test_same_status_clock_advance_updates_lateness_on_failure(env, monkeypatch):
