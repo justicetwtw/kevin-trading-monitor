@@ -64,6 +64,98 @@ def test_send_to_multi_chat_ids_all_success():
     assert sent_chat_ids == ["111", "222"]
 
 
+def test_detailed_all_200_is_sent():
+    patcher, _ = _patch_httpx(post_status_code=200)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111", "222"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "sent"
+    assert result["delivered"] == 2
+
+
+def test_detailed_all_rejected_is_failed_retryable():
+    """A definitive HTTP rejection means not delivered — safe to retry."""
+    patcher, _ = _patch_httpx(post_status_code=400)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "failed"
+    assert result["delivered"] == 0
+
+
+def test_detailed_5xx_is_ambiguous_not_retryable():
+    """A 5xx on a non-idempotent POST doesn't prove non-delivery: ambiguous."""
+    patcher, _ = _patch_httpx(post_status_code=500)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "ambiguous"
+
+
+def test_detailed_429_rate_limit_is_ambiguous():
+    patcher, _ = _patch_httpx(post_status_code=429)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "ambiguous"
+
+
+def test_detailed_403_client_error_is_definitive_failed():
+    patcher, _ = _patch_httpx(post_status_code=403)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "failed"
+
+
+def test_detailed_timeout_is_ambiguous():
+    """A transport/timeout error may have reached Telegram: ambiguous, no retry."""
+    async def boom(*_, **__):
+        raise httpx.TimeoutException("timeout")
+
+    patcher, _ = _patch_httpx(post_side_effect=boom)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "ambiguous"
+
+
+def test_detailed_sensitive_keeps_body_out_of_logs():
+    """The us_open runner sends with sensitive=True; body must not reach logs."""
+    from loguru import logger
+
+    captured = []
+    sink_id = logger.add(captured.append, level="INFO", format="{message}")
+    try:
+        patcher, _ = _patch_httpx(post_status_code=200)
+        with patcher:
+            notifier = TelegramNotifier(token="t", chat_ids=["111"])
+            notifier.send_message_detailed("SUPER-SECRET-BODY-42", sensitive=True)
+    finally:
+        logger.remove(sink_id)
+    blob = "".join(str(m) for m in captured)
+    assert "SUPER-SECRET-BODY-42" not in blob
+    assert "redacted" in blob.lower()
+
+
+def test_detailed_partial_delivery_is_ambiguous():
+    """Some recipients delivered, others rejected: ambiguous (message went out)."""
+    responses = [
+        MagicMock(status_code=200, text="ok"),
+        MagicMock(status_code=400, text="bad"),
+    ]
+
+    async def side_effect(*_, **__):
+        return responses.pop(0)
+
+    patcher, _ = _patch_httpx(post_side_effect=side_effect)
+    with patcher:
+        notifier = TelegramNotifier(token="t", chat_ids=["111", "222"])
+        result = notifier.send_message_detailed("hi")
+    assert result["outcome"] == "ambiguous"
+    assert result["delivered"] == 1
+
+
 def test_partial_failure_returns_false_by_default():
     """A message is not fully delivered when any configured recipient fails."""
     responses = [

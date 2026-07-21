@@ -13,6 +13,12 @@ from loguru import logger
 
 from src.alerts.telegram_bot import send_telegram
 from src.config.settings import TIMEZONE_USER
+from src.runners.us_open_state import (
+    DELIVERY_SENT,
+    STATE_PATH as US_OPEN_STATE_PATH,
+    StateReadError,
+    UsOpenDeliveryStore,
+)
 
 DEDUP_PATH = Path("data_store/brief_sent_today.json")
 
@@ -31,14 +37,29 @@ EXPECTED_BY_HOUR = {
 
 
 def _load_sent_today() -> dict:
-    if not DEDUP_PATH.exists():
-        return {}
-    try:
-        data = json.loads(DEDUP_PATH.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {}
     today_str = datetime.now(TIMEZONE_USER).strftime("%Y-%m-%d")
-    return data.get(today_str, {})
+    sent: dict = {}
+    if DEDUP_PATH.exists():
+        try:
+            data = json.loads(DEDUP_PATH.read_text(encoding="utf-8"))
+            sent = dict(data.get(today_str, {}))
+        except (json.JSONDecodeError, OSError):
+            sent = {}
+
+    # us_open moved to the dedicated SLA delivery state. Treat it as sent when
+    # either the new session-keyed store or the legacy boolean says so (the ET
+    # session date equals today's Taipei date at the open). A corrupt delivery
+    # state must not crash the sanity check: leave us_open unmarked so it is
+    # reported as a degraded/missing delivery rather than swallowing the error.
+    store = UsOpenDeliveryStore(US_OPEN_STATE_PATH, legacy_path=None)
+    try:
+        record = store.get(f"us_open:{today_str}")
+    except StateReadError as exc:
+        logger.error(f"us_open delivery state unreadable ({exc}); reporting degraded")
+        record = None
+    if record and record.get("delivery_state") == DELIVERY_SENT:
+        sent["us_open"] = True
+    return sent
 
 
 def _expected_today(now_taipei: datetime) -> list:

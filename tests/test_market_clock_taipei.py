@@ -82,14 +82,47 @@ def test_workflow_crons_match_exact_us_open_and_close():
     sanity = Path(".github/workflows/brief_sanity.yml").read_text(
         encoding="utf-8"
     )
-    assert "30 13 * * 1-5" in market_brief  # 21:30 Taipei DST open
-    assert "30 14 * * 1-5" in market_brief  # 22:30 Taipei standard open
     assert "30 20 * * 1-5" in market_brief  # 04:30 Taipei DST EOD brief
     assert "30 21 * * 1-5" in market_brief  # 05:30 Taipei standard EOD brief
     assert "15 20 * * 1-5" in eod            # 04:15 Taipei DST EOD scan
     assert "15 21 * * 1-5" in eod            # 05:15 Taipei standard EOD scan
     assert "45 15 * * *" in sanity            # 23:45 Taipei sanity
     assert "55 15 * * *" in sanity            # 23:55 Taipei backup
+
+
+def test_us_open_moved_to_isolated_dedicated_workflow():
+    """Issue #13: us_open must leave the shared `market-brief` concurrency queue."""
+    market_brief = Path(".github/workflows/market_brief.yml").read_text(
+        encoding="utf-8"
+    )
+    us_open = Path(".github/workflows/us_open_brief.yml").read_text(
+        encoding="utf-8"
+    )
+    # The old single-shot open crons no longer share the broad brief queue.
+    assert "30 13 * * 1-5" not in market_brief
+    assert "30 14 * * 1-5" not in market_brief
+    # us_open is no longer dispatched or routed by the shared workflow.
+    assert "- us_open" not in market_brief  # not a dispatch choice anymore
+    assert 'BT="us_open"' not in market_brief  # no DST case branch anymore
+    # The dedicated watchdog owns the open with staggered attempts and an
+    # isolated concurrency group.
+    assert "group: us-open-brief" in us_open
+    assert "cancel-in-progress: false" in us_open
+    for dst_attempt in ("32 13 * * 1-5", "39 13 * * 1-5", "48 13 * * 1-5"):
+        assert dst_attempt in us_open  # daylight open +2/+9/+18
+    for std_attempt in ("32 14 * * 1-5", "39 14 * * 1-5", "48 14 * * 1-5"):
+        assert std_attempt in us_open  # standard open +2/+9/+18
+    # durable claim before send + real (pre-setup) workflow-start timestamp.
+    assert "US_OPEN_DURABLE_STATE" in us_open
+    assert "US_OPEN_WORKFLOW_STARTED_AT" in us_open
+    # unique per-attempt identity so a re-run cannot steal a prior claim.
+    assert "GITHUB_RUN_ATTEMPT" in us_open
+    # the start timestamp is captured before dependency install.
+    start_idx = us_open.index("US_OPEN_WORKFLOW_STARTED_AT")
+    install_idx = us_open.index("Install dependencies")
+    assert start_idx < install_idx
+    # a hung run must not starve backups: the job is time-bounded.
+    assert "timeout-minutes:" in us_open
 
 
 def test_tuesday_late_sanity_checks_overnight_and_local_briefs():

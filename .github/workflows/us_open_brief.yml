@@ -1,0 +1,77 @@
+name: US Open Brief (SLA)
+
+# Dedicated, delay-resilient U.S. opening-brief path (Issue #13).
+# It is isolated from every other brief so a busy shared queue can never drop
+# or reorder its attempts. GitHub cron is UTC and has no punctuality SLA; the
+# runtime code recomputes the actual New York session, so these staggered
+# attempts only *trigger* the runner and never assert DST or market phase.
+# Offsets below are minutes past the 09:30 ET open.
+
+on:
+  schedule:
+    # ===== U.S. daylight time: 09:30 ET = 13:30 UTC = 21:30 Taipei =====
+    - cron: '32 13 * * 1-5'   # ~open +2   (on_time)
+    - cron: '39 13 * * 1-5'   # ~open +9   (on_time)
+    - cron: '48 13 * * 1-5'   # ~open +18  (late)
+    - cron: '3 14 * * 1-5'    # ~open +33  (intraday_recovery)
+    # ===== U.S. standard time: 09:30 ET = 14:30 UTC = 22:30 Taipei =====
+    - cron: '32 14 * * 1-5'   # ~open +2
+    - cron: '39 14 * * 1-5'   # ~open +9
+    - cron: '48 14 * * 1-5'   # ~open +18
+    - cron: '3 15 * * 1-5'    # ~open +33
+  workflow_dispatch: {}
+
+# The dedicated group serializes attempts (no two send concurrently). At-most-
+# once does NOT rely on the queue surviving: the runner reads durable state and
+# durably pushes its claim BEFORE sending, so a dropped/replaced pending attempt
+# can cause neither a duplicate (serialization + durable claim) nor a miss
+# (later staggered crons re-cover from the durable state). See
+# docs/market_brief_sla_v1.md §10 for the concurrency rationale and residuals.
+concurrency:
+  group: us-open-brief
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  us_open:
+    runs-on: ubuntu-latest
+    # Bound the whole job well below the watchdog spacing so a hung
+    # checkout/install/generate/send cannot hold the concurrency group and
+    # starve later backups: a hang releases the group within this window and
+    # the next staggered attempt still recovers the session.
+    timeout-minutes: 8
+    steps:
+      - name: Record workflow start (before setup — separates queue vs setup delay)
+        run: |
+          echo "US_OPEN_WORKFLOW_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run U.S. open brief (session-aware, delay-resilient)
+        timeout-minutes: 5
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          US_OPEN_SCHEDULE_SOURCE: ${{ github.event.schedule || github.event_name }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          # A re-run keeps run_id but increments run_attempt; the runner combines
+          # them into a unique attempt identity for the at-most-once claim.
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          # Enable the runner's durable claim push (commit + push to main before
+          # the outbound send) so a post-send crash surfaces ambiguity.
+          US_OPEN_DURABLE_STATE: '1'
+        run: python -m src.runners.run_us_open_brief
+      - if: always()
+        uses: ./.github/actions/commit-state
