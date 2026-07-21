@@ -64,6 +64,7 @@ _BRANCH_ENV = "TRUMP_STATE_BRANCH"
 # repo root, so these resolve to the same files the store/archive read and write.
 _STATE_REL = "data_store/trump_delivery_state.json"
 _ARCHIVE_REL = "data_store/trump_posts_archive.json"
+_LEGACY_REL = "data_store/trump_seen_posts.json"
 _DATA_STORE_REL = "data_store"
 
 
@@ -146,16 +147,19 @@ def _remote_conflict_kind(content: str, expected: dict) -> str | None:
 
 
 def _parse_archive(content: str, *, origin: str) -> dict:
-    """Parse + validate a remote archive payload (fail closed)."""
+    """Parse + validate a remote archive payload (fail closed, key==id bound)."""
+    from src.data.trump_truth import ArchiveError, validate_archive_content
+
     try:
         data = json.loads(content)
     except (json.JSONDecodeError, ValueError, TypeError) as exc:
         raise StateReadError(
             f"{origin} archive is unreadable: {type(exc).__name__}"
         ) from exc
-    if not isinstance(data, dict):
-        raise StateReadError(f"{origin} archive is not a JSON object")
-    return data
+    try:
+        return validate_archive_content(data, origin=origin)
+    except ArchiveError as exc:
+        raise StateReadError(str(exc)) from exc
 
 
 def _remote_archive_has(content: str, post_ids: Iterable[str]) -> bool:
@@ -181,6 +185,15 @@ def _write_local_archive(content: str) -> None:
         raise StateReadError("failed to persist hydrated archive locally")
 
 
+def _write_empty_archive() -> None:
+    """Reset the local archive to empty (verified-absent remote bootstrap)."""
+    from src.data.trump_truth import ARCHIVE_FILE
+    from src.storage import state_manager
+
+    if not state_manager.write_json(ARCHIVE_FILE, {}):
+        raise StateReadError("failed to reset local archive to empty")
+
+
 # -- absence / hydration -----------------------------------------------------
 
 
@@ -199,10 +212,13 @@ def _remote_path_absent(path: str, branch: str) -> bool:
 def hydrate_from_remote(store: TrumpDeliveryStore) -> bool:
     """Replace the local ledger with origin's authoritative version.
 
-    No-op (``False``) when durable mode is off. Fails closed (``StateReadError``)
-    if origin cannot be fetched, if the object is unreadable while the path is not
-    PROVABLY absent, or if the remote state is malformed. Only a verified-absent
-    path bootstraps a genuine first run.
+    Returns ``True`` only on a VERIFIED-absent remote ledger (a genuine first
+    run, i.e. a bootstrap); ``False`` when it hydrated from present remote content
+    or when durable mode is off. On verified absence the local ledger is reset to
+    an explicit empty state so a stale local tracked file from an older event
+    checkout can never seed a decision. Fails closed (``StateReadError``) if
+    origin cannot be fetched, if the object is unreadable while the path is not
+    provably absent, or if the remote state is malformed.
     """
     if not durable_enabled():
         return False
@@ -212,8 +228,9 @@ def hydrate_from_remote(store: TrumpDeliveryStore) -> bool:
     show = _git_run("show", f"origin/{branch}:{_STATE_REL}")
     if show.returncode == 0:
         store.hydrate_from(show.stdout or "")
-        return True
+        return False
     if _remote_path_absent(_STATE_REL, branch):
+        store.reset_empty()  # authoritative empty base; discard any stale local
         return True
     raise StateReadError(
         "authoritative remote ledger could not be read (path present but "
@@ -226,7 +243,8 @@ def hydrate_archive_from_remote() -> bool:
 
     So a stale checkout never re-writes an older archive over origin's (which
     would drop recently-captured rows) and the pre-send capture push rebases
-    cleanly. Same fail-closed rules as the ledger hydration.
+    cleanly. On verified absence the local archive is reset to empty. Same
+    fail-closed rules as the ledger hydration.
     """
     if not durable_enabled():
         return False
@@ -236,13 +254,54 @@ def hydrate_archive_from_remote() -> bool:
     show = _git_run("show", f"origin/{branch}:{_ARCHIVE_REL}")
     if show.returncode == 0:
         _write_local_archive(show.stdout or "")
-        return True
+        return False
     if _remote_path_absent(_ARCHIVE_REL, branch):
+        _write_empty_archive()  # authoritative empty base; discard stale local
         return True  # no archive on origin yet (genuine first run)
     raise StateReadError(
         "authoritative remote archive could not be read (path present but "
         "unreadable); failing closed"
     )
+
+
+def hydrate_legacy_from_remote(legacy_path) -> bool:
+    """Make the local legacy seen file authoritative from ``origin/main``.
+
+    First-ledger bootstrap migrates ``trump_seen_posts.json``; a stale event
+    checkout could carry an OLDER legacy-seen than origin (e.g. a queued new-code
+    run behind an old-code run that just committed newer seen state), which would
+    re-blast posts the old run already delivered. Reading the legacy file from
+    validated ``origin/main`` — resetting the local copy to origin's content, or
+    to empty when origin has none — closes that rollout window. No-op when durable
+    mode is off (local/tests keep their own legacy file).
+    """
+    if not durable_enabled() or not legacy_path:
+        return False
+    from pathlib import Path
+
+    branch = _branch()
+    legacy = Path(str(legacy_path))
+    if _git_run("fetch", "origin", branch).returncode != 0:
+        raise StateReadError("cannot fetch origin to hydrate authoritative legacy")
+    show = _git_run("show", f"origin/{branch}:{_LEGACY_REL}")
+    if show.returncode == 0:
+        try:
+            data = json.loads(show.stdout or "{}")
+        except (json.JSONDecodeError, ValueError) as exc:
+            raise StateReadError(
+                f"origin legacy seen malformed: {type(exc).__name__}"
+            ) from exc
+        if not isinstance(data, dict):
+            raise StateReadError("origin legacy seen is not a JSON object")
+    elif _remote_path_absent(_LEGACY_REL, branch):
+        data = {}  # origin has no legacy seen: authoritative empty
+    else:
+        raise StateReadError(
+            "authoritative remote legacy seen unreadable; failing closed"
+        )
+    legacy.parent.mkdir(parents=True, exist_ok=True)
+    legacy.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    return True
 
 
 # -- shared commit / push / verify core --------------------------------------
@@ -348,21 +407,38 @@ def durable_push(
     return _commit_push_verify(message, verify=verify, cas=cas)
 
 
+def _remote_ledger_has_records(content: str, post_ids: Iterable[str]) -> bool:
+    """True iff origin's ledger has a record for every ``post_ids`` entry."""
+    try:
+        posts = TrumpDeliveryStore.parse_state(
+            content, origin="origin/main state"
+        )["posts"]
+    except StateReadError:
+        return False
+    return all(str(pid) in posts for pid in post_ids)
+
+
 def durable_push_capture(post_ids: Iterable[str], message: str) -> str:
-    """Commit + push the new archive rows and VERIFY them on origin.
+    """Commit + push the capture (archive rows + pending ledger records) and
+    VERIFY both on origin.
 
     Called BEFORE any per-post claim/send, so a remote ``sent`` record can never
-    exist without the post already durable in the authoritative archive. Returns
-    ``PUSH_OK`` only when origin's archive contains every ``post_ids`` entry.
+    exist without the post already durable in the authoritative archive, AND a
+    timeout before a post's per-post claim cannot leave it archive-only with no
+    ledger record. Returns ``PUSH_OK`` only when origin's archive AND ledger both
+    contain every ``post_ids`` entry.
     """
     if not durable_enabled():
         return PUSH_DISABLED
     ids = [str(p) for p in post_ids]
 
     def verify(branch: str) -> bool:
-        show = _git_run("show", f"origin/{branch}:{_ARCHIVE_REL}")
-        if show.returncode != 0:
+        archive = _git_run("show", f"origin/{branch}:{_ARCHIVE_REL}")
+        ledger = _git_run("show", f"origin/{branch}:{_STATE_REL}")
+        if archive.returncode != 0 or ledger.returncode != 0:
             return False
-        return _remote_archive_has(show.stdout or "", ids)
+        return _remote_archive_has(archive.stdout or "", ids) and (
+            _remote_ledger_has_records(ledger.stdout or "", ids)
+        )
 
     return _commit_push_verify(message, verify=verify)

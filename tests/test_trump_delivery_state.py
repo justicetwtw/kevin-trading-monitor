@@ -14,10 +14,12 @@ import tempfile
 
 import pytest
 
+from src.storage import trump_delivery_state as tds
 from src.storage.trump_delivery_state import (
     DELIVERY_AMBIGUOUS,
     DELIVERY_CLAIMED,
     DELIVERY_FAILED,
+    DELIVERY_PENDING,
     DELIVERY_SENT,
     DO_AMBIGUOUS,
     DO_PROCEED,
@@ -237,3 +239,91 @@ def test_no_post_text_or_secrets_in_persisted_record(tmp_path):
         }
     )
     assert "text" not in raw
+
+
+# --- schema: map key bound to record identity -------------------------------
+
+
+def test_parse_state_rejects_key_id_mismatch():
+    # posts['X'] = {'post_id':'Y'} could make X falsely skip as sent or deliver
+    # Y's payload for X; the validator must fail closed.
+    bad = json.dumps(
+        {
+            "schema_version": 1,
+            "posts": {"X": {"post_id": "Y", "delivery_state": "sent"}},
+        }
+    )
+    with pytest.raises(StateReadError):
+        TrumpDeliveryStore.parse_state(bad)
+
+
+def test_parse_state_rejects_nonstring_capture_started_at():
+    bad = json.dumps(
+        {"schema_version": 1, "capture_started_at": 12345, "posts": {}}
+    )
+    with pytest.raises(StateReadError):
+        TrumpDeliveryStore.parse_state(bad)
+
+
+def test_parse_state_accepts_pending_state(tmp_path):
+    store = _store(tmp_path)
+    store.mark_pending([_post("p1")], run_id="r", attempt_id="r:1")
+    assert store.get("p1")["delivery_state"] == DELIVERY_PENDING
+    # Round-trips through the fail-closed reader.
+    assert store.action_for("p1") == DO_PROCEED  # pending -> deliver it
+
+
+# --- pending + reset --------------------------------------------------------
+
+
+def test_mark_pending_only_for_new_posts(tmp_path):
+    store = _store(tmp_path)
+    store.claim(_post("already"), run_id="r", attempt_id="r:1")
+    marked = store.mark_pending(
+        [_post("already"), _post("fresh")], run_id="r", attempt_id="r:1"
+    )
+    assert marked == ["fresh"]  # existing 'claimed' record left untouched
+    assert store.get("already")["delivery_state"] == DELIVERY_CLAIMED
+    assert store.get("fresh")["delivery_state"] == DELIVERY_PENDING
+
+
+def test_reset_empty_discards_stale_local(tmp_path):
+    store = _store(tmp_path)
+    store.claim(_post("stale"), run_id="r", attempt_id="r:1")
+    store.reset_empty()
+    assert store._read_raw()["posts"] == {}
+    assert store.capture_started_at() is None
+
+
+# --- state-aware pruning ----------------------------------------------------
+
+
+def test_prune_never_evicts_non_terminal_records(tmp_path, monkeypatch):
+    # Over the size bound, only terminal 'sent' records may be evicted; a
+    # non-terminal record (pending/claimed/failed/ambiguous) is NEVER pruned —
+    # deleting it would silently turn a red unresolved delivery into a green
+    # absence.
+    monkeypatch.setattr(tds, "MAX_POSTS", 3)
+    store = _store(tmp_path)
+    # Three old delivered posts + one unresolved failed (oldest of all).
+    store.claim(_post("keepme"), run_id="r", attempt_id="r:1")
+    store.resolve("keepme", "failed", run_id="r")
+    for i in range(4):
+        store.claim(_post(f"sent{i}"), run_id="r", attempt_id="r:1")
+        store.resolve(f"sent{i}", "sent", run_id="r")
+    posts = store._read_raw()["posts"]
+    assert "keepme" in posts  # non-terminal survived pruning
+    assert posts["keepme"]["delivery_state"] == DELIVERY_FAILED
+    # Only 'sent' records were evicted to respect the bound.
+    assert sum(
+        1 for r in posts.values() if r["delivery_state"] == DELIVERY_SENT
+    ) <= 3
+
+
+def test_non_terminal_ids(tmp_path):
+    store = _store(tmp_path)
+    store.mark_pending([_post("p")], run_id="r", attempt_id="r:1")
+    store.claim(_post("c"), run_id="r", attempt_id="r:1")
+    store.claim(_post("s"), run_id="r", attempt_id="r:1")
+    store.resolve("s", "sent", run_id="r")
+    assert store.non_terminal_ids() == {"p", "c"}  # 'sent' excluded

@@ -121,7 +121,7 @@ def _patch_runner(monkeypatch, posts, translator, *, send_ok=True, outcome=None)
         "TrumpDeliveryStore",
         lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v, **k: len(v))
 
     def _fake_detailed(message, **kwargs):
         state["sent"].append((message, kwargs))
@@ -407,7 +407,7 @@ def test_archive_runs_before_translation(monkeypatch):
     monkeypatch.setattr(
         run_trump_monitor,
         "archive_posts",
-        lambda v: order.append("archive") or len(v),
+        lambda v, **k: order.append("archive") or len(v),
     )
     monkeypatch.setattr(
         run_trump_monitor,
@@ -647,7 +647,7 @@ def test_post_delivery_is_marked_sensitive_to_redact_log_preview(monkeypatch):
         "TrumpDeliveryStore",
         lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v, **k: len(v))
     monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
     monkeypatch.setattr(run_trump_monitor, "write_json", lambda *a, **k: True)
     monkeypatch.setattr(

@@ -86,7 +86,7 @@ def _patch_successful_runner(monkeypatch, posts, *, checkpoint=None, outcome="se
         "TrumpDeliveryStore",
         lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value, **k: len(value))
     monkeypatch.setattr(
         run_trump_monitor,
         "send_telegram_detailed",
@@ -342,7 +342,7 @@ def test_failed_middle_of_long_post_does_not_mark_seen(monkeypatch):
         "TrumpDeliveryStore",
         lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=None),
     )
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value: len(value))
+    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda value, **k: len(value))
     monkeypatch.setattr(run_trump_monitor, "get_default_translator", lambda: None)
     calls = {"count": 0}
 

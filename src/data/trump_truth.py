@@ -448,12 +448,35 @@ def filter_new_posts(
     return new_posts
 
 
+def validate_archive_content(data: Any, *, origin: str = "archive") -> dict[str, Any]:
+    """Validate a parsed archive dict, binding each key to its payload identity.
+
+    An archive value must be an object whose ``id`` exactly matches its map key,
+    so a key/id mismatch (``archive['X'] = {'id':'Y'}``) can never make a failed
+    ``X`` retry and deliver ``Y``'s payload. Raises ``ArchiveError`` on any
+    violation (fail closed / no-send), never a silent skip.
+    """
+    if not isinstance(data, dict):
+        raise ArchiveError(f"{origin} is not a JSON object")
+    for key, value in data.items():
+        if not isinstance(key, str) or not key:
+            raise ArchiveError(f"{origin} has an empty/non-string key")
+        if not isinstance(value, dict):
+            raise ArchiveError(f"{origin} entry {key!r} is not an object")
+        if str(value.get("id") or "") != key:
+            raise ArchiveError(
+                f"{origin} key {key!r} != payload id {value.get('id')!r}"
+            )
+    return data
+
+
 def _read_archive_fail_closed() -> dict[str, Any]:
     """Read the rolling archive, distinguishing absent (empty) from corrupt.
 
     An absent file is a legitimate empty archive; a PRESENT but unreadable/invalid
-    file raises ``ArchiveError`` rather than silently returning ``{}`` (which would
-    overwrite the whole rolling history from scratch on the next write).
+    file (or one with a key/id mismatch) raises ``ArchiveError`` rather than
+    silently returning ``{}`` (which would overwrite the whole rolling history
+    from scratch on the next write) or a mis-identified payload.
     """
     import json
 
@@ -472,9 +495,7 @@ def _read_archive_fail_closed() -> dict[str, Any]:
         raise ArchiveError(
             f"archive present but not valid JSON: {type(exc).__name__}"
         ) from exc
-    if not isinstance(data, dict):
-        raise ArchiveError("archive present but not a JSON object")
-    return data
+    return validate_archive_content(data, origin="archive")
 
 
 def get_archived_posts(post_ids: list[str]) -> dict[str, dict[str, Any]]:
@@ -497,31 +518,52 @@ def get_archived_posts(post_ids: list[str]) -> dict[str, dict[str, Any]]:
     return found
 
 
-def archive_posts(posts: list[dict[str, Any]]) -> int:
+def archive_posts(
+    posts: list[dict[str, Any]],
+    *,
+    protected_ids: set[str] | None = None,
+) -> int:
     """Store every captured post in a rolling archive, deduplicated by ID.
 
     Fails closed: a corrupt-present archive read or a failed write raises
     ``ArchiveError`` so the runner never treats an unarchived post as captured
     (and never marks it ``sent`` while it is missing from the durable record).
+
+    ``protected_ids`` (every ID referenced by a non-terminal ledger record) is
+    NEVER pruned — a still-owed post must not lose its payload. Only unprotected
+    rows are evicted, oldest first, to fit ``MAX_ARCHIVE``; if the protected rows
+    alone exceed the bound, we keep them all and raise ``ArchiveError`` so the
+    overflow is a loud, visible fail-closed signal rather than silent deletion of
+    delivery evidence.
     """
+    protected = {str(pid) for pid in (protected_ids or set())}
     archive = _read_archive_fail_closed()
     before = len(archive)
     for post in posts:
         post_id = str(post.get("id") or "")
         if post_id:
             archive[post_id] = post
+    overflow = False
     if len(archive) > MAX_ARCHIVE:
-        ordered = sorted(
-            archive.items(),
+        unprotected = sorted(
+            (item for item in archive.items() if item[0] not in protected),
             key=lambda item: str(
-                item[1].get("created_at")
-                or item[1].get("captured_at")
-                or ""
+                item[1].get("created_at") or item[1].get("captured_at") or ""
             ),
         )
-        archive = dict(ordered[-MAX_ARCHIVE:])
+        drop = len(archive) - MAX_ARCHIVE
+        for key, _ in unprotected[:drop]:
+            archive.pop(key, None)
+        # If protected rows alone still exceed the bound, keep them (never delete
+        # a non-terminal payload) and signal the overflow after persisting.
+        overflow = len(archive) > MAX_ARCHIVE
     if not write_json(ARCHIVE_FILE, archive):
         raise ArchiveError("archive write failed; refusing to report success")
+    if overflow:
+        raise ArchiveError(
+            f"archive protected rows exceed MAX_ARCHIVE ({len(archive)}); "
+            "fail closed rather than delete unresolved-delivery payloads"
+        )
     return len(archive) - before
 
 

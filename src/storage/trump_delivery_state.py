@@ -43,17 +43,30 @@ STATE_SCHEMA_VERSION = 1
 MAX_POSTS = 10000
 
 # delivery_state values.
+DELIVERY_PENDING = "pending"  # captured + archived durably, not yet delivered
 DELIVERY_CLAIMED = "claimed"
 DELIVERY_SENT = "sent"
 DELIVERY_FAILED = "failed"
 DELIVERY_AMBIGUOUS = "ambiguous"
 
 SUPPORTED_DELIVERY_STATES = frozenset(
-    {DELIVERY_CLAIMED, DELIVERY_SENT, DELIVERY_FAILED, DELIVERY_AMBIGUOUS}
+    {
+        DELIVERY_PENDING,
+        DELIVERY_CLAIMED,
+        DELIVERY_SENT,
+        DELIVERY_FAILED,
+        DELIVERY_AMBIGUOUS,
+    }
+)
+# ``sent`` is the only terminal state; every other state is an unresolved /
+# undelivered post that must keep the workflow red and must never be pruned
+# (ledger record) or have its archive payload dropped.
+NON_TERMINAL_STATES = frozenset(
+    {DELIVERY_PENDING, DELIVERY_CLAIMED, DELIVERY_FAILED, DELIVERY_AMBIGUOUS}
 )
 
 # resolve_delivery_action outcomes.
-DO_PROCEED = "proceed"  # never attempted -> send now
+DO_PROCEED = "proceed"  # never attempted / captured-pending -> send now
 DO_RETRY = "retry"  # prior attempt definitively failed (nothing delivered)
 DO_SKIP_SENT = "skip_sent"  # already delivered
 DO_SKIP_AMBIGUOUS = "skip_ambiguous"  # already quarantined; leave it
@@ -69,7 +82,8 @@ def resolve_delivery_action(existing: dict | None) -> str:
 
     A persisted ``claimed`` can only have been left by a previous run that
     crashed between persisting its durable claim and resolving the send — a
-    genuine exactly-once ambiguity we surface rather than risk a duplicate.
+    genuine exactly-once ambiguity we surface rather than risk a duplicate. A
+    ``pending`` record is captured+archived but never delivered, so it is sent.
     """
     if not existing:
         return DO_PROCEED
@@ -82,6 +96,8 @@ def resolve_delivery_action(existing: dict | None) -> str:
         return DO_AMBIGUOUS
     if state == DELIVERY_FAILED:
         return DO_RETRY
+    if state == DELIVERY_PENDING:
+        return DO_PROCEED  # captured but undelivered -> deliver it
     return DO_PROCEED
 
 
@@ -111,12 +127,28 @@ class TrumpDeliveryStore:
         schema = data.get("schema_version", STATE_SCHEMA_VERSION)
         if not isinstance(schema, int) or schema > STATE_SCHEMA_VERSION:
             raise StateReadError(f"{origin} has unsupported schema_version {schema!r}")
+        capture_started_at = data.get("capture_started_at")
+        if capture_started_at is not None and not isinstance(capture_started_at, str):
+            raise StateReadError(
+                f"{origin} has a non-string capture_started_at "
+                f"{type(capture_started_at).__name__}"
+            )
         posts = data.get("posts")
         if not isinstance(posts, dict):
             raise StateReadError(f"{origin} has a missing/invalid 'posts' object")
         for key, record in posts.items():
             if not isinstance(record, dict):
                 raise StateReadError(f"{origin} post {key!r} is not an object")
+            # Bind the map key to the record identity: a key/post_id mismatch
+            # (``posts['X'] = {'post_id':'Y'}``) could make X falsely skip as
+            # 'sent' or deliver Y's payload for X. Fail closed instead.
+            if not isinstance(key, str) or not key:
+                raise StateReadError(f"{origin} has an empty/non-string post key")
+            if record.get("post_id") != key:
+                raise StateReadError(
+                    f"{origin} post key {key!r} != record post_id "
+                    f"{record.get('post_id')!r}"
+                )
             if record.get("delivery_state") not in SUPPORTED_DELIVERY_STATES:
                 raise StateReadError(
                     f"{origin} post {key!r} has unsupported delivery_state "
@@ -124,7 +156,7 @@ class TrumpDeliveryStore:
                 )
         return {
             "schema_version": schema,
-            "capture_started_at": data.get("capture_started_at"),
+            "capture_started_at": capture_started_at,
             "posts": posts,
         }
 
@@ -176,19 +208,40 @@ class TrumpDeliveryStore:
 
     @staticmethod
     def _prune(posts: dict[str, Any]) -> None:
+        """Bound file growth by evicting oldest **terminal ('sent')** records only.
+
+        A non-terminal record (pending/claimed/failed/ambiguous) is an unresolved
+        delivery: pruning it would silently turn a red, still-owed post into a
+        green absence, so it is NEVER evicted automatically — even if that leaves
+        the ledger above ``MAX_POSTS`` (a large non-terminal backlog is itself a
+        loud, visible signal that needs operator attention, not silent deletion).
+        """
         if len(posts) <= MAX_POSTS:
             return
-        ordered = sorted(
-            posts.items(),
+        sent = [
+            (key, record)
+            for key, record in posts.items()
+            if record.get("delivery_state") == DELIVERY_SENT
+        ]
+        sent.sort(
             key=lambda item: str(
                 item[1].get("resolved_at")
                 or item[1].get("claimed_at")
                 or item[1].get("created_at")
                 or ""
-            ),
+            )
         )
-        for key, _ in ordered[: len(posts) - MAX_POSTS]:
+        for key, _ in sent[: len(posts) - MAX_POSTS]:
             posts.pop(key, None)
+
+    def non_terminal_ids(self) -> set[str]:
+        """Post IDs whose delivery is still unresolved (must never lose payload)."""
+        posts = self._read_raw()["posts"]
+        return {
+            pid
+            for pid, record in posts.items()
+            if record.get("delivery_state") in NON_TERMINAL_STATES
+        }
 
     # -- reads ---------------------------------------------------------------
 
@@ -333,12 +386,71 @@ class TrumpDeliveryStore:
         Counts only — post IDs/states, never text or chat IDs.
         """
         posts = self._read_raw()["posts"]
-        counts = {DELIVERY_CLAIMED: 0, DELIVERY_AMBIGUOUS: 0, DELIVERY_FAILED: 0}
+        counts = {
+            DELIVERY_PENDING: 0,
+            DELIVERY_CLAIMED: 0,
+            DELIVERY_AMBIGUOUS: 0,
+            DELIVERY_FAILED: 0,
+        }
         for record in posts.values():
             state = record.get("delivery_state")
             if state in counts:
                 counts[state] += 1
         return counts
+
+    def mark_pending(
+        self,
+        posts_to_capture: list[dict],
+        *,
+        run_id: str | None = None,
+        attempt_id: str | None = None,
+    ) -> list[str]:
+        """Durably mark newly-captured posts ``pending`` before the delivery loop.
+
+        Writes a ``pending`` record for every captured post that has no ledger
+        record yet, so a timeout BEFORE a post's per-post claim cannot leave it
+        archived-but-invisible (no ledger record, recoverable only from the live
+        source). A post that already has a record (pending/claimed/failed/
+        ambiguous/sent) is left untouched. Returns the IDs newly marked pending.
+        """
+        data = self._read_raw()
+        ledger = data["posts"]
+        marked: list[str] = []
+        for post in posts_to_capture:
+            post_id = str(post.get("id") or "")
+            if not post_id or post_id in ledger:
+                continue
+            ledger[post_id] = {
+                "post_id": post_id,
+                "created_at": post.get("created_at"),
+                "source": post.get("source"),
+                "delivery_state": DELIVERY_PENDING,
+                "claimed_at": None,
+                "resolved_at": None,
+                "run_id": run_id,
+                "workflow_attempt_id": attempt_id,
+                "stage_code": "captured_pending",
+            }
+            marked.append(post_id)
+        if marked:
+            self._prune(ledger)
+            data["schema_version"] = STATE_SCHEMA_VERSION
+            self._write_raw(data)
+        return marked
+
+    def reset_empty(self) -> None:
+        """Initialize the local ledger to an explicit empty authoritative state.
+
+        Called on a VERIFIED-absent remote ledger so a stale local tracked file
+        from an older event checkout can never seed a decision.
+        """
+        self._write_raw(
+            {
+                "schema_version": STATE_SCHEMA_VERSION,
+                "capture_started_at": None,
+                "posts": {},
+            }
+        )
 
     # -- legacy migration ----------------------------------------------------
 

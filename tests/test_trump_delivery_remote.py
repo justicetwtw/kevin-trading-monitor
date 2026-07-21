@@ -233,7 +233,7 @@ def test_hydrate_overwrites_local_with_remote(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(tdr, "_git_run", _fake_git(remote=remote))
     store = TrumpDeliveryStore(path=tmp_path / "l.json", legacy_path=None)
-    assert hydrate_from_remote(store) is True
+    assert hydrate_from_remote(store) is False  # hydrated from present remote
     assert store.get("r1")["delivery_state"] == "sent"
 
 
@@ -265,7 +265,8 @@ def test_hydrate_verified_absent_bootstraps(monkeypatch, tmp_path):
     monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
     monkeypatch.setattr(tdr, "_git_run", _fake_git(remote=None))
     store = TrumpDeliveryStore(path=tmp_path / "l.json", legacy_path=None)
-    assert hydrate_from_remote(store) is True  # provably absent -> first run
+    assert hydrate_from_remote(store) is True  # provably absent -> bootstrap
+    assert store._read_raw()["posts"] == {}  # local reset to empty authoritative
 
 
 def test_hydrate_malformed_remote_fails_closed(monkeypatch, tmp_path):
@@ -303,21 +304,45 @@ def _archive_git(*, ledger=None, archive=None, fail=()):
     return run
 
 
-def test_durable_push_capture_ok_only_when_archive_has_all_ids(monkeypatch):
+_LEDGER_AB = (
+    '{"posts":{"a":{"post_id":"a","delivery_state":"pending"},'
+    '"b":{"post_id":"b","delivery_state":"pending"}}}'
+)
+
+
+def test_durable_push_capture_ok_only_when_archive_and_ledger_have_all_ids(
+    monkeypatch,
+):
+    # Capture is durable only when origin's archive AND ledger both carry a,b.
     monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
     monkeypatch.setattr(tdr, "_sleep", lambda s: None)
     monkeypatch.setattr(
         tdr, "_git_run",
-        _archive_git(ledger='{"posts":{}}', archive='{"a":1,"b":2}'),
+        _archive_git(ledger=_LEDGER_AB, archive='{"a":{"id":"a"},"b":{"id":"b"}}'),
     )
     assert tdr.durable_push_capture(["a", "b"], "m") == PUSH_OK
 
 
-def test_durable_push_capture_failed_when_id_missing(monkeypatch):
+def test_durable_push_capture_failed_when_archive_id_missing(monkeypatch):
     monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
     monkeypatch.setattr(tdr, "_sleep", lambda s: None)
     monkeypatch.setattr(
-        tdr, "_git_run", _archive_git(ledger='{"posts":{}}', archive='{"a":1}')
+        tdr, "_git_run",
+        _archive_git(ledger=_LEDGER_AB, archive='{"a":{"id":"a"}}'),
+    )
+    assert tdr.durable_push_capture(["a", "b"], "m") == PUSH_FAILED
+
+
+def test_durable_push_capture_failed_when_ledger_record_missing(monkeypatch):
+    # Archive has both, but the pending ledger record for b is absent: not durable.
+    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(tdr, "_sleep", lambda s: None)
+    monkeypatch.setattr(
+        tdr, "_git_run",
+        _archive_git(
+            ledger='{"posts":{"a":{"post_id":"a","delivery_state":"pending"}}}',
+            archive='{"a":{"id":"a"},"b":{"id":"b"}}',
+        ),
     )
     assert tdr.durable_push_capture(["a", "b"], "m") == PUSH_FAILED
 
@@ -334,7 +359,7 @@ def test_hydrate_archive_writes_local(monkeypatch, tmp_path):
     monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
     monkeypatch.setattr(state_manager, "DATA_STORE_DIR", tmp_path)
     monkeypatch.setattr(tdr, "_git_run", _archive_git(archive='{"a":{"id":"a"}}'))
-    assert tdr.hydrate_archive_from_remote() is True
+    assert tdr.hydrate_archive_from_remote() is False  # hydrated from present
     written = json.loads((tmp_path / trump_truth.ARCHIVE_FILE).read_text())
     assert "a" in written
 
@@ -349,10 +374,13 @@ def test_hydrate_archive_malformed_fails_closed(monkeypatch, tmp_path):
         tdr.hydrate_archive_from_remote()
 
 
-def test_hydrate_archive_absent_bootstraps(monkeypatch):
+def test_hydrate_archive_absent_bootstraps(monkeypatch, tmp_path):
+    from src.storage import state_manager
+
     monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(state_manager, "DATA_STORE_DIR", tmp_path)
     monkeypatch.setattr(tdr, "_git_run", _archive_git(archive=None))
-    assert tdr.hydrate_archive_from_remote() is True  # provably absent
+    assert tdr.hydrate_archive_from_remote() is True  # provably absent -> reset
 
 
 # --- end-to-end: REAL bare-repo git integration (durable mode) ---------------
@@ -422,7 +450,7 @@ def _failed_record(post_id, created_at):
 
 
 def _wire_real(monkeypatch, work, *, posts, outcome="sent", run_id="run-A",
-               run_attempt="1", on_send=None):
+               run_attempt="1", on_send=None, legacy_path=None):
     from pathlib import Path
 
     from src.data import trump_truth
@@ -439,7 +467,7 @@ def _wire_real(monkeypatch, work, *, posts, outcome="sent", run_id="run-A",
     monkeypatch.setattr(
         run_trump_monitor, "TrumpDeliveryStore",
         lambda: TrumpDeliveryStore(
-            path=str(ds / "trump_delivery_state.json"), legacy_path=None
+            path=str(ds / "trump_delivery_state.json"), legacy_path=legacy_path
         ),
     )
     monkeypatch.setattr(
@@ -556,3 +584,85 @@ def test_real_stale_checkout_after_sent_does_not_resend(monkeypatch, tmp_path):
     sent = _wire_real(monkeypatch, work, posts=[_post("X")])
     assert run_trump_monitor.main() == 0
     assert sent == []  # hydrated origin sent record; no resend
+
+
+def test_real_mid_loop_timeout_pending_drains_from_archive(monkeypatch, tmp_path):
+    # Archive several posts, crash mid-loop after the first delivery. Every
+    # remaining captured post is durably 'pending' (or 'claimed') on origin, never
+    # archive-only, so an independent checkout with an EMPTY live source drains
+    # the still-pending posts from the archive rather than losing them.
+    origin, work = _setup_origin(tmp_path, ledger=_EMPTY_LEDGER, archive={})
+    posts = [
+        _post("p1", hours_ago=4), _post("p2", hours_ago=3),
+        _post("p3", hours_ago=2), _post("p4", hours_ago=1),
+    ]
+    calls = {"n": 0}
+
+    def _crash_after_first():
+        calls["n"] += 1
+        if calls["n"] >= 2:  # p1 delivered, then a hard timeout mid-send of p2
+            raise RuntimeError("simulated job timeout mid-loop")
+
+    _wire_real(monkeypatch, work, posts=posts, on_send=_crash_after_first)
+    with pytest.raises(RuntimeError):
+        run_trump_monitor.main()
+
+    archive = _origin_file(origin, _ARCHIVE_REL)
+    ledger = _origin_file(origin, _STATE_REL)["posts"]
+    # All four were captured (archived + a durable pending/claimed ledger record)
+    # BEFORE the loop, so none is archive-only-invisible.
+    assert all(pid in archive for pid in ("p1", "p2", "p3", "p4"))
+    assert ledger["p1"]["delivery_state"] == "sent"
+    assert ledger["p3"]["delivery_state"] == "pending"
+    assert ledger["p4"]["delivery_state"] == "pending"
+
+    # Independent fresh checkout, EMPTY live source: the still-pending p3/p4 drain
+    # from the authoritative archive and reach remote 'sent'.
+    work2 = _clone(origin, tmp_path / "work2")
+    sent2 = _wire_real(monkeypatch, work2, posts=[], run_id="run-B")
+    run_trump_monitor.main()
+    ledger2 = _origin_file(origin, _STATE_REL)["posts"]
+    assert ledger2["p3"]["delivery_state"] == "sent"
+    assert ledger2["p4"]["delivery_state"] == "sent"
+    assert len(sent2) == 2  # exactly the two pending posts drained
+
+
+def test_real_stale_checkout_newer_origin_legacy_no_reblast(monkeypatch, tmp_path):
+    # First rollout: origin has NO ledger/archive yet but a NEWER legacy-seen file
+    # (X already delivered by the old-code run). A queued new-code checkout whose
+    # LOCAL legacy is older/empty must bootstrap legacy from authoritative
+    # origin/main and NOT re-blast X.
+    origin = tmp_path / "origin.git"
+    work = tmp_path / "work"
+    _git_cmd(tmp_path, "init", "--bare", "-b", "main", str(origin))
+    _clone(origin, work)
+    _git_cmd(work, "symbolic-ref", "HEAD", "refs/heads/main")
+    ds = work / "data_store"
+    ds.mkdir(parents=True, exist_ok=True)
+    legacy = ds / "trump_seen_posts.json"
+    legacy.write_text(json.dumps({"X": {"created_at": "2026-07-20T00:00:00+00:00"}}))
+    _git_cmd(work, "add", "-A")
+    _git_cmd(work, "commit", "-m", "seed newer legacy")
+    _git_cmd(work, "push", "-u", "origin", "main")
+    # Queued stale checkout: local legacy is EMPTY (predates origin's X commit).
+    legacy.write_text(json.dumps({}))
+
+    sent = _wire_real(
+        monkeypatch, work, posts=[_post("X")], legacy_path=str(legacy)
+    )
+    assert run_trump_monitor.main() == 0
+    assert sent == []  # X already delivered per authoritative origin legacy
+
+
+def test_real_ledger_key_id_mismatch_fails_red_no_send(monkeypatch, tmp_path):
+    # origin ledger has a key/post_id mismatch (X -> post_id Y): reading it must
+    # fail closed (red, no send), never let X falsely skip or deliver Y.
+    ledger = {
+        "schema_version": 1,
+        "capture_started_at": None,
+        "posts": {"X": {"post_id": "Y", "delivery_state": "sent"}},
+    }
+    origin, work = _setup_origin(tmp_path, ledger=ledger, archive={})
+    sent = _wire_real(monkeypatch, work, posts=[_post("X")])
+    assert run_trump_monitor.main() == 1  # fail closed
+    assert sent == []

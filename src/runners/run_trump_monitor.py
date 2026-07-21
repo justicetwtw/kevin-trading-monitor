@@ -42,11 +42,13 @@ from src.storage.trump_delivery_remote import (
     durable_push_capture,
     hydrate_archive_from_remote,
     hydrate_from_remote,
+    hydrate_legacy_from_remote,
 )
 from src.storage.trump_delivery_state import (
     DELIVERY_AMBIGUOUS,
     DELIVERY_CLAIMED,
     DELIVERY_FAILED,
+    DELIVERY_PENDING,
     DO_PROCEED,
     DO_RETRY,
     StateReadError,
@@ -80,21 +82,21 @@ def _parse_time(value: Any) -> datetime | None:
         return None
 
 
-def _capture_started_at(
-    store: TrumpDeliveryStore, previous: dict[str, Any]
-) -> datetime:
+def _capture_started_at(store: TrumpDeliveryStore) -> datetime:
     """Resolve the capture checkpoint from the fail-closed delivery ledger.
 
-    The checkpoint used to live only in the fail-*open* health file, so a
-    corrupt health file silently reset it to now-24h and widened the eligible
-    window. It now lives in the atomic, fail-closed delivery store; the legacy
-    health value is adopted once (best-effort) then persisted durably.
+    The checkpoint lives in the atomic, fail-closed ledger, which is hydrated
+    from authoritative ``origin/main`` before this is read — so it is never taken
+    from a possibly-stale event checkout. On a genuine first run (no checkpoint
+    in the ledger) it defaults to the 24h backfill window; a stale checkout's
+    health checkpoint is deliberately NOT adopted, because dedup is guaranteed by
+    the authoritative ledger + origin-hydrated legacy seen, so a 24h window can
+    never re-blast an already-delivered post.
     """
     existing = _parse_time(store.capture_started_at())
     if existing is not None:
         return existing
-    legacy = _parse_time(previous.get("capture_started_at"))
-    started = legacy or (datetime.now(timezone.utc) - INITIAL_BACKFILL_WINDOW)
+    started = datetime.now(timezone.utc) - INITIAL_BACKFILL_WINDOW
     store.set_capture_started_at(started.isoformat())
     return started
 
@@ -617,24 +619,28 @@ def _archive_retry_candidates(
     store: TrumpDeliveryStore,
     eligible: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[str]]:
-    """Rebuild delivery candidates for durable ``failed`` posts.
+    """Rebuild delivery candidates for undelivered ``pending``/``failed`` posts.
 
-    A ``failed`` post still present in the live-source window is retried via the
-    normal eligible/``DO_RETRY`` path; only ``failed`` posts that have aged OUT
-    of the bounded source window are recovered here from the authoritative
-    archive (bounded, oldest first), so a definitive failure is never silently
-    lost once it leaves the source. Returns ``(retry_posts, missing_ids)`` where
-    ``missing_ids`` are ``failed`` records whose archived payload cannot be
-    recovered — the caller keeps the run red (fail closed), never green.
+    A ``pending`` post (captured but not yet delivered — e.g. a mid-loop timeout
+    before its per-post claim) or a definitively ``failed`` post that is still in
+    the live-source window is retried via the normal eligible path; only those
+    that have aged OUT of the bounded source window are recovered here from the
+    authoritative archive (bounded, oldest first), so a captured-or-failed post
+    is never silently lost once it leaves the source. Returns
+    ``(retry_posts, missing_ids)`` where ``missing_ids`` are undelivered records
+    whose archived payload cannot be recovered — the caller keeps the run red
+    (fail closed), never green.
 
     ``get_archived_posts`` fails closed (raises ``ArchiveError``) on a
     corrupt-present archive.
     """
-    failed_ids = store.ids_in_state(DELIVERY_FAILED)
-    if not failed_ids:
+    undelivered_ids = store.ids_in_state(DELIVERY_PENDING) + store.ids_in_state(
+        DELIVERY_FAILED
+    )
+    if not undelivered_ids:
         return [], []
     eligible_ids = {str(post.get("id") or "") for post in eligible}
-    absent = [pid for pid in failed_ids if pid not in eligible_ids][
+    absent = [pid for pid in undelivered_ids if pid not in eligible_ids][
         :MAX_ARCHIVE_RETRY_PER_RUN
     ]
     if not absent:
@@ -672,15 +678,20 @@ def main() -> int:
     store = TrumpDeliveryStore()
     run_attempt_id = _attempt_id(run_id)
     try:
-        # Hydrate origin's authoritative ledger BEFORE any delivery decision: a
-        # stale event checkout (a queued scheduled run, or a GitHub re-run started
-        # from a SHA predating the previous run's state commit) must never show a
-        # delivered post as unseen and re-blast it. A corrupt local OR remote
-        # ledger — or a present-but-unreadable legacy bootstrap file — fails
-        # closed rather than being read as empty.
-        hydrate_from_remote(store)
+        # Hydrate origin's authoritative ledger AND archive BEFORE any delivery
+        # decision: a stale event checkout (a queued scheduled run, or a re-run
+        # started from a SHA predating the previous run's state commit) must never
+        # show a delivered post as unseen and re-blast it. On a VERIFIED-absent
+        # remote (genuine first run) the local files are reset to empty and the
+        # legacy seen file is taken from authoritative origin/main — never the
+        # stale checkout — so a rollout race cannot re-blast. A corrupt local OR
+        # remote ledger/archive/legacy fails closed rather than reading as empty.
+        bootstrapped = hydrate_from_remote(store)
+        hydrate_archive_from_remote()
+        if bootstrapped:
+            hydrate_legacy_from_remote(store.legacy_path)
         store.migrate_legacy_seen()
-        capture_started_at = _capture_started_at(store, previous)
+        capture_started_at = _capture_started_at(store)
     except StateReadError as exc:
         # A corrupt/unreadable ledger (local or authoritative remote) or bootstrap
         # file must NOT be read as empty (which would re-blast the whole
@@ -738,12 +749,10 @@ def main() -> int:
             if resolve_delivery_action(store.get(str(post.get("id") or "")))
             in (DO_PROCEED, DO_RETRY)
         ]
-        # Hydrate origin's authoritative archive too (so a stale checkout never
-        # over-writes it and the capture push rebases cleanly), then rebuild
-        # delivery candidates for durable 'failed' posts that have aged OUT of
-        # the bounded live-source window — a definitive failure is retried from
-        # the archive, never silently lost once it leaves the source.
-        hydrate_archive_from_remote()
+        # Rebuild delivery candidates for undelivered pending/failed posts that
+        # have aged OUT of the bounded live-source window (the archive was
+        # hydrated from authoritative origin during bootstrap above), so a
+        # captured-or-failed post is never silently lost once it leaves the source.
         retry_posts, missing_failed = _archive_retry_candidates(store, eligible)
     except StateReadError as exc:
         logger.error(
@@ -760,14 +769,16 @@ def main() -> int:
         return 1
 
     deliver_posts = _dedupe_ordered(new_posts + retry_posts)
+    deliver_ids = [str(post.get("id") or "") for post in deliver_posts]
 
     def _backlog_open() -> tuple[dict[str, int], int]:
         counts = store.unresolved_backlog()
-        # 'failed' now keeps the workflow red until it becomes 'sent' or is
-        # operator-cleared; a failed record whose archived payload is missing is
-        # also unresolved (fail closed rather than green).
+        # pending/claimed/ambiguous/failed all keep the workflow red until 'sent'
+        # or operator-cleared; a record whose archived payload is missing is also
+        # unresolved (fail closed rather than green).
         total = (
-            counts[DELIVERY_CLAIMED]
+            counts[DELIVERY_PENDING]
+            + counts[DELIVERY_CLAIMED]
             + counts[DELIVERY_AMBIGUOUS]
             + counts[DELIVERY_FAILED]
             + len(missing_failed)
@@ -805,13 +816,17 @@ def main() -> int:
         logger.info("=== run_trump_monitor done: healthy, no new posts ===")
         return 0
 
-    # Capture the NEW posts, then make the archive durable and remote-verified
-    # BEFORE any claim/send, so a remote 'sent' record can never exist without
-    # the post already in the authoritative archive. Retry posts are already
-    # archived (they were recovered from it). Corrupt-present archive or write
-    # failure => red, no send.
+    # Durably mark every newly-captured post 'pending' and archive it, then make
+    # BOTH the archive rows and the pending ledger records durable + remote-
+    # verified BEFORE any claim/send. This closes the mid-loop-timeout gap: a
+    # captured post can never be archive-only with no ledger record. Every
+    # non-terminal ledger ID is protected from archive pruning, so a still-owed
+    # post's payload is never deleted (overflow fails closed instead). Retry posts
+    # are already pending/failed + archived. Corrupt/write failure => red, no send.
     try:
-        archived_count = archive_posts(new_posts)
+        store.mark_pending(new_posts, run_id=run_id, attempt_id=run_attempt_id)
+        protected = store.non_terminal_ids() | set(deliver_ids)
+        archived_count = archive_posts(new_posts, protected_ids=protected)
     except ArchiveError as exc:
         logger.error(
             f"Trump archive fail-closed ({type(exc).__name__}); not sending"
@@ -832,9 +847,8 @@ def main() -> int:
         )
         return 1
 
-    deliver_ids = [str(post.get("id") or "") for post in deliver_posts]
     if (
-        durable_push_capture(deliver_ids, "state: trump archive capture [skip ci]")
+        durable_push_capture(deliver_ids, "state: trump capture [skip ci]")
         == PUSH_FAILED
     ):
         # The archive is not durably on origin; sending now could deliver a post
@@ -890,8 +904,8 @@ def main() -> int:
         delivery_status = "delivery_ambiguous"
     elif blocked_count:
         delivery_status = "delivery_blocked_not_durable"
-    elif backlog[DELIVERY_FAILED] or missing_failed:
-        delivery_status = "delivery_failed_backlog"
+    elif backlog[DELIVERY_FAILED] or backlog[DELIVERY_PENDING] or missing_failed:
+        delivery_status = "delivery_undelivered_backlog"
     else:
         delivery_status = "delivered_all"
     _write_health(
@@ -911,6 +925,7 @@ def main() -> int:
             "delivery_blocked_count": blocked_count,
             "delivery_retried_from_archive_count": len(retry_posts),
             "delivery_unresolved_backlog_count": backlog_open,
+            "delivery_pending_backlog_count": backlog[DELIVERY_PENDING],
             "delivery_failed_backlog_count": backlog[DELIVERY_FAILED],
             "delivery_archive_missing_failed_count": len(missing_failed),
             "delivery_requires_all_recipients": True,
