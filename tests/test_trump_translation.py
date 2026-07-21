@@ -282,6 +282,87 @@ def test_empty_provider_response_is_a_failure():
     assert result.error_code == "empty_response"
 
 
+def test_timeout_exception_maps_to_generic_timeout_code():
+    def stall(**kwargs):
+        raise TimeoutError("deadline exceeded")
+
+    translator = GeminiTranslator("KEY", "m", generate_fn=stall)
+    result = translator.translate("please translate this english sentence")
+    assert result.status == "failed"
+    assert result.error_code == "timeout"
+
+
+def test_incomplete_finish_reason_helper_flags_truncation_only():
+    # Non-STOP terminal reasons are incomplete and must raise.
+    for bad in ("MAX_TOKENS", "SAFETY", "RECITATION"):
+        raised = False
+        try:
+            translation._raise_if_incomplete(bad)
+        except translation._TranslationIncomplete:
+            raised = True
+        assert raised, bad
+    # Clean / unknown / absent reasons must NOT raise.
+    for ok in ("STOP", "FINISH_REASON_STOP", "FINISH_REASON_UNSPECIFIED", "", None):
+        translation._raise_if_incomplete(ok)
+
+
+def test_truncated_translation_falls_back_to_english_not_ok():
+    def truncating(**kwargs):
+        raise translation._TranslationIncomplete("MAX_TOKENS")
+
+    translator = GeminiTranslator("KEY", "m", generate_fn=truncating)
+    result = translator.translate("a very long english post that would truncate")
+    # A partial/truncated translation is a failure, never a silent 'ok'.
+    assert result.status == "failed"
+    assert result.error_code == "incomplete_response"
+    assert result.text is None
+
+
+def test_archive_runs_before_translation(monkeypatch):
+    order: list[str] = []
+    post = _post("o1", "Ordering matters for source archive")
+
+    class OrderTranslator:
+        name = "order"
+
+        def translate(self, text):
+            order.append("translate")
+            return TranslationResult("譯文", "ok", self.name, None)
+
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "fetch_recent_posts_with_health",
+        lambda: {
+            "status": "healthy",
+            "source": "truth_social_official_api",
+            "latest_post_at": post["created_at"],
+            "posts": [post],
+            "attempts": [],
+            "raw_count": 1,
+            "returned_count": 1,
+            "source_limit": 1000,
+        },
+    )
+    monkeypatch.setattr(run_trump_monitor, "get_unseen_posts", lambda v: v)
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "archive_posts",
+        lambda v: order.append("archive") or len(v),
+    )
+    monkeypatch.setattr(run_trump_monitor, "mark_posts_seen", lambda v: None)
+    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
+    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
+    monkeypatch.setattr(run_trump_monitor, "write_json", lambda *a, **k: True)
+    monkeypatch.setattr(
+        run_trump_monitor, "get_default_translator", lambda: OrderTranslator()
+    )
+    reset_translation_cache()
+
+    assert run_trump_monitor.main() == 0
+    assert order[0] == "archive"  # source archive is captured before translation
+    assert "translate" in order
+
+
 # --- chunking with dual-language content ------------------------------------
 
 

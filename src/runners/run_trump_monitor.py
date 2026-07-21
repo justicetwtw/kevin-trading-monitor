@@ -433,8 +433,10 @@ def main() -> int:
         logger.info("=== run_trump_monitor done: healthy, no new posts ===")
         return 0
 
-    translations, translation_health = _build_translations(new_posts, translator)
+    # Archive is source-side and must not be gated behind delivery-time
+    # translation: capture the original posts first, then translate for render.
     archived_count = archive_posts(new_posts)
+    translations, translation_health = _build_translations(new_posts, translator)
     delivered_count = 0
     failed = False
     for chunk in build_delivery_chunks(new_posts, translations):

@@ -128,6 +128,15 @@ def translate_text(text: str, translator: Translator | None) -> TranslationResul
 # --- Gemini adapter (reuse the approved product path) -----------------------
 
 
+class _TranslationIncomplete(Exception):
+    """The provider stopped before a complete, clean translation.
+
+    Raised when the response finished for a non-STOP reason (truncation at the
+    output-token limit, safety block, recitation, etc). Such output is a partial
+    result and must fall back to English rather than masquerade as success.
+    """
+
+
 def _generic_error_code(exc: BaseException) -> str:
     """Map any provider exception to a small, log-safe, generic code.
 
@@ -146,6 +155,20 @@ def _generic_error_code(exc: BaseException) -> str:
     return "provider_error"
 
 
+def _raise_if_incomplete(finish_reason_name: str | None) -> None:
+    """Reject any non-STOP terminal finish reason as an incomplete translation.
+
+    A truncated (MAX_TOKENS) or blocked (SAFETY / RECITATION) response yields
+    only partial Chinese; treating it as ``ok`` would deliver a silently
+    cut-off translation and mislabel health as healthy.
+    """
+    name = (finish_reason_name or "").upper()
+    # Empty / unknown is treated as complete: the SDK shape may vary and we do
+    # not want a false failure when a clean response simply lacks the field.
+    if name and name not in {"STOP", "FINISH_REASON_STOP", "FINISH_REASON_UNSPECIFIED"}:
+        raise _TranslationIncomplete(name)
+
+
 def _gemini_generate(
     *,
     api_key: str,
@@ -158,7 +181,12 @@ def _gemini_generate(
     from google import genai
     from google.genai import types
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(
+        api_key=api_key,
+        # Bounded timeout so a hung upstream raises instead of blocking every
+        # post's delivery until the Actions job is SIGKILLed (§6.4).
+        http_options=types.HttpOptions(timeout=cfg.TRANSLATION_TIMEOUT_MS),
+    )
     response = client.models.generate_content(
         model=model,
         contents=[prompt],
@@ -168,6 +196,13 @@ def _gemini_generate(
             temperature=cfg.TRANSLATION_TEMPERATURE,
         ),
     )
+    # A translation cut off at the token limit (or blocked) is not a success.
+    candidates = getattr(response, "candidates", None) or []
+    if candidates:
+        finish_reason = getattr(candidates[0], "finish_reason", None)
+        _raise_if_incomplete(getattr(finish_reason, "name", None) or (
+            str(finish_reason) if finish_reason is not None else None
+        ))
     return response.text
 
 
@@ -199,6 +234,11 @@ class GeminiTranslator:
                 model=self._model,
                 system_instruction=cfg.TRANSLATION_SYSTEM_INSTRUCTION,
                 prompt=cfg.build_translation_prompt(text),
+            )
+        except _TranslationIncomplete:
+            # Truncated / blocked output → fall back to English, mark degraded.
+            return TranslationResult(
+                None, "failed", self.name, "incomplete_response"
             )
         except Exception as exc:  # noqa: BLE001 - map to a generic code
             return TranslationResult(

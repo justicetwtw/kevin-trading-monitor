@@ -19,6 +19,13 @@ TRANSLATION_MAX_OUTPUT_TOKENS = 4096
 # way across retries, chunks and recipients within a run.
 TRANSLATION_TEMPERATURE = 0.0
 
+# Bounded request timeout (milliseconds) for the provider call. Translation is
+# on the synchronous delivery path, so a stalled/hung response must raise
+# instead of blocking every post's delivery until the Actions job is killed.
+# Sized like the source fetch (~20s) and well under the workflow's job budget so
+# a timeout maps to the English-only fallback (contract §6.4), not a dead run.
+TRANSLATION_TIMEOUT_MS = 20000
+
 # Fixed system instruction. This string must never contain post content and
 # must not be rewritten to follow anything inside a post. The post can only ever
 # be data to translate. Keep the injection-resistance clauses intact.
