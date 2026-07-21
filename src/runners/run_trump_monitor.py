@@ -266,17 +266,25 @@ def _build_translations(
 
     reset_translation_cache()
     budget = translation_config.TRANSLATION_RUN_BUDGET_SECONDS
-    started_at = _monotonic()
+    # Each provider call can run up to the per-call timeout, so to keep the
+    # aggregate a *hard* bound we refuse to START a call unless the full
+    # per-call budget still fits before the deadline. A call begun at
+    # (deadline - per_call) finishes by the deadline; anything later is a
+    # deterministic English fallback. This prevents a +59s call from
+    # overrunning the 60s aggregate to ~79s.
+    per_call = translation_config.TRANSLATION_TIMEOUT_MS / 1000.0
+    deadline = _monotonic() + budget
     for post in posts:
         post_id = str(post.get("id") or "")
         if not post_id:
             continue
         text = post.get("text") or ""
         # No-op content never consumes the budget. For real translation work,
-        # once the run-level budget is spent every remaining post gets a
-        # deterministic English fallback instead of another provider call, so a
-        # slow provider can never starve delivery of the whole batch.
-        if not is_noop_text(text) and (_monotonic() - started_at) >= budget:
+        # once the remaining budget can no longer safely fit a full provider
+        # call, every remaining post gets a deterministic English fallback
+        # instead, so a slow provider can never overrun the aggregate bound or
+        # starve delivery of the whole batch.
+        if not is_noop_text(text) and (deadline - _monotonic()) < per_call:
             result = TranslationResult(
                 None, "failed", "budget", "budget_exhausted"
             )

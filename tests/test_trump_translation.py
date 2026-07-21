@@ -622,22 +622,59 @@ def test_fidelity_mismatch_degrades_and_falls_back_for_each_token():
         assert result.text is None, case
 
 
-def test_required_fidelity_tokens_cover_url_ticker_amount_percent_date():
-    tokens = translation.required_fidelity_tokens(_FIDELITY_SOURCE)
-    assert "https://t.co/xY" in tokens
-    assert "NVDA" in tokens
-    assert "1000" in tokens  # currency amount, comma-normalized
-    assert "25" in tokens  # percentage core
-    for part in ("2026", "7", "21"):  # ISO date components, zero-stripped
-        assert part in tokens
+def test_extract_value_tokens_are_typed_and_boundary_aware():
+    tokens = translation._extract_value_tokens(_FIDELITY_SOURCE)
+    assert tokens[("url", "https://t.co/xY")] == 1
+    assert tokens[("date", (2026, 7, 21))] == 1
+    assert tokens[("number", "1000")] == 1  # $1,000 -> value 1000
+    assert tokens[("number", "25")] == 1  # 25% -> value 25
+    # The date's own digits are consumed and never recounted as bare numbers.
+    assert tokens[("number", "2026")] == 0
+    assert translation._ticker_counts(_FIDELITY_SOURCE)["NVDA"] == 1
+
+
+def test_fidelity_rejects_substring_value_changes():
+    # Substring membership would have false-passed all of these.
+    assert translation.fidelity_error("up 25% today", "上漲 125%") == "fidelity_mismatch"
+    assert (
+        translation.fidelity_error("paid $1,000", "付了 $11,000") == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error("on 2026-07-21", "在 2026-17-21") == "fidelity_mismatch"
+    )
+
+
+def test_fidelity_preserves_value_multiplicity():
+    # Two occurrences of 100; only one survives -> mismatch.
+    assert (
+        translation.fidelity_error("$100 then $100 again", "先 100 再一次")
+        == "fidelity_mismatch"
+    )
+    assert translation.fidelity_error("$100 then $100 again", "先 100 再 100") is None
+
+
+def test_fidelity_protects_plain_numeric_values():
+    assert (
+        translation.fidelity_error("47 states voted", "各州都投票了")
+        == "fidelity_mismatch"
+    )
+    assert translation.fidelity_error("47 states voted", "47 個州都投票了") is None
+    assert translation.fidelity_error("won 3 votes", "贏得 5 票") == "fidelity_mismatch"
 
 
 def test_fidelity_does_not_flag_all_caps_prose():
     # Trump-style ALL CAPS words are legitimately translated, not preserved
     # verbatim; they must never trigger a false fidelity mismatch.
     source = "THIS IS A GREAT AND BEAUTIFUL DAY FOR AMERICA, BELIEVE ME"
-    assert translation.required_fidelity_tokens(source) == []
+    assert translation._extract_value_tokens(source) == {}
     assert translation.fidelity_error(source, "今天對美國來說是偉大又美好的一天") is None
+
+
+def test_fidelity_allows_faithful_unit_and_format_reformatting():
+    # Value survives even when the surrounding symbol/format is reworded.
+    assert translation.fidelity_error("costs $100", "花費 100 美元") is None
+    assert translation.fidelity_error("up 25%", "上漲百分之 25") is None
+    assert translation.fidelity_error("on 2026-07-21", "在 2026年7月21日") is None
 
 
 def test_fullwidth_percent_and_digits_still_match():
@@ -708,3 +745,48 @@ def test_budget_exhausted_still_marks_seen_only_on_final_fragment(monkeypatch):
     assert state["seen"] == ["long"]
     health = state["writes"]["trump_monitor_health.json"]
     assert health["translation_budget_exhausted_count"] == 1
+
+
+class _RecordingTranslator:
+    """Records every provider call so we can prove none was allowed to start."""
+
+    name = "recording"
+
+    def __init__(self):
+        self.calls: list[str] = []
+
+    def translate(self, text):
+        self.calls.append(text)
+        return TranslationResult("譯文", "ok", self.name, None)
+
+
+def test_budget_refuses_to_start_a_call_that_would_overrun_the_bound(monkeypatch):
+    # With only 5s (or 1s) left before the 60s deadline, a call that could take
+    # the full 20s per-call timeout must NOT be started — the aggregate bound is
+    # hard, not merely checked before an unbounded call.
+    for elapsed in (55, 59):
+        translator = _RecordingTranslator()
+        ticks = iter([0, elapsed])  # deadline=60; remaining = 60 - elapsed < 20
+        monkeypatch.setattr(run_trump_monitor, "_monotonic", lambda t=ticks: next(t))
+        reset_translation_cache()
+
+        translations, health = run_trump_monitor._build_translations(
+            [_post("x", "Some English policy text")], translator
+        )
+        assert translator.calls == [], f"provider must not run at +{elapsed}s"
+        assert translations["x"].error_code == "budget_exhausted"
+        assert health["translation_budget_exhausted_count"] == 1
+
+
+def test_budget_starts_a_call_when_full_per_call_time_still_fits(monkeypatch):
+    # 40s elapsed leaves exactly the 20s per-call budget, so the call may start.
+    translator = _RecordingTranslator()
+    ticks = iter([0, 40])  # deadline=60; remaining = 20 == per_call
+    monkeypatch.setattr(run_trump_monitor, "_monotonic", lambda: next(ticks))
+    reset_translation_cache()
+
+    translations, _ = run_trump_monitor._build_translations(
+        [_post("y", "Another English policy text")], translator
+    )
+    assert translator.calls == ["Another English policy text"]
+    assert translations["y"].status == "ok"

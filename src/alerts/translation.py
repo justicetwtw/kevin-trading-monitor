@@ -17,6 +17,7 @@ Design red lines (see ``docs/trump_truth_zh_tw_translation_v1.md``):
 from __future__ import annotations
 
 import re
+from collections import Counter
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
@@ -94,16 +95,27 @@ def _noop_result(text: str) -> TranslationResult:
 
 
 # --- Fidelity validation of protected tokens --------------------------------
-# A faithful translation must preserve high-signal, verbatim-kept tokens: URLs,
-# stock tickers, currency amounts, percentages and dates. We only protect tokens
-# a correct translation is guaranteed to keep as-is, so prose (including Trump's
-# all-caps words, which are legitimately translated) is never falsely flagged.
+# A faithful translation must preserve high-signal, verbatim-kept values: URLs,
+# stock tickers, dates and numeric values (which cover currency amounts and
+# percentages). We extract *typed canonical tokens* from both the source and the
+# translation and compare them as multisets with token boundaries — never by
+# substring membership — so a value change like 25% -> 125% or $1,000 -> $11,000,
+# a swapped date component, or a dropped duplicate is caught, while faithful
+# reformatting ($100 -> 100 美元, 25% -> 百分之 25, 2026-07-21 -> 2026 年 7 月 21 日)
+# is not falsely flagged. Numbers are matched by value, so unit/symbol wording is
+# free to change but the value itself must survive. Only high-signal tokens are
+# protected, so prose (including Trump's all-caps words) is never flagged.
 
-_URL_TOKEN_RE = re.compile(r"https?://[^\s]+", re.IGNORECASE)
+# Restrict to RFC 3986 URL characters so a URL immediately followed by CJK text
+# or full-width punctuation (common in Chinese, no space) is not over-captured.
+_URL_TOKEN_RE = re.compile(
+    r"https?://[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+", re.IGNORECASE
+)
 _CASHTAG_RE = re.compile(r"\$([A-Za-z]{1,6})\b")
-_CURRENCY_RE = re.compile(r"\$\s?(\d[\d,]*(?:\.\d+)?)")
-_PERCENT_RE = re.compile(r"(\d[\d,]*(?:\.\d+)?)\s?%")
-_ISO_DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+_ISO_DATE_RE = re.compile(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})")
+_CJK_DATE_RE = re.compile(r"(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日")
+_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+_URL_TRAILING = ".,;:!?)]}\"'>"
 
 # Full-width -> ASCII for digits, '%', '$' and ',' so a translation that emits
 # full-width forms still matches. Thousands separators are stripped between
@@ -117,28 +129,68 @@ def _normalize_for_match(text: str) -> str:
     return re.sub(r"(?<=\d),(?=\d)", "", normalized)
 
 
-def required_fidelity_tokens(source: str) -> list[str]:
-    """Tokens that must survive verbatim in a faithful translation."""
-    norm = _normalize_for_match(source)
-    tokens: list[str] = []
-    tokens += _URL_TOKEN_RE.findall(source)
-    tokens += _CASHTAG_RE.findall(norm)  # ticker letters, e.g. NVDA
-    tokens += _CURRENCY_RE.findall(norm)  # numeric core, e.g. 100
-    tokens += _PERCENT_RE.findall(norm)  # numeric core, e.g. 25
-    for year, month, day in _ISO_DATE_RE.findall(norm):
-        tokens += [str(int(year)), str(int(month)), str(int(day))]
-    # De-duplicate while preserving order; drop empties.
-    return list(dict.fromkeys(token for token in tokens if token))
+def _canonical_number(raw: str) -> str:
+    """Canonicalize a numeric literal so 007 == 7 and 1000 == 1,000."""
+    if "." in raw:
+        return raw
+    return str(int(raw))
+
+
+def _extract_value_tokens(text: str) -> Counter:
+    """Typed multiset of URLs, dates (y, m, d) and numeric values.
+
+    Extraction order removes each matched span before the next pattern so a
+    URL's or date's own digits are never re-counted as bare numbers.
+    """
+    tokens: Counter = Counter()
+    work = text or ""
+
+    def _url_repl(match: re.Match) -> str:
+        tokens[("url", match.group(0).rstrip(_URL_TRAILING))] += 1
+        return " "
+
+    work = _URL_TOKEN_RE.sub(_url_repl, work)
+    work = _normalize_for_match(work)
+
+    def _date_repl(match: re.Match) -> str:
+        y, m, d = (int(match.group(i)) for i in (1, 2, 3))
+        tokens[("date", (y, m, d))] += 1
+        return " "
+
+    work = _ISO_DATE_RE.sub(_date_repl, work)
+    work = _CJK_DATE_RE.sub(_date_repl, work)
+
+    for number in _NUMBER_RE.findall(work):
+        tokens[("number", _canonical_number(number))] += 1
+    return tokens
+
+
+def _ticker_counts(text: str) -> Counter:
+    """Cashtag tickers in the source, e.g. ``$NVDA`` -> ``NVDA``."""
+    return Counter(sym.upper() for sym in _CASHTAG_RE.findall(text or ""))
 
 
 def fidelity_error(source: str, translation: str) -> str | None:
-    """Return an error code when a protected source token is missing/changed."""
-    required = required_fidelity_tokens(source)
-    if not required:
+    """Return an error code when a protected source value is missing/changed.
+
+    Compares typed multisets: every URL, date and numeric value in the source
+    must appear at least as many times in the translation, and every source
+    ticker must appear as a whole word at least as often. Returns ``None`` when
+    fidelity holds or the source carries no protected value.
+    """
+    source_values = _extract_value_tokens(source)
+    source_tickers = _ticker_counts(source)
+    if not source_values and not source_tickers:
         return None
-    normalized = _normalize_for_match(translation)
-    for token in required:
-        if token not in normalized:
+
+    translation_values = _extract_value_tokens(translation)
+    for token, count in source_values.items():
+        if translation_values[token] < count:
+            return "fidelity_mismatch"
+
+    for ticker, count in source_tickers.items():
+        found = len(re.findall(rf"\b{re.escape(ticker)}\b", translation or ""))
+        if found < count:
             return "fidelity_mismatch"
     return None
 
