@@ -293,6 +293,13 @@ def test_source_unavailable_is_explicit_failure(monkeypatch):
             ],
         },
     )
+    # Use a temp ledger so main()'s legacy migration never touches the real
+    # data_store/ (tests must not write repo state).
+    monkeypatch.setattr(
+        run_trump_monitor,
+        "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(path=_temp_ledger_path(), legacy_path=None),
+    )
     monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
     monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
     writes = {}
