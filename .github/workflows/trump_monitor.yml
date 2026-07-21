@@ -33,6 +33,10 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Reuse the already-approved Gemini product path for zh-TW translation.
+          # If the secret is unset the runner falls back to English-only delivery.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
         run: python -m src.runners.run_trump_monitor
       - name: Commit archive and explicit source health
         if: always()
