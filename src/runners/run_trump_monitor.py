@@ -9,6 +9,7 @@ fragment reaches every configured Telegram recipient.
 from __future__ import annotations
 
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -19,9 +20,11 @@ from src.alerts.telegram_bot import send_telegram
 from src.alerts.translation import (
     TranslationResult,
     get_default_translator,
+    is_noop_text,
     reset_translation_cache,
     translate_text,
 )
+from src.config import trump_translation_config as translation_config
 from src.config.market_clock import TAIPEI
 from src.data.trump_truth import (
     archive_posts,
@@ -35,6 +38,10 @@ HEALTH_FILE = "trump_monitor_health.json"
 MAX_TELEGRAM_CHARS = 3600
 UNAVAILABLE_NOTICE_COOLDOWN = timedelta(hours=6)
 INITIAL_BACKFILL_WINDOW = timedelta(hours=24)
+
+# Monotonic clock indirection so the run-level translation budget is
+# deterministic and injectable in tests (no wall-clock sleeps).
+_monotonic = time.monotonic
 
 
 def _parse_time(value: Any) -> datetime | None:
@@ -235,7 +242,14 @@ def _build_translations(
     The health dict carries only aggregates and a provider capability name —
     never post text, translation text or credentials.
     """
-    counts = {"attempted": 0, "ok": 0, "noop": 0, "failed": 0}
+    counts = {
+        "attempted": 0,
+        "ok": 0,
+        "noop": 0,
+        "failed": 0,
+        "budget_exhausted": 0,
+        "fidelity_mismatch": 0,
+    }
     translations: dict[str, TranslationResult] = {}
     if translator is None:
         health = {
@@ -245,15 +259,29 @@ def _build_translations(
             "translation_ok_count": 0,
             "translation_noop_count": 0,
             "translation_failed_count": 0,
+            "translation_budget_exhausted_count": 0,
+            "translation_fidelity_mismatch_count": 0,
         }
         return translations, health
 
     reset_translation_cache()
+    budget = translation_config.TRANSLATION_RUN_BUDGET_SECONDS
+    started_at = _monotonic()
     for post in posts:
         post_id = str(post.get("id") or "")
         if not post_id:
             continue
-        result = translate_text(post.get("text") or "", translator)
+        text = post.get("text") or ""
+        # No-op content never consumes the budget. For real translation work,
+        # once the run-level budget is spent every remaining post gets a
+        # deterministic English fallback instead of another provider call, so a
+        # slow provider can never starve delivery of the whole batch.
+        if not is_noop_text(text) and (_monotonic() - started_at) >= budget:
+            result = TranslationResult(
+                None, "failed", "budget", "budget_exhausted"
+            )
+        else:
+            result = translate_text(text, translator)
         translations[post_id] = result
         if result.status == "noop":
             counts["noop"] += 1
@@ -263,6 +291,10 @@ def _build_translations(
                 counts["ok"] += 1
             else:
                 counts["failed"] += 1
+                if result.error_code == "budget_exhausted":
+                    counts["budget_exhausted"] += 1
+                elif result.error_code == "fidelity_mismatch":
+                    counts["fidelity_mismatch"] += 1
 
     health = {
         # Degraded means at least one post fell back to English-only; the post
@@ -273,6 +305,8 @@ def _build_translations(
         "translation_ok_count": counts["ok"],
         "translation_noop_count": counts["noop"],
         "translation_failed_count": counts["failed"],
+        "translation_budget_exhausted_count": counts["budget_exhausted"],
+        "translation_fidelity_mismatch_count": counts["fidelity_mismatch"],
     }
     return translations, health
 
@@ -364,6 +398,8 @@ def _write_health(
             "translation_ok_count": 0,
             "translation_noop_count": 0,
             "translation_failed_count": 0,
+            "translation_budget_exhausted_count": 0,
+            "translation_fidelity_mismatch_count": 0,
         }
     )
     write_json(HEALTH_FILE, health)

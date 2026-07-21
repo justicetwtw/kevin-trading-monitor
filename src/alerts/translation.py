@@ -93,6 +93,56 @@ def _noop_result(text: str) -> TranslationResult:
     return TranslationResult(text, "noop", "deterministic_noop", None)
 
 
+# --- Fidelity validation of protected tokens --------------------------------
+# A faithful translation must preserve high-signal, verbatim-kept tokens: URLs,
+# stock tickers, currency amounts, percentages and dates. We only protect tokens
+# a correct translation is guaranteed to keep as-is, so prose (including Trump's
+# all-caps words, which are legitimately translated) is never falsely flagged.
+
+_URL_TOKEN_RE = re.compile(r"https?://[^\s]+", re.IGNORECASE)
+_CASHTAG_RE = re.compile(r"\$([A-Za-z]{1,6})\b")
+_CURRENCY_RE = re.compile(r"\$\s?(\d[\d,]*(?:\.\d+)?)")
+_PERCENT_RE = re.compile(r"(\d[\d,]*(?:\.\d+)?)\s?%")
+_ISO_DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+
+# Full-width -> ASCII for digits, '%', '$' and ',' so a translation that emits
+# full-width forms still matches. Thousands separators are stripped between
+# digits so "1,000" and "1000" compare equal.
+_FULLWIDTH_MAP = {ord("０") + i: ord("0") + i for i in range(10)}
+_FULLWIDTH_MAP.update({ord("％"): ord("%"), ord("＄"): ord("$"), ord("，"): ord(",")})
+
+
+def _normalize_for_match(text: str) -> str:
+    normalized = (text or "").translate(_FULLWIDTH_MAP)
+    return re.sub(r"(?<=\d),(?=\d)", "", normalized)
+
+
+def required_fidelity_tokens(source: str) -> list[str]:
+    """Tokens that must survive verbatim in a faithful translation."""
+    norm = _normalize_for_match(source)
+    tokens: list[str] = []
+    tokens += _URL_TOKEN_RE.findall(source)
+    tokens += _CASHTAG_RE.findall(norm)  # ticker letters, e.g. NVDA
+    tokens += _CURRENCY_RE.findall(norm)  # numeric core, e.g. 100
+    tokens += _PERCENT_RE.findall(norm)  # numeric core, e.g. 25
+    for year, month, day in _ISO_DATE_RE.findall(norm):
+        tokens += [str(int(year)), str(int(month)), str(int(day))]
+    # De-duplicate while preserving order; drop empties.
+    return list(dict.fromkeys(token for token in tokens if token))
+
+
+def fidelity_error(source: str, translation: str) -> str | None:
+    """Return an error code when a protected source token is missing/changed."""
+    required = required_fidelity_tokens(source)
+    if not required:
+        return None
+    normalized = _normalize_for_match(translation)
+    for token in required:
+        if token not in normalized:
+            return "fidelity_mismatch"
+    return None
+
+
 # --- Process cache ----------------------------------------------------------
 # Keyed by exact input text so identical posts, retries, chunk rebuilds and
 # multiple recipients within one workflow process translate at most once.
@@ -247,6 +297,11 @@ class GeminiTranslator:
         cleaned = (output or "").strip()
         if not cleaned:
             return TranslationResult(None, "failed", self.name, "empty_response")
+        # Never accept a translation that dropped or altered a protected token
+        # (URL, ticker, amount, percentage, date); fall back to English instead.
+        mismatch = fidelity_error(text, cleaned)
+        if mismatch:
+            return TranslationResult(None, "failed", self.name, mismatch)
         return TranslationResult(cleaned, "ok", self.name, None)
 
 
