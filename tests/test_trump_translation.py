@@ -623,7 +623,7 @@ def test_fidelity_mismatch_degrades_and_falls_back_for_each_token():
 
 
 def test_extract_value_tokens_are_typed_and_boundary_aware():
-    tokens = translation._extract_value_tokens(_FIDELITY_SOURCE)
+    tokens, _ = translation._extract_value_tokens(_FIDELITY_SOURCE)
     assert tokens[("url", "https://t.co/xY")] == 1
     assert tokens[("date", (2026, 7, 21))] == 1
     assert tokens[("number", "1000")] == 1  # $1,000 -> value 1000
@@ -666,7 +666,9 @@ def test_fidelity_does_not_flag_all_caps_prose():
     # Trump-style ALL CAPS words are legitimately translated, not preserved
     # verbatim; they must never trigger a false fidelity mismatch.
     source = "THIS IS A GREAT AND BEAUTIFUL DAY FOR AMERICA, BELIEVE ME"
-    assert translation._extract_value_tokens(source) == {}
+    tokens, _ = translation._extract_value_tokens(source)
+    assert tokens == {}
+    assert translation._ticker_counts(source) == {}
     assert translation.fidelity_error(source, "今天對美國來說是偉大又美好的一天") is None
 
 
@@ -675,6 +677,62 @@ def test_fidelity_allows_faithful_unit_and_format_reformatting():
     assert translation.fidelity_error("costs $100", "花費 100 美元") is None
     assert translation.fidelity_error("up 25%", "上漲百分之 25") is None
     assert translation.fidelity_error("on 2026-07-21", "在 2026年7月21日") is None
+
+
+def test_fidelity_rejects_invented_values_symmetrically():
+    # Re-review 4742502505: a translation that ADDS a protected value the source
+    # never contained must be rejected, not silently accepted.
+    assert (
+        translation.fidelity_error("Tariffs are 25%", "關稅為 25%,另一項為 125%")
+        == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error("paid $100", "支付 100 美元,另加 500 美元")
+        == "fidelity_mismatch"
+    )
+
+
+def test_fidelity_rejects_polarity_currency_and_percent_type_changes():
+    # Negative that flips positive; USD rendered as a foreign currency; a
+    # percentage silently turned into a currency amount.
+    assert translation.fidelity_error("NVDA -3%", "NVDA +3%") == "fidelity_mismatch"
+    assert translation.fidelity_error("NVDA -3%", "NVDA 下跌 3%") is None
+    assert translation.fidelity_error("costs $100", "花費 100 日圓") == "fidelity_mismatch"
+    assert translation.fidelity_error("up 25%", "上漲 25 美元") == "fidelity_mismatch"
+
+
+def test_fidelity_protects_plain_ticker_without_flagging_prose():
+    # A plain (non-cashtag) ticker must be preserved...
+    assert (
+        translation.fidelity_error("NVDA is up today", "今天上漲")
+        == "fidelity_mismatch"
+    )
+    assert translation.fidelity_error("NVDA is up today", "NVDA 今天上漲") is None
+    # ...but ordinary ALL CAPS prose is not a ticker.
+    assert translation.fidelity_error("MAKE AMERICA GREAT", "讓美國再次偉大") is None
+
+
+def test_fidelity_ignores_scale_word_magnitudes():
+    # A faithful million->億 / billion->億 rescale changes the digits and must
+    # not be flagged.
+    assert translation.fidelity_error("gave $100 million", "捐了 1 億美元") is None
+    assert translation.fidelity_error("5 billion people", "50 億人") is None
+
+
+def test_looks_untranslated_detects_english_echo():
+    assert translation._looks_untranslated("New tariff policy", "New tariff policy")
+    assert translation._looks_untranslated("New tariff policy", "Tariff policy is new")
+    assert not translation._looks_untranslated("New tariff policy", "新的關稅政策")
+
+
+def test_english_echo_is_rejected_as_invalid_response():
+    source = "Massive new tariffs on all imports starting Monday"
+    for echo in (source, "Massive NEW tariffs on all imports"):
+        translator = GeminiTranslator("K", "m", generate_fn=lambda echo=echo, **k: echo)
+        result = translator.translate(source)
+        assert result.status == "failed"
+        assert result.error_code == "invalid_response"
+        assert result.text is None
 
 
 def test_fullwidth_percent_and_digits_still_match():

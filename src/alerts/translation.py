@@ -96,15 +96,18 @@ def _noop_result(text: str) -> TranslationResult:
 
 # --- Fidelity validation of protected tokens --------------------------------
 # A faithful translation must preserve high-signal, verbatim-kept values: URLs,
-# stock tickers, dates and numeric values (which cover currency amounts and
-# percentages). We extract *typed canonical tokens* from both the source and the
-# translation and compare them as multisets with token boundaries — never by
-# substring membership — so a value change like 25% -> 125% or $1,000 -> $11,000,
-# a swapped date component, or a dropped duplicate is caught, while faithful
-# reformatting ($100 -> 100 美元, 25% -> 百分之 25, 2026-07-21 -> 2026 年 7 月 21 日)
-# is not falsely flagged. Numbers are matched by value, so unit/symbol wording is
-# free to change but the value itself must survive. Only high-signal tokens are
-# protected, so prose (including Trump's all-caps words) is never flagged.
+# stock tickers, dates and numeric values (currency amounts and percentages).
+# We extract *typed canonical tokens* from both sides and compare them as
+# *symmetric* multisets with token boundaries — never substring membership — so
+# a value change (25%->125%), a dropped/added value ($1,000->$11,000, an invented
+# amount), a swapped date component, or a dropped duplicate is caught in BOTH
+# directions. Numbers are matched by canonical value so faithful unit/format
+# reformatting ($100->100 美元, 25%->百分之 25, 2026-07-21->2026 年 7 月 21 日) is not
+# flagged, while polarity (a negative that flips positive), currency substitution
+# ($->foreign) and percentage->currency type changes ARE rejected. Scale-word
+# magnitudes (million->億) and ordinals are excluded because a faithful rendering
+# legitimately rescales their digits. Only high-signal tokens are protected, so
+# prose (including Trump's all-caps words) is never flagged.
 
 # Restrict to RFC 3986 URL characters so a URL immediately followed by CJK text
 # or full-width punctuation (common in Chinese, no space) is not over-captured.
@@ -114,8 +117,37 @@ _URL_TOKEN_RE = re.compile(
 _CASHTAG_RE = re.compile(r"\$([A-Za-z]{1,6})\b")
 _ISO_DATE_RE = re.compile(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})")
 _CJK_DATE_RE = re.compile(r"(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日")
-_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+# A standalone number not glued to a letter/digit (so "MP3"/"COVID19" are skipped).
+_NUMBER_RE = re.compile(r"(?<![A-Za-z0-9.])\d+(?:\.\d+)?")
+_NEGATIVE_RE = re.compile(r"[\-−]\s?(\d+(?:\.\d+)?)")
 _URL_TRAILING = ".,;:!?)]}\"'>"
+# Trailing context that means a number's digits are legitimately rescaled/reworded
+# in translation, so the exact digits must NOT be compared.
+_SCALE_EN_RE = re.compile(
+    r"\s*(?:hundred|thousand|million|billion|trillion|st|nd|rd|th)\b",
+    re.IGNORECASE,
+)
+_SCALE_CJK = "百千萬万億亿兆"
+# Direction words that faithfully express a negative percentage/change.
+_DOWN_WORDS = (
+    "下跌", "下降", "減少", "降低", "下滑", "衰退", "縮減", "跌", "下修", "調降", "負",
+)
+# Non-USD currency words: a "$"/USD source must not be rendered as these.
+_FOREIGN_CURRENCY_RE = re.compile(
+    r"日圓|日元|歐元|英鎊|人民幣|韓元|韓圜|港幣|港元|盧布|盧比|加元|澳元|瑞郎|"
+    r"新台幣|新臺幣|台幣"
+)
+_PERCENT_MARK_RE = re.compile(r"%|％|百分|趴")
+_UPPER_WORD_RE = re.compile(r"\b[A-Z]{2,6}\b")
+# All-caps English that is also a ticker symbol but is overwhelmingly prose in a
+# Trump post; never treat these as bare tickers (cashtags like $ALL still count).
+_TICKER_STOPWORDS = frozenset(
+    {
+        "ALL", "ARE", "AND", "THE", "FOR", "NOT", "YOU", "NOW", "NEW", "BIG",
+        "WIN", "OUT", "OUR", "WHO", "WHY", "HOW", "CAN", "GET", "GOT", "HAS",
+        "USA", "CEO", "GDP", "FBI", "CIA", "DOJ", "FED", "USD", "NATO", "GO",
+    }
+)
 
 # Full-width -> ASCII for digits, '%', '$' and ',' so a translation that emits
 # full-width forms still matches. Thousands separators are stripped between
@@ -136,11 +168,31 @@ def _canonical_number(raw: str) -> str:
     return str(int(raw))
 
 
-def _extract_value_tokens(text: str) -> Counter:
-    """Typed multiset of URLs, dates (y, m, d) and numeric values.
+def _known_tickers() -> frozenset:
+    cached = getattr(_known_tickers, "_cache", None)
+    if cached is None:
+        try:
+            from src.config import universe
 
+            cached = frozenset(
+                sym
+                for sym in universe.ALL_TICKERS_SCAN
+                if len(sym) >= 3 and sym.isalpha() and sym not in _TICKER_STOPWORDS
+            )
+        except Exception:
+            cached = frozenset()
+        _known_tickers._cache = cached  # type: ignore[attr-defined]
+    return cached
+
+
+def _extract_value_tokens(text: str) -> tuple[Counter, str]:
+    """Typed multiset of URLs, dates (y, m, d) and exact numeric values.
+
+    Returns the token multiset and the URL/date-stripped working text (used for
+    polarity checks so an ISO date's own hyphen is never read as a minus sign).
     Extraction order removes each matched span before the next pattern so a
-    URL's or date's own digits are never re-counted as bare numbers.
+    URL's or date's own digits are never re-counted as bare numbers. Scale-word
+    magnitudes and ordinals are skipped.
     """
     tokens: Counter = Counter()
     work = text or ""
@@ -160,38 +212,99 @@ def _extract_value_tokens(text: str) -> Counter:
     work = _ISO_DATE_RE.sub(_date_repl, work)
     work = _CJK_DATE_RE.sub(_date_repl, work)
 
-    for number in _NUMBER_RE.findall(work):
-        tokens[("number", _canonical_number(number))] += 1
-    return tokens
+    for match in _NUMBER_RE.finditer(work):
+        tail = work[match.end():match.end() + 12]
+        cjk_next = tail.lstrip()[:1]
+        if _SCALE_EN_RE.match(tail) or (cjk_next and cjk_next in _SCALE_CJK):
+            continue  # million/億/ordinal: digits legitimately change
+        tokens[("number", _canonical_number(match.group(0)))] += 1
+    return tokens, work
 
 
 def _ticker_counts(text: str) -> Counter:
-    """Cashtag tickers in the source, e.g. ``$NVDA`` -> ``NVDA``."""
-    return Counter(sym.upper() for sym in _CASHTAG_RE.findall(text or ""))
+    """Cashtag plus known-symbol bare tickers, e.g. ``$NVDA`` / ``NVDA``.
+
+    All-caps prose is not treated as a ticker: a bare upper word counts only
+    when it is a known symbol in the observation universe.
+    """
+    counts: Counter = Counter()
+    work = _CASHTAG_RE.sub(
+        lambda m: counts.update([m.group(1).upper()]) or " ", text or ""
+    )
+    known = _known_tickers()
+    for word in _UPPER_WORD_RE.findall(work):
+        if word in known:
+            counts[word] += 1
+    return counts
+
+
+def _looks_untranslated(source: str, output: str) -> bool:
+    """True when the output is an English echo / wrapper, not a translation.
+
+    ``translate_text`` only invokes the provider for substantive non-Chinese
+    input, so a clean translation must contain Han script. An output with no Han
+    (an English echo, a JSON/instruction wrapper) or one equal to the source is
+    not a Chinese translation.
+    """
+    stripped = (output or "").strip()
+    if not stripped:
+        return True
+    if not _HAN_RE.search(stripped):
+        return True
+    src_norm = " ".join((source or "").split()).lower()
+    out_norm = " ".join(stripped.split()).lower()
+    return out_norm == src_norm
 
 
 def fidelity_error(source: str, translation: str) -> str | None:
-    """Return an error code when a protected source value is missing/changed.
+    """Return an error code when protected source values are corrupted.
 
-    Compares typed multisets: every URL, date and numeric value in the source
-    must appear at least as many times in the translation, and every source
-    ticker must appear as a whole word at least as often. Returns ``None`` when
-    fidelity holds or the source carries no protected value.
+    Symmetric multiset comparison rejects both dropped/changed and invented
+    URLs, dates, numeric values and tickers; polarity, currency substitution and
+    percentage->currency type changes are rejected too. Returns ``None`` when
+    fidelity holds or neither side carries a protected value.
     """
-    source_values = _extract_value_tokens(source)
+    source_values, source_work = _extract_value_tokens(source)
+    translation_values, _ = _extract_value_tokens(translation)
     source_tickers = _ticker_counts(source)
-    if not source_values and not source_tickers:
+    translation_tickers = _ticker_counts(translation)
+    if not any(
+        (source_values, translation_values, source_tickers, translation_tickers)
+    ):
         return None
 
-    translation_values = _extract_value_tokens(translation)
-    for token, count in source_values.items():
-        if translation_values[token] < count:
+    # Symmetric: preservation AND no invented values, in both directions.
+    if source_values != translation_values:
+        return "fidelity_mismatch"
+    if source_tickers != translation_tickers:
+        return "fidelity_mismatch"
+
+    # Polarity: a negative source magnitude must stay negative (an explicit
+    # minus or a down-direction word); catches -3% -> +3%.
+    source_negatives = {
+        _canonical_number(m.group(1)) for m in _NEGATIVE_RE.finditer(source_work)
+    }
+    if source_negatives:
+        translation_negatives = {
+            _canonical_number(m.group(1))
+            for m in _NEGATIVE_RE.finditer(
+                _extract_value_tokens(translation)[1]
+            )
+        }
+        if not any(word in (translation or "") for word in _DOWN_WORDS):
+            if source_negatives - translation_negatives:
+                return "fidelity_mismatch"
+
+    # Currency: a USD ("$") source must not be rendered in a foreign currency.
+    if "$" in (source or "") and not _FOREIGN_CURRENCY_RE.search(source or ""):
+        if _FOREIGN_CURRENCY_RE.search(translation or ""):
             return "fidelity_mismatch"
 
-    for ticker, count in source_tickers.items():
-        found = len(re.findall(rf"\b{re.escape(ticker)}\b", translation or ""))
-        if found < count:
-            return "fidelity_mismatch"
+    # A percentage must not silently become a non-percentage (e.g. currency).
+    if _PERCENT_MARK_RE.search(_normalize_for_match(source)) and not (
+        _PERCENT_MARK_RE.search(_normalize_for_match(translation))
+    ):
+        return "fidelity_mismatch"
     return None
 
 
@@ -350,8 +463,14 @@ class GeminiTranslator:
         cleaned = (output or "").strip()
         if not cleaned:
             return TranslationResult(None, "failed", self.name, "empty_response")
-        # Never accept a translation that dropped or altered a protected token
-        # (URL, ticker, amount, percentage, date); fall back to English instead.
+        # Reject an English echo / wrapper rendered as if it were Chinese.
+        if _looks_untranslated(text, cleaned):
+            return TranslationResult(
+                None, "failed", self.name, "invalid_response"
+            )
+        # Never accept a translation that dropped, altered or invented a
+        # protected token (URL, ticker, amount, percentage, date, polarity,
+        # currency); fall back to English instead.
         mismatch = fidelity_error(text, cleaned)
         if mismatch:
             return TranslationResult(None, "failed", self.name, mismatch)
