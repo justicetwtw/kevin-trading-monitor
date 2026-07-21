@@ -22098,5 +22098,89 @@
       }
     },
     "captured_at": "2026-07-20T23:13:17.327427+00:00"
+  },
+  "116958082822194064": {
+    "id": "116958082822194064",
+    "created_at": "2026-07-21T12:58:34.937Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958082822194064",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T14:22:38.804125+00:00"
+  },
+  "116958082268222915": {
+    "id": "116958082268222915",
+    "created_at": "2026-07-21T12:58:26.484Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958082268222915",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T14:22:38.804170+00:00"
+  },
+  "116958077127443735": {
+    "id": "116958077127443735",
+    "created_at": "2026-07-21T12:57:08.044Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958077127443735",
+    "text": "The latest one of 52,000, plus, innocent protesters. Savages!!! When will the Dumocrats wake up??? President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T14:22:38.808195+00:00"
+  },
+  "116957959265033006": {
+    "id": "116957959265033006",
+    "created_at": "2026-07-21T12:27:09.601Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116957959265033006",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116957942431800428Rich people and Companies are pouring out of Dumocrat run Blue States at levels never seen before! If this trend continues, these States will become the \"Ghettos\" of the Future — No people, no money, no hope. MAKE AMERICA GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-21T14:22:38.808372+00:00"
+  },
+  "116957942431800428": {
+    "id": "116957942431800428",
+    "created_at": "2026-07-21T12:22:52.750Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116957942431800428",
+    "text": "Across the nation, Trump's long-predicted high-tax exodus has a Midwest sequel: https://justthenews.com/government/white-house/california-illinois-trumps-predicted-tax-apocalypse-has-midwest-sequel",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T14:22:38.808465+00:00"
   }
 }
