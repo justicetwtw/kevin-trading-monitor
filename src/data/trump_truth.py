@@ -28,7 +28,18 @@ from tenacity import (
 
 from src.config.keywords import classify_post, get_matched_keywords
 from src.config.rss_sources import TRUMP_TRUTH_SOURCES
-from src.storage.state_manager import read_json, write_json
+from src.storage.state_manager import DATA_STORE_DIR, read_json, write_json
+
+
+class ArchiveError(Exception):
+    """Raised when the rolling post archive cannot be read or written.
+
+    Capture must fail closed: a corrupt-present archive read as the empty default
+    would let the rolling history be overwritten from scratch, and an ignored
+    write failure would report a post archived when it was not — after which the
+    delivery ledger could mark it ``sent`` and it would never be captured again.
+    """
+
 
 SEEN_POSTS_FILE = "trump_seen_posts.json"
 ARCHIVE_FILE = "trump_posts_archive.json"
@@ -437,11 +448,43 @@ def filter_new_posts(
     return new_posts
 
 
+def _read_archive_fail_closed() -> dict[str, Any]:
+    """Read the rolling archive, distinguishing absent (empty) from corrupt.
+
+    An absent file is a legitimate empty archive; a PRESENT but unreadable/invalid
+    file raises ``ArchiveError`` rather than silently returning ``{}`` (which would
+    overwrite the whole rolling history from scratch on the next write).
+    """
+    import json
+
+    path = DATA_STORE_DIR / ARCHIVE_FILE
+    if not path.exists():
+        return {}
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ArchiveError(
+            f"archive present but unreadable: {type(exc).__name__}"
+        ) from exc
+    try:
+        data = json.loads(raw)
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise ArchiveError(
+            f"archive present but not valid JSON: {type(exc).__name__}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise ArchiveError("archive present but not a JSON object")
+    return data
+
+
 def archive_posts(posts: list[dict[str, Any]]) -> int:
-    """Store every captured post in a rolling archive, deduplicated by ID."""
-    archive = read_json(ARCHIVE_FILE, default={})
-    if not isinstance(archive, dict):
-        archive = {}
+    """Store every captured post in a rolling archive, deduplicated by ID.
+
+    Fails closed: a corrupt-present archive read or a failed write raises
+    ``ArchiveError`` so the runner never treats an unarchived post as captured
+    (and never marks it ``sent`` while it is missing from the durable record).
+    """
+    archive = _read_archive_fail_closed()
     before = len(archive)
     for post in posts:
         post_id = str(post.get("id") or "")
@@ -457,7 +500,8 @@ def archive_posts(posts: list[dict[str, Any]]) -> int:
             ),
         )
         archive = dict(ordered[-MAX_ARCHIVE:])
-    write_json(ARCHIVE_FILE, archive)
+    if not write_json(ARCHIVE_FILE, archive):
+        raise ArchiveError("archive write failed; refusing to report success")
     return len(archive) - before
 
 

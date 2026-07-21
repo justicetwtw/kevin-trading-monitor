@@ -143,6 +143,18 @@ class TrumpDeliveryStore:
             ) from exc
         return self.parse_state(text, origin=str(self.path))
 
+    def hydrate_from(self, content: str) -> None:
+        """Make ``content`` (authoritative origin/main state) the local base.
+
+        Validates with the same fail-closed rules as a local read and atomically
+        overwrites the local file, so every subsequent decision/read uses
+        origin's ledger rather than a possibly-stale event checkout. Raises
+        ``StateReadError`` if the authoritative payload is malformed (the caller
+        maps that to red / no-send, never a silent empty base).
+        """
+        data = self.parse_state(content, origin="origin/main state")
+        self._write_raw(data)
+
     def _write_raw(self, data: dict[str, Any]) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         payload = json.dumps(data, ensure_ascii=False, indent=2)
@@ -208,11 +220,20 @@ class TrumpDeliveryStore:
 
     # -- writes --------------------------------------------------------------
 
-    def claim(self, post: dict, *, run_id: str | None = None) -> dict | None:
+    def claim(
+        self,
+        post: dict,
+        *,
+        run_id: str | None = None,
+        attempt_id: str | None = None,
+    ) -> dict | None:
         """Durably record a ``claimed`` state before a non-idempotent send.
 
         Returns the persisted record, or ``None`` when the post is already
-        ``sent`` (never re-claim/downgrade a delivered post).
+        ``sent`` (never re-claim/downgrade a delivered post). ``attempt_id`` is a
+        UNIQUE per-workflow-attempt identity (run id + run attempt) so a GitHub
+        re-run — which keeps the same run id — cannot mistake a prior attempt's
+        claim for its own during remote compare-and-set verification.
         """
         post_id = str(post.get("id") or "")
         if not post_id:
@@ -230,6 +251,7 @@ class TrumpDeliveryStore:
             "claimed_at": _utc_now(),
             "resolved_at": None,
             "run_id": run_id,
+            "workflow_attempt_id": attempt_id,
             "stage_code": "claimed_before_send",
         }
         posts[post_id] = record
@@ -245,6 +267,7 @@ class TrumpDeliveryStore:
         *,
         stage_code: str | None = None,
         run_id: str | None = None,
+        attempt_id: str | None = None,
     ) -> dict | None:
         """Persist a terminal-ish delivery outcome for a claimed post.
 
@@ -268,12 +291,30 @@ class TrumpDeliveryStore:
         record["resolved_at"] = _utc_now()
         if run_id is not None:
             record["run_id"] = run_id
+        if attempt_id is not None:
+            record["workflow_attempt_id"] = attempt_id
         record["stage_code"] = stage_code or f"resolved_{outcome}"
         posts[post_id] = record
         self._prune(posts)
         data["schema_version"] = STATE_SCHEMA_VERSION
         self._write_raw(data)
         return record
+
+    def unresolved_backlog(self) -> dict[str, int]:
+        """Public-safe counts of records that must keep the workflow red.
+
+        A durable ``claimed`` (a crashed prior send) or ``ambiguous`` (a
+        partial/unknown outbound) is an *unresolved* delivery: the workflow must
+        not report green just because no NEW source post arrived. Counts only —
+        post IDs/states, never text or chat IDs.
+        """
+        posts = self._read_raw()["posts"]
+        counts = {DELIVERY_CLAIMED: 0, DELIVERY_AMBIGUOUS: 0}
+        for record in posts.values():
+            state = record.get("delivery_state")
+            if state in counts:
+                counts[state] += 1
+        return counts
 
     # -- legacy migration ----------------------------------------------------
 
@@ -285,12 +326,25 @@ class TrumpDeliveryStore:
         """
         if not self.legacy_path or not self.legacy_path.exists():
             return 0
+        # A PRESENT legacy seen file that cannot be read is NOT "no prior
+        # deliveries": bootstrapping an empty ledger from it would re-blast every
+        # already-delivered post still in the source window. Fail closed so the
+        # caller stops rather than silently treating a corrupt bootstrap as first
+        # run. (A genuinely absent file is handled above.)
         try:
-            legacy = json.loads(self.legacy_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError, UnicodeDecodeError):
-            return 0
+            raw = self.legacy_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            raise StateReadError(
+                f"legacy seen file present but unreadable: {type(exc).__name__}"
+            ) from exc
+        try:
+            legacy = json.loads(raw)
+        except (json.JSONDecodeError, ValueError) as exc:
+            raise StateReadError(
+                f"legacy seen file present but not valid JSON: {type(exc).__name__}"
+            ) from exc
         if not isinstance(legacy, dict):
-            return 0
+            raise StateReadError("legacy seen file present but not a JSON object")
         data = self._read_raw()
         posts = data["posts"]
         migrated = 0

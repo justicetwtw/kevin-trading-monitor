@@ -513,10 +513,14 @@ def test_ambiguous_delivery_is_quarantined_not_retried(monkeypatch):
     assert _delivered_ids(state) == []
     assert _ledger_state(state, "q1") == "ambiguous"
 
-    # A second, fresh process must NOT re-deliver the quarantined post.
+    # A second, fresh process must NOT re-deliver the quarantined post, AND must
+    # stay RED: an unresolved ambiguous backlog is not "green, nothing to do".
     state["sent"].clear()
-    assert run_trump_monitor.main() == 0  # nothing new to do
+    assert run_trump_monitor.main() == 1  # unresolved backlog keeps it red
     assert state["sent"] == []
+    health = state["writes"]["trump_monitor_health.json"]
+    assert health["delivery_status"] == "unresolved_delivery_backlog"
+    assert health["delivery_unresolved_backlog_count"] == 1
 
 
 def test_sent_post_is_never_redelivered_on_a_fresh_run(monkeypatch):

@@ -28,11 +28,21 @@ from src.alerts.translation import (
 from src.config import trump_translation_config as translation_config
 from src.config.market_clock import TAIPEI
 from src.data.trump_truth import (
+    ArchiveError,
     archive_posts,
     fetch_recent_posts_with_health,
 )
 from src.storage.state_manager import read_json, write_json
+from src.storage.trump_delivery_remote import (
+    PUSH_CONFLICT_CLAIM,
+    PUSH_CONFLICT_SENT,
+    PUSH_FAILED,
+    durable_push,
+    hydrate_from_remote,
+)
 from src.storage.trump_delivery_state import (
+    DELIVERY_AMBIGUOUS,
+    DELIVERY_CLAIMED,
     DO_PROCEED,
     DO_RETRY,
     StateReadError,
@@ -498,6 +508,103 @@ def _fail_closed_health(reason: str) -> None:
     )
 
 
+def _attempt_id(run_id: str | None) -> str:
+    """Unique per-workflow-attempt identity (run id + run attempt).
+
+    A GitHub re-run reuses ``GITHUB_RUN_ID`` but bumps ``GITHUB_RUN_ATTEMPT``, so
+    binding the durable claim/result to this composite identity stops a re-run
+    from verifying (and thus trusting) a prior attempt's remote record.
+    """
+    run_attempt = os.getenv("GITHUB_RUN_ATTEMPT") or "1"
+    return f"{run_id or 'local'}:{run_attempt}"
+
+
+def _resync_authoritative(store: TrumpDeliveryStore) -> bool:
+    """Restore origin's authoritative ledger over our dirty local copy.
+
+    After a compare-and-set conflict or an undurable claim, the local ledger
+    carries our uncommitted claim; hydrating discards it so the trailing
+    commit-state never pushes a record that would clobber the authoritative one.
+    Returns False (state unreadable) if origin can no longer be read.
+    """
+    try:
+        hydrate_from_remote(store)
+        return True
+    except StateReadError as exc:
+        logger.error(
+            f"trump conflict resync failed ({type(exc).__name__}); workflow red"
+        )
+        return False
+
+
+def _deliver_durably(
+    store: TrumpDeliveryStore,
+    post: dict[str, Any],
+    translation: TranslationResult | None,
+    *,
+    run_id: str | None,
+    attempt_id: str,
+) -> str:
+    """Claim (remote-verified) -> send -> resolve (remote-verified) for one post.
+
+    Returns a durable outcome label:
+
+    - ``sent`` / ``failed`` / ``ambiguous`` — the send result (see ``_deliver_post``).
+    - ``skip_sent`` — origin already shows this post delivered (raced / re-run);
+      not resent, not counted as a new delivery.
+    - ``conflict_claim`` — a *foreign* attempt owns an unresolved claim; not sent.
+    - ``claim_undurable`` — the claim could not be verified on origin; not sent
+      (safe to retry next run).
+    - ``state_unreadable`` — authoritative state could not be re-read on conflict.
+    - ``state_persist_failed`` — the send happened but its terminal record could
+      not be verified on origin (kept red so the next run does not misread it).
+
+    In local/test mode (durable disabled) ``durable_push`` returns ``disabled``,
+    so this reduces to the original claim -> send -> resolve with no git effects.
+    """
+    post_id = str(post.get("id") or "")
+    if not post_id:
+        return "skip_empty"
+    if store.claim(post, run_id=run_id, attempt_id=attempt_id) is None:
+        return "skip_sent"  # already 'sent' (raced/hydrated) — never resend
+
+    claim_push = durable_push(
+        store,
+        f"trump claim {post_id} [skip ci]",
+        expected={
+            "post_id": post_id,
+            "delivery_state": DELIVERY_CLAIMED,
+            "workflow_attempt_id": attempt_id,
+        },
+        block_foreign_claim=True,
+    )
+    if claim_push == PUSH_CONFLICT_SENT:
+        _resync_authoritative(store)
+        return "skip_sent"
+    if claim_push == PUSH_CONFLICT_CLAIM:
+        return "conflict_claim" if _resync_authoritative(store) else "state_unreadable"
+    if claim_push == PUSH_FAILED:
+        # The claim is not durable on origin; sending now would risk a duplicate
+        # on the next run. Do not send; restore authoritative state and retry later.
+        return "claim_undurable" if _resync_authoritative(store) else "state_unreadable"
+
+    # PUSH_OK (durable) or PUSH_DISABLED (local): the claim is durable enough.
+    outcome = _deliver_post(post, translation)
+    store.resolve(post_id, outcome, run_id=run_id, attempt_id=attempt_id)
+    term_push = durable_push(
+        store,
+        f"trump {outcome} {post_id} [skip ci]",
+        expected={
+            "post_id": post_id,
+            "delivery_state": outcome,
+            "workflow_attempt_id": attempt_id,
+        },
+    )
+    if term_push == PUSH_FAILED:
+        return "state_persist_failed"
+    return outcome
+
+
 def main() -> int:
     logger.info("=== run_trump_monitor start: all-post capture mode ===")
     previous = read_json(HEALTH_FILE, default={})
@@ -507,12 +614,21 @@ def main() -> int:
     run_id = os.getenv("GITHUB_RUN_ID") or None
 
     store = TrumpDeliveryStore()
+    run_attempt_id = _attempt_id(run_id)
     try:
+        # Hydrate origin's authoritative ledger BEFORE any delivery decision: a
+        # stale event checkout (a queued scheduled run, or a GitHub re-run started
+        # from a SHA predating the previous run's state commit) must never show a
+        # delivered post as unseen and re-blast it. A corrupt local OR remote
+        # ledger — or a present-but-unreadable legacy bootstrap file — fails
+        # closed rather than being read as empty.
+        hydrate_from_remote(store)
         store.migrate_legacy_seen()
         capture_started_at = _capture_started_at(store, previous)
     except StateReadError as exc:
-        # A corrupt delivery ledger must NOT be read as empty (which would
-        # re-blast the whole checkpoint window). Fail closed and exit non-zero.
+        # A corrupt/unreadable ledger (local or authoritative remote) or bootstrap
+        # file must NOT be read as empty (which would re-blast the whole
+        # checkpoint window). Fail closed and exit non-zero.
         logger.error(
             f"Trump delivery ledger unreadable; failing closed: {type(exc).__name__}"
         )
@@ -575,6 +691,11 @@ def main() -> int:
 
     if not new_posts:
         _, translation_health = _build_translations([], translator)
+        backlog = store.unresolved_backlog()
+        backlog_open = backlog[DELIVERY_CLAIMED] + backlog[DELIVERY_AMBIGUOUS]
+        # An unresolved claimed/ambiguous backlog must keep the workflow RED even
+        # when no new source post arrived: "nothing new" is not "delivery clean".
+        status = "unresolved_delivery_backlog" if backlog_open else "no_new_posts"
         _write_health(
             result,
             capture_started_at=capture_started_at,
@@ -583,17 +704,49 @@ def main() -> int:
             new_count=0,
             archived_count=0,
             delivered_count=0,
-            delivery_status="no_new_posts",
+            delivery_status=status,
+            last_notice_at=previous.get("last_unavailable_notice_at"),
+            translation_health=translation_health,
+            delivery_health={
+                "delivery_unresolved_backlog_count": backlog_open,
+                "delivery_ledger_counts": store.health_counts(),
+            },
+        )
+        if backlog_open:
+            logger.error(
+                f"Trump delivery backlog unresolved: {backlog_open} "
+                "claimed/ambiguous record(s); workflow red until cleared"
+            )
+            return 1
+        logger.info("=== run_trump_monitor done: healthy, no new posts ===")
+        return 0
+
+    # Capture the original posts BEFORE translate/claim/send, and fail closed if
+    # the archive cannot be durably written: a delivered-but-unarchived post is
+    # lost to capture forever. Corrupt-present archive or write failure => red,
+    # no send, no 'sent' ledger transition.
+    try:
+        archived_count = archive_posts(new_posts)
+    except ArchiveError as exc:
+        logger.error(
+            f"Trump archive fail-closed ({type(exc).__name__}); not sending"
+        )
+        _, translation_health = _build_translations([], translator)
+        _write_health(
+            result,
+            capture_started_at=capture_started_at,
+            eligible_count=len(eligible),
+            timestamp_missing_count=timestamp_missing,
+            new_count=len(new_posts),
+            archived_count=0,
+            delivered_count=0,
+            delivery_status="archive_unavailable_fail_closed",
             last_notice_at=previous.get("last_unavailable_notice_at"),
             translation_health=translation_health,
             delivery_health={"delivery_ledger_counts": store.health_counts()},
         )
-        logger.info("=== run_trump_monitor done: healthy, no new posts ===")
-        return 0
+        return 1
 
-    # Archive is source-side and must not be gated behind delivery-time
-    # translation: capture the original posts first, then translate for render.
-    archived_count = archive_posts(new_posts)
     translations, translation_health = _build_translations(new_posts, translator)
 
     ordered = sorted(
@@ -602,29 +755,40 @@ def main() -> int:
         or datetime.min.replace(tzinfo=timezone.utc),
     )
     delivered_count = ambiguous_count = failed_count = 0
+    blocked_count = 0  # foreign-claim / undurable-claim / unreadable / persist-fail
     for post in ordered:
-        post_id = str(post.get("id") or "")
-        if not post_id:
-            continue
-        # Durable claim BEFORE the non-idempotent send. If the run is cancelled
-        # between here and the resolve, the post is left 'claimed' and the next
-        # run treats it as ambiguous (quarantine), never an auto-retry.
-        if store.claim(post, run_id=run_id) is None:
-            continue  # already 'sent' (raced) — do not resend
-        outcome = _deliver_post(post, translations.get(post_id))
-        store.resolve(post_id, outcome, run_id=run_id)
-        if outcome == "sent":
+        # Each post is claimed durably (remote-verified in durable mode) BEFORE
+        # its non-idempotent send, and its terminal result is remote-verified
+        # after. A stale/raced/re-run checkout can never resend a delivered post.
+        label = _deliver_durably(
+            store,
+            post,
+            translations.get(str(post.get("id") or "")),
+            run_id=run_id,
+            attempt_id=run_attempt_id,
+        )
+        if label == "sent":
             delivered_count += 1
-        elif outcome == "ambiguous":
+        elif label == "ambiguous":
             ambiguous_count += 1
-        else:
+        elif label == "failed":
             failed_count += 1
-
-    if failed_count or ambiguous_count:
-        if ambiguous_count:
-            delivery_status = "delivery_ambiguous"
+        elif label in ("skip_sent", "skip_empty"):
+            continue  # already delivered elsewhere / no id — nothing to send
         else:
-            delivery_status = "delivery_failed_partial"
+            # conflict_claim / claim_undurable / state_unreadable /
+            # state_persist_failed: a non-durable, no-send condition kept red.
+            blocked_count += 1
+
+    backlog = store.unresolved_backlog()
+    backlog_open = backlog[DELIVERY_CLAIMED] + backlog[DELIVERY_AMBIGUOUS]
+    red = bool(failed_count or ambiguous_count or blocked_count or backlog_open)
+    if ambiguous_count or backlog_open:
+        delivery_status = "delivery_ambiguous"
+    elif blocked_count:
+        delivery_status = "delivery_blocked_not_durable"
+    elif failed_count:
+        delivery_status = "delivery_failed_partial"
     else:
         delivery_status = "delivered_all"
     _write_health(
@@ -641,15 +805,18 @@ def main() -> int:
         delivery_health={
             "delivery_ambiguous_count": ambiguous_count,
             "delivery_failed_count": failed_count,
+            "delivery_blocked_count": blocked_count,
+            "delivery_unresolved_backlog_count": backlog_open,
             "delivery_requires_all_recipients": True,
             "delivery_ledger_counts": store.health_counts(),
         },
     )
 
-    if failed_count or ambiguous_count:
+    if red:
         logger.error(
             f"Trump delivery incomplete: {failed_count} failed (retry), "
-            f"{ambiguous_count} ambiguous (quarantined)"
+            f"{ambiguous_count} ambiguous, {blocked_count} blocked, "
+            f"{backlog_open} unresolved backlog"
         )
         return 1
 

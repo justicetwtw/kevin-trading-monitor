@@ -232,6 +232,7 @@ def test_no_post_text_or_secrets_in_persisted_record(tmp_path):
             "claimed_at",
             "resolved_at",
             "run_id",
+            "workflow_attempt_id",
             "stage_code",
         }
     )
