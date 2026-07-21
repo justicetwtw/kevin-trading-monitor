@@ -340,6 +340,154 @@ def _theses_section(data: dict[str, Any]) -> str:
     )
 
 
+def _focus_section(data: dict[str, Any]) -> str:
+    """Render the Focus Trading Engine block (shadow/display-only).
+
+    When the feature flag is off the block honestly shows a disabled state; when
+    on it renders Market Regime, Portfolio Exceptions, Theme Rotation and Focus
+    Securities with source/readiness blockers visible (contract §8 first screen).
+    """
+    focus = data.get("focus_engine") or {}
+    if not focus.get("enabled"):
+        return (
+            '<section id="focus"><div class="section-head">'
+            "<h2>Focus Engine (shadow)</h2>"
+            "<p>Holdings-first thesis/timing/exposure overlay.</p></div>"
+            '<div class="ok-state">Focus Engine is disabled '
+            "(FOCUS_ENGINE_ENABLED != 1); existing Decision Engine is authoritative."
+            "</div></section>"
+        )
+    fdata = focus.get("data") or {}
+    health = focus.get("health") or {}
+    regime = fdata.get("market_regime") or {}
+    exceptions = fdata.get("portfolio_exceptions") or {}
+    rotation = fdata.get("theme_rotation") or {}
+    cards = fdata.get("focus_securities") or []
+
+    # 1. Market Regime — VIX complex, freshness, workflow health, blockers visible.
+    vol_fresh = (regime.get("freshness") or {}) if isinstance(regime, dict) else {}
+    regime_blockers = []
+    if not regime:
+        regime_blockers.append("market_regime_unavailable")
+    if vol_fresh.get("status") in ("stale", "missing"):
+        regime_blockers.append(f"volatility_{vol_fresh.get('status')}")
+    cap = (regime.get("exposure_cap") or {}) if isinstance(regime, dict) else {}
+    composite = (regime.get("composite_regime") or {}) if isinstance(regime, dict) else {}
+    mtrend = (regime.get("trend") or {}) if isinstance(regime, dict) else {}
+    idx_trend = mtrend.get("index_trend") or {}
+    if cap.get("blocks_new_exposure"):
+        cap_effect = "blocks new exposure"
+    elif cap.get("reduces_new_exposure"):
+        cap_effect = "reduces new exposure"
+    else:
+        cap_effect = "full"
+    market_regime_html = (
+        "<h3>Market Regime</h3>"
+        '<div class="account-strip">'
+        f'<span>Workflow <strong>{_badge(health.get("workflow_status"))}</strong></span>'
+        f'<span>Error codes <strong>{_e(health.get("error_codes") or [])}</strong></span>'
+        f'<span>Composite regime <strong>{_badge(regime.get("regime"))}</strong></span>'
+        f'<span>VIX regime <strong>{_badge(composite.get("vix_regime"))}</strong></span>'
+        f'<span>Escalated <strong>{_e(composite.get("escalated_from_vix"))}</strong></span>'
+        f'<span>VIX <strong>{_e(regime.get("vix"))}</strong></span>'
+        f'<span>VIX as-of <strong>{_e(vol_fresh.get("as_of"))}</strong></span>'
+        f'<span>Freshness <strong>{_badge(vol_fresh.get("status"))}</strong></span>'
+        f'<span>Exposure cap <strong>{_e(cap.get("max_exposure_multiplier"))}</strong> ({cap_effect})</span>'
+        f'<span>Term inversion <strong>{_e(regime.get("term_inversion"))}</strong></span>'
+        "</div>"
+        '<div class="account-strip">'
+        f'<span>QQQ &gt;50/200DMA <strong>{_e(idx_trend.get("QQQ", {}).get("above_50dma"))}/'
+        f'{_e(idx_trend.get("QQQ", {}).get("above_200dma"))}</strong></span>'
+        f'<span>SMH &gt;50/200DMA <strong>{_e(idx_trend.get("SMH", {}).get("above_50dma"))}/'
+        f'{_e(idx_trend.get("SMH", {}).get("above_200dma"))}</strong></span>'
+        f'<span>SOXX &gt;50/200DMA <strong>{_e(idx_trend.get("SOXX", {}).get("above_50dma"))}/'
+        f'{_e(idx_trend.get("SOXX", {}).get("above_200dma"))}</strong></span>'
+        f'<span>Breadth &gt;50/200DMA <strong>{_e(mtrend.get("breadth_above_50dma"))}/'
+        f'{_e(mtrend.get("breadth_above_200dma"))}</strong></span>'
+        "</div>"
+        + (
+            f'<div class="privacy-note"><strong>Blockers:</strong> {_e(regime_blockers)}. '
+            "VVIX/COR1M remain capability gaps (paid source not connected).</div>"
+            if regime_blockers
+            else '<div class="privacy-note">VVIX/COR1M remain capability gaps '
+            "(paid source not connected).</div>"
+        )
+    )
+
+    # 2. Portfolio Exceptions — aggregate-only private risk (no identifiers).
+    portfolio_html = (
+        "<h3>Portfolio Exceptions</h3>"
+        + (
+            '<div class="account-strip">'
+            f'<span>Hedge coverage <strong>{_badge(exceptions.get("hedge_coverage_band"))}</strong></span>'
+            f'<span>Coverage status <strong>{_e(exceptions.get("hedge_coverage_status"))}</strong></span>'
+            f'<span>Max theme concentration <strong>{_badge(exceptions.get("max_theme_concentration_band"))}</strong></span>'
+            f'<span>Unmapped risk gap <strong>{_e(exceptions.get("has_unmapped_risk_gap"))}</strong></span>'
+            "</div>"
+            '<div class="privacy-note">Aggregate bands/counts only; no symbols, '
+            "strikes, contracts, costs or account value.</div>"
+            if exceptions
+            else '<div class="empty">No private position input configured '
+            "(aggregate exceptions unavailable).</div>"
+        )
+    )
+
+    # 3. Theme Rotation — constituents-only proxy with rank/percentile + blockers.
+    rotation_rows = rotation.get("rows") or []
+    rotation_html = (
+        "<h3>Theme Rotation (price-return proxy, not fund flow)</h3>"
+        + _table(
+            rotation_rows,
+            [
+                ("theme", "Theme"),
+                ("status", "Status"),
+                ("basket_kind", "Basket"),
+                ("member_coverage", "Coverage"),
+                ("as_of", "As of"),
+                ("theme_rank", "Rank"),
+                ("theme_percentile_rank", "Percentile"),
+                ("rs_vs_qqq_20", "RS20 vs QQQ"),
+                ("leadership_direction", "Leadership"),
+                ("breakout_20d_share", "20D breakout"),
+                ("breakout_55d_share", "55D breakout"),
+            ],
+        )
+    )
+
+    # 4. Focus Securities — holdings-first cards with source/as-of/blockers visible.
+    focus_html = (
+        "<h3>Focus Securities</h3>"
+        + _table(
+            cards,
+            [
+                ("symbol", "Symbol"),
+                ("company_thesis_state", "Thesis"),
+                ("timing_state", "Timing"),
+                ("exposure_posture", "Posture"),
+                ("add_allowed", "Add ready"),
+                ("regime_exposure_cap_multiplier", "Regime cap x"),
+                ("rs20_vs_qqq", "RS20"),
+                ("valuation_status", "Valuation"),
+                ("valuation_decision_grade", "Val OK"),
+                ("options_capability_status", "Options"),
+                ("readiness_blockers", "Blockers"),
+                ("as_of", "As of"),
+            ],
+        )
+    )
+    return (
+        '<section id="focus"><div class="section-head">'
+        "<h2>Focus Engine (shadow)</h2>"
+        "<p>Static public focus universe; timing paces exposure, never the thesis. "
+        "Not a trade signal.</p></div>"
+        + market_regime_html
+        + portfolio_html
+        + rotation_html
+        + focus_html
+        + "</section>"
+    )
+
+
 def _market_context(payloads: dict[str, Any]) -> str:
     option_rows = [
         row
@@ -412,6 +560,7 @@ def render_html(payloads: dict[str, Any]) -> str:
             _trump_section(data),
             _theme_section(data),
             _allocation_section(data),
+            _focus_section(data),
             _positions_section(data),
             _theses_section(data),
             _market_context(payloads),
@@ -423,7 +572,7 @@ def render_html(payloads: dict[str, Any]) -> str:
 <header><div class="kicker">Personal capital allocation / thesis monitor</div><h1>Kevin Trading Mission Control</h1>
 <div class="subtitle">Exceptions, source honesty, theses and opportunity context first. Telegram carries urgent alerts, every new Trump post and private portfolio risk.</div>
 <div class="meta">generated_at {_e(mission.get('generated_at'))} · repo is the source of truth · decision support only · no automated trading</div></header>
-<nav><a href="#attention">Attention</a><a href="#trump">Trump source</a><a href="#themes">Themes</a><a href="#allocation">Allocation</a><a href="#positions">Portfolio health</a><a href="#theses">Theses</a><a href="#context">Market context</a></nav>
+<nav><a href="#attention">Attention</a><a href="#trump">Trump source</a><a href="#themes">Themes</a><a href="#allocation">Allocation</a><a href="#focus">Focus engine</a><a href="#positions">Portfolio health</a><a href="#theses">Theses</a><a href="#context">Market context</a></nav>
 <main>{sections}<p class="meta">{_e(data.get('disclaimer'))}</p></main></body></html>"""
 
 

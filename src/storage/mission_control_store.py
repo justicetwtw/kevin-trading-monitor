@@ -11,6 +11,7 @@ from datetime import date, datetime
 from typing import Any
 
 from src.config.settings import TIMEZONE_USER
+from src.focus.payload import build_focus_payload
 from src.storage import dashboard_store
 from src.storage.state_manager import read_json
 
@@ -367,6 +368,20 @@ def _build_attention_queue(
     )
 
 
+def _focus_engine_block() -> dict[str, Any]:
+    """Public-safe Focus Trading Engine block for the dashboard.
+
+    Reads only the redacted `focus_engine_state.json` produced by the shadow
+    runner. When the feature flag is off, or no shadow state exists, this returns
+    a disabled envelope so the dashboard renders nothing but the honest status.
+    The public dashboard never fetches prices or loads private positions here.
+    """
+    state = read_json("focus_engine_state.json", default={})
+    if isinstance(state, dict) and state.get("schema_version"):
+        return state
+    return build_focus_payload()
+
+
 def build_mission_control_payload() -> dict[str, Any]:
     """Build the dashboard first-screen decision-support payload."""
     snapshot = read_json("position_snapshot.json", default={})
@@ -531,6 +546,7 @@ def build_mission_control_payload() -> dict[str, Any]:
         "themes": themes,
         "theses": theses,
         "allocation_queue": allocation_rows,
+        "focus_engine": _focus_engine_block(),
         "disclaimer": (
             "Decision support only. Public dashboard state intentionally excludes "
             "exact holdings, strikes, costs and account value. It never creates an "
@@ -548,5 +564,6 @@ def build_mission_control_payload() -> dict[str, Any]:
             "layer_macro_regime_state.json",
             "layer_fundamentals_dashboard_state.json",
             "iv_history.json",
+            "focus_engine_state.json",
         ],
     )
