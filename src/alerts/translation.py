@@ -19,6 +19,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from typing import Literal, Protocol
 
 from src.config import trump_translation_config as cfg
@@ -119,25 +120,59 @@ _ISO_DATE_RE = re.compile(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})")
 _CJK_DATE_RE = re.compile(r"(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日")
 # A standalone number not glued to a letter/digit (so "MP3"/"COVID19" are skipped).
 _NUMBER_RE = re.compile(r"(?<![A-Za-z0-9.])\d+(?:\.\d+)?")
-_NEGATIVE_RE = re.compile(r"[\-−]\s?(\d+(?:\.\d+)?)")
+# A minus sign that is a real polarity marker, not a range hyphen "3-5".
+_NEGATIVE_RE = re.compile(r"(?<![\d.])[\-−]\s?(\d+(?:\.\d+)?)")
 _URL_TRAILING = ".,;:!?)]}\"'>"
-# Trailing context that means a number's digits are legitimately rescaled/reworded
-# in translation, so the exact digits must NOT be compared.
+# Ordinals are skipped: "1st" -> "第一" legitimately drops the digit.
+_ORDINAL_RE = re.compile(r"(?:st|nd|rd|th)\b", re.IGNORECASE)
+# Scaled quantities are CANONICALIZED to a base value, not skipped, so a wrong
+# rescale ($100 million -> 9 億) is caught while a faithful one ($100 million ->
+# 1 億) matches.
 _SCALE_EN_RE = re.compile(
-    r"\s*(?:hundred|thousand|million|billion|trillion|st|nd|rd|th)\b",
+    r"\s*(hundred|thousand|million|billion|trillion)\b", re.IGNORECASE
+)
+_SCALE_EN_MULT = {
+    "hundred": 100, "thousand": 1000, "million": 10 ** 6,
+    "billion": 10 ** 9, "trillion": 10 ** 12,
+}
+_SCALE_CJK_MULT = {
+    "百": 100, "千": 1000, "萬": 10 ** 4, "万": 10 ** 4,
+    "億": 10 ** 8, "亿": 10 ** 8, "兆": 10 ** 12,
+}
+# Direction / negation markers, English source and accepted zh-TW equivalents.
+_SRC_UP_RE = re.compile(
+    r"(?<![\d.])\+\s?\d|\b(?:up|rise|rises|rose|risen|gain|gains|gained|"
+    r"increase|increases|increased|grow|grows|grew|surge|surged|jump|jumped|"
+    r"higher|climb|climbed)\b",
     re.IGNORECASE,
 )
-_SCALE_CJK = "百千萬万億亿兆"
-# Direction words that faithfully express a negative percentage/change.
-_DOWN_WORDS = (
-    "下跌", "下降", "減少", "降低", "下滑", "衰退", "縮減", "跌", "下修", "調降", "負",
+_SRC_DOWN_RE = re.compile(
+    r"(?<![\d.])[\-−]\s?\d|\b(?:down|fall|falls|fell|fallen|drop|drops|dropped|"
+    r"decrease|decreases|decreased|decline|declines|declined|plunge|plunged|"
+    r"lower|cut|cuts|sink|sank|tumble|tumbled)\b",
+    re.IGNORECASE,
 )
-# Non-USD currency words: a "$"/USD source must not be rendered as these.
+_SRC_NEG_RE = re.compile(
+    r"\b(?:not|no|never|without|cannot|can't|won't|wont|don't|dont|doesn't|"
+    r"didn't|isn't|aren't|neither|nor|none|deny|denies|denied|refuse|refuses)\b",
+    re.IGNORECASE,
+)
+_ZH_UP_RE = re.compile(
+    r"\+\s?\d|上漲|上升|增加|提高|成長|走高|攀升|漲|升|擴大|走揚|上揚"
+)
+_ZH_DOWN_RE = re.compile(
+    r"(?<![\d.])[\-−]\s?\d|下跌|下降|減少|降低|下滑|衰退|縮減|走低|下修|調降|跌|負"
+)
+_ZH_NEG_RE = re.compile(r"不|未|無|沒有|沒|並非|非|否認|拒絕|別|勿|毫無")
+# Currency / percentage source and accepted-marker forms.
+_USD_SRC_RE = re.compile(r"\$|\bUSD\b|\bdollars?\b", re.IGNORECASE)
+_USD_MARK_RE = re.compile(r"美元|美金|\$|\bUSD\b|\bdollars?\b", re.IGNORECASE)
 _FOREIGN_CURRENCY_RE = re.compile(
     r"日圓|日元|歐元|英鎊|人民幣|韓元|韓圜|港幣|港元|盧布|盧比|加元|澳元|瑞郎|"
     r"新台幣|新臺幣|台幣"
 )
-_PERCENT_MARK_RE = re.compile(r"%|％|百分|趴")
+_PCT_SRC_RE = re.compile(r"%|％|\bpercent\b|\bpercentage\b|\bpct\b", re.IGNORECASE)
+_PERCENT_MARK_RE = re.compile(r"%|％|百分|趴|個百分點")
 _UPPER_WORD_RE = re.compile(r"\b[A-Z]{2,6}\b")
 # All-caps English that is also a ticker symbol but is overwhelmingly prose in a
 # Trump post; never treat these as bare tickers (cashtags like $ALL still count).
@@ -161,11 +196,15 @@ def _normalize_for_match(text: str) -> str:
     return re.sub(r"(?<=\d),(?=\d)", "", normalized)
 
 
-def _canonical_number(raw: str) -> str:
-    """Canonicalize a numeric literal so 007 == 7 and 1000 == 1,000."""
-    if "." in raw:
+def _canonical_number(raw: str, multiplier: int = 1) -> str:
+    """Canonical base value so 007==7, 1000==1,000 and 100 million==1 億."""
+    try:
+        value = Decimal(raw) * multiplier
+    except (InvalidOperation, ValueError):
         return raw
-    return str(int(raw))
+    if value == value.to_integral_value():
+        return str(int(value))
+    return format(value.normalize(), "f")
 
 
 def _known_tickers() -> frozenset:
@@ -213,11 +252,18 @@ def _extract_value_tokens(text: str) -> tuple[Counter, str]:
     work = _CJK_DATE_RE.sub(_date_repl, work)
 
     for match in _NUMBER_RE.finditer(work):
-        tail = work[match.end():match.end() + 12]
-        cjk_next = tail.lstrip()[:1]
-        if _SCALE_EN_RE.match(tail) or (cjk_next and cjk_next in _SCALE_CJK):
-            continue  # million/億/ordinal: digits legitimately change
-        tokens[("number", _canonical_number(match.group(0)))] += 1
+        tail = work[match.end():match.end() + 16]
+        stripped_tail = tail.lstrip()
+        if _ORDINAL_RE.match(stripped_tail):
+            continue  # "1st" -> "第一" legitimately drops the digit
+        multiplier = 1
+        scale_en = _SCALE_EN_RE.match(tail)
+        cjk_next = stripped_tail[:1]
+        if scale_en:
+            multiplier = _SCALE_EN_MULT[scale_en.group(1).lower()]
+        elif cjk_next in _SCALE_CJK_MULT:
+            multiplier = _SCALE_CJK_MULT[cjk_next]
+        tokens[("number", _canonical_number(match.group(0), multiplier))] += 1
     return tokens, work
 
 
@@ -242,9 +288,11 @@ def _looks_untranslated(source: str, output: str) -> bool:
     """True when the output is an English echo / wrapper, not a translation.
 
     ``translate_text`` only invokes the provider for substantive non-Chinese
-    input, so a clean translation must contain Han script. An output with no Han
-    (an English echo, a JSON/instruction wrapper) or one equal to the source is
-    not a Chinese translation.
+    input, so a clean zh-TW translation is dominated by Han script. Rejects
+    output with no Han, output equal to or containing the normalized source
+    (a Chinese-prefixed/suffixed or JSON/markdown wrapper), and output whose
+    non-ticker English words still overlap most of the source (a paraphrased
+    English echo carrying one or two Han characters).
     """
     stripped = (output or "").strip()
     if not stripped:
@@ -253,23 +301,63 @@ def _looks_untranslated(source: str, output: str) -> bool:
         return True
     src_norm = " ".join((source or "").split()).lower()
     out_norm = " ".join(stripped.split()).lower()
-    return out_norm == src_norm
+    if src_norm and (out_norm == src_norm or src_norm in out_norm):
+        return True
+
+    tickers = set(_ticker_counts(source))
+
+    def _content_words(text: str) -> list[str]:
+        return [
+            word.lower()
+            for word in re.findall(r"[A-Za-z]{3,}", text or "")
+            if word.upper() not in tickers
+        ]
+
+    source_words = _content_words(source)
+    if len(source_words) >= 3:
+        output_words = set(_content_words(stripped))
+        overlap = sum(1 for word in source_words if word in output_words)
+        if overlap >= max(3, int(0.6 * len(source_words))):
+            return True
+    return False
+
+
+def _has_up(text: str, zh: bool) -> bool:
+    pattern = _ZH_UP_RE if zh else _SRC_UP_RE
+    return bool(pattern.search(text or ""))
+
+
+def _has_down(text: str, zh: bool) -> bool:
+    pattern = _ZH_DOWN_RE if zh else _SRC_DOWN_RE
+    return bool(pattern.search(text or ""))
 
 
 def fidelity_error(source: str, translation: str) -> str | None:
     """Return an error code when protected source values are corrupted.
 
     Symmetric multiset comparison rejects both dropped/changed and invented
-    URLs, dates, numeric values and tickers; polarity, currency substitution and
-    percentage->currency type changes are rejected too. Returns ``None`` when
-    fidelity holds or neither side carries a protected value.
+    URLs, dates and numeric values (scaled quantities canonicalized to a base
+    value) and tickers; direction/negation reversal, currency substitution and
+    percentage type loss are rejected too. Returns ``None`` when fidelity holds
+    or neither side carries a protected value.
     """
     source_values, source_work = _extract_value_tokens(source)
-    translation_values, _ = _extract_value_tokens(translation)
+    translation_values, translation_work = _extract_value_tokens(translation)
     source_tickers = _ticker_counts(source)
     translation_tickers = _ticker_counts(translation)
+    directional = (
+        _has_up(source_work, False)
+        or _has_down(source_work, False)
+        or _SRC_NEG_RE.search(source or "")
+    )
     if not any(
-        (source_values, translation_values, source_tickers, translation_tickers)
+        (
+            source_values,
+            translation_values,
+            source_tickers,
+            translation_tickers,
+            directional,
+        )
     ):
         return None
 
@@ -279,30 +367,32 @@ def fidelity_error(source: str, translation: str) -> str | None:
     if source_tickers != translation_tickers:
         return "fidelity_mismatch"
 
-    # Polarity: a negative source magnitude must stay negative (an explicit
-    # minus or a down-direction word); catches -3% -> +3%.
-    source_negatives = {
-        _canonical_number(m.group(1)) for m in _NEGATIVE_RE.finditer(source_work)
-    }
-    if source_negatives:
-        translation_negatives = {
-            _canonical_number(m.group(1))
-            for m in _NEGATIVE_RE.finditer(
-                _extract_value_tokens(translation)[1]
-            )
-        }
-        if not any(word in (translation or "") for word in _DOWN_WORDS):
-            if source_negatives - translation_negatives:
-                return "fidelity_mismatch"
+    # Direction: a clearly-up (or down) source must not be rendered as the
+    # opposite; catches +3% -> 下跌 3%, rose -> 下跌, fell -> 上漲.
+    src_up = _has_up(source_work, False)
+    src_down = _has_down(source_work, False)
+    tr_up = _has_up(translation_work, True)
+    tr_down = _has_down(translation_work, True)
+    if src_up and not src_down and tr_down and not tr_up:
+        return "fidelity_mismatch"
+    if src_down and not src_up and tr_up and not tr_down:
+        return "fidelity_mismatch"
 
-    # Currency: a USD ("$") source must not be rendered in a foreign currency.
-    if "$" in (source or "") and not _FOREIGN_CURRENCY_RE.search(source or ""):
-        if _FOREIGN_CURRENCY_RE.search(translation or ""):
+    # Negation: a negated source must keep an explicit zh negation.
+    if _SRC_NEG_RE.search(source or "") and not _ZH_NEG_RE.search(translation or ""):
+        return "fidelity_mismatch"
+
+    # Currency: a USD source must be rendered with a USD marker, not a foreign
+    # currency (catches $100 -> 100 日圓, and a silent unit drop).
+    if _USD_SRC_RE.search(source or "") and not _FOREIGN_CURRENCY_RE.search(source or ""):
+        if _FOREIGN_CURRENCY_RE.search(translation or "") or not _USD_MARK_RE.search(
+            translation or ""
+        ):
             return "fidelity_mismatch"
 
-    # A percentage must not silently become a non-percentage (e.g. currency).
-    if _PERCENT_MARK_RE.search(_normalize_for_match(source)) and not (
-        _PERCENT_MARK_RE.search(_normalize_for_match(translation))
+    # Percentage must not silently become a non-percentage (e.g. currency).
+    if _PCT_SRC_RE.search(source or "") and not _PERCENT_MARK_RE.search(
+        _normalize_for_match(translation)
     ):
         return "fidelity_mismatch"
     return None

@@ -645,12 +645,16 @@ def test_fidelity_rejects_substring_value_changes():
 
 
 def test_fidelity_preserves_value_multiplicity():
-    # Two occurrences of 100; only one survives -> mismatch.
+    # Two occurrences of 100; only one survives -> mismatch (USD marker kept so
+    # the mismatch is the dropped duplicate, not the currency check).
     assert (
-        translation.fidelity_error("$100 then $100 again", "先 100 再一次")
+        translation.fidelity_error("$100 then $100 again", "先 100 美元 再一次")
         == "fidelity_mismatch"
     )
-    assert translation.fidelity_error("$100 then $100 again", "先 100 再 100") is None
+    assert (
+        translation.fidelity_error("$100 then $100 again", "先 100 美元 再 100 美元")
+        is None
+    )
 
 
 def test_fidelity_protects_plain_numeric_values():
@@ -712,22 +716,57 @@ def test_fidelity_protects_plain_ticker_without_flagging_prose():
     assert translation.fidelity_error("MAKE AMERICA GREAT", "讓美國再次偉大") is None
 
 
-def test_fidelity_ignores_scale_word_magnitudes():
-    # A faithful million->億 / billion->億 rescale changes the digits and must
-    # not be flagged.
+def test_scaled_quantities_are_canonicalized_not_skipped():
+    # Re-review 4743268540: a faithful rescale matches; a wrong one is caught.
     assert translation.fidelity_error("gave $100 million", "捐了 1 億美元") is None
     assert translation.fidelity_error("5 billion people", "50 億人") is None
+    assert (
+        translation.fidelity_error("paid $100 million", "支付 9 億美元")
+        == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error("5 billion people", "5 億人") == "fidelity_mismatch"
+    )
 
 
-def test_looks_untranslated_detects_english_echo():
-    assert translation._looks_untranslated("New tariff policy", "New tariff policy")
-    assert translation._looks_untranslated("New tariff policy", "Tariff policy is new")
-    assert not translation._looks_untranslated("New tariff policy", "新的關稅政策")
+def test_direction_and_negation_reversals_are_rejected():
+    # Re-review 4743268540: known polarity/negation reversals must degrade.
+    assert translation.fidelity_error("NVDA +3%", "NVDA 下跌 3%") == "fidelity_mismatch"
+    assert (
+        translation.fidelity_error("NVDA rose 3%", "NVDA 下跌 3%") == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error("NVDA fell 3%", "NVDA 上漲 3%") == "fidelity_mismatch"
+    )
+    assert (
+        translation.fidelity_error("Tariffs will not rise", "關稅將上升")
+        == "fidelity_mismatch"
+    )
+    # Faithful direction / negation is preserved.
+    assert translation.fidelity_error("NVDA rose 3%", "NVDA 上漲 3%") is None
+    assert translation.fidelity_error("NVDA fell 3%", "NVDA 下跌 3%") is None
+    assert translation.fidelity_error("Tariffs will not rise", "關稅將不會上升") is None
 
 
-def test_english_echo_is_rejected_as_invalid_response():
+def test_usd_source_requires_usd_marker_not_foreign_currency():
+    assert translation.fidelity_error("costs $100", "花費 100 日圓") == "fidelity_mismatch"
+    assert translation.fidelity_error("costs $100", "花費 100") == "fidelity_mismatch"
+    assert translation.fidelity_error("costs $100", "花費 100 美元") is None
+
+
+def test_looks_untranslated_detects_echo_and_wrappers():
+    src = "Massive new tariffs on all imports starting Monday"
+    assert translation._looks_untranslated(src, src)  # exact echo
+    assert translation._looks_untranslated(src, "翻譯:" + src)  # Chinese-prefix wrapper
+    assert translation._looks_untranslated(src, src + " 。以上為翻譯")  # suffix wrapper
+    assert translation._looks_untranslated(src, '{"translation": "' + src + '"}')  # json
+    assert translation._looks_untranslated(src, src + " 啊")  # mostly-English + 1 Han
+    assert not translation._looks_untranslated(src, "週一起對所有進口課徵大規模新關稅")
+
+
+def test_english_echo_and_wrapper_are_rejected_as_invalid_response():
     source = "Massive new tariffs on all imports starting Monday"
-    for echo in (source, "Massive NEW tariffs on all imports"):
+    for echo in (source, "翻譯:" + source, '{"translation": "' + source + '"}'):
         translator = GeminiTranslator("K", "m", generate_fn=lambda echo=echo, **k: echo)
         result = translator.translate(source)
         assert result.status == "failed"
