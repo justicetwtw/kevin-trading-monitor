@@ -22,6 +22,7 @@ from src.runners.us_open_state import (
     DELIVERY_OBSERVING,
     DELIVERY_SENT,
     DELIVERY_SKIPPED,
+    StateReadError,
     UsOpenDeliveryStore,
     new_record,
 )
@@ -785,6 +786,105 @@ def test_stabilization_regen_failure_is_red_and_retryable(env, monkeypatch):
     rec = _read(env)
     assert rec["delivery_state"] == DELIVERY_FAILED  # not stuck 'claimed'
     assert rec["stage_code"] == "generation_failed"  # retryable in-window
+
+
+def _seed(store, dt, delivery_state, **kw):
+    store.upsert(new_record(
+        resolve_us_open_session(dt),
+        status=kw.get("status"), lateness_minutes=kw.get("lateness", 0),
+        schedule_source="prior", workflow_run_id="run-1",
+        workflow_started_at=dt.isoformat(), delivery_state=delivery_state,
+    ))
+
+
+def test_hydration_remote_sent_is_skipped_as_duplicate(env, monkeypatch):
+    # A stale-checkout run whose hydrated origin state shows 'sent' skips as a
+    # clean duplicate (green) and never calls Telegram.
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+
+    def _hydrate(store):
+        _seed(store, _tpe(2026, 7, 20, 21, 32), DELIVERY_SENT, status="on_time")
+        return True
+
+    monkeypatch.setattr(rub, "_hydrate_local_from_remote", _hydrate)
+    send = _NeverCalled()
+    monkeypatch.setattr(rub, "_send_detailed", send)
+
+    rc = rub.main()
+
+    assert rc == 0
+    assert send.called is False
+    assert _read(env)["delivery_state"] == DELIVERY_SENT
+
+
+def test_hydration_remote_claimed_is_not_replaced_or_sent(env, monkeypatch):
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+
+    def _hydrate(store):
+        _seed(store, _tpe(2026, 7, 20, 21, 32), DELIVERY_CLAIMED, status="on_time")
+        return True
+
+    monkeypatch.setattr(rub, "_hydrate_local_from_remote", _hydrate)
+    send = _NeverCalled()
+    monkeypatch.setattr(rub, "_send_detailed", send)
+
+    rc = rub.main()
+
+    assert rc == 1  # unresolved remote claim -> surface, do not send
+    assert send.called is False
+    assert _read(env)["delivery_state"] == DELIVERY_AMBIGUOUS
+
+
+def test_hydration_malformed_remote_fails_closed(tmp_path, monkeypatch):
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    from types import SimpleNamespace
+
+    def fake(*args):
+        if args[0] == "show":
+            return SimpleNamespace(returncode=0, stdout='{"sessions": []}', stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    store = UsOpenDeliveryStore(tmp_path / "s.json")
+    with pytest.raises(StateReadError):
+        rub._hydrate_local_from_remote(store)
+
+
+def test_hydrate_local_from_remote_writes_origin_content(tmp_path, monkeypatch):
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    from types import SimpleNamespace
+    remote = _remote_with(_EXPECTED, delivery_state="sent")
+
+    def fake(*args):
+        if args[0] == "show":
+            return SimpleNamespace(returncode=0, stdout=remote, stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    store = UsOpenDeliveryStore(tmp_path / "s.json")
+    assert rub._hydrate_local_from_remote(store) is True
+    assert store.get("us_open:2026-07-20")["delivery_state"] == "sent"
+
+
+def test_same_status_clock_advance_updates_lateness_on_failure(env, monkeypatch):
+    # Clock advances during the claim push but stays on_time; a failed send must
+    # persist the request-time lateness, not the generation-time value.
+    clock = {"t": _tpe(2026, 7, 20, 21, 32)}  # +2 on_time
+    monkeypatch.setattr(rub, "_now_taipei", lambda: clock["t"])
+
+    def _push(_msg, **kw):
+        clock["t"] = _tpe(2026, 7, 20, 21, 37)  # +7, still on_time
+        return rub.PUSH_OK
+
+    monkeypatch.setattr(rub, "_durable_push", _push)
+    monkeypatch.setattr(rub, "_send_detailed", _sender("failed", delivered=0))
+
+    rc = rub.main()
+
+    assert rc == 1
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_FAILED
+    assert rec["lateness_minutes"] == 7  # request-time, not +2 generation-time
 
 
 def test_malformed_record_fails_closed_without_sending(env, monkeypatch):

@@ -112,55 +112,66 @@ class UsOpenDeliveryStore:
 
     # -- raw io --------------------------------------------------------------
 
+    @staticmethod
+    def parse_state(content: str, *, origin: str = "state") -> dict[str, Any]:
+        """Parse + fail-closed-validate a state JSON string (local or remote).
+
+        The same rules guard the local file and the hydrated authoritative
+        remote content: a malformed/unreadable document, an unsupported schema,
+        a missing/wrong-typed ``sessions`` map, or a malformed individual record
+        all raise ``StateReadError`` rather than being read as empty (which would
+        license a duplicate send).
+        """
+        try:
+            data = json.loads(content)
+        except (json.JSONDecodeError, ValueError, TypeError) as exc:
+            raise StateReadError(
+                f"{origin} is unreadable: {type(exc).__name__}"
+            ) from exc
+        if not isinstance(data, dict):
+            raise StateReadError(f"{origin} is not a JSON object")
+        schema = data.get("schema_version", STATE_SCHEMA_VERSION)
+        if not isinstance(schema, int) or schema > STATE_SCHEMA_VERSION:
+            raise StateReadError(f"{origin} has unsupported schema_version {schema!r}")
+        sessions = data.get("sessions")
+        if not isinstance(sessions, dict):
+            raise StateReadError(f"{origin} has a missing/invalid 'sessions' object")
+        for key, record in sessions.items():
+            if not isinstance(record, dict):
+                raise StateReadError(f"{origin} session {key!r} is not an object")
+            if record.get("session_key") != key:
+                raise StateReadError(
+                    f"{origin} session {key!r} has mismatched session_key "
+                    f"{record.get('session_key')!r}"
+                )
+            if record.get("delivery_state") not in SUPPORTED_DELIVERY_STATES:
+                raise StateReadError(
+                    f"{origin} session {key!r} has unsupported "
+                    f"delivery_state {record.get('delivery_state')!r}"
+                )
+        return {"schema_version": schema, "sessions": sessions}
+
     def _read_raw(self) -> dict[str, Any]:
         if not self.path.exists():
             # A missing file is a legitimate empty state (first run ever).
             return {"schema_version": STATE_SCHEMA_VERSION, "sessions": {}}
         try:
-            data = json.loads(self.path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError, UnicodeDecodeError) as exc:
-            # An *existing* but unreadable file must NOT be treated as empty:
-            # a lost sent-record would license a duplicate send. Fail closed.
+            text = self.path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
             raise StateReadError(
                 f"{self.path} exists but is unreadable: {type(exc).__name__}"
             ) from exc
-        if not isinstance(data, dict):
-            raise StateReadError(f"{self.path} is not a JSON object")
-        schema = data.get("schema_version", STATE_SCHEMA_VERSION)
-        if not isinstance(schema, int) or schema > STATE_SCHEMA_VERSION:
-            # An unsupported/newer schema must not be interpreted as empty.
-            raise StateReadError(
-                f"{self.path} has unsupported schema_version {schema!r}"
-            )
-        # A present file must carry a valid `sessions` object. A missing or
-        # wrong-typed `sessions` (e.g. `[]`) is structurally corrupt and must
-        # fail closed, never be silently replaced with an empty map that could
-        # erase a prior sent record and license a duplicate send. Only a truly
-        # *missing file* (handled above) is a legitimate empty state.
-        sessions = data.get("sessions")
-        if not isinstance(sessions, dict):
-            raise StateReadError(
-                f"{self.path} has a missing/invalid 'sessions' object"
-            )
-        # Validate every stored record so a malformed individual entry fails
-        # closed here rather than crashing a later `.get()`/`.get('...')` call
-        # in the runner or the sanity check.
-        for key, record in sessions.items():
-            if not isinstance(record, dict):
-                raise StateReadError(
-                    f"{self.path} session {key!r} is not an object"
-                )
-            if record.get("session_key") != key:
-                raise StateReadError(
-                    f"{self.path} session {key!r} has mismatched session_key "
-                    f"{record.get('session_key')!r}"
-                )
-            if record.get("delivery_state") not in SUPPORTED_DELIVERY_STATES:
-                raise StateReadError(
-                    f"{self.path} session {key!r} has unsupported "
-                    f"delivery_state {record.get('delivery_state')!r}"
-                )
-        return {"schema_version": schema, "sessions": sessions}
+        return self.parse_state(text, origin=str(self.path))
+
+    def hydrate_from(self, content: str) -> None:
+        """Make ``content`` (authoritative remote state) the local base.
+
+        Validates with the same fail-closed rules and atomically overwrites the
+        local file, so every subsequent decision/read uses origin's state rather
+        than a possibly-stale checkout. Raises ``StateReadError`` if malformed.
+        """
+        data = self.parse_state(content, origin="origin/main state")
+        self._write_raw(data)
 
     def _write_raw(self, data: dict[str, Any]) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)

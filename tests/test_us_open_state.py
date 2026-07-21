@@ -283,6 +283,36 @@ def test_mismatched_session_key_fails_closed(tmp_path):
         store.get("us_open:2026-07-20")
 
 
+def test_parse_state_validates_remote_content():
+    good = json.dumps({"schema_version": 1, "sessions": {
+        "us_open:2026-07-20": {
+            "session_key": "us_open:2026-07-20", "delivery_state": "sent"}}})
+    parsed = UsOpenDeliveryStore.parse_state(good, origin="origin/main state")
+    assert "us_open:2026-07-20" in parsed["sessions"]
+
+
+def test_parse_state_rejects_malformed_remote_content():
+    for bad in ('{"sessions": []}', "{not json", '{"sessions": {"k": []}}',
+                '{"schema_version": 99, "sessions": {}}'):
+        with pytest.raises(StateReadError):
+            UsOpenDeliveryStore.parse_state(bad, origin="origin/main state")
+
+
+def test_hydrate_from_installs_authoritative_state(tmp_path):
+    store = _store(tmp_path)
+    store.hydrate_from(json.dumps({"schema_version": 1, "sessions": {
+        "us_open:2026-07-20": {
+            "session_key": "us_open:2026-07-20", "delivery_state": "sent"}}}))
+    assert store.get("us_open:2026-07-20")["delivery_state"] == DELIVERY_SENT
+
+
+def test_hydrate_from_malformed_raises_and_does_not_write(tmp_path):
+    store = _store(tmp_path)
+    with pytest.raises(StateReadError):
+        store.hydrate_from('{"sessions": []}')
+    assert store.get("us_open:2026-07-20") is None  # nothing written
+
+
 def test_unsupported_delivery_state_fails_closed(tmp_path):
     path = tmp_path / "us_open_delivery_state.json"
     path.write_text(

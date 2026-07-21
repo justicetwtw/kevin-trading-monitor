@@ -248,6 +248,30 @@ def _durable_push(message: str, *, expected: dict, block_foreign_claim: bool = F
     return PUSH_FAILED
 
 
+def _hydrate_local_from_remote(store) -> bool:
+    """Replace the local state with origin's authoritative version before any
+    delivery decision (durable mode only; no-op locally/in tests).
+
+    A scheduled run or GitHub re-run may check out the original event SHA even
+    after a previous watchdog has pushed a newer claim/sent record; a stale local
+    file must never license a new claim. Fetches origin, reads
+    ``origin/<branch>:data_store/us_open_delivery_state.json`` and validates it
+    with the same fail-closed rules. Raises ``StateReadError`` if origin cannot be
+    fetched or the remote state is malformed.
+    """
+    if os.getenv("US_OPEN_DURABLE_STATE") != "1":
+        return False
+    branch = os.getenv("US_OPEN_STATE_BRANCH", "main")
+    if _git_run("fetch", "origin", branch).returncode != 0:
+        raise StateReadError("cannot fetch origin to hydrate authoritative state")
+    show = _git_run("show", f"origin/{branch}:{STATE_PATH}")
+    if show.returncode != 0:
+        # No state file on origin yet (first run ever): keep the local base.
+        return True
+    store.hydrate_from(show.stdout or "")
+    return True
+
+
 def _telemetry_only(store, record, outcome, stage_code, env, *,
                     status=None, lateness=None) -> None:
     """Append an attributable attempt entry and persist, without (re)sending."""
@@ -308,9 +332,12 @@ def main() -> int:
 
     session = decision.session
 
-    # Read state once; a corrupt (not merely missing) file fails closed so a
-    # lost record can never license a re-send.
+    # Hydrate origin's authoritative state, then read it. A corrupt (not merely
+    # missing) file — local or remote — fails closed so a lost/stale record can
+    # never license a re-send, and a stale checkout can never out-vote a newer
+    # remote claim/sent.
     try:
+        _hydrate_local_from_remote(store)
         store.migrate_legacy(max_session_date_et=session.session_date_et)
         existing = store.get(session.session_key)
     except StateReadError as exc:
@@ -525,6 +552,11 @@ def main() -> int:
             deliver_decision.status == record["status"]
             and body_brief_type(deliver_decision.status) == current_body_type
         ):
+            # Stable SLA class, but the clock still advanced: copy the
+            # request-time status/lateness so a failed/ambiguous outcome never
+            # retains stale generation-time lateness.
+            record["status"] = deliver_decision.status
+            record["lateness_minutes"] = deliver_decision.lateness_minutes
             message = render_us_open_message(body, deliver_decision)
             send_decision = deliver_decision
             stabilized = True
@@ -566,6 +598,10 @@ def main() -> int:
         return _persist_terminal(store, record, env, "phase_unstable", session,
                                  base_exit=1)
 
+    # Persist the exact request-time SLA class/lateness before the send, so a
+    # failed/ambiguous outcome reflects the request moment, not generation time.
+    record["status"] = send_decision.status
+    record["lateness_minutes"] = send_decision.lateness_minutes
     outcome = _send_detailed(message)
     result = outcome.get("outcome")
 
