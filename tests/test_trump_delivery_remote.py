@@ -276,254 +276,283 @@ def test_hydrate_malformed_remote_fails_closed(monkeypatch, tmp_path):
         hydrate_from_remote(store)
 
 
-# --- end-to-end: real main() in durable mode over one shared origin ----------
+# --- archive-specific durable unit tests (fake git) --------------------------
+
+_ARCHIVE_REL = "data_store/trump_posts_archive.json"
 
 
-class _Origin:
-    """A shared authoritative origin backed by a fake git for main() runs.
+def _archive_git(*, ledger=None, archive=None, fail=()):
+    """Fake git serving DISTINCT ledger and archive content per path."""
 
-    ``push`` makes the CURRENT checkout's local ledger durable on origin;
-    ``show`` returns it. Rewire per run to that run's local path, so two runs on
-    *different* local paths still share one authoritative remote — a genuine
-    independent-checkout model, not a reopened temp file.
-    """
+    def run(*args):
+        sub = args[0]
+        if sub in fail:
+            return _rc(1)
+        if sub == "diff":
+            return _rc(1)  # something staged -> commit proceeds
+        if sub == "show":
+            ref = args[1]
+            if ref.endswith(_ARCHIVE_REL):
+                return _rc(0, stdout=archive) if archive is not None else _rc(128)
+            return _rc(0, stdout=ledger) if ledger is not None else _rc(128)
+        if sub == "ls-tree":
+            content = archive if args[-1] == _ARCHIVE_REL else ledger
+            return _rc(0, stdout="" if content is None else "100644 blob x\tp\n")
+        return _rc(0)
 
-    def __init__(self):
-        self.content = None  # None == provably absent (genuine first run)
-
-    def git_for(self, local_path, *, fail_terminal_push=False):
-        def run(*args):
-            sub = args[0]
-            if sub == "diff":
-                return _rc(1)  # something staged -> commit proceeds
-            if sub == "show":
-                if self.content is None:
-                    return _rc(128, stderr="bad object")
-                return _rc(0, stdout=self.content)
-            if sub == "ls-tree":
-                return _rc(
-                    0, stdout="" if self.content is None else "100644 blob x\tp\n"
-                )
-            if sub == "push":
-                try:
-                    local = open(local_path, encoding="utf-8").read()
-                except OSError:
-                    return _rc(1)
-                if fail_terminal_push:
-                    posts = json.loads(local).get("posts", {})
-                    if any(
-                        r.get("delivery_state") in ("sent", "failed", "ambiguous")
-                        for r in posts.values()
-                    ):
-                        return _rc(1)  # terminal push fails; remote unchanged
-                self.content = local
-                return _rc(0)
-            return _rc(0)
-
-        return run
+    return run
 
 
-def _wire(monkeypatch, *, local_path, git, posts, outcome="sent",
-          run_id="run-A", run_attempt="1", on_send=None, archive_raises=False):
-    state = {"sent": [], "writes": {}}
+def test_durable_push_capture_ok_only_when_archive_has_all_ids(monkeypatch):
+    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(tdr, "_sleep", lambda s: None)
+    monkeypatch.setattr(
+        tdr, "_git_run",
+        _archive_git(ledger='{"posts":{}}', archive='{"a":1,"b":2}'),
+    )
+    assert tdr.durable_push_capture(["a", "b"], "m") == PUSH_OK
+
+
+def test_durable_push_capture_failed_when_id_missing(monkeypatch):
+    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(tdr, "_sleep", lambda s: None)
+    monkeypatch.setattr(
+        tdr, "_git_run", _archive_git(ledger='{"posts":{}}', archive='{"a":1}')
+    )
+    assert tdr.durable_push_capture(["a", "b"], "m") == PUSH_FAILED
+
+
+def test_durable_push_capture_disabled(monkeypatch):
+    monkeypatch.delenv("TRUMP_DURABLE_STATE", raising=False)
+    assert tdr.durable_push_capture(["a"], "m") == PUSH_DISABLED
+
+
+def test_hydrate_archive_writes_local(monkeypatch, tmp_path):
+    from src.data import trump_truth
+    from src.storage import state_manager
+
+    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(state_manager, "DATA_STORE_DIR", tmp_path)
+    monkeypatch.setattr(tdr, "_git_run", _archive_git(archive='{"a":{"id":"a"}}'))
+    assert tdr.hydrate_archive_from_remote() is True
+    written = json.loads((tmp_path / trump_truth.ARCHIVE_FILE).read_text())
+    assert "a" in written
+
+
+def test_hydrate_archive_malformed_fails_closed(monkeypatch, tmp_path):
+    from src.storage import state_manager
+
+    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(state_manager, "DATA_STORE_DIR", tmp_path)
+    monkeypatch.setattr(tdr, "_git_run", _archive_git(archive="[1,2,3]"))
+    with pytest.raises(StateReadError):
+        tdr.hydrate_archive_from_remote()
+
+
+def test_hydrate_archive_absent_bootstraps(monkeypatch):
+    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
+    monkeypatch.setattr(tdr, "_git_run", _archive_git(archive=None))
+    assert tdr.hydrate_archive_from_remote() is True  # provably absent
+
+
+# --- end-to-end: REAL bare-repo git integration (durable mode) ---------------
+# The prior fake-git E2E missed the dirty-worktree rebase break because it never
+# created the archive file. These use a real bare origin + working clone(s) so a
+# genuinely new archive row must not block the claim rebase, and origin content
+# is asserted directly.
+
+_EMPTY_LEDGER = {"schema_version": 1, "capture_started_at": None, "posts": {}}
+
+
+def _git_cmd(cwd, *args):
+    import subprocess
+
+    r = subprocess.run(
+        ["git", *args], cwd=str(cwd), capture_output=True, text=True
+    )
+    assert r.returncode == 0, f"git {args} failed: {r.stderr}"
+    return r
+
+
+def _clone(origin, dest):
+    _git_cmd(dest.parent, "clone", str(origin), str(dest))
+    _git_cmd(dest, "config", "user.email", "t@t.co")
+    _git_cmd(dest, "config", "user.name", "t")
+    return dest
+
+
+def _setup_origin(tmp_path, *, ledger, archive):
+    origin = tmp_path / "origin.git"
+    work = tmp_path / "work"
+    _git_cmd(tmp_path, "init", "--bare", "-b", "main", str(origin))
+    _clone(origin, work)
+    _git_cmd(work, "symbolic-ref", "HEAD", "refs/heads/main")
+    ds = work / "data_store"
+    ds.mkdir(parents=True, exist_ok=True)
+    (ds / "trump_delivery_state.json").write_text(json.dumps(ledger))
+    (ds / "trump_posts_archive.json").write_text(json.dumps(archive))
+    _git_cmd(work, "add", "-A")
+    _git_cmd(work, "commit", "-m", "seed")
+    _git_cmd(work, "push", "-u", "origin", "main")
+    return origin, work
+
+
+def _origin_file(origin, rel):
+    import subprocess
+
+    r = subprocess.run(
+        ["git", "show", f"main:{rel}"], cwd=str(origin),
+        capture_output=True, text=True,
+    )
+    return json.loads(r.stdout) if r.returncode == 0 else None
+
+
+def _failed_record(post_id, created_at):
+    return {
+        "post_id": post_id,
+        "created_at": created_at,
+        "source": "truth_social_official_api",
+        "delivery_state": "failed",
+        "claimed_at": None,
+        "resolved_at": created_at,
+        "run_id": "old",
+        "workflow_attempt_id": "old:1",
+        "stage_code": "resolved_failed",
+    }
+
+
+def _wire_real(monkeypatch, work, *, posts, outcome="sent", run_id="run-A",
+               run_attempt="1", on_send=None):
+    from pathlib import Path
+
+    from src.data import trump_truth
+    from src.storage import state_manager
+
+    ds = Path(work) / "data_store"
+    monkeypatch.chdir(work)
     monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
     monkeypatch.setenv("GITHUB_RUN_ID", run_id)
     monkeypatch.setenv("GITHUB_RUN_ATTEMPT", run_attempt)
-    monkeypatch.setattr(tdr, "_git_run", git)
-    monkeypatch.setattr(tdr, "_sleep", lambda s: None)
+    monkeypatch.setattr(tdr, "_sleep", lambda s: None)  # _git_run stays REAL
+    monkeypatch.setattr(trump_truth, "DATA_STORE_DIR", ds)
+    monkeypatch.setattr(state_manager, "DATA_STORE_DIR", ds)
     monkeypatch.setattr(
-        run_trump_monitor, "fetch_recent_posts_with_health", lambda: _healthy(posts)
+        run_trump_monitor, "TrumpDeliveryStore",
+        lambda: TrumpDeliveryStore(
+            path=str(ds / "trump_delivery_state.json"), legacy_path=None
+        ),
     )
     monkeypatch.setattr(
-        run_trump_monitor,
-        "TrumpDeliveryStore",
-        lambda: TrumpDeliveryStore(path=local_path, legacy_path=None),
+        run_trump_monitor, "fetch_recent_posts_with_health",
+        lambda: _healthy(posts),
     )
-    if archive_raises:
-        def _raise(_):
-            raise trump_truth.ArchiveError("archive corrupt")
-        monkeypatch.setattr(run_trump_monitor, "archive_posts", _raise)
-    else:
-        monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
     monkeypatch.setattr(run_trump_monitor, "get_default_translator", lambda: None)
+    sent = []
 
     def _send(message, **kwargs):
         if on_send is not None:
             on_send()
-        state["sent"].append((message, kwargs))
+        sent.append(message)
         return {"outcome": outcome, "delivered": 1, "total": 1}
 
     monkeypatch.setattr(run_trump_monitor, "send_telegram_detailed", _send)
     monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
-    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "write_json",
-        lambda f, v: state["writes"].__setitem__(f, v) or True,
-    )
-    return state
+    return sent
 
 
-def _remote_posts(origin):
-    return json.loads(origin.content)["posts"] if origin.content else {}
-
-
-def test_e2e_stale_checkout_after_remote_sent_does_not_resend(monkeypatch):
-    # Run A (checkout A) delivers X; origin records X=sent. Run B is a genuinely
-    # independent checkout (different local path, empty local ledger) that shares
-    # the same origin: it must hydrate origin and NOT resend X.
-    origin = _Origin()
-    post = _post("X", "tariff news")
-
-    path_a = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    st_a = _wire(monkeypatch, local_path=path_a, git=origin.git_for(path_a),
-                 posts=[post], run_id="run-A")
-    assert run_trump_monitor.main() == 0
-    assert [m for m, _ in st_a["sent"]]  # A delivered
-    assert _remote_posts(origin)["X"]["delivery_state"] == "sent"
-
-    path_b = os.path.join(tempfile.mkdtemp(), "ledger.json")  # separate checkout
-    assert not os.path.exists(path_b)
-    st_b = _wire(monkeypatch, local_path=path_b, git=origin.git_for(path_b),
-                 posts=[post], run_id="run-B")
-    assert run_trump_monitor.main() == 0
-    assert st_b["sent"] == []  # hydrated origin; never resent
-
-
-def test_e2e_stale_checkout_preserves_foreign_claim_and_stays_red(monkeypatch):
-    # Origin holds a FOREIGN unresolved claim for X (another attempt, possibly
-    # still completing). A stale independent checkout must NOT steal, overwrite,
-    # convert, or resend it; it stays red on the unresolved backlog and the
-    # foreign record is preserved exactly on origin.
-    origin = _Origin()
-    origin.content = _ledger_json({
-        "X": {
-            "post_id": "X", "delivery_state": "claimed",
-            "workflow_attempt_id": "run-OTHER:1", "created_at": None,
-            "source": None, "claimed_at": "t", "resolved_at": None,
-            "run_id": "run-OTHER", "stage_code": "claimed_before_send",
-        }
-    })
-    post = _post("X")
-    path = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    st = _wire(monkeypatch, local_path=path, git=origin.git_for(path),
-               posts=[post], run_id="run-MINE")
-    assert run_trump_monitor.main() == 1  # red, no send
-    assert st["sent"] == []
-    health = st["writes"]["trump_monitor_health.json"]
-    assert health["delivery_status"] == "unresolved_delivery_backlog"
-    rec = _remote_posts(origin)["X"]
-    assert rec["delivery_state"] == "claimed"  # preserved, never converted
-    assert rec["workflow_attempt_id"] == "run-OTHER:1"  # preserved exactly
-
-
-def test_e2e_claim_before_send_is_durable_on_origin(monkeypatch):
-    # At the moment Telegram is called, origin must already carry our claim: the
-    # claim is remote-verified BEFORE the non-idempotent send.
-    origin = _Origin()
-    post = _post("X")
-    path = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    seen_at_send = {}
+def test_real_new_post_durable_delivery_and_archive_before_send(
+    monkeypatch, tmp_path
+):
+    # A genuinely new archive row must NOT block the claim rebase (if it did, the
+    # claim would be non-durable -> red/no-send), and origin must already hold
+    # the archived post at the moment Telegram is called.
+    origin, work = _setup_origin(tmp_path, ledger=_EMPTY_LEDGER, archive={})
+    seen = {}
 
     def _on_send():
-        seen_at_send["state"] = (
-            _remote_posts(origin).get("X", {}).get("delivery_state")
-        )
+        seen["archived"] = "X" in (_origin_file(origin, _ARCHIVE_REL) or {})
 
-    _wire(monkeypatch, local_path=path, git=origin.git_for(path),
-          posts=[post], run_id="run-A", on_send=_on_send)
+    sent = _wire_real(monkeypatch, work, posts=[_post("X")], on_send=_on_send)
+
     assert run_trump_monitor.main() == 0
-    assert seen_at_send["state"] == "claimed"  # claim durable before send
-    assert _remote_posts(origin)["X"]["delivery_state"] == "sent"
+    assert sent  # delivered: the dirty archive did NOT block claim persistence
+    assert seen["archived"] is True  # archive durable on origin BEFORE the send
+    assert _origin_file(origin, _STATE_REL)["posts"]["X"]["delivery_state"] == "sent"
+    assert "X" in _origin_file(origin, _ARCHIVE_REL)
 
 
-def test_e2e_terminal_push_failure_after_send_is_red(monkeypatch):
-    # The send happens but its terminal result cannot be verified on origin: the
-    # run must be red so the next run does not misread a delivered post.
-    origin = _Origin()
-    post = _post("X")
-    path = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    st = _wire(
-        monkeypatch, local_path=path,
-        git=origin.git_for(path, fail_terminal_push=True), posts=[post],
+def test_real_crash_before_trailing_commit_keeps_archive_and_no_resend(
+    monkeypatch, tmp_path
+):
+    # main() pushes ledger+archive durably during the run; a crash BEFORE the
+    # trailing commit-state therefore loses neither. A fresh independent checkout
+    # must find origin 'sent' + archived and never resend.
+    origin, work = _setup_origin(tmp_path, ledger=_EMPTY_LEDGER, archive={})
+    sent1 = _wire_real(monkeypatch, work, posts=[_post("X")])
+    assert run_trump_monitor.main() == 0
+    assert sent1
+    assert _origin_file(origin, _STATE_REL)["posts"]["X"]["delivery_state"] == "sent"
+    assert "X" in _origin_file(origin, _ARCHIVE_REL)
+
+    work2 = _clone(origin, tmp_path / "work2")
+    sent2 = _wire_real(monkeypatch, work2, posts=[_post("X")], run_id="run-B")
+    assert run_trump_monitor.main() == 0
+    assert sent2 == []  # already sent on origin — no resend
+    assert "X" in _origin_file(origin, _ARCHIVE_REL)  # archive preserved
+
+
+def test_real_failed_absent_from_source_retried_from_archive(monkeypatch, tmp_path):
+    # A definitively-failed post that aged OUT of the live source is rebuilt from
+    # the authoritative archive, retried, and transitions to remote 'sent'.
+    created = "2020-01-02T00:00:00+00:00"
+    ledger = {
+        "schema_version": 1,
+        "capture_started_at": "2020-01-01T00:00:00+00:00",
+        "posts": {"X": _failed_record("X", created)},
+    }
+    origin, work = _setup_origin(
+        tmp_path, ledger=ledger, archive={"X": _post("X")}
     )
-    assert run_trump_monitor.main() == 1
-    assert len(st["sent"]) >= 1  # it DID send
-    health = st["writes"]["trump_monitor_health.json"]
-    assert health["delivery_status"] == "delivery_blocked_not_durable"
+    sent = _wire_real(monkeypatch, work, posts=[])  # X NOT in the live source
+    assert run_trump_monitor.main() == 0
+    assert sent  # retried from archive and delivered
+    assert _origin_file(origin, _STATE_REL)["posts"]["X"]["delivery_state"] == "sent"
 
 
-def test_e2e_backlog_only_run_stays_red_and_sends_nothing(monkeypatch):
-    # Origin already holds an ambiguous record and there is no new post: the run
-    # must stay red (unresolved backlog) and send nothing.
-    origin = _Origin()
-    origin.content = _ledger_json({
-        "old": {"post_id": "old", "delivery_state": "ambiguous",
-                "workflow_attempt_id": "run-Z:1", "created_at": None,
-                "source": None, "claimed_at": None, "resolved_at": "t",
-                "run_id": "run-Z", "stage_code": "resolved_ambiguous"}
-    })
-    path = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    st = _wire(monkeypatch, local_path=path, git=origin.git_for(path), posts=[])
-    assert run_trump_monitor.main() == 1
-    assert st["sent"] == []
-    health = st["writes"]["trump_monitor_health.json"]
-    assert health["delivery_status"] == "unresolved_delivery_backlog"
-
-
-def test_e2e_archive_failure_prevents_any_send(monkeypatch):
-    origin = _Origin()
-    post = _post("X")
-    path = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    st = _wire(monkeypatch, local_path=path, git=origin.git_for(path),
-               posts=[post], archive_raises=True)
-    assert run_trump_monitor.main() == 1
-    assert st["sent"] == []  # never sent when the post could not be archived
-    health = st["writes"]["trump_monitor_health.json"]
-    assert health["delivery_status"] == "archive_unavailable_fail_closed"
-    assert _remote_posts(origin) == {}  # nothing claimed/sent on origin
-
-
-def test_e2e_corrupt_legacy_bootstrap_fails_closed(monkeypatch):
-    # Ledger absent on origin (first run) but the committed legacy seen file is
-    # corrupt: bootstrapping an empty ledger would re-blast. Fail closed.
-    origin = _Origin()  # content None -> provably absent
-    legacy_path = os.path.join(tempfile.mkdtemp(), "trump_seen_posts.json")
-    with open(legacy_path, "w", encoding="utf-8") as fh:
-        fh.write("{ not valid json ")
-    ledger_path = os.path.join(tempfile.mkdtemp(), "ledger.json")
-    post = _post("X")
-
-    monkeypatch.setenv("TRUMP_DURABLE_STATE", "1")
-    monkeypatch.setenv("GITHUB_RUN_ID", "run-A")
-    monkeypatch.setenv("GITHUB_RUN_ATTEMPT", "1")
-    monkeypatch.setattr(tdr, "_git_run", origin.git_for(ledger_path))
-    monkeypatch.setattr(tdr, "_sleep", lambda s: None)
-    monkeypatch.setattr(
-        run_trump_monitor, "fetch_recent_posts_with_health", lambda: _healthy([post])
-    )
-    monkeypatch.setattr(
-        run_trump_monitor,
-        "TrumpDeliveryStore",
-        lambda: TrumpDeliveryStore(path=ledger_path, legacy_path=legacy_path),
-    )
-    monkeypatch.setattr(run_trump_monitor, "archive_posts", lambda v: len(v))
-    monkeypatch.setattr(run_trump_monitor, "get_default_translator", lambda: None)
-    sent = []
-    monkeypatch.setattr(
-        run_trump_monitor, "send_telegram_detailed",
-        lambda m, **k: sent.append(m) or {"outcome": "sent"},
-    )
-    monkeypatch.setattr(run_trump_monitor, "send_telegram", lambda *a, **k: True)
-    writes = {}
-    monkeypatch.setattr(run_trump_monitor, "read_json", lambda *a, **k: {})
-    monkeypatch.setattr(
-        run_trump_monitor, "write_json",
-        lambda f, v: writes.__setitem__(f, v) or True,
-    )
-
+def test_real_failed_missing_archive_is_red_no_send(monkeypatch, tmp_path):
+    # A failed record whose archived payload is missing must fail closed: red, no
+    # send, and the failure preserved (never a silent green miss).
+    ledger = {
+        "schema_version": 1,
+        "capture_started_at": "2020-01-01T00:00:00+00:00",
+        "posts": {"X": _failed_record("X", "2020-01-02T00:00:00+00:00")},
+    }
+    origin, work = _setup_origin(tmp_path, ledger=ledger, archive={})  # X absent
+    sent = _wire_real(monkeypatch, work, posts=[])
     assert run_trump_monitor.main() == 1
     assert sent == []
-    assert writes["trump_monitor_health.json"]["delivery_status"] == (
-        "state_unreadable_fail_closed"
+    assert _origin_file(origin, _STATE_REL)["posts"]["X"]["delivery_state"] == "failed"
+
+
+def test_real_stale_checkout_after_sent_does_not_resend(monkeypatch, tmp_path):
+    # origin already holds X sent + archived; an independent checkout that still
+    # sees X in the live source must hydrate origin and never resend.
+    ledger = {
+        "schema_version": 1,
+        "capture_started_at": None,
+        "posts": {
+            "X": {
+                "post_id": "X", "delivery_state": "sent",
+                "workflow_attempt_id": "old:1", "created_at": None,
+                "source": None, "claimed_at": None,
+                "resolved_at": "t", "run_id": "old",
+                "stage_code": "resolved_sent",
+            }
+        },
+    }
+    origin, work = _setup_origin(
+        tmp_path, ledger=ledger, archive={"X": _post("X")}
     )
+    sent = _wire_real(monkeypatch, work, posts=[_post("X")])
+    assert run_trump_monitor.main() == 0
+    assert sent == []  # hydrated origin sent record; no resend

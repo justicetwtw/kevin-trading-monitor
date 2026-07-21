@@ -31,6 +31,7 @@ from src.data.trump_truth import (
     ArchiveError,
     archive_posts,
     fetch_recent_posts_with_health,
+    get_archived_posts,
 )
 from src.storage.state_manager import read_json, write_json
 from src.storage.trump_delivery_remote import (
@@ -38,17 +39,24 @@ from src.storage.trump_delivery_remote import (
     PUSH_CONFLICT_SENT,
     PUSH_FAILED,
     durable_push,
+    durable_push_capture,
+    hydrate_archive_from_remote,
     hydrate_from_remote,
 )
 from src.storage.trump_delivery_state import (
     DELIVERY_AMBIGUOUS,
     DELIVERY_CLAIMED,
+    DELIVERY_FAILED,
     DO_PROCEED,
     DO_RETRY,
     StateReadError,
     TrumpDeliveryStore,
     resolve_delivery_action,
 )
+
+# Bounded retry-from-archive work per run: a large failed backlog is retried a
+# chunk at a time (oldest first) so no single run is unbounded.
+MAX_ARCHIVE_RETRY_PER_RUN = 50
 
 HEALTH_FILE = "trump_monitor_health.json"
 MAX_TELEGRAM_CHARS = 3600
@@ -605,6 +613,54 @@ def _deliver_durably(
     return outcome
 
 
+def _archive_retry_candidates(
+    store: TrumpDeliveryStore,
+    eligible: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Rebuild delivery candidates for durable ``failed`` posts.
+
+    A ``failed`` post still present in the live-source window is retried via the
+    normal eligible/``DO_RETRY`` path; only ``failed`` posts that have aged OUT
+    of the bounded source window are recovered here from the authoritative
+    archive (bounded, oldest first), so a definitive failure is never silently
+    lost once it leaves the source. Returns ``(retry_posts, missing_ids)`` where
+    ``missing_ids`` are ``failed`` records whose archived payload cannot be
+    recovered — the caller keeps the run red (fail closed), never green.
+
+    ``get_archived_posts`` fails closed (raises ``ArchiveError``) on a
+    corrupt-present archive.
+    """
+    failed_ids = store.ids_in_state(DELIVERY_FAILED)
+    if not failed_ids:
+        return [], []
+    eligible_ids = {str(post.get("id") or "") for post in eligible}
+    absent = [pid for pid in failed_ids if pid not in eligible_ids][
+        :MAX_ARCHIVE_RETRY_PER_RUN
+    ]
+    if not absent:
+        return [], []
+    archived = get_archived_posts(absent)
+    retry_posts = [archived[pid] for pid in absent if pid in archived]
+    missing_ids = [pid for pid in absent if pid not in archived]
+    return retry_posts, missing_ids
+
+
+def _dedupe_ordered(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """De-duplicate by post id, keeping the first, then sort chronologically."""
+    seen: set[str] = set()
+    unique: list[dict[str, Any]] = []
+    for post in posts:
+        post_id = str(post.get("id") or "")
+        if post_id and post_id not in seen:
+            seen.add(post_id)
+            unique.append(post)
+    return sorted(
+        unique,
+        key=lambda item: _parse_time(item.get("created_at"))
+        or datetime.min.replace(tzinfo=timezone.utc),
+    )
+
+
 def main() -> int:
     logger.info("=== run_trump_monitor start: all-post capture mode ===")
     previous = read_json(HEALTH_FILE, default={})
@@ -682,19 +738,45 @@ def main() -> int:
             if resolve_delivery_action(store.get(str(post.get("id") or "")))
             in (DO_PROCEED, DO_RETRY)
         ]
+        # Hydrate origin's authoritative archive too (so a stale checkout never
+        # over-writes it and the capture push rebases cleanly), then rebuild
+        # delivery candidates for durable 'failed' posts that have aged OUT of
+        # the bounded live-source window — a definitive failure is retried from
+        # the archive, never silently lost once it leaves the source.
+        hydrate_archive_from_remote()
+        retry_posts, missing_failed = _archive_retry_candidates(store, eligible)
     except StateReadError as exc:
         logger.error(
-            f"Trump delivery ledger unreadable; failing closed: {type(exc).__name__}"
+            f"Trump delivery/archive state unreadable; failing closed: "
+            f"{type(exc).__name__}"
         )
         _fail_closed_health("state_unreadable_fail_closed")
         return 1
+    except ArchiveError as exc:
+        logger.error(
+            f"Trump archive fail-closed rebuilding retries ({type(exc).__name__})"
+        )
+        _fail_closed_health("archive_unavailable_fail_closed")
+        return 1
 
-    if not new_posts:
+    deliver_posts = _dedupe_ordered(new_posts + retry_posts)
+
+    def _backlog_open() -> tuple[dict[str, int], int]:
+        counts = store.unresolved_backlog()
+        # 'failed' now keeps the workflow red until it becomes 'sent' or is
+        # operator-cleared; a failed record whose archived payload is missing is
+        # also unresolved (fail closed rather than green).
+        total = (
+            counts[DELIVERY_CLAIMED]
+            + counts[DELIVERY_AMBIGUOUS]
+            + counts[DELIVERY_FAILED]
+            + len(missing_failed)
+        )
+        return counts, total
+
+    if not deliver_posts:
         _, translation_health = _build_translations([], translator)
-        backlog = store.unresolved_backlog()
-        backlog_open = backlog[DELIVERY_CLAIMED] + backlog[DELIVERY_AMBIGUOUS]
-        # An unresolved claimed/ambiguous backlog must keep the workflow RED even
-        # when no new source post arrived: "nothing new" is not "delivery clean".
+        backlog, backlog_open = _backlog_open()
         status = "unresolved_delivery_backlog" if backlog_open else "no_new_posts"
         _write_health(
             result,
@@ -709,22 +791,25 @@ def main() -> int:
             translation_health=translation_health,
             delivery_health={
                 "delivery_unresolved_backlog_count": backlog_open,
+                "delivery_failed_backlog_count": backlog[DELIVERY_FAILED],
+                "delivery_archive_missing_failed_count": len(missing_failed),
                 "delivery_ledger_counts": store.health_counts(),
             },
         )
         if backlog_open:
             logger.error(
                 f"Trump delivery backlog unresolved: {backlog_open} "
-                "claimed/ambiguous record(s); workflow red until cleared"
+                "claimed/ambiguous/failed record(s); workflow red until cleared"
             )
             return 1
         logger.info("=== run_trump_monitor done: healthy, no new posts ===")
         return 0
 
-    # Capture the original posts BEFORE translate/claim/send, and fail closed if
-    # the archive cannot be durably written: a delivered-but-unarchived post is
-    # lost to capture forever. Corrupt-present archive or write failure => red,
-    # no send, no 'sent' ledger transition.
+    # Capture the NEW posts, then make the archive durable and remote-verified
+    # BEFORE any claim/send, so a remote 'sent' record can never exist without
+    # the post already in the authoritative archive. Retry posts are already
+    # archived (they were recovered from it). Corrupt-present archive or write
+    # failure => red, no send.
     try:
         archived_count = archive_posts(new_posts)
     except ArchiveError as exc:
@@ -747,16 +832,35 @@ def main() -> int:
         )
         return 1
 
-    translations, translation_health = _build_translations(new_posts, translator)
+    deliver_ids = [str(post.get("id") or "") for post in deliver_posts]
+    if (
+        durable_push_capture(deliver_ids, "state: trump archive capture [skip ci]")
+        == PUSH_FAILED
+    ):
+        # The archive is not durably on origin; sending now could deliver a post
+        # a crash would leave unarchived. Fail closed (retryable next run).
+        logger.error("Trump archive not durable on origin; not sending (retryable)")
+        _, translation_health = _build_translations([], translator)
+        _write_health(
+            result,
+            capture_started_at=capture_started_at,
+            eligible_count=len(eligible),
+            timestamp_missing_count=timestamp_missing,
+            new_count=len(new_posts),
+            archived_count=archived_count,
+            delivered_count=0,
+            delivery_status="archive_not_durable_fail_closed",
+            last_notice_at=previous.get("last_unavailable_notice_at"),
+            translation_health=translation_health,
+            delivery_health={"delivery_ledger_counts": store.health_counts()},
+        )
+        return 1
 
-    ordered = sorted(
-        new_posts,
-        key=lambda item: _parse_time(item.get("created_at"))
-        or datetime.min.replace(tzinfo=timezone.utc),
-    )
+    translations, translation_health = _build_translations(deliver_posts, translator)
+
     delivered_count = ambiguous_count = failed_count = 0
     blocked_count = 0  # foreign-claim / undurable-claim / unreadable / persist-fail
-    for post in ordered:
+    for post in deliver_posts:
         # Each post is claimed durably (remote-verified in durable mode) BEFORE
         # its non-idempotent send, and its terminal result is remote-verified
         # after. A stale/raced/re-run checkout can never resend a delivered post.
@@ -780,15 +884,14 @@ def main() -> int:
             # state_persist_failed: a non-durable, no-send condition kept red.
             blocked_count += 1
 
-    backlog = store.unresolved_backlog()
-    backlog_open = backlog[DELIVERY_CLAIMED] + backlog[DELIVERY_AMBIGUOUS]
-    red = bool(failed_count or ambiguous_count or blocked_count or backlog_open)
-    if ambiguous_count or backlog_open:
+    backlog, backlog_open = _backlog_open()
+    red = bool(blocked_count or backlog_open)
+    if backlog[DELIVERY_CLAIMED] or backlog[DELIVERY_AMBIGUOUS]:
         delivery_status = "delivery_ambiguous"
     elif blocked_count:
         delivery_status = "delivery_blocked_not_durable"
-    elif failed_count:
-        delivery_status = "delivery_failed_partial"
+    elif backlog[DELIVERY_FAILED] or missing_failed:
+        delivery_status = "delivery_failed_backlog"
     else:
         delivery_status = "delivered_all"
     _write_health(
@@ -806,7 +909,10 @@ def main() -> int:
             "delivery_ambiguous_count": ambiguous_count,
             "delivery_failed_count": failed_count,
             "delivery_blocked_count": blocked_count,
+            "delivery_retried_from_archive_count": len(retry_posts),
             "delivery_unresolved_backlog_count": backlog_open,
+            "delivery_failed_backlog_count": backlog[DELIVERY_FAILED],
+            "delivery_archive_missing_failed_count": len(missing_failed),
             "delivery_requires_all_recipients": True,
             "delivery_ledger_counts": store.health_counts(),
         },
@@ -814,14 +920,14 @@ def main() -> int:
 
     if red:
         logger.error(
-            f"Trump delivery incomplete: {failed_count} failed (retry), "
+            f"Trump delivery incomplete: {failed_count} failed, "
             f"{ambiguous_count} ambiguous, {blocked_count} blocked, "
             f"{backlog_open} unresolved backlog"
         )
         return 1
 
     logger.info(
-        f"=== run_trump_monitor done: {len(new_posts)} captured, "
+        f"=== run_trump_monitor done: {len(deliver_posts)} to deliver, "
         f"{delivered_count} delivered ==="
     )
     return 0

@@ -1,31 +1,42 @@
-"""Authoritative-remote durability for the Trump delivery ledger.
+"""Authoritative-remote durability for the Trump delivery ledger and archive.
 
 Mirrors the merged ``us_open`` remote-state hardening, isolated to the Trump
-ledger's per-post semantics:
+per-post semantics:
 
 - Before any non-idempotent Telegram send the runner **hydrates** the local
-  ledger from ``origin/main`` — a stale event checkout (a queued scheduled run
-  or a GitHub re-run started from a SHA predating the previous run's state
-  commit) can otherwise show a post as unseen and re-blast it.
+  ledger AND the rolling archive from ``origin/main`` — a stale event checkout (a
+  queued scheduled run or a GitHub re-run started from a SHA predating the
+  previous run's state commit) can otherwise show a post as unseen and re-blast
+  it, or clobber origin's archive with an older copy.
+- New archive rows are committed + pushed + **verified on origin BEFORE any
+  per-post claim/send** (``durable_push_capture``), so a remote ``sent`` record
+  can never exist without the corresponding post already durable in the
+  authoritative archive.
 - Each per-post ``claimed`` / terminal transition is committed, pushed, and then
   **verified on origin** (compare-and-set on ``post_id`` + unique
-  ``workflow_attempt_id``) BEFORE the outbound send is trusted as durable.
-- Every remote payload is read through the shared fail-closed
-  ``TrumpDeliveryStore.parse_state``; a malformed authoritative ledger maps to a
-  controlled red / no-send, never a silent empty base or an uncaught throw.
+  ``workflow_attempt_id``) before the outbound send is trusted as durable.
+- Every push stages the whole ``data_store/`` directory, so an unstaged archive
+  change can never leave the working tree dirty and abort the ledger
+  ``git pull --rebase`` (which refuses on unstaged changes).
+- Every remote payload is read through the shared fail-closed validators; a
+  malformed authoritative ledger/archive maps to a controlled red / no-send,
+  never a silent empty base or an uncaught throw.
 
 Durable mode is gated by ``TRUMP_DURABLE_STATE=1`` (set only in the workflow).
 Off locally and in tests, hydration is a no-op and pushes report ``disabled`` so
 the runner relies on the trailing ``commit-state`` action exactly as before — no
 git side effects in unit tests.
 
-The pushed file only ever contains post IDs, states, timestamps, source names
-and generic stage codes — never post text, translation text, chat IDs or tokens.
+The ledger only ever contains post IDs, states, timestamps, source names and
+generic stage codes — never translation text, chat IDs or tokens. The archive
+holds the captured public post payloads (as it always has).
 """
 
 from __future__ import annotations
 
+import json
 import os
+from collections.abc import Iterable
 
 from loguru import logger
 
@@ -47,11 +58,13 @@ PUSH_CONFLICT_CLAIM = "conflict_claim"  # another attempt holds an unresolved cl
 _ENABLE_ENV = "TRUMP_DURABLE_STATE"
 _BRANCH_ENV = "TRUMP_STATE_BRANCH"
 
-# Path AS TRACKED IN THE REPO (repo-root-relative). ``git show <ref>:<path>`` and
-# ``git ls-tree <ref> -- <path>`` require the repo-relative path, not the store's
-# absolute local path. Durable mode only runs in CI, where the working directory
-# is the repo root and this resolves to the same file the store reads/writes.
+# Paths AS TRACKED IN THE REPO (repo-root-relative). ``git show <ref>:<path>`` and
+# ``git ls-tree <ref> -- <path>`` require repo-relative paths, not the store's
+# absolute local path. Durable mode only runs where the working directory is the
+# repo root, so these resolve to the same files the store/archive read and write.
 _STATE_REL = "data_store/trump_delivery_state.json"
+_ARCHIVE_REL = "data_store/trump_posts_archive.json"
+_DATA_STORE_REL = "data_store"
 
 
 def durable_enabled() -> bool:
@@ -63,7 +76,7 @@ def _branch() -> str:
 
 
 def _git_run(*args):
-    """Run one git subprocess (CI-only; patched in tests)."""
+    """Run one git subprocess (CI-only; patched in unit tests)."""
     import subprocess
 
     return subprocess.run(
@@ -77,8 +90,11 @@ def _sleep(seconds: float) -> None:
     time.sleep(seconds)
 
 
+# -- ledger helpers ----------------------------------------------------------
+
+
 def _remote_record(content: str, post_id: str) -> dict | None:
-    """Look up one post's record in remote state via the SHARED fail-closed
+    """Look up one post's record in remote ledger via the SHARED fail-closed
     validator, so hydration, the claim CAS and post-push verification all
     interpret origin identically. Raises ``StateReadError`` on a malformed
     payload; returns ``None`` only when the state is valid but has no such post.
@@ -95,8 +111,7 @@ def _remote_state_has(content: str, expected: dict) -> bool:
 
     Identity is matched on ``workflow_attempt_id`` (run id + run attempt), not
     the reused ``run_id``, so a re-run cannot verify a prior attempt's record.
-    Raises ``StateReadError`` on a malformed remote payload (an unverifiable
-    remote is treated as not-yet-durable by the caller).
+    Raises ``StateReadError`` on a malformed remote payload.
     """
     record = _remote_record(content, expected["post_id"])
     if record is None:
@@ -108,12 +123,12 @@ def _remote_state_has(content: str, expected: dict) -> bool:
 
 
 def _remote_conflict_kind(content: str, expected: dict) -> str | None:
-    """Classify a compare-and-set conflict against origin's validated state.
+    """Classify a compare-and-set conflict against origin's validated ledger.
 
     ``PUSH_CONFLICT_SENT`` if origin already shows this post delivered (by any
     attempt); ``PUSH_CONFLICT_CLAIM`` if a *different* attempt holds an
-    unresolved ``claimed``/``ambiguous`` record; else ``None`` (no record, or our
-    own attempt's record). Raises ``StateReadError`` on a malformed remote.
+    unresolved ``claimed``/``ambiguous`` record; else ``None``. Raises
+    ``StateReadError`` on a malformed remote.
     """
     record = _remote_record(content, expected["post_id"])
     if record is None:
@@ -127,28 +142,67 @@ def _remote_conflict_kind(content: str, expected: dict) -> str | None:
     return None
 
 
-def _remote_path_absent(branch: str) -> bool:
-    """True only if the ledger is PROVABLY absent from ``origin/<branch>``.
+# -- archive helpers ---------------------------------------------------------
+
+
+def _parse_archive(content: str, *, origin: str) -> dict:
+    """Parse + validate a remote archive payload (fail closed)."""
+    try:
+        data = json.loads(content)
+    except (json.JSONDecodeError, ValueError, TypeError) as exc:
+        raise StateReadError(
+            f"{origin} archive is unreadable: {type(exc).__name__}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise StateReadError(f"{origin} archive is not a JSON object")
+    return data
+
+
+def _remote_archive_has(content: str, post_ids: Iterable[str]) -> bool:
+    """True iff origin's archive contains every required post id.
+
+    A malformed remote archive here cannot prove durability, so it is treated as
+    not-yet-durable (retry / fail), never an uncaught throw.
+    """
+    try:
+        data = _parse_archive(content, origin="origin/main")
+    except StateReadError:
+        return False
+    return all(str(pid) in data for pid in post_ids)
+
+
+def _write_local_archive(content: str) -> None:
+    """Validate origin's archive and atomically make it the local base."""
+    from src.data.trump_truth import ARCHIVE_FILE
+    from src.storage import state_manager
+
+    data = _parse_archive(content, origin="origin/main")
+    if not state_manager.write_json(ARCHIVE_FILE, data):
+        raise StateReadError("failed to persist hydrated archive locally")
+
+
+# -- absence / hydration -----------------------------------------------------
+
+
+def _remote_path_absent(path: str, branch: str) -> bool:
+    """True only if ``path`` is PROVABLY absent from ``origin/<branch>``.
 
     ``git ls-tree`` exits 0 with empty output only when the path does not exist
     in the tree; any non-zero result, or a listed entry, is NOT proof of absence.
     A genuine first-ever run can bootstrap, while a transient/unreadable object
-    (which must fail closed) is never mistaken for "no ledger yet".
+    (which must fail closed) is never mistaken for "no file yet".
     """
-    result = _git_run("ls-tree", f"origin/{branch}", "--", _STATE_REL)
+    result = _git_run("ls-tree", f"origin/{branch}", "--", path)
     return result.returncode == 0 and not (result.stdout or "").strip()
 
 
 def hydrate_from_remote(store: TrumpDeliveryStore) -> bool:
     """Replace the local ledger with origin's authoritative version.
 
-    No-op (returns ``False``) when durable mode is off. Otherwise fetches origin,
-    reads ``origin/<branch>:<ledger>`` and validates it with the shared
-    fail-closed rules. Fails closed (``StateReadError``) if origin cannot be
-    fetched, if the object cannot be read while the path is not PROVABLY absent
-    (a transient/unreadable object must never be read as "first run ever"), or if
-    the remote state is malformed. Only a verified-absent path bootstraps a
-    genuine first run.
+    No-op (``False``) when durable mode is off. Fails closed (``StateReadError``)
+    if origin cannot be fetched, if the object is unreadable while the path is not
+    PROVABLY absent, or if the remote state is malformed. Only a verified-absent
+    path bootstraps a genuine first run.
     """
     if not durable_enabled():
         return False
@@ -159,7 +213,7 @@ def hydrate_from_remote(store: TrumpDeliveryStore) -> bool:
     if show.returncode == 0:
         store.hydrate_from(show.stdout or "")
         return True
-    if _remote_path_absent(branch):
+    if _remote_path_absent(_STATE_REL, branch):
         return True
     raise StateReadError(
         "authoritative remote ledger could not be read (path present but "
@@ -167,35 +221,45 @@ def hydrate_from_remote(store: TrumpDeliveryStore) -> bool:
     )
 
 
-def durable_push(
-    store: TrumpDeliveryStore,
-    message: str,
-    *,
-    expected: dict,
-    block_foreign_claim: bool = False,
-) -> str:
-    """Commit + push the ledger and VERIFY the record on origin before OK.
+def hydrate_archive_from_remote() -> bool:
+    """Replace the local rolling archive with origin's authoritative version.
 
-    ``expected`` = {post_id, delivery_state, workflow_attempt_id}. Returns
-    ``PUSH_OK`` only after re-fetching origin and confirming its ledger has a
-    record for this post with OUR ``delivery_state`` and ``workflow_attempt_id``;
-    an ``Everything up-to-date`` push without a matching remote record is
-    ``PUSH_FAILED``.
-
-    When ``block_foreign_claim`` is set (the initial claim): a remote ``sent``
-    returns ``PUSH_CONFLICT_SENT`` and a *foreign* ``claimed``/``ambiguous``
-    returns ``PUSH_CONFLICT_CLAIM``, so a re-run never steals a prior attempt's
-    post; and if the pre-claim remote cannot be read AND the path is not provably
-    absent, the attempt does not add/commit/pull/push on a stale base. Every git
-    step is checked; the local commit is reconciled with a freshly-fetched origin
-    on EVERY retry so a benign non-fast-forward race can recover; a rebase
-    conflict aborts cleanly and fails. Malformed authoritative state fails closed.
+    So a stale checkout never re-writes an older archive over origin's (which
+    would drop recently-captured rows) and the pre-send capture push rebases
+    cleanly. Same fail-closed rules as the ledger hydration.
     """
     if not durable_enabled():
-        return PUSH_DISABLED
-
+        return False
     branch = _branch()
-    path = _STATE_REL
+    if _git_run("fetch", "origin", branch).returncode != 0:
+        raise StateReadError("cannot fetch origin to hydrate authoritative archive")
+    show = _git_run("show", f"origin/{branch}:{_ARCHIVE_REL}")
+    if show.returncode == 0:
+        _write_local_archive(show.stdout or "")
+        return True
+    if _remote_path_absent(_ARCHIVE_REL, branch):
+        return True  # no archive on origin yet (genuine first run)
+    raise StateReadError(
+        "authoritative remote archive could not be read (path present but "
+        "unreadable); failing closed"
+    )
+
+
+# -- shared commit / push / verify core --------------------------------------
+
+
+def _commit_push_verify(message, *, verify, cas=None) -> str:
+    """Stage the whole ``data_store/``, commit, rebase, push, verify on origin.
+
+    Staging the whole directory (not just the ledger) keeps the working tree
+    clean before ``git pull --rebase`` — an unstaged archive change would
+    otherwise abort the rebase — and pushes the ledger and archive in one
+    transaction. ``verify(branch) -> bool`` proves durability from origin's
+    CONTENT (raising ``StateReadError`` => not durable). ``cas(ledger_content)``,
+    when given, guards the initial claim: it returns a conflict outcome, ``None``
+    to proceed, or raises ``StateReadError`` to fail closed.
+    """
+    branch = _branch()
 
     def _ok(*args) -> bool:
         return _git_run(*args).returncode == 0
@@ -210,11 +274,11 @@ def durable_push(
             _sleep((attempt - 1) * 2)
         if not _ok("fetch", "origin", branch):
             continue
-        if block_foreign_claim:
-            pre = _git_run("show", f"origin/{branch}:{path}")
+        if cas is not None:
+            pre = _git_run("show", f"origin/{branch}:{_STATE_REL}")
             if pre.returncode == 0:
                 try:
-                    conflict = _remote_conflict_kind(pre.stdout or "", expected)
+                    conflict = cas(pre.stdout or "")
                 except StateReadError:
                     logger.error(
                         "trump CAS pre-read: authoritative remote ledger is "
@@ -223,19 +287,19 @@ def durable_push(
                     return PUSH_FAILED
                 if conflict is not None:
                     return conflict
-            elif not _remote_path_absent(branch):
+            elif not _remote_path_absent(_STATE_REL, branch):
                 # Cannot read the pre-claim remote and the path is not provably
                 # absent: do NOT add/commit/pull/push on a stale base.
                 continue
-        if not _ok("add", path):
-            continue
+        # Stage the whole data_store dir so nothing (esp. the archive) is left
+        # unstaged to abort the rebase. Missing files under the dir are fine.
+        _git_run("add", "--", _DATA_STORE_REL)
         staged_empty = _git_run("diff", "--cached", "--quiet").returncode == 0
         if not staged_empty:
             if not _ok("commit", "-m", message):
                 continue
-        # ALWAYS reconcile the (possibly already-committed on a prior retry) local
-        # ledger with the freshly-fetched origin before pushing, even when this
-        # retry's index is clean. Abort cleanly on conflict.
+        # ALWAYS reconcile with the freshly-fetched origin before pushing (even a
+        # clean index on a retry) so a benign non-fast-forward race recovers.
         if not _ok("pull", "--rebase", "origin", branch):
             _git_run("rebase", "--abort")
             continue
@@ -243,13 +307,62 @@ def durable_push(
         # Proof of durability is the REMOTE CONTENT, not the push exit code.
         if not _ok("fetch", "origin", branch):
             continue
-        show = _git_run("show", f"origin/{branch}:{path}")
-        if show.returncode == 0:
-            try:
-                verified = _remote_state_has(show.stdout or "", expected)
-            except StateReadError:
-                verified = False
-            if verified:
+        try:
+            if verify(branch):
                 return PUSH_OK
-    logger.error("trump durable push could not verify the record on origin")
+        except StateReadError:
+            pass
+    logger.error("trump durable push could not verify on origin")
     return PUSH_FAILED
+
+
+def durable_push(
+    store: TrumpDeliveryStore,
+    message: str,
+    *,
+    expected: dict,
+    block_foreign_claim: bool = False,
+) -> str:
+    """Commit + push the ledger (with the archive) and VERIFY the record on origin.
+
+    ``expected`` = {post_id, delivery_state, workflow_attempt_id}. Returns
+    ``PUSH_OK`` only after re-fetching origin and confirming its ledger has a
+    record for this post with OUR ``delivery_state`` and ``workflow_attempt_id``.
+    With ``block_foreign_claim`` (the initial claim), a remote ``sent`` →
+    ``PUSH_CONFLICT_SENT`` and a foreign ``claimed``/``ambiguous`` →
+    ``PUSH_CONFLICT_CLAIM`` so a re-run never steals a prior attempt's post.
+    """
+    if not durable_enabled():
+        return PUSH_DISABLED
+
+    cas = None
+    if block_foreign_claim:
+        cas = lambda content: _remote_conflict_kind(content, expected)  # noqa: E731
+
+    def verify(branch: str) -> bool:
+        show = _git_run("show", f"origin/{branch}:{_STATE_REL}")
+        if show.returncode != 0:
+            return False
+        return _remote_state_has(show.stdout or "", expected)
+
+    return _commit_push_verify(message, verify=verify, cas=cas)
+
+
+def durable_push_capture(post_ids: Iterable[str], message: str) -> str:
+    """Commit + push the new archive rows and VERIFY them on origin.
+
+    Called BEFORE any per-post claim/send, so a remote ``sent`` record can never
+    exist without the post already durable in the authoritative archive. Returns
+    ``PUSH_OK`` only when origin's archive contains every ``post_ids`` entry.
+    """
+    if not durable_enabled():
+        return PUSH_DISABLED
+    ids = [str(p) for p in post_ids]
+
+    def verify(branch: str) -> bool:
+        show = _git_run("show", f"origin/{branch}:{_ARCHIVE_REL}")
+        if show.returncode != 0:
+            return False
+        return _remote_archive_has(show.stdout or "", ids)
+
+    return _commit_push_verify(message, verify=verify)

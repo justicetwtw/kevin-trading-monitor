@@ -198,6 +198,27 @@ class TrumpDeliveryStore:
     def action_for(self, post_id: str) -> str:
         return resolve_delivery_action(self.get(post_id))
 
+    def ids_in_state(self, state: str) -> list[str]:
+        """Post IDs currently in ``state``, oldest first (by created/claim time).
+
+        Chronological order keeps retry-from-archive work bounded and stable.
+        """
+        posts = self._read_raw()["posts"]
+        matched = [
+            (pid, record)
+            for pid, record in posts.items()
+            if record.get("delivery_state") == state
+        ]
+        matched.sort(
+            key=lambda item: str(
+                item[1].get("created_at")
+                or item[1].get("claimed_at")
+                or item[1].get("resolved_at")
+                or ""
+            )
+        )
+        return [pid for pid, _ in matched]
+
     def capture_started_at(self) -> str | None:
         return self._read_raw().get("capture_started_at")
 
@@ -303,13 +324,16 @@ class TrumpDeliveryStore:
     def unresolved_backlog(self) -> dict[str, int]:
         """Public-safe counts of records that must keep the workflow red.
 
-        A durable ``claimed`` (a crashed prior send) or ``ambiguous`` (a
-        partial/unknown outbound) is an *unresolved* delivery: the workflow must
-        not report green just because no NEW source post arrived. Counts only —
-        post IDs/states, never text or chat IDs.
+        A durable ``claimed`` (a crashed prior send), ``ambiguous`` (a
+        partial/unknown outbound) or ``failed`` (a definitive rejection that
+        delivered nothing) is an *unresolved / undelivered* post: the workflow
+        must not report green just because no NEW source post arrived, and a
+        ``failed`` post must stay red until it becomes ``sent`` or is operator
+        cleared — even after it ages out of the bounded live-source window.
+        Counts only — post IDs/states, never text or chat IDs.
         """
         posts = self._read_raw()["posts"]
-        counts = {DELIVERY_CLAIMED: 0, DELIVERY_AMBIGUOUS: 0}
+        counts = {DELIVERY_CLAIMED: 0, DELIVERY_AMBIGUOUS: 0, DELIVERY_FAILED: 0}
         for record in posts.values():
             state = record.get("delivery_state")
             if state in counts:

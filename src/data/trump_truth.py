@@ -477,6 +477,26 @@ def _read_archive_fail_closed() -> dict[str, Any]:
     return data
 
 
+def get_archived_posts(post_ids: list[str]) -> dict[str, dict[str, Any]]:
+    """Return archived payloads for ``post_ids`` (fail-closed read).
+
+    Used to rebuild retry candidates for durable ``failed`` posts that have aged
+    out of the bounded live-source window: the authoritative archive is the
+    system of record for the full post. A corrupt-present archive raises
+    ``ArchiveError`` (fail closed) rather than silently returning nothing.
+    Missing IDs are simply absent from the result (the caller fails closed on a
+    ``failed`` record whose payload cannot be recovered).
+    """
+    archive = _read_archive_fail_closed()
+    found: dict[str, dict[str, Any]] = {}
+    for post_id in post_ids:
+        key = str(post_id)
+        record = archive.get(key)
+        if isinstance(record, dict):
+            found[key] = record
+    return found
+
+
 def archive_posts(posts: list[dict[str, Any]]) -> int:
     """Store every captured post in a rolling archive, deduplicated by ID.
 
