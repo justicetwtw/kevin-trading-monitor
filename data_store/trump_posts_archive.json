@@ -22182,5 +22182,109 @@
       "tier2": {}
     },
     "captured_at": "2026-07-21T14:22:38.808465+00:00"
+  },
+  "116958583609419396": {
+    "id": "116958583609419396",
+    "created_at": "2026-07-21T15:05:56.350Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958583609419396",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T15:57:23.821010+00:00"
+  },
+  "116958572526754317": {
+    "id": "116958572526754317",
+    "created_at": "2026-07-21T15:03:07.236Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958572526754317",
+    "text": "Blame immigration chaos on Biden and Harris — not Trump: https://nypost.com/2026/07/16/opinion/blame-immigration-chaos-on-biden-and-harris-not-trump/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T15:57:23.824582+00:00"
+  },
+  "116958570470986474": {
+    "id": "116958570470986474",
+    "created_at": "2026-07-21T15:02:35.863Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958570470986474",
+    "text": "Why permanent daylight saving time may be better for your health: https://nypost.com/health/health-benefits-of-daylight-savings-time/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T15:57:23.824695+00:00"
+  },
+  "116958568886511888": {
+    "id": "116958568886511888",
+    "created_at": "2026-07-21T15:02:11.691Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958568886511888",
+    "text": "Grassley: Democrats Who Weaponized DOJ Hate Blanche, Which Proves He's A Good AG Pick: https://thefederalist.com/2026/07/15/grassley-democrats-who-weaponized-doj-hate-blanche-which-proves-hes-a-good-ag-pick/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T15:57:23.824757+00:00"
+  },
+  "116958564034058314": {
+    "id": "116958564034058314",
+    "created_at": "2026-07-21T15:00:57.648Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958564034058314",
+    "text": "Trump Rx Delivers Massive Price Relief on Prescription Drug Costs: https://amac.us/newsline/economy/trumprx-prescription-drug-savings-deliver-lower-costs-for-americans/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "market_general": [
+          "economy"
+        ]
+      }
+    },
+    "captured_at": "2026-07-21T15:57:23.824815+00:00"
+  },
+  "116958562322324112": {
+    "id": "116958562322324112",
+    "created_at": "2026-07-21T15:00:31.527Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116958562322324112",
+    "text": "Trump Announces Nearly $10 Billion in Defense Industrial Base Investments in Pennsylvania at McCormick's Summit: https://www.breitbart.com/politics/2026/07/15/trump-announces-nearly-10-billion-in-defense-industrial-base-investments-in-pennsylvania-at-mccormicks-summit/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-21T15:57:23.824885+00:00"
   }
 }
