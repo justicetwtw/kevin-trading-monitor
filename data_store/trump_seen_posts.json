@@ -8553,5 +8553,45 @@
     "seen_at": "2026-07-21T20:04:53.635675+00:00",
     "created_at": "2026-07-21T19:23:49.479Z",
     "source": "cnn_historical_archive"
+  },
+  "116959705309751797": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:51:12.133Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959708649144417": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:52:03.154Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959709239826209": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:52:12.169Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959710016956595": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:52:24.026Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959710637459603": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:52:33.495Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959718422116686": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:54:32.209Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959718559155454": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T19:54:34.300Z",
+    "source": "cnn_historical_archive"
+  },
+  "116959913931409391": {
+    "seen_at": "2026-07-21T21:21:44.160972+00:00",
+    "created_at": "2026-07-21T20:44:15.444Z",
+    "source": "cnn_historical_archive"
   }
 }
