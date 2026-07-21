@@ -380,6 +380,7 @@ def new_record(
     workflow_run_id: str,
     workflow_started_at: str | None,
     runner_started_at: str | None = None,
+    workflow_attempt_id: str | None = None,
     delivery_state: str = DELIVERY_CLAIMED,
 ) -> dict:
     """Build a fresh delivery record for a session (contract section 4 schema).
@@ -387,6 +388,9 @@ def new_record(
     ``workflow_started_at`` is the real workflow first-step time (before Python
     setup/install) so GitHub queue delay can be separated from runner/setup and
     generation delay; ``runner_started_at`` is when the Python attempt began.
+    ``workflow_attempt_id`` is a UNIQUE per-attempt identity (run id + run
+    attempt) so a GitHub re-run — which keeps the same run id — cannot mistake a
+    prior attempt's claim for its own.
     """
     return {
         "schema_version": STATE_SCHEMA_VERSION,
@@ -402,6 +406,7 @@ def new_record(
         "lateness_minutes": lateness_minutes,
         "schedule_source": schedule_source,
         "workflow_run_id": workflow_run_id,
+        "workflow_attempt_id": workflow_attempt_id,
         "delivery_state": delivery_state,
         "status": status,
         "stage_code": None,

@@ -482,19 +482,19 @@ def test_terminal_persist_failure_is_red_even_when_delivered(env, monkeypatch):
 _EXPECTED = {
     "session_key": "us_open:2026-07-20",
     "delivery_state": "claimed",
-    "workflow_run_id": "run-42",
+    "workflow_attempt_id": "run-42:1",
 }
 
 
-def _remote_with(expected):
-    """A remote state file (as `git show` would return) containing `expected`."""
+def _remote_with(expected, delivery_state=None, attempt_id=None):
+    """A remote state file (as `git show` would return) containing a record."""
     return json.dumps({
         "schema_version": 1,
         "sessions": {
             expected["session_key"]: {
                 "session_key": expected["session_key"],
-                "delivery_state": expected["delivery_state"],
-                "workflow_run_id": expected["workflow_run_id"],
+                "delivery_state": delivery_state or expected["delivery_state"],
+                "workflow_attempt_id": attempt_id or expected["workflow_attempt_id"],
             }
         },
     })
@@ -548,14 +548,81 @@ def test_durable_push_noop_when_remote_missing_record_is_failed(monkeypatch):
     assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
 
 
-def test_durable_push_wrong_run_id_on_remote_is_failed(monkeypatch):
-    # remote has the session but a different attempt's run id: not our claim.
+def test_durable_push_wrong_attempt_id_on_remote_is_failed(monkeypatch):
+    # remote has the session but a DIFFERENT attempt id (e.g. a re-run): not ours.
     monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
     monkeypatch.setattr(rub, "_sleep", lambda s: None)
-    other = dict(_EXPECTED, workflow_run_id="someone-else")
     monkeypatch.setattr(rub, "_git_run",
-                        _fake_git(remote_state=_remote_with(other)))
+                        _fake_git(remote_state=_remote_with(
+                            _EXPECTED, attempt_id="run-42:2")))
     assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_FAILED
+
+
+def test_durable_push_blocks_foreign_unresolved_claim_as_conflict(monkeypatch):
+    # A re-run (same run id, new attempt, stale checkout) must not steal attempt
+    # 1's unresolved claim: block_foreign_claim -> PUSH_CONFLICT, no overwrite.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    foreign = _remote_with(_EXPECTED, delivery_state="claimed",
+                           attempt_id="run-42:1")
+    mine = dict(_EXPECTED, workflow_attempt_id="run-42:2")
+    monkeypatch.setattr(rub, "_git_run", _fake_git(remote_state=foreign))
+    assert rub._durable_push("m", expected=mine, block_foreign_claim=True) == (
+        rub.PUSH_CONFLICT
+    )
+
+
+def test_durable_push_blocks_foreign_sent_as_conflict(monkeypatch):
+    # remote already shows the session delivered by another attempt: conflict.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    delivered = _remote_with(_EXPECTED, delivery_state="sent",
+                             attempt_id="run-9:1")
+    monkeypatch.setattr(rub, "_git_run", _fake_git(remote_state=delivered))
+    assert rub._durable_push("m", expected=_EXPECTED, block_foreign_claim=True) == (
+        rub.PUSH_CONFLICT
+    )
+
+
+def test_durable_push_own_claim_is_not_foreign(monkeypatch):
+    # our own attempt's claim already on origin: not foreign, verified -> OK.
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    monkeypatch.setattr(rub, "_git_run",
+                        _fake_git(remote_state=_remote_with(_EXPECTED)))
+    assert rub._durable_push("m", expected=_EXPECTED, block_foreign_claim=True) == (
+        rub.PUSH_OK
+    )
+
+
+def test_durable_push_recovers_from_nonff_race_via_clean_index_rebase(monkeypatch):
+    # attempt 1 commits and pushes but the record isn't on origin yet (race);
+    # attempt 2 has a CLEAN index yet must still rebase and recover.
+    from types import SimpleNamespace
+    monkeypatch.setenv("US_OPEN_DURABLE_STATE", "1")
+    monkeypatch.setattr(rub, "_sleep", lambda s: None)
+    state = {"iter": 0, "clean_rebases": 0}
+
+    def fake(*args):
+        sub = args[0]
+        if sub == "add":
+            state["iter"] += 1
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+        if sub == "diff":  # iter 1 staged (rc1); iter 2+ already committed (rc0)
+            return SimpleNamespace(returncode=0 if state["iter"] >= 2 else 1,
+                                   stdout="", stderr="")
+        if sub == "pull":
+            if state["iter"] >= 2:  # rebase on a clean-index retry
+                state["clean_rebases"] += 1
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+        if sub == "show":  # verify: record present only from iter 2 onward
+            content = _remote_with(_EXPECTED) if state["iter"] >= 2 else '{"sessions": {}}'
+            return SimpleNamespace(returncode=0, stdout=content, stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(rub, "_git_run", fake)
+    assert rub._durable_push("m", expected=_EXPECTED) == rub.PUSH_OK
+    assert state["clean_rebases"] >= 1  # retried the rebase despite a clean index
 
 
 def test_durable_push_add_failure_is_failed(monkeypatch):
@@ -664,6 +731,60 @@ def test_clock_advances_during_push_crosses_close_aborts(env, monkeypatch):
     assert rc == 1  # closed during the push -> do not send, red miss
     assert send.called is False
     assert _read(env)["status"] == "expired"
+
+
+def test_rerun_does_not_steal_foreign_claim_or_send(env, monkeypatch):
+    # GitHub re-run: local (stale) state has no claim, but the durable claim push
+    # reports a foreign unresolved claim from the original attempt. Never send.
+    _freeze(monkeypatch, _tpe(2026, 7, 20, 21, 32))
+    monkeypatch.setattr(
+        rub, "_durable_push",
+        lambda msg, **kw: rub.PUSH_CONFLICT if kw.get("block_foreign_claim")
+        else rub.PUSH_OK,
+    )
+    send = _NeverCalled()
+    monkeypatch.setattr(rub, "_send_detailed", send)
+
+    rc = rub.main()
+
+    assert rc == 1
+    assert send.called is False
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_AMBIGUOUS
+    assert rec["stage_code"] == "ambiguous_delivery"
+
+
+def test_stabilization_regen_failure_is_red_and_retryable(env, monkeypatch):
+    # Clock crosses +30 during the claim push; the intraday body regeneration
+    # raises. The durable claim must NOT be left 'claimed' (false ambiguity):
+    # persist a retryable failed/generation_failed and never call Telegram.
+    clock = {"t": _tpe(2026, 7, 20, 21, 59)}  # +29 late
+    monkeypatch.setattr(rub, "_now_taipei", lambda: clock["t"])
+    calls = {"n": 0}
+
+    def _gen(_bt):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return _LEGACY_BODY  # initial us_open body succeeds
+        raise RuntimeError("intraday builder down")  # regeneration fails
+
+    monkeypatch.setattr(rub, "_generate_body", _gen)
+
+    def _push(_msg, **kw):
+        clock["t"] = _tpe(2026, 7, 20, 22, 1)  # +31 during the claim push
+        return rub.PUSH_OK
+
+    monkeypatch.setattr(rub, "_durable_push", _push)
+    send = _NeverCalled()
+    monkeypatch.setattr(rub, "_send_detailed", send)
+
+    rc = rub.main()
+
+    assert rc == 1
+    assert send.called is False
+    rec = _read(env)
+    assert rec["delivery_state"] == DELIVERY_FAILED  # not stuck 'claimed'
+    assert rec["stage_code"] == "generation_failed"  # retryable in-window
 
 
 def test_malformed_record_fails_closed_without_sending(env, monkeypatch):

@@ -66,6 +66,9 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           US_OPEN_SCHEDULE_SOURCE: ${{ github.event.schedule || github.event_name }}
           GITHUB_RUN_ID: ${{ github.run_id }}
+          # A re-run keeps run_id but increments run_attempt; the runner combines
+          # them into a unique attempt identity for the at-most-once claim.
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
           # Enable the runner's durable claim push (commit + push to main before
           # the outbound send) so a post-send crash surfaces ambiguity.
           US_OPEN_DURABLE_STATE: '1'

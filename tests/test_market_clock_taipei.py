@@ -115,6 +115,8 @@ def test_us_open_moved_to_isolated_dedicated_workflow():
     # durable claim before send + real (pre-setup) workflow-start timestamp.
     assert "US_OPEN_DURABLE_STATE" in us_open
     assert "US_OPEN_WORKFLOW_STARTED_AT" in us_open
+    # unique per-attempt identity so a re-run cannot steal a prior claim.
+    assert "GITHUB_RUN_ATTEMPT" in us_open
     # the start timestamp is captured before dependency install.
     start_idx = us_open.index("US_OPEN_WORKFLOW_STARTED_AT")
     install_idx = us_open.index("Install dependencies")

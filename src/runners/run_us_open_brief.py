@@ -65,9 +65,16 @@ def _now_taipei() -> datetime:
 
 
 def _env() -> dict:
+    run_id = os.getenv("GITHUB_RUN_ID", "local")
+    # A GitHub re-run keeps the same run id and (re-runs of a scheduled workflow)
+    # the same checked-out SHA, but increments run_attempt. Identify a delivery
+    # attempt by run id + attempt so a re-run cannot claim a prior attempt's
+    # remote record as its own.
+    run_attempt = os.getenv("GITHUB_RUN_ATTEMPT", "1")
     return {
         "schedule_source": os.getenv("US_OPEN_SCHEDULE_SOURCE", "unknown"),
-        "workflow_run_id": os.getenv("GITHUB_RUN_ID", "local"),
+        "workflow_run_id": run_id,
+        "workflow_attempt_id": f"{run_id}:{run_attempt}",
         # Real workflow first-step time, captured before Python setup/install so
         # GitHub queue delay is separable from runner/setup delay (contract §6).
         "workflow_started_at": os.getenv("US_OPEN_WORKFLOW_STARTED_AT") or None,
@@ -107,6 +114,7 @@ def _send_detailed(message: str) -> dict:
 PUSH_DISABLED = "disabled"  # durable mode off (local/tests): rely on commit-state
 PUSH_OK = "pushed"  # claim is durable and verified on shared state
 PUSH_FAILED = "failed"  # durable mode on but the claim could not be verified
+PUSH_CONFLICT = "conflict"  # another attempt already owns/delivered this session
 
 # Bounded phase-stabilization rounds after a verified claim (fail red, not spin).
 _MAX_STABILIZE_ROUNDS = 3
@@ -127,33 +135,64 @@ def _sleep(seconds: float) -> None:
     time.sleep(seconds)
 
 
-def _remote_state_has(content: str, expected: dict) -> bool:
-    """True iff the remote state JSON contains the exact expected session record."""
+def _remote_record(content: str, session_key: str) -> dict | None:
     try:
         data = json.loads(content)
     except (json.JSONDecodeError, ValueError, TypeError):
-        return False
+        return None
     if not isinstance(data, dict):
-        return False
-    record = (data.get("sessions") or {}).get(expected["session_key"])
-    if not isinstance(record, dict):
+        return None
+    record = (data.get("sessions") or {}).get(session_key)
+    return record if isinstance(record, dict) else None
+
+
+def _remote_state_has(content: str, expected: dict) -> bool:
+    """True iff origin has the expected session record with OUR attempt identity.
+
+    Identity is matched on ``workflow_attempt_id`` (run id + run attempt), not the
+    reused ``workflow_run_id``, so a re-run cannot verify a prior attempt's record.
+    """
+    record = _remote_record(content, expected["session_key"])
+    if record is None:
         return False
     return (
         record.get("delivery_state") == expected["delivery_state"]
-        and record.get("workflow_run_id") == expected["workflow_run_id"]
+        and record.get("workflow_attempt_id") == expected.get("workflow_attempt_id")
     )
 
 
-def _durable_push(message: str, *, expected: dict) -> str:
+def _remote_foreign_unresolved(content: str, expected: dict) -> bool:
+    """True iff origin already has a delivery/unresolved claim from ANOTHER attempt.
+
+    A remote ``sent`` (delivered) or a ``claimed``/``ambiguous`` left by a
+    different ``workflow_attempt_id`` means this attempt must not claim or send —
+    a GitHub re-run (same run id, new attempt, stale checkout) must never treat a
+    prior attempt's unresolved claim as its own.
+    """
+    record = _remote_record(content, expected["session_key"])
+    if record is None:
+        return False
+    state = record.get("delivery_state")
+    if state == "sent":
+        return True
+    if state in ("claimed", "ambiguous"):
+        return record.get("workflow_attempt_id") != expected.get("workflow_attempt_id")
+    return False
+
+
+def _durable_push(message: str, *, expected: dict, block_foreign_claim: bool = False) -> str:
     """Commit + push the delivery state and VERIFY it on origin before OK.
 
-    ``expected`` = {session_key, delivery_state, workflow_run_id}. Returns
-    ``PUSH_OK`` only after re-fetching origin and confirming the remote
-    ``data_store/us_open_delivery_state.json`` actually contains that exact
-    record — an ``Everything up-to-date`` push without matching remote state is
-    ``PUSH_FAILED``. Every git step is checked (a failed ``add`` is never read as
-    "nothing to commit", a failed ``commit`` never proceeds, a ``pull --rebase``
-    conflict aborts cleanly and fails); the repository is never left uncertain.
+    ``expected`` = {session_key, delivery_state, workflow_attempt_id}. Returns
+    ``PUSH_OK`` only after re-fetching origin and confirming its state file has
+    that exact record (identity = ``workflow_attempt_id``); an
+    ``Everything up-to-date`` push without matching remote state is
+    ``PUSH_FAILED``. When ``block_foreign_claim`` is set (the initial claim), a
+    remote delivery/unresolved claim from another attempt returns ``PUSH_CONFLICT``
+    so a re-run never steals it. Every git step is checked; the local commit is
+    reconciled with a freshly-fetched origin on EVERY retry (even when the index
+    is clean) so a benign non-fast-forward race can recover; a ``pull --rebase``
+    conflict aborts cleanly and fails.
     """
     if os.getenv("US_OPEN_DURABLE_STATE") != "1":
         return PUSH_DISABLED
@@ -171,9 +210,17 @@ def _durable_push(message: str, *, expected: dict) -> str:
     for attempt in range(1, 5):
         if attempt > 1:
             _sleep((attempt - 1) * 2)
-        # Refresh the base so we rebase onto the latest shared state.
+        # Refresh the base so we reconcile onto the latest shared state.
         if not _ok("fetch", "origin", branch):
             continue
+        # Compare-and-swap gate for the initial claim: never overwrite another
+        # attempt's delivery/unresolved claim.
+        if block_foreign_claim:
+            pre = _git_run("show", f"origin/{branch}:{STATE_PATH}")
+            if pre.returncode == 0 and _remote_foreign_unresolved(
+                pre.stdout or "", expected
+            ):
+                return PUSH_CONFLICT
         # A failed `add` must not be read as "nothing to commit".
         if not _ok("add", str(STATE_PATH)):
             continue
@@ -182,10 +229,13 @@ def _durable_push(message: str, *, expected: dict) -> str:
             # A real commit must succeed before any push can be durable.
             if not _ok("commit", "-m", message):
                 continue
-            # Integrate concurrent state commits; abort cleanly on conflict.
-            if not _ok("pull", "--rebase", "origin", branch):
-                _git_run("rebase", "--abort")
-                continue
+        # ALWAYS reconcile the (possibly already-committed on a prior retry) local
+        # state with the freshly-fetched origin before pushing, even when this
+        # retry's index is clean — otherwise a benign non-fast-forward race would
+        # keep re-pushing the same stale commit. Abort cleanly on conflict.
+        if not _ok("pull", "--rebase", "origin", branch):
+            _git_run("rebase", "--abort")
+            continue
         _git_run("push", "origin", f"HEAD:{branch}")
         # Proof of durability is the REMOTE CONTENT, not the push exit code:
         # re-fetch and confirm origin's state file has our exact record.
@@ -230,7 +280,7 @@ def _persist_terminal(store, record, env, outcome_label, session, *, base_exit):
         expected={
             "session_key": session.session_key,
             "delivery_state": record["delivery_state"],
-            "workflow_run_id": env["workflow_run_id"],
+            "workflow_attempt_id": env["workflow_attempt_id"],
         },
     )
     if push == PUSH_FAILED:
@@ -281,6 +331,7 @@ def main() -> int:
             lateness_minutes=lateness,
             schedule_source=env["schedule_source"],
             workflow_run_id=env["workflow_run_id"],
+            workflow_attempt_id=env["workflow_attempt_id"],
             workflow_started_at=workflow_started_at,
             runner_started_at=runner_started.isoformat(),
             delivery_state=delivery_state,
@@ -382,12 +433,28 @@ def main() -> int:
         )
 
     def _expected(state):
-        # Identity the remote state must contain for a push to count as durable.
+        # Identity the remote state must contain for a push to count as durable —
+        # the UNIQUE attempt id, so a re-run cannot verify a prior attempt's record.
         return {
             "session_key": session.session_key,
             "delivery_state": state,
-            "workflow_run_id": env["workflow_run_id"],
+            "workflow_attempt_id": env["workflow_attempt_id"],
         }
+
+    def _foreign_conflict(dec):
+        # Another attempt already delivered or holds an unresolved claim for this
+        # session (e.g. a GitHub re-run of a crashed attempt, same run id). Never
+        # steal it or re-send: surface ambiguous and stay red until cleared.
+        record["delivery_state"] = DELIVERY_AMBIGUOUS
+        record["stage_code"] = "ambiguous_delivery"
+        _telemetry_only(store, record, "foreign_claim_conflict",
+                        "ambiguous_delivery", env,
+                        status=dec.status, lateness=dec.lateness_minutes)
+        logger.error(
+            f"us_open {session.session_key}: another attempt owns the claim/"
+            "delivery; not sending, marking ambiguous"
+        )
+        return 1
 
     def _claim_persist_failed(dec):
         # Sending without a remotely-durable claim risks a duplicate; fail closed
@@ -429,13 +496,19 @@ def main() -> int:
     current_body_type = body_brief_type(gen_decision.status)
 
     # Persist the claim (the delivery lock) locally and durably push it,
-    # verifying the record is actually on origin, BEFORE the outbound send.
+    # verifying the record is actually on origin, BEFORE the outbound send. The
+    # first claim is compare-and-swap gated: it will not steal another attempt's
+    # unresolved claim or a prior delivery (the GitHub re-run path).
     message = render_us_open_message(body, gen_decision)
     store.upsert(record)
-    if _durable_push(
+    claim_push = _durable_push(
         f"us_open claim {session.session_key} [skip ci]",
         expected=_expected("claimed"),
-    ) == PUSH_FAILED:
+        block_foreign_claim=True,
+    )
+    if claim_push == PUSH_CONFLICT:
+        return _foreign_conflict(gen_decision)
+    if claim_push == PUSH_FAILED:
         return _claim_persist_failed(gen_decision)
 
     # The claim push can take seconds; the phase may have advanced. Stabilize:
@@ -457,7 +530,20 @@ def main() -> int:
             stabilized = True
             break
         if body_brief_type(deliver_decision.status) != current_body_type:
-            body = _generate_body(body_brief_type(deliver_decision.status))
+            try:
+                body = _generate_body(body_brief_type(deliver_decision.status))
+            except Exception as exc:  # noqa: BLE001 - fail closed, like initial gen
+                # The claim is durable; a regeneration crash must NOT leave it
+                # 'claimed' (a false permanent ambiguity). Persist a retryable
+                # failed terminal instead, and never call Telegram.
+                record["delivery_state"] = DELIVERY_FAILED
+                record["stage_code"] = "generation_failed"
+                logger.error(
+                    f"us_open stabilization regeneration failed for "
+                    f"{session.session_key}: {type(exc).__name__}"
+                )
+                return _persist_terminal(store, record, env, "generation_failed",
+                                         session, base_exit=1)
             current_body_type = body_brief_type(deliver_decision.status)
         record["status"] = deliver_decision.status
         record["lateness_minutes"] = deliver_decision.lateness_minutes
