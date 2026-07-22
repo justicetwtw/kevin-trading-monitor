@@ -42,6 +42,7 @@
   },
   "2026-07-22": {
     "us_midday": true,
-    "us_eod": true
+    "us_eod": true,
+    "tw_open": true
   }
 }
