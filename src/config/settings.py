@@ -32,7 +32,10 @@ SEC_EDGAR_USER_AGENT = os.getenv("SEC_EDGAR_USER_AGENT", "")
 
 # Podcast digest / email
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+# ``or`` (not a getenv default) so an empty GEMINI_MODEL env — e.g. a workflow
+# exporting an unset secret as "" — cannot override the code default and make
+# every call use an empty model.
+GEMINI_MODEL = os.getenv("GEMINI_MODEL") or "gemini-2.5-flash"
 GMAIL_SENDER = os.getenv("GMAIL_SENDER", "")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT", "")

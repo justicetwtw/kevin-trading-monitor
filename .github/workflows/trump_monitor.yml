@@ -5,10 +5,13 @@ on:
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
-# A slow/retrying source check must not create overlapping five-minute runs.
+# All-post delivery must never be interrupted mid-flight: a delayed/manual run
+# must QUEUE behind the in-progress run, not cancel it (which could kill a
+# provider call or a partial Telegram/seen-state write). cancel-in-progress:
+# false keeps the running job and queues at most one pending run.
 concurrency:
   group: trump-monitor
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -33,6 +36,23 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Reuse the already-approved Gemini product path for zh-TW translation.
+          # If the API key is unset the runner falls back to English-only. The
+          # model falls back to a code default (settings.GEMINI_MODEL) rather
+          # than an empty override, so a missing GEMINI_MODEL secret cannot make
+          # every call use an empty model and silently degrade.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          # A re-run keeps run_id but increments run_attempt; the runner combines
+          # them into a unique attempt identity for the at-most-once claim, so a
+          # re-run cannot verify (and trust) a prior attempt's remote record.
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          # Durable delivery: hydrate origin/main's authoritative ledger before
+          # every delivery decision, and commit+push+verify each per-post claim
+          # and terminal result on origin (compare-and-set) so a stale event
+          # checkout or a lost runner can never re-blast an already-delivered post.
+          TRUMP_DURABLE_STATE: '1'
         run: python -m src.runners.run_trump_monitor
       - name: Commit archive and explicit source health
         if: always()

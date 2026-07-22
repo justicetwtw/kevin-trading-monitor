@@ -6,22 +6,34 @@ runs:
   steps:
     - shell: bash
       run: |
+        set -euo pipefail
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add data_store/ || true
+        # Do not swallow a failed `git add`: a state file that cannot be staged
+        # must fail the step, not be silently dropped from the durable record.
+        git add data_store/
         if git diff --staged --quiet; then
           echo "No state changes to commit"
           exit 0
         fi
         git commit -m "state: ${{ github.workflow }} [skip ci]"
+        local_sha="$(git rev-parse HEAD)"
 
         for i in 1 2 3; do
           if git pull --rebase origin main && git push origin main; then
-            echo "Push succeeded on attempt $i"
-            exit 0
+            # Confirm the pushed commit is actually the remote tip before
+            # declaring success, so a silently-dropped push is not reported OK.
+            git fetch origin main
+            pushed_sha="$(git rev-parse HEAD)"
+            remote_sha="$(git rev-parse origin/main)"
+            if [ "$pushed_sha" = "$remote_sha" ]; then
+              echo "Push succeeded and verified on attempt $i ($remote_sha)"
+              exit 0
+            fi
+            echo "Push reported ok but remote tip $remote_sha != $pushed_sha; retrying"
           fi
           echo "Push attempt $i failed, retry in $((i*2))s..."
-          sleep $((i*2))
+          sleep "$((i*2))"
         done
         echo "Push failed after 3 attempts"
         exit 1

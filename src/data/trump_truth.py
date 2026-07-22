@@ -28,7 +28,18 @@ from tenacity import (
 
 from src.config.keywords import classify_post, get_matched_keywords
 from src.config.rss_sources import TRUMP_TRUTH_SOURCES
-from src.storage.state_manager import read_json, write_json
+from src.storage.state_manager import DATA_STORE_DIR, read_json, write_json
+
+
+class ArchiveError(Exception):
+    """Raised when the rolling post archive cannot be read or written.
+
+    Capture must fail closed: a corrupt-present archive read as the empty default
+    would let the rolling history be overwritten from scratch, and an ignored
+    write failure would report a post archived when it was not — after which the
+    delivery ledger could mark it ``sent`` and it would never be captured again.
+    """
+
 
 SEEN_POSTS_FILE = "trump_seen_posts.json"
 ARCHIVE_FILE = "trump_posts_archive.json"
@@ -437,27 +448,122 @@ def filter_new_posts(
     return new_posts
 
 
-def archive_posts(posts: list[dict[str, Any]]) -> int:
-    """Store every captured post in a rolling archive, deduplicated by ID."""
-    archive = read_json(ARCHIVE_FILE, default={})
-    if not isinstance(archive, dict):
-        archive = {}
+def validate_archive_content(data: Any, *, origin: str = "archive") -> dict[str, Any]:
+    """Validate a parsed archive dict, binding each key to its payload identity.
+
+    An archive value must be an object whose ``id`` exactly matches its map key,
+    so a key/id mismatch (``archive['X'] = {'id':'Y'}``) can never make a failed
+    ``X`` retry and deliver ``Y``'s payload. Raises ``ArchiveError`` on any
+    violation (fail closed / no-send), never a silent skip.
+    """
+    if not isinstance(data, dict):
+        raise ArchiveError(f"{origin} is not a JSON object")
+    for key, value in data.items():
+        if not isinstance(key, str) or not key:
+            raise ArchiveError(f"{origin} has an empty/non-string key")
+        if not isinstance(value, dict):
+            raise ArchiveError(f"{origin} entry {key!r} is not an object")
+        if str(value.get("id") or "") != key:
+            raise ArchiveError(
+                f"{origin} key {key!r} != payload id {value.get('id')!r}"
+            )
+    return data
+
+
+def _read_archive_fail_closed() -> dict[str, Any]:
+    """Read the rolling archive, distinguishing absent (empty) from corrupt.
+
+    An absent file is a legitimate empty archive; a PRESENT but unreadable/invalid
+    file (or one with a key/id mismatch) raises ``ArchiveError`` rather than
+    silently returning ``{}`` (which would overwrite the whole rolling history
+    from scratch on the next write) or a mis-identified payload.
+    """
+    import json
+
+    path = DATA_STORE_DIR / ARCHIVE_FILE
+    if not path.exists():
+        return {}
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ArchiveError(
+            f"archive present but unreadable: {type(exc).__name__}"
+        ) from exc
+    try:
+        data = json.loads(raw)
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise ArchiveError(
+            f"archive present but not valid JSON: {type(exc).__name__}"
+        ) from exc
+    return validate_archive_content(data, origin="archive")
+
+
+def get_archived_posts(post_ids: list[str]) -> dict[str, dict[str, Any]]:
+    """Return archived payloads for ``post_ids`` (fail-closed read).
+
+    Used to rebuild retry candidates for durable ``failed`` posts that have aged
+    out of the bounded live-source window: the authoritative archive is the
+    system of record for the full post. A corrupt-present archive raises
+    ``ArchiveError`` (fail closed) rather than silently returning nothing.
+    Missing IDs are simply absent from the result (the caller fails closed on a
+    ``failed`` record whose payload cannot be recovered).
+    """
+    archive = _read_archive_fail_closed()
+    found: dict[str, dict[str, Any]] = {}
+    for post_id in post_ids:
+        key = str(post_id)
+        record = archive.get(key)
+        if isinstance(record, dict):
+            found[key] = record
+    return found
+
+
+def archive_posts(
+    posts: list[dict[str, Any]],
+    *,
+    protected_ids: set[str] | None = None,
+) -> int:
+    """Store every captured post in a rolling archive, deduplicated by ID.
+
+    Fails closed: a corrupt-present archive read or a failed write raises
+    ``ArchiveError`` so the runner never treats an unarchived post as captured
+    (and never marks it ``sent`` while it is missing from the durable record).
+
+    ``protected_ids`` (every ID referenced by a non-terminal ledger record) is
+    NEVER pruned — a still-owed post must not lose its payload. Only unprotected
+    rows are evicted, oldest first, to fit ``MAX_ARCHIVE``; if the protected rows
+    alone exceed the bound, we keep them all and raise ``ArchiveError`` so the
+    overflow is a loud, visible fail-closed signal rather than silent deletion of
+    delivery evidence.
+    """
+    protected = {str(pid) for pid in (protected_ids or set())}
+    archive = _read_archive_fail_closed()
     before = len(archive)
     for post in posts:
         post_id = str(post.get("id") or "")
         if post_id:
             archive[post_id] = post
+    overflow = False
     if len(archive) > MAX_ARCHIVE:
-        ordered = sorted(
-            archive.items(),
+        unprotected = sorted(
+            (item for item in archive.items() if item[0] not in protected),
             key=lambda item: str(
-                item[1].get("created_at")
-                or item[1].get("captured_at")
-                or ""
+                item[1].get("created_at") or item[1].get("captured_at") or ""
             ),
         )
-        archive = dict(ordered[-MAX_ARCHIVE:])
-    write_json(ARCHIVE_FILE, archive)
+        drop = len(archive) - MAX_ARCHIVE
+        for key, _ in unprotected[:drop]:
+            archive.pop(key, None)
+        # If protected rows alone still exceed the bound, keep them (never delete
+        # a non-terminal payload) and signal the overflow after persisting.
+        overflow = len(archive) > MAX_ARCHIVE
+    if not write_json(ARCHIVE_FILE, archive):
+        raise ArchiveError("archive write failed; refusing to report success")
+    if overflow:
+        raise ArchiveError(
+            f"archive protected rows exceed MAX_ARCHIVE ({len(archive)}); "
+            "fail closed rather than delete unresolved-delivery payloads"
+        )
     return len(archive) - before
 
 
