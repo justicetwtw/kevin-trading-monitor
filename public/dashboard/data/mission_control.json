@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-21T17:09:34.157492+08:00",
+  "generated_at": "2026-07-22T08:14:42.137569+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -14,15 +14,15 @@
   ],
   "data": {
     "summary": {
-      "regime": "neutral",
-      "regime_modifier": 5,
+      "regime": "risk_on",
+      "regime_modifier": 10,
       "position_configured": false,
       "position_count": 0,
       "position_source": null,
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-21T08:46:15.824487+00:00",
+      "trump_monitor_checked_at": "2026-07-22T00:05:53.575882+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -81,9 +81,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-20T22:18:52.091000+00:00",
-      "checked_at": "2026-07-21T08:46:15.824487+00:00",
-      "health_age_hours": 0.4,
+      "latest_post_at": "2026-07-21T22:54:15.696000+00:00",
+      "checked_at": "2026-07-22T00:05:53.575882+00:00",
+      "health_age_hours": 0.1,
       "attempts": [
         {
           "status": "unavailable",
@@ -96,20 +96,20 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 34784,
+          "raw_count": 34805,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-20T22:18:52.091000+00:00",
+          "latest_post_at": "2026-07-21T22:54:15.696000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 34784,
+      "source_raw_count": 34805,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-15T06:32:32.760175+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 99,
+      "eligible_count": 120,
       "new_count": 0,
       "delivered_count": 0,
       "delivery_status": "no_new_posts",
@@ -298,8 +298,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 87.4,
-        "ivp": 84.9,
+        "ivr": 73.2,
+        "ivp": 57.4,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -316,8 +316,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 30.4,
-        "ivp": 39.6,
+        "ivr": 78.9,
+        "ivp": 88.9,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -360,7 +360,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-07-21T09:09:34.157473+00:00",
+      "generated_at": "2026-07-22T00:14:42.137547+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
