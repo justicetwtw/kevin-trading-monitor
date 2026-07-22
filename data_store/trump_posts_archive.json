@@ -22928,5 +22928,68 @@
       "tier2": {}
     },
     "captured_at": "2026-07-22T12:17:11.827903+00:00"
+  },
+  "116963738416841583": {
+    "id": "116963738416841583",
+    "created_at": "2026-07-22T12:56:52.461Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116963738416841583",
+    "text": "From this point forward, any time the Islamic Republic of Iran shoots at a ship in the Strait of Hormuz, whether it be by Missile, Rocket, Drone, or any other device or weapon, the United States will bomb and destroy ONE BRIDGE OR POWER PLANT, including those located next to, or in, the Capital City of Tehran. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "Hormuz",
+          "missile",
+          "bomb",
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-22T14:25:50.155477+00:00"
+  },
+  "116963651250041725": {
+    "id": "116963651250041725",
+    "created_at": "2026-07-22T12:34:42.404Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116963651250041725",
+    "text": "Heading to Dover Air Force Base to HONOR OUR HEROES! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-22T14:25:50.155565+00:00"
+  },
+  "116963640178728533": {
+    "id": "116963640178728533",
+    "created_at": "2026-07-22T12:31:53.470Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116963640178728533",
+    "text": "MAGA CANDIDATES WON EVERYTHING LAST NIGHT IN ARIZONA, A COMPLETE SWEEP!!! I WON ARIZONA 18 MONTHS AGO. THE DUMOCRATS ARE DUMBFOUNDED. AFTER DECADES, ARIZONA IS BECOMING A REPUBLICAN STATE. CONGRATULATIONS TO ALL! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T14:25:50.155634+00:00"
   }
 }
