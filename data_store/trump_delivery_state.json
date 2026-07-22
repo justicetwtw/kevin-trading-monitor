@@ -21283,12 +21283,12 @@
       "post_id": "116961570518477700",
       "created_at": "2026-07-22T03:45:33.027Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-07-22T06:14:01.204472+00:00",
       "resolved_at": null,
       "run_id": "29896020183",
       "workflow_attempt_id": "29896020183:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "116961518130020934": {
       "post_id": "116961518130020934",
