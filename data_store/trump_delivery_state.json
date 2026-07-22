@@ -21404,12 +21404,12 @@
       "post_id": "116962993377590525",
       "created_at": "2026-07-22T09:47:24.067Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-22T10:51:29.867057+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-22T10:51:33.273579+00:00",
       "run_id": "29913441431",
       "workflow_attempt_id": "29913441431:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116962948048564200": {
       "post_id": "116962948048564200",
