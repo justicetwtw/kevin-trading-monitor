@@ -22480,5 +22480,37 @@
       }
     },
     "captured_at": "2026-07-21T23:12:34.690321+00:00"
+  },
+  "116961148061262709": {
+    "id": "116961148061262709",
+    "created_at": "2026-07-22T01:58:06.772Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961148061262709",
+    "text": "Rigged Elections!!!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T03:36:38.246276+00:00"
+  },
+  "116961030891139357": {
+    "id": "116961030891139357",
+    "created_at": "2026-07-22T01:28:18.901Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961030891139357",
+    "text": "These are the real facts. REPORT THEM!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T03:36:38.246367+00:00"
   }
 }
