@@ -22512,5 +22512,221 @@
       "tier2": {}
     },
     "captured_at": "2026-07-22T03:36:38.246367+00:00"
+  },
+  "116961577008925127": {
+    "id": "116961577008925127",
+    "created_at": "2026-07-22T03:47:12.063Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961577008925127",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.482838+00:00"
+  },
+  "116961574322416527": {
+    "id": "116961574322416527",
+    "created_at": "2026-07-22T03:46:31.000Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961574322416527",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.482878+00:00"
+  },
+  "116961572831779086": {
+    "id": "116961572831779086",
+    "created_at": "2026-07-22T03:46:08.354Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961572831779086",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116961572058857401",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486175+00:00"
+  },
+  "116961572058857401": {
+    "id": "116961572058857401",
+    "created_at": "2026-07-22T03:45:56.531Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961572058857401",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486200+00:00"
+  },
+  "116961571415704629": {
+    "id": "116961571415704629",
+    "created_at": "2026-07-22T03:45:46.746Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961571415704629",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116961570518477700",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486266+00:00"
+  },
+  "116961570518477700": {
+    "id": "116961570518477700",
+    "created_at": "2026-07-22T03:45:33.027Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961570518477700",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486279+00:00"
+  },
+  "116961518130020934": {
+    "id": "116961518130020934",
+    "created_at": "2026-07-22T03:32:13.575Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961518130020934",
+    "text": "35,152 is the new number just released by Homeland Security of non-citizens registered to vote in New Jersey. These are just the ones that got caught. The real numbers will prove to be many times this amount. They are all Dumocrats! Republicans, get smart and straighten out our Crooked Elections! Pass The Save America Act!!!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-22T06:13:15.486354+00:00"
+  },
+  "116961484899190159": {
+    "id": "116961484899190159",
+    "created_at": "2026-07-22T03:23:46.581Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961484899190159",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486372+00:00"
+  },
+  "116961482604750674": {
+    "id": "116961482604750674",
+    "created_at": "2026-07-22T03:23:11.571Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961482604750674",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486384+00:00"
+  },
+  "116961480817837390": {
+    "id": "116961480817837390",
+    "created_at": "2026-07-22T03:22:44.304Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961480817837390",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486396+00:00"
+  },
+  "116961475884596578": {
+    "id": "116961475884596578",
+    "created_at": "2026-07-22T03:21:29.027Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961475884596578",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486407+00:00"
+  },
+  "116961438077640740": {
+    "id": "116961438077640740",
+    "created_at": "2026-07-22T03:11:52.072Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961438077640740",
+    "text": "https://truthsocial.com/@realDonaldTrump/116946506480346191",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-22T06:13:15.486451+00:00"
+  },
+  "116961389455371069": {
+    "id": "116961389455371069",
+    "created_at": "2026-07-22T02:59:30.153Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116961389455371069",
+    "text": "Mike Lindell would be a GREAT Governor. He loves Minnesota with all of his heart. President DJTKSTP/SurveyUSA poll: Lindell, Tafoya increase their leads; Craig, Ellison margins shrink: https://kstp.com/kstp-news/top-news/kstp-surveyusa-poll-lindell-tafoya-increase-their-election-leads-craig-ellison-margins-shrink/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-22T06:13:15.486547+00:00"
   }
 }
