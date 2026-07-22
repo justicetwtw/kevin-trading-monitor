@@ -7,12 +7,12 @@
     "score": null,
     "indicators": {
       "buffett_indicator": 2.19,
-      "shiller_cape": 40.98,
+      "shiller_cape": 40.94,
       "sp500_top10_concentration": null,
       "margin_debt_yoy": null
     },
     "n_available": 2,
-    "fetched_at": "2026-07-22T17:37:29.398643-04:00"
+    "fetched_at": "2026-07-22T18:28:52.531024-04:00"
   },
-  "fetched_at": "2026-07-22T21:37:29.398688+00:00"
+  "fetched_at": "2026-07-22T22:28:52.531064+00:00"
 }
