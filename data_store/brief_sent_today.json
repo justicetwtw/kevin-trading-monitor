@@ -40,6 +40,7 @@
     "us_premarket": true
   },
   "2026-07-23": {
-    "us_midday": true
+    "us_midday": true,
+    "us_eod": true
   }
 }
