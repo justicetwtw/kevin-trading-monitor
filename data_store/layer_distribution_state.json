@@ -48,12 +48,12 @@
       }
     ],
     "level": "distribution",
-    "fetched_at": "2026-07-23T15:14:09.561798+00:00"
+    "fetched_at": "2026-07-23T16:50:43.445837+00:00"
   },
   "qqq": {
     "symbol": "QQQ",
     "lookback": 25,
-    "count": 8,
+    "count": 9,
     "days": [
       {
         "date": "2026-06-17",
@@ -102,10 +102,16 @@
         "drop_pct": -0.015029585113280416,
         "volume": 54109300,
         "prev_volume": 39402000
+      },
+      {
+        "date": "2026-07-23",
+        "drop_pct": -0.017863438040769255,
+        "volume": 24920202,
+        "prev_volume": 23437600
       }
     ],
     "level": "distribution",
-    "fetched_at": "2026-07-23T15:14:09.931150+00:00"
+    "fetched_at": "2026-07-23T16:50:43.596361+00:00"
   },
   "level": "distribution",
   "modifiers": {
@@ -113,5 +119,5 @@
     "sell_put": -15,
     "sell_call": 5
   },
-  "fetched_at": "2026-07-23T15:14:09.932252+00:00"
+  "fetched_at": "2026-07-23T16:50:43.598440+00:00"
 }
