@@ -21624,12 +21624,12 @@
       "post_id": "116971862681784017",
       "created_at": "2026-07-23T23:22:58.907Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-23T23:32:02.999322+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-23T23:32:05.798175+00:00",
       "run_id": "30053441744",
       "workflow_attempt_id": "30053441744:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
