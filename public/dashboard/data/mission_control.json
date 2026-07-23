@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-23T08:59:20.293026+08:00",
+  "generated_at": "2026-07-23T17:07:32.730395+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-22T23:42:26.819992+00:00",
+      "trump_monitor_checked_at": "2026-07-23T07:08:36.725359+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -44,7 +44,7 @@
         "category": "source_health",
         "symbol": null,
         "title": "Trump monitor health is stale",
-        "detail": "Last verified check is approximately 1.3 hours old."
+        "detail": "Last verified check is approximately 2 hours old."
       },
       {
         "severity": "P1",
@@ -88,9 +88,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-22T16:51:35.744000+00:00",
-      "checked_at": "2026-07-22T23:42:26.819992+00:00",
-      "health_age_hours": 1.3,
+      "latest_post_at": "2026-07-23T03:07:05.842000+00:00",
+      "checked_at": "2026-07-23T07:08:36.725359+00:00",
+      "health_age_hours": 2.0,
       "attempts": [
         {
           "status": "unavailable",
@@ -103,20 +103,20 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 34837,
+          "raw_count": 34839,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-22T16:51:35.744000+00:00",
+          "latest_post_at": "2026-07-23T03:07:05.842000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 34837,
+      "source_raw_count": 34839,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 53,
+      "eligible_count": 55,
       "new_count": 0,
       "delivered_count": 0,
       "delivery_status": "no_new_posts",
@@ -367,7 +367,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-07-23T00:59:20.293002+00:00",
+      "generated_at": "2026-07-23T09:07:32.730373+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
