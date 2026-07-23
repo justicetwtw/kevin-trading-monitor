@@ -23089,5 +23089,41 @@
     "captured_at": "2026-07-22T22:29:04.589122+00:00",
     "events": [],
     "scan_time": "2026-07-22T22:29:04.668361+00:00"
+  },
+  "116967081629708353": {
+    "id": "116967081629708353",
+    "created_at": "2026-07-23T03:07:05.842Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116967081629708353",
+    "text": "https://www.instagram.com/p/DbBSMG8jqBx/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-23T04:31:59.954432+00:00"
+  },
+  "116966741803054909": {
+    "id": "116966741803054909",
+    "created_at": "2026-07-23T01:40:40.500Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116966741803054909",
+    "text": "Exclusive — Cyprus Energy Minister: Trump's 'Energy Security' Engagement 'Vital' to Future of West: https://www.breitbart.com/politics/2026/07/22/exclusive-cyprus-energy-minister-trumps-energy-security-engagement-vital-to-future-of-west/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "energy"
+        ]
+      }
+    },
+    "captured_at": "2026-07-23T04:31:59.954549+00:00"
   }
 }
