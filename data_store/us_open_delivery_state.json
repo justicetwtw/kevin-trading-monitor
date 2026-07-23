@@ -366,6 +366,16 @@
           "workflow_run_id": "30024184009",
           "schedule_source": "48 14 * * 1-5",
           "workflow_started_at": "2026-07-23T16:13:51Z"
+        },
+        {
+          "at": "2026-07-24T00:42:10.003050+08:00",
+          "outcome": "duplicate",
+          "stage_code": null,
+          "status": null,
+          "lateness_minutes": null,
+          "workflow_run_id": "30026200605",
+          "schedule_source": "3 15 * * 1-5",
+          "workflow_started_at": "2026-07-23T16:41:36Z"
         }
       ]
     }
