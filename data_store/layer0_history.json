@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-07-23T16:50:40.393797+00:00",
+  "scan_time": "2026-07-23T18:17:14.333642+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 19.020000457763672,
+          "value": 19.649999618530273,
           "regime": "neutral"
         },
         "copper_gold": {
-          "value": 0.10338978796277482,
+          "value": 0.10314935576286623,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 5,
       "regime": "neutral",
-      "fetched_at": "2026-07-23T16:50:42.329385+00:00"
+      "fetched_at": "2026-07-23T18:17:17.416606+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,17 +36,17 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-07-23T12:50:42.330291-04:00"
+        "fetched_at": "2026-07-23T14:17:17.417520-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-07-23T16:50:43.227300+00:00"
+      "fetched_at": "2026-07-23T18:17:18.819083+00:00"
     },
     "distribution": {
       "spy": {
         "symbol": "SPY",
         "lookback": 25,
-        "count": 7,
+        "count": 8,
         "days": [
           {
             "date": "2026-06-17",
@@ -89,10 +89,16 @@
             "drop_pct": -0.009897156017872166,
             "volume": 62651000,
             "prev_volume": 46409800
+          },
+          {
+            "date": "2026-07-23",
+            "drop_pct": -0.013767515014619579,
+            "volume": 33097800,
+            "prev_volume": 32696300
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-07-23T16:50:43.445837+00:00"
+        "fetched_at": "2026-07-23T18:17:19.019239+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -149,13 +155,13 @@
           },
           {
             "date": "2026-07-23",
-            "drop_pct": -0.017863438040769255,
-            "volume": 24920202,
+            "drop_pct": -0.020372858317958088,
+            "volume": 29208919,
             "prev_volume": 23437600
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-07-23T16:50:43.596361+00:00"
+        "fetched_at": "2026-07-23T18:17:19.293968+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -163,7 +169,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-07-23T16:50:43.598440+00:00"
+      "fetched_at": "2026-07-23T18:17:19.295056+00:00"
     },
     "bubble": {
       "score": 0,
@@ -179,9 +185,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-07-23T12:50:44.465341-04:00"
+        "fetched_at": "2026-07-23T14:17:20.333825-04:00"
       },
-      "fetched_at": "2026-07-23T16:50:44.465383+00:00"
+      "fetched_at": "2026-07-23T18:17:20.333870+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -191,13 +197,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-07-23T16:50:45.062898+00:00"
+      "fetched_at": "2026-07-23T18:17:21.133169+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 19.020000457763672,
-        "vix9d": 18.649999618530273,
-        "vix3m": 20.799999237060547,
+        "vix": 19.649999618530273,
+        "vix9d": 19.34000015258789,
+        "vix3m": 21.15999984741211,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -207,13 +213,13 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-07-23T16:50:45.112770+00:00"
+      "fetched_at": "2026-07-23T18:17:21.232815+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-07-23T16:50:49.349707+00:00"
+      "fetched_at": "2026-07-23T18:17:25.568308+00:00"
     }
   },
   "aggregate_modifiers": {
