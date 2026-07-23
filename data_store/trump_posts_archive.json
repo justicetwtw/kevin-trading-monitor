@@ -23141,5 +23141,55 @@
       "tier2": {}
     },
     "captured_at": "2026-07-23T11:26:21.551658+00:00"
+  },
+  "116969243226176328": {
+    "id": "116969243226176328",
+    "created_at": "2026-07-23T12:16:49.186Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116969243226176328",
+    "text": "A year ago the United States of America attacked, very powerfully, the Houthis, for their interference with commerce and trade, by shooting at ships. Since that time, and during our conflict with Iran, they have acted very responsibly. Unfortunately, now they are starting up again, shooting at two Saudi Arabian ships last night. Please let this TRUTH serve to represent that if they do this again, the U.S. will hold Iran responsible, in that the Houthis are a Surrogate and/or Proxy of Iran, and major military punishment will be inflicted upon Iran and, of course, the Houthis, themselves, who I am very disappointed with in that they have, until now, acted very professionally and smart. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-23T12:55:47.350060+00:00"
+  },
+  "116969149016233329": {
+    "id": "116969149016233329",
+    "created_at": "2026-07-23T11:52:51.658Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116969149016233329",
+    "text": "The Civil Nuclear Deal (There will be no enrichment of material!) being made between the United States Department of Energy and Saudi Arabia, which pertains only to non-military use such as the ones that Iran and UAE (and others) already have, will be approved, but is totally subject to Saudi Arabia joining the very respected and successful Abraham Accords. The United States is not opposed to Civil (Non-Enriched) Nuclear Facilities. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ],
+        "energy": [
+          "energy"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-23T12:55:47.350191+00:00"
   }
 }
