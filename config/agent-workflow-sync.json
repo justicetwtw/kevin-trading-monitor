@@ -1,0 +1,14 @@
+{
+  "schema": "agent-workflow-sync-config:v1",
+  "role": "consumer",
+  "repository": "justicetwtw/kevin-trading-monitor",
+  "default_ref": "main",
+  "contract_path": "docs/shared-agent-workflow-contract.md",
+  "source_repository": "justicetwtw/jin-yi-yang-bot",
+  "source_ref": "main",
+  "peer_repository": "justicetwtw/jin-yi-yang-bot",
+  "peer_ref": "main",
+  "automation_branch": "automation/sync-agent-workflow-contract",
+  "drift_issue_title": "Agent workflow sync drift: jin-yi-yang-bot",
+  "source_policy_paths": []
+}
