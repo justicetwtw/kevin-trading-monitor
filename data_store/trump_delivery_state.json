@@ -21740,6 +21740,17 @@
       "run_id": "30072816496",
       "workflow_attempt_id": "30072816496:1",
       "stage_code": "resolved_sent"
+    },
+    "116975606621428184": {
+      "post_id": "116975606621428184",
+      "created_at": "2026-07-24T15:15:06.894Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "30106991840",
+      "workflow_attempt_id": "30106991840:1",
+      "stage_code": "captured_pending"
     }
   }
 }
