@@ -1,0 +1,175 @@
+name: Agent Workflow Cross-Repo Sync
+
+on:
+  pull_request:
+    paths:
+      - "docs/shared-agent-workflow-contract.md"
+      - "docs/agent-team-workflow.md"
+      - "docs/codex-cloud-delivery.md"
+      - "docs/codex-delivery-workflow.md"
+      - "docs/local-codex-delivery.md"
+      - "config/agent-workflow-sync.json"
+      - "scripts/agent-workflow-sync.mjs"
+      - "scripts/agent-workflow-sync.test.mjs"
+      - "scripts/verify-codex-delivery-routing.mjs"
+      - ".github/workflows/agent-workflow-sync.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/shared-agent-workflow-contract.md"
+      - "docs/agent-team-workflow.md"
+      - "docs/codex-cloud-delivery.md"
+      - "docs/codex-delivery-workflow.md"
+      - "docs/local-codex-delivery.md"
+      - "config/agent-workflow-sync.json"
+      - "scripts/agent-workflow-sync.mjs"
+      - "scripts/agent-workflow-sync.test.mjs"
+      - "scripts/verify-codex-delivery-routing.mjs"
+      - ".github/workflows/agent-workflow-sync.yml"
+  schedule:
+    - cron: "17 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: agent-workflow-sync-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read sync role
+        id: config
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROLE="$(node -e "const c=require('./config/agent-workflow-sync.json'); process.stdout.write(c.role)")"
+          echo "role=$ROLE" >> "$GITHUB_OUTPUT"
+
+      - name: Test sync tooling
+        run: node --test scripts/agent-workflow-sync.test.mjs
+
+      - name: Verify local portable contract
+        run: node scripts/agent-workflow-sync.mjs local
+
+      - name: Enforce source portable-contract update
+        if: github.event_name == 'pull_request' && steps.config.outputs.role == 'source'
+        run: >-
+          node scripts/agent-workflow-sync.mjs source-guard
+          --base "${{ github.event.pull_request.base.sha }}"
+          --head "${{ github.event.pull_request.head.sha }}"
+
+      - name: Compare peer default branch
+        id: compare
+        if: github.event_name != 'pull_request' || steps.config.outputs.role == 'consumer'
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          node scripts/agent-workflow-sync.mjs compare > sync-result.json 2> sync-error.txt
+          RC=$?
+          set -e
+          if [[ "$RC" == "1" ]] && grep -q '^remote_fetch_failed_404$' sync-error.txt; then
+            cat > sync-result.json <<'JSON'
+          {
+            "status": "drift",
+            "reason": "remote_contract_missing"
+          }
+          JSON
+            RC=2
+          fi
+          cat sync-result.json
+          if [[ -s sync-error.txt ]]; then cat sync-error.txt >&2; fi
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          if [[ "$RC" != "0" && "$RC" != "2" ]]; then exit "$RC"; fi
+
+      - name: Block stale consumer PR
+        if: github.event_name == 'pull_request' && steps.config.outputs.role == 'consumer' && steps.compare.outputs.rc == '2'
+        run: |
+          echo "Consumer portable workflow contract is not identical to the canonical source." >&2
+          exit 1
+
+      - name: Maintain source-side drift issue
+        if: github.event_name != 'pull_request' && steps.config.outputs.role == 'source'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TITLE="$(node -e "const c=require('./config/agent-workflow-sync.json'); process.stdout.write(c.drift_issue_title)")"
+          gh issue list --state open --limit 100 --json number,title > open-issues.json
+          ISSUE="$(jq -r --arg title "$TITLE" '.[] | select(.title == $title) | .number' open-issues.json | head -n 1)"
+          if [[ "${{ steps.compare.outputs.rc }}" == "2" ]]; then
+            BODY=$(cat <<EOF
+          The portable agent workflow contract on the peer default branch is stale or missing.
+
+          Source repository: \`${{ github.repository }}\`
+          Source SHA: \`${{ github.sha }}\`
+          Consumer repository: \`justicetwtw/kevin-trading-monitor\`
+
+          The consumer-side scheduled workflow should create or update Draft PR branch \`automation/sync-agent-workflow-contract\`. Keep this issue open until both default branches contain byte-identical contracts.
+          EOF
+          )
+            if [[ -z "$ISSUE" ]]; then
+              gh issue create --title "$TITLE" --body "$BODY"
+            else
+              gh issue comment "$ISSUE" --body "$BODY"
+            fi
+          elif [[ -n "$ISSUE" ]]; then
+            gh issue close "$ISSUE" --comment "Peer default branch is synchronized with the canonical portable workflow contract."
+          fi
+
+      - name: Create or update consumer synchronization PR
+        if: github.event_name != 'pull_request' && steps.config.outputs.role == 'consumer' && steps.compare.outputs.rc == '2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="$(node -e "const c=require('./config/agent-workflow-sync.json'); process.stdout.write(c.automation_branch)")"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH:$BRANCH"
+            git switch "$BRANCH"
+            git merge --no-edit origin/main
+          else
+            git switch -c "$BRANCH" origin/main
+          fi
+          node scripts/agent-workflow-sync.mjs sync --write > sync-write-result.json
+          cat sync-write-result.json
+          git add docs/shared-agent-workflow-contract.md
+          if ! git diff --cached --quiet; then
+            VERSION="$(node -e "const fs=require('fs'); const t=fs.readFileSync('docs/shared-agent-workflow-contract.md','utf8'); const m=t.match(/\"contract_version\"\s*:\s*\"([^\"]+)\"/); process.stdout.write(m[1])")"
+            git commit -m "docs(agent): sync portable workflow contract $VERSION"
+            git push origin "HEAD:refs/heads/$BRANCH"
+          fi
+          PR="$(gh pr list --state open --head "$BRANCH" --json number --jq '.[0].number // empty')"
+          cat > sync-pr-body.md <<'EOF'
+          ## Automated workflow synchronization
+
+          This Draft PR copies the byte-identical portable agent workflow contract from the canonical source repository `justicetwtw/jin-yi-yang-bot`.
+
+          The automation does not modify repository-specific trading rules, product code, secrets, deployment settings or production behavior.
+
+          Review the source contract version and merge normally. Do not create a replacement PR while this synchronization PR is open.
+          EOF
+          if [[ -z "$PR" ]]; then
+            if ! gh pr create --draft --base main --head "$BRANCH" --title "docs(agent): sync portable workflow contract" --body-file sync-pr-body.md; then
+              gh issue create --title "Agent workflow synchronization requires manual PR" --body "The synchronized branch \`$BRANCH\` was pushed, but GitHub Actions could not create the Draft PR. Create a Draft PR from that existing branch; do not create a replacement synchronization branch."
+              exit 1
+            fi
+          else
+            gh pr edit "$PR" --body-file sync-pr-body.md
+          fi
