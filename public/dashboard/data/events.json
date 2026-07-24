@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-23T17:07:32.560777+08:00",
+  "generated_at": "2026-07-24T08:54:49.691544+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -11,10 +11,6 @@
       {
         "symbol": "CRWV",
         "earnings_date": "2026-05-07"
-      },
-      {
-        "symbol": "SNPS",
-        "earnings_date": "2026-05-27"
       },
       {
         "symbol": "CRDO",
@@ -34,14 +30,6 @@
       },
       {
         "symbol": "NOW",
-        "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "GEV",
-        "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "TSLA",
         "earnings_date": "2026-07-22"
       },
       {
@@ -145,6 +133,10 @@
         "earnings_date": "2026-08-05"
       },
       {
+        "symbol": "UUUU",
+        "earnings_date": "2026-08-05"
+      },
+      {
         "symbol": "CEG",
         "earnings_date": "2026-08-06"
       },
@@ -157,15 +149,7 @@
         "earnings_date": "2026-08-06"
       },
       {
-        "symbol": "RKLB",
-        "earnings_date": "2026-08-06"
-      },
-      {
         "symbol": "MP",
-        "earnings_date": "2026-08-06"
-      },
-      {
-        "symbol": "UUUU",
         "earnings_date": "2026-08-06"
       },
       {
@@ -178,6 +162,10 @@
       },
       {
         "symbol": "ASTS",
+        "earnings_date": "2026-08-10"
+      },
+      {
+        "symbol": "RKLB",
         "earnings_date": "2026-08-10"
       },
       {
@@ -210,6 +198,10 @@
       },
       {
         "symbol": "NVDA",
+        "earnings_date": "2026-08-26"
+      },
+      {
+        "symbol": "SNPS",
         "earnings_date": "2026-08-26"
       },
       {
@@ -247,6 +239,14 @@
       {
         "symbol": "TSM",
         "earnings_date": "2026-10-15"
+      },
+      {
+        "symbol": "GEV",
+        "earnings_date": "2026-10-21"
+      },
+      {
+        "symbol": "TSLA",
+        "earnings_date": "2026-10-21"
       },
       {
         "symbol": "MU",
@@ -290,6 +290,10 @@
       },
       {
         "symbol": "WDC",
+        "earnings_date": "[]"
+      },
+      {
+        "symbol": "STX",
         "earnings_date": "[]"
       },
       {
