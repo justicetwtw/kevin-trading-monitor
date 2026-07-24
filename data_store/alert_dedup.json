@@ -1,11 +1,11 @@
 {
-  "Trump::news": {
-    "last_sent": "2026-07-15T21:37:29.581412+00:00",
+  "TSLA::leaps_entry": {
+    "last_sent": "2026-07-24T16:56:15.160011+00:00",
     "alert_level": "green",
     "tags": []
   },
-  "OKLO::leaps_entry": {
-    "last_sent": "2026-07-16T16:46:30.260661+00:00",
+  "MP::leaps_entry": {
+    "last_sent": "2026-07-24T16:56:16.201225+00:00",
     "alert_level": "green",
     "tags": []
   }
