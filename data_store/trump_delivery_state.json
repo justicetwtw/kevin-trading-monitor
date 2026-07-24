@@ -21723,12 +21723,12 @@
       "post_id": "116972979528582177",
       "created_at": "2026-07-24T04:07:00.641Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-24T06:38:18.787381+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-24T06:38:22.431058+00:00",
       "run_id": "30072816496",
       "workflow_attempt_id": "30072816496:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116972976347462953": {
       "post_id": "116972976347462953",
