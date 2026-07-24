@@ -23316,5 +23316,37 @@
       }
     },
     "captured_at": "2026-07-24T00:57:32.361084+00:00"
+  },
+  "116972245395063508": {
+    "id": "116972245395063508",
+    "created_at": "2026-07-24T01:00:18.649Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116972245395063508",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116972241542468155Very good!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-24T04:11:10.994539+00:00"
+  },
+  "116972241542468155": {
+    "id": "116972241542468155",
+    "created_at": "2026-07-24T00:59:19.862Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116972241542468155",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-24T04:11:10.994572+00:00"
   }
 }
