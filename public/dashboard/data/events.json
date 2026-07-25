@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-24T17:04:11.856875+08:00",
+  "generated_at": "2026-07-25T09:00:23.501041+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -8,18 +8,6 @@
   "data": {
     "alerts": [],
     "earnings_calendar": [
-      {
-        "symbol": "CRWV",
-        "earnings_date": "2026-05-07"
-      },
-      {
-        "symbol": "CRDO",
-        "earnings_date": "2026-06-01"
-      },
-      {
-        "symbol": "RBRK",
-        "earnings_date": "2026-06-04"
-      },
       {
         "symbol": "GOOG",
         "earnings_date": "2026-07-22"
@@ -33,19 +21,19 @@
         "earnings_date": "2026-07-22"
       },
       {
-        "symbol": "LMT",
-        "earnings_date": "2026-07-23"
-      },
-      {
-        "symbol": "RTX",
-        "earnings_date": "2026-07-23"
-      },
-      {
-        "symbol": "INTC",
-        "earnings_date": "2026-07-23"
+        "symbol": "NEE",
+        "earnings_date": "2026-07-24"
       },
       {
         "symbol": "KLAC",
+        "earnings_date": "2026-07-28"
+      },
+      {
+        "symbol": "GLW",
+        "earnings_date": "2026-07-28"
+      },
+      {
+        "symbol": "STX",
         "earnings_date": "2026-07-28"
       },
       {
@@ -77,7 +65,15 @@
         "earnings_date": "2026-07-29"
       },
       {
+        "symbol": "APH",
+        "earnings_date": "2026-07-29"
+      },
+      {
         "symbol": "ARM",
+        "earnings_date": "2026-07-29"
+      },
+      {
+        "symbol": "FLS",
         "earnings_date": "2026-07-29"
       },
       {
@@ -93,11 +89,27 @@
         "earnings_date": "2026-07-30"
       },
       {
+        "symbol": "SO",
+        "earnings_date": "2026-07-30"
+      },
+      {
         "symbol": "VLO",
         "earnings_date": "2026-07-30"
       },
       {
+        "symbol": "XOM",
+        "earnings_date": "2026-07-31"
+      },
+      {
         "symbol": "CVX",
+        "earnings_date": "2026-07-31"
+      },
+      {
+        "symbol": "ETN",
+        "earnings_date": "2026-07-31"
+      },
+      {
+        "symbol": "CCJ",
         "earnings_date": "2026-07-31"
       },
       {
@@ -105,11 +117,23 @@
         "earnings_date": "2026-08-03"
       },
       {
+        "symbol": "CAT",
+        "earnings_date": "2026-08-04"
+      },
+      {
+        "symbol": "AMD",
+        "earnings_date": "2026-08-04"
+      },
+      {
         "symbol": "ANET",
         "earnings_date": "2026-08-04"
       },
       {
-        "symbol": "LEU",
+        "symbol": "DD",
+        "earnings_date": "2026-08-04"
+      },
+      {
+        "symbol": "KTOS",
         "earnings_date": "2026-08-04"
       },
       {
@@ -121,7 +145,15 @@
         "earnings_date": "2026-08-05"
       },
       {
+        "symbol": "WDC",
+        "earnings_date": "2026-08-05"
+      },
+      {
         "symbol": "SNDK",
+        "earnings_date": "2026-08-05"
+      },
+      {
+        "symbol": "LEU",
         "earnings_date": "2026-08-05"
       },
       {
@@ -142,10 +174,6 @@
       },
       {
         "symbol": "NBIS",
-        "earnings_date": "2026-08-06"
-      },
-      {
-        "symbol": "KTOS",
         "earnings_date": "2026-08-06"
       },
       {
@@ -185,6 +213,10 @@
         "earnings_date": "2026-08-12"
       },
       {
+        "symbol": "CRWV",
+        "earnings_date": "2026-08-12"
+      },
+      {
         "symbol": "AMAT",
         "earnings_date": "2026-08-13"
       },
@@ -213,12 +245,24 @@
         "earnings_date": "2026-09-01"
       },
       {
+        "symbol": "CRM",
+        "earnings_date": "2026-09-02"
+      },
+      {
         "symbol": "AVAV",
+        "earnings_date": "2026-09-02"
+      },
+      {
+        "symbol": "CRDO",
         "earnings_date": "2026-09-02"
       },
       {
         "symbol": "AVGO",
         "earnings_date": "2026-09-03"
+      },
+      {
+        "symbol": "RBRK",
+        "earnings_date": "2026-09-08"
       },
       {
         "symbol": "ORCL",
@@ -229,7 +273,15 @@
         "earnings_date": "2026-09-10"
       },
       {
+        "symbol": "MU",
+        "earnings_date": "2026-09-23"
+      },
+      {
         "symbol": "COST",
+        "earnings_date": "2026-09-24"
+      },
+      {
+        "symbol": "UEC",
         "earnings_date": "2026-09-24"
       },
       {
@@ -241,6 +293,14 @@
         "earnings_date": "2026-10-15"
       },
       {
+        "symbol": "LMT",
+        "earnings_date": "2026-10-20"
+      },
+      {
+        "symbol": "RTX",
+        "earnings_date": "2026-10-20"
+      },
+      {
         "symbol": "GEV",
         "earnings_date": "2026-10-21"
       },
@@ -249,72 +309,12 @@
         "earnings_date": "2026-10-21"
       },
       {
-        "symbol": "MU",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "CAT",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "XOM",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "AMD",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "CRM",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "APH",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "GLW",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "ETN",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "NEE",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "SO",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "WDC",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "STX",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "DD",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "CCJ",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "FLS",
-        "earnings_date": "[]"
+        "symbol": "INTC",
+        "earnings_date": "2026-10-22"
       },
       {
         "symbol": "FCX",
-        "earnings_date": "[]"
-      },
-      {
-        "symbol": "UEC",
-        "earnings_date": "[]"
+        "earnings_date": "2026-10-22"
       }
     ]
   }
