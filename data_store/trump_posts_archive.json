@@ -23866,5 +23866,61 @@
       "tier2": {}
     },
     "captured_at": "2026-07-26T10:23:12.750216+00:00"
+  },
+  "116986582428363613": {
+    "id": "116986582428363613",
+    "created_at": "2026-07-26T13:46:24.418Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116986582428363613",
+    "text": "Thank you to Highly Respected Mohammed VI, the King of Morocco — Such a Great Honor! I look forward to traveling  the entire length of this Great Highway someday, hopefully soon! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-07-26T14:15:01.618407+00:00"
+  },
+  "116986556826955994": {
+    "id": "116986556826955994",
+    "created_at": "2026-07-26T13:39:53.769Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116986556826955994",
+    "text": "https://www.cnbc.com/2026/07/23/google-1-billion-eu-fine-dma.html",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Google"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-07-26T14:15:01.618506+00:00"
+  },
+  "116986444957105099": {
+    "id": "116986444957105099",
+    "created_at": "2026-07-26T13:11:26.895Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116986444957105099",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-26T14:15:01.618526+00:00"
   }
 }
