@@ -22119,12 +22119,12 @@
       "post_id": "116987909203284060",
       "created_at": "2026-07-26T19:23:49.394Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T19:48:11.356716+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T19:48:14.080001+00:00",
       "run_id": "30217575216",
       "workflow_attempt_id": "30217575216:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116987908357353303": {
       "post_id": "116987908357353303",
