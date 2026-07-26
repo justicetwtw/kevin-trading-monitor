@@ -21877,12 +21877,12 @@
       "post_id": "116985546564236950",
       "created_at": "2026-07-26T09:22:58.480Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-07-26T10:23:51.591122+00:00",
       "resolved_at": null,
       "run_id": "30198147338",
       "workflow_attempt_id": "30198147338:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "116985545303195966": {
       "post_id": "116985545303195966",
