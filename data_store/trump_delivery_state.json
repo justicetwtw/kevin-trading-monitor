@@ -22350,12 +22350,12 @@
       "post_id": "116988259931830276",
       "created_at": "2026-07-26T20:53:01.089Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-07-26T21:36:05.218458+00:00",
       "resolved_at": null,
       "run_id": "30221353250",
       "workflow_attempt_id": "30221353250:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "116988257716740009": {
       "post_id": "116988257716740009",
