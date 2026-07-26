@@ -22295,12 +22295,12 @@
       "post_id": "116988278856697658",
       "created_at": "2026-07-26T20:57:49.857Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T21:36:33.154964+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T21:36:36.652459+00:00",
       "run_id": "30221353250",
       "workflow_attempt_id": "30221353250:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116988275180360117": {
       "post_id": "116988275180360117",
