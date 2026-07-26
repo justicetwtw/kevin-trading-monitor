@@ -22240,12 +22240,12 @@
       "post_id": "116988295070814409",
       "created_at": "2026-07-26T21:01:57.265Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T21:37:00.305135+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T21:37:03.180519+00:00",
       "run_id": "30221353250",
       "workflow_attempt_id": "30221353250:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116988289425321513": {
       "post_id": "116988289425321513",
