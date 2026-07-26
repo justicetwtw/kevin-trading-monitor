@@ -21998,12 +21998,12 @@
       "post_id": "116986444957105099",
       "created_at": "2026-07-26T13:11:26.895Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T14:15:03.889234+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T14:15:06.490480+00:00",
       "run_id": "30205662336",
       "workflow_attempt_id": "30205662336:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
