@@ -21844,12 +21844,12 @@
       "post_id": "116984230117651831",
       "created_at": "2026-07-26T03:48:11.004Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-07-26T06:26:26.593717+00:00",
       "resolved_at": null,
       "run_id": "30191028069",
       "workflow_attempt_id": "30191028069:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "116984203022960894": {
       "post_id": "116984203022960894",
