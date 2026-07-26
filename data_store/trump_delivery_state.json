@@ -22031,12 +22031,12 @@
       "post_id": "116987945290640259",
       "created_at": "2026-07-26T19:33:00.071Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T19:48:46.378812+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T19:48:48.980062+00:00",
       "run_id": "30217575216",
       "workflow_attempt_id": "30217575216:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116987944179267331": {
       "post_id": "116987944179267331",
