@@ -21943,12 +21943,12 @@
       "post_id": "116985539855804799",
       "created_at": "2026-07-26T09:21:16.117Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T10:23:24.779274+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T10:23:27.504160+00:00",
       "run_id": "30198147338",
       "workflow_attempt_id": "30198147338:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116985538488226369": {
       "post_id": "116985538488226369",
