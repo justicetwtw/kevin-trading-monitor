@@ -22361,12 +22361,12 @@
       "post_id": "116988257716740009",
       "created_at": "2026-07-26T20:52:27.290Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T21:35:59.502814+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T21:36:02.677069+00:00",
       "run_id": "30221353250",
       "workflow_attempt_id": "30221353250:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116988245918385278": {
       "post_id": "116988245918385278",
