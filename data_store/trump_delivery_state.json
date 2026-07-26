@@ -22218,12 +22218,12 @@
       "post_id": "116988306864320016",
       "created_at": "2026-07-26T21:04:57.222Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-26T21:37:10.289595+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-26T21:37:13.275779+00:00",
       "run_id": "30221353250",
       "workflow_attempt_id": "30221353250:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116988306182862172": {
       "post_id": "116988306182862172",
