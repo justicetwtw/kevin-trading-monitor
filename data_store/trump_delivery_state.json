@@ -22801,12 +22801,12 @@
       "post_id": "116994497445449017",
       "created_at": "2026-07-27T23:19:17.994Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-27T23:46:07.891508+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-27T23:46:10.325624+00:00",
       "run_id": "30315147891",
       "workflow_attempt_id": "30315147891:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116994496630944909": {
       "post_id": "116994496630944909",
