@@ -1,10 +1,8 @@
 {
   "TSLA::leaps_entry": {
-    "last_sent": "2026-07-24T18:25:12.785623+00:00",
+    "last_sent": "2026-07-27T17:49:04.351129+00:00",
     "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1"
-    ]
+    "tags": []
   },
   "MP::leaps_entry": {
     "last_sent": "2026-07-24T18:25:13.549572+00:00",
@@ -12,5 +10,10 @@
     "tags": [
       "⚠Trump_Tier1"
     ]
+  },
+  "TSM::leaps_entry": {
+    "last_sent": "2026-07-27T17:49:05.190523+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
