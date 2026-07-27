@@ -22526,12 +22526,12 @@
       "post_id": "116992795342274139",
       "created_at": "2026-07-27T16:06:25.957Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-27T17:56:44.126007+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-27T17:56:47.725292+00:00",
       "run_id": "30291435458",
       "workflow_attempt_id": "30291435458:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116992794702989897": {
       "post_id": "116992794702989897",
