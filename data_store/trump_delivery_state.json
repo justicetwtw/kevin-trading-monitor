@@ -22570,12 +22570,12 @@
       "post_id": "116992785834552197",
       "created_at": "2026-07-27T16:04:00.881Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-27T17:56:22.390228+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-27T17:56:25.467249+00:00",
       "run_id": "30291435458",
       "workflow_attempt_id": "30291435458:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
