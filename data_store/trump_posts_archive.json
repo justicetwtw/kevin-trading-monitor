@@ -25406,5 +25406,21 @@
       "tier2": {}
     },
     "captured_at": "2026-07-28T01:06:19.436277+00:00"
+  },
+  "116995133068341490": {
+    "id": "116995133068341490",
+    "created_at": "2026-07-28T02:00:56.829Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116995133068341490",
+    "text": "Confirm Todd Blanche without delay: https://www.washingtontimes.com/news/2026/jul/23/confirm-todd-blanche-without-delay/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T04:20:35.620002+00:00"
   }
 }
