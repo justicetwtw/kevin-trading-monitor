@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-27T18:26:53.377692+08:00",
+  "generated_at": "2026-07-28T08:54:01.281939+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -19,10 +19,6 @@
       {
         "symbol": "NOW",
         "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "NEE",
-        "earnings_date": "2026-07-24"
       },
       {
         "symbol": "KLAC",
@@ -186,7 +182,7 @@
       },
       {
         "symbol": "OKLO",
-        "earnings_date": "2026-08-10"
+        "earnings_date": "2026-08-07"
       },
       {
         "symbol": "ASTS",
@@ -315,6 +311,10 @@
       {
         "symbol": "FCX",
         "earnings_date": "2026-10-22"
+      },
+      {
+        "symbol": "NEE",
+        "earnings_date": "2026-10-27"
       }
     ]
   }

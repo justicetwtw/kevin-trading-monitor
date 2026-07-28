@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-27T18:26:53.585361+08:00",
+  "generated_at": "2026-07-28T08:54:01.527585+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-27T08:17:40.097380+00:00",
+      "trump_monitor_checked_at": "2026-07-27T23:46:47.579625+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -44,7 +44,7 @@
         "category": "source_health",
         "symbol": null,
         "title": "Trump monitor health is stale",
-        "detail": "Last verified check is approximately 2.2 hours old."
+        "detail": "Last verified check is approximately 1.1 hours old."
       },
       {
         "severity": "P1",
@@ -88,9 +88,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-27T05:27:30.493000+00:00",
-      "checked_at": "2026-07-27T08:17:40.097380+00:00",
-      "health_age_hours": 2.2,
+      "latest_post_at": "2026-07-27T23:29:03.350000+00:00",
+      "checked_at": "2026-07-27T23:46:47.579625+00:00",
+      "health_age_hours": 1.1,
       "attempts": [
         {
           "status": "unavailable",
@@ -103,22 +103,22 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 34921,
+          "raw_count": 34954,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-27T05:27:30.493000+00:00",
+          "latest_post_at": "2026-07-27T23:29:03.350000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 34921,
+      "source_raw_count": 34954,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 137,
-      "new_count": 1,
-      "delivered_count": 1,
+      "eligible_count": 170,
+      "new_count": 13,
+      "delivered_count": 13,
       "delivery_status": "delivered_all",
       "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
       "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
@@ -305,8 +305,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 56.5,
-        "ivp": 26.3,
+        "ivr": 55.4,
+        "ivp": 24.1,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -323,8 +323,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 86.6,
-        "ivp": 93.0,
+        "ivr": 96.7,
+        "ivp": 94.8,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -367,7 +367,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-07-27T10:26:53.585332+00:00",
+      "generated_at": "2026-07-28T00:54:01.527564+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
