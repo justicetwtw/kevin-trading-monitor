@@ -23021,12 +23021,12 @@
       "post_id": "116997917894077171",
       "created_at": "2026-07-28T13:49:09.899Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-07-28T15:35:05.649815+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-07-28T15:35:08.337954+00:00",
       "run_id": "30373919406",
       "workflow_attempt_id": "30373919406:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "116997915992497491": {
       "post_id": "116997915992497491",
