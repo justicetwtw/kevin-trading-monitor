@@ -26008,5 +26008,178 @@
     "captured_at": "2026-07-28T17:01:45.178649+00:00",
     "events": [],
     "scan_time": "2026-07-28T17:01:45.257917+00:00"
+  },
+  "116998787858683666": {
+    "id": "116998787858683666",
+    "created_at": "2026-07-28T17:30:24.504Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998787858683666",
+    "text": "RT @realDonaldTrumpWe're going to bring this heroic young man, and his family, into the White House with, perhaps, the boy he saved, to give him a High Civilian Honor. Very brave, he deserves it! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.995697+00:00"
+  },
+  "116998782313244681": {
+    "id": "116998782313244681",
+    "created_at": "2026-07-28T17:28:59.884Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998782313244681",
+    "text": "Trump Rallies Around 'Trump Accounts' During Ga. Speech: https://www.newsmax.com/newsfront/donald-trump-georgia-rally-investment-accounts/2026/07/22/id/1263753/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.995809+00:00"
+  },
+  "116998780287502025": {
+    "id": "116998780287502025",
+    "created_at": "2026-07-28T17:28:28.972Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998780287502025",
+    "text": "Trump touts explosive early growth of new child savings accounts: https://www.washingtontimes.com/news/2026/jul/22/trump-touts-explosive-early-growth-new-child-savings-accounts/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "market_general": [
+          "growth"
+        ]
+      }
+    },
+    "captured_at": "2026-07-28T18:21:05.995873+00:00"
+  },
+  "116998775699194439": {
+    "id": "116998775699194439",
+    "created_at": "2026-07-28T17:27:18.965Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998775699194439",
+    "text": "Trump: 'With communism, everything turns to s***': https://www.washingtonexaminer.com/news/white-house/4659752/trump-communism-dont-think-anybody-wants-that-georgia-remarks/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.995937+00:00"
+  },
+  "116998774304633594": {
+    "id": "116998774304633594",
+    "created_at": "2026-07-28T17:26:57.686Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998774304633594",
+    "text": "Trump blasts Jon Ossoff, 'communist' Democrats in Georgia speech: https://justthenews.com/politics-policy/all-things-trump/trump-blasts-jon-ossoff-communist-democrats-georgia-speech",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.995994+00:00"
+  },
+  "116998772846859723": {
+    "id": "116998772846859723",
+    "created_at": "2026-07-28T17:26:35.442Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998772846859723",
+    "text": "Trump holds hands with toddler and mocks 'Pee-wee Herman look-alike' Jon Ossoff at Georgia Trump Accounts rally: https://nypost.com/2026/07/22/us-news/trump-holds-hands-with-toddler-and-mocks-pee-wee-jon-ossoff-at-georgia-trump-accounts-rally/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.996056+00:00"
+  },
+  "116998771507248785": {
+    "id": "116998771507248785",
+    "created_at": "2026-07-28T17:26:14.997Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998771507248785",
+    "text": "Trump gives emotional tribute to fallen Army Lt Tyler Feehan after flying grieving family on Air Force One: https://www.foxnews.com/politics/trump-pays-emotional-tribute-fallen-army-lt-tyler-feehan-flying-grieving-family-air-force-one",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-28T18:21:05.996117+00:00"
+  },
+  "116998766458372558": {
+    "id": "116998766458372558",
+    "created_at": "2026-07-28T17:24:57.958Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998766458372558",
+    "text": "Tariffs pull, USMCA pushes: Toyota to Texas: https://thehill.com/opinion/white-house/5965989-toyota-texas-tacoma-tariffs-impact/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.996167+00:00"
+  },
+  "116998688330805629": {
+    "id": "116998688330805629",
+    "created_at": "2026-07-28T17:05:05.827Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998688330805629",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/116998687659903888We're going to bring this heroic young man, and his family, into the White House with, perhaps, the boy he saved, to give him a High Civilian Honor. Very brave, he deserves it! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.996230+00:00"
+  },
+  "116998687659903888": {
+    "id": "116998687659903888",
+    "created_at": "2026-07-28T17:04:55.593Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/116998687659903888",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-28T18:21:05.996246+00:00"
   }
 }
