@@ -26201,5 +26201,41 @@
     "captured_at": "2026-07-28T22:44:17.281894+00:00",
     "events": [],
     "scan_time": "2026-07-28T22:44:17.361566+00:00"
+  },
+  "117000284640096040": {
+    "id": "117000284640096040",
+    "created_at": "2026-07-28T23:51:03.578Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117000284640096040",
+    "text": "Congratulations to the Great Jay Clayton on his confirmation by the United States Senate, to be the next Director of National Intelligence. Jay is outstanding in every way, and will do a spectacular job as Director! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Intel"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-07-29T00:09:15.831224+00:00"
+  },
+  "117000281218088963": {
+    "id": "117000281218088963",
+    "created_at": "2026-07-28T23:50:11.360Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117000281218088963",
+    "text": "THE MASSIE MASSACRE in the Great Commonwealth of Kentucky has had a really great impact on Senator Rand Paul who will be running in two years. He's been terrific, lately! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-07-29T00:09:15.831356+00:00"
   }
 }
