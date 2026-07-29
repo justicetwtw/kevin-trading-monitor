@@ -13,11 +13,11 @@
       "regime": "risk_off"
     },
     "vix": {
-      "value": 19.90999984741211,
+      "value": 19.540000915527344,
       "regime": "neutral"
     },
     "copper_gold": {
-      "value": 0.10345997286295794,
+      "value": 0.1031646156073072,
       "regime": "neutral"
     }
   },
@@ -25,5 +25,5 @@
   "risk_off_count": 1,
   "modifier": 5,
   "regime": "neutral",
-  "fetched_at": "2026-07-29T16:40:25.393971+00:00"
+  "fetched_at": "2026-07-29T17:57:55.679254+00:00"
 }
