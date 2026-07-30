@@ -26454,5 +26454,25 @@
     "captured_at": "2026-07-30T15:15:44.151546+00:00",
     "events": [],
     "scan_time": "2026-07-30T15:15:44.231985+00:00"
+  },
+  "117009581290419286": {
+    "id": "117009581290419286",
+    "created_at": "2026-07-30T15:15:19.200Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117009581290419286",
+    "text": "Todd Blanche is a STAR, and everyone knows it! He has the potential to go down as one of the Greatest Attorney Generals of All Time. However, John Cornyn, of Texas, and Thom Tillis, of North Carolina, both of whom I refused to Endorse, and whose political careers have been ended by my action, are refusing to vote for this Great Nominee, who will remain, in any event, as Acting. Remember, both Cornyn and Tillis voted for Merrick Garland, and others, too numerous to mention. I have no objection to temporarily withdrawing Todd's name, if they do not do the right thing, and putting him back after Cornyn and Tillis are out of office. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-30T16:10:43.921421+00:00"
   }
 }
