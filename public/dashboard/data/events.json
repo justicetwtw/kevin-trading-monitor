@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-29T17:22:06.679986+08:00",
+  "generated_at": "2026-07-30T08:53:25.214354+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -8,38 +8,6 @@
   "data": {
     "alerts": [],
     "earnings_calendar": [
-      {
-        "symbol": "GOOG",
-        "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "GOOGL",
-        "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "NOW",
-        "earnings_date": "2026-07-22"
-      },
-      {
-        "symbol": "KLAC",
-        "earnings_date": "2026-07-28"
-      },
-      {
-        "symbol": "GLW",
-        "earnings_date": "2026-07-28"
-      },
-      {
-        "symbol": "STX",
-        "earnings_date": "2026-07-28"
-      },
-      {
-        "symbol": "BE",
-        "earnings_date": "2026-07-28"
-      },
-      {
-        "symbol": "MIR",
-        "earnings_date": "2026-07-28"
-      },
       {
         "symbol": "MSFT",
         "earnings_date": "2026-07-29"
@@ -309,8 +277,40 @@
         "earnings_date": "2026-10-22"
       },
       {
+        "symbol": "GLW",
+        "earnings_date": "2026-10-27"
+      },
+      {
         "symbol": "NEE",
         "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "STX",
+        "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "BE",
+        "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "MIR",
+        "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "GOOG",
+        "earnings_date": "2026-10-28"
+      },
+      {
+        "symbol": "GOOGL",
+        "earnings_date": "2026-10-28"
+      },
+      {
+        "symbol": "NOW",
+        "earnings_date": "2026-10-28"
+      },
+      {
+        "symbol": "KLAC",
+        "earnings_date": "2026-10-28"
       },
       {
         "symbol": "GEV",

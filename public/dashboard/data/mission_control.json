@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-29T17:22:06.896908+08:00",
+  "generated_at": "2026-07-30T08:53:25.427287+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-29T09:09:59.965481+00:00",
+      "trump_monitor_checked_at": "2026-07-30T00:08:50.700471+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -81,9 +81,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-29T01:09:06.353000+00:00",
-      "checked_at": "2026-07-29T09:09:59.965481+00:00",
-      "health_age_hours": 0.2,
+      "latest_post_at": "2026-07-29T22:13:23.449000+00:00",
+      "checked_at": "2026-07-30T00:08:50.700471+00:00",
+      "health_age_hours": 0.7,
       "attempts": [
         {
           "status": "unavailable",
@@ -96,20 +96,20 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 35004,
+          "raw_count": 35007,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-29T01:09:06.353000+00:00",
+          "latest_post_at": "2026-07-29T22:13:23.449000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 35004,
+      "source_raw_count": 35007,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 220,
+      "eligible_count": 223,
       "new_count": 0,
       "delivered_count": 0,
       "delivery_status": "no_new_posts",
@@ -298,8 +298,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 57.5,
-        "ivp": 30.5,
+        "ivr": 56.6,
+        "ivp": 28.3,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -316,8 +316,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 94.1,
-        "ivp": 93.2,
+        "ivr": 100.0,
+        "ivp": 98.3,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -360,7 +360,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-07-29T09:22:06.896885+00:00",
+      "generated_at": "2026-07-30T00:53:25.427266+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
