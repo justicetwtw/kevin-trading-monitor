@@ -15,5 +15,10 @@
     "last_sent": "2026-07-27T17:49:05.190523+00:00",
     "alert_level": "green",
     "tags": []
+  },
+  "META::sell_put": {
+    "last_sent": "2026-07-30T16:55:27.216175+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
