@@ -26620,5 +26620,29 @@
     "captured_at": "2026-07-31T15:24:22.433386+00:00",
     "events": [],
     "scan_time": "2026-07-31T15:24:22.514434+00:00"
+  },
+  "117015146759027639": {
+    "id": "117015146759027639",
+    "created_at": "2026-07-31T14:50:41.513Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117015146759027639",
+    "text": "I am pleased to announce that the man who so foolishly led the Indiana State Senate, with almost every Candidate losing their Race, many of them in Office for years, will not be seeking Re-Election as Senate President because he wouldn't have had a chance to be elected — Better yet would be if he would resign from Office, completely, but he will be met by us at the Indiana Polls. Rodric Bray should be ashamed of himself for costing our Country, mainly the Republican Party, two U.S. House Seats, and for costing all of his colleagues who went along with him, an Election loss! Isn't it amazing how Politics works? I want to thank the Great State of Indiana for your support, not only in my Presidential Election, which we won with the Highest Vote in the History of the State, but also for your support in getting rid of wayward Senators, led down the Path of Destruction by a FOOL named Rodric Bray. Indiana, I will never forget your loyalty! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-07-31T16:17:49.328762+00:00"
   }
 }
