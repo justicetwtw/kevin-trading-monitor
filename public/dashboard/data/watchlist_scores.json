@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T17:14:02.201827+08:00",
+  "generated_at": "2026-07-31T09:02:24.797706+08:00",
   "source_files": [
     "layer_fundamentals_dashboard_state.json",
     "layer_macro_regime_state.json",
@@ -8,7 +8,7 @@
   ],
   "data": {
     "disclaimer": "決策輔助,不是自動下單訊號;最終交易決策由 Kevin 做出。Repo 是 single source of truth。",
-    "regime": "neutral",
+    "regime": "risk_on",
     "rows": [
       {
         "symbol": "NVDA",
@@ -35,7 +35,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -45,7 +45,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=100.0 ivp=98.3 samples=60"
+          "ivr=71.8 ivp=78.7 samples=61"
         ]
       },
       {
@@ -73,7 +73,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -83,7 +83,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=64.7 ivp=56.7 samples=60"
+          "ivr=41.6 ivp=31.1 samples=61"
         ]
       },
       {
@@ -111,7 +111,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -121,7 +121,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=89.5 ivp=93.3 samples=60"
+          "ivr=77.2 ivp=90.2 samples=61"
         ]
       },
       {
@@ -149,7 +149,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -159,7 +159,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=56.6 ivp=28.3 samples=60"
+          "ivr=50.2 ivp=19.7 samples=61"
         ]
       },
       {
@@ -187,7 +187,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -197,7 +197,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=97.4 ivp=91.7 samples=60"
+          "ivr=33.7 ivp=52.5 samples=61"
         ]
       },
       {
@@ -220,12 +220,12 @@
             "status": "display_only_phase_1"
           },
           "valuation_expectation": {
-            "score": 7,
+            "score": 9,
             "max": 10,
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -235,7 +235,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=41.9 ivp=61.7 samples=60"
+          "ivr=27.3 ivp=44.3 samples=61"
         ]
       },
       {
@@ -258,12 +258,12 @@
             "status": "display_only_phase_1"
           },
           "valuation_expectation": {
-            "score": 7,
+            "score": 9,
             "max": 10,
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -273,7 +273,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=39.1 ivp=56.7 samples=60"
+          "ivr=22.9 ivp=36.1 samples=61"
         ]
       },
       {
@@ -301,7 +301,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -311,7 +311,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=81.9 ivp=80.0 samples=60"
+          "ivr=37.5 ivp=54.1 samples=61"
         ]
       },
       {
@@ -339,7 +339,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -349,7 +349,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=95.5 ivp=96.7 samples=60"
+          "ivr=100.0 ivp=98.4 samples=61"
         ]
       },
       {
@@ -377,7 +377,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -387,7 +387,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=89.4 ivp=91.7 samples=60"
+          "ivr=94.7 ivp=93.4 samples=61"
         ]
       },
       {
@@ -415,7 +415,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -425,7 +425,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=50.6 ivp=36.7 samples=60"
+          "ivr=55.2 ivp=47.5 samples=61"
         ]
       },
       {
@@ -453,7 +453,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -463,7 +463,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=24.3 ivp=26.8 samples=56"
+          "ivr=25.2 ivp=29.8 samples=57"
         ]
       },
       {
@@ -491,7 +491,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -501,7 +501,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=81.1 ivp=95.0 samples=60"
+          "ivr=97.0 ivp=96.7 samples=61"
         ]
       },
       {
@@ -529,7 +529,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -539,7 +539,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=46.6 ivp=58.3 samples=60"
+          "ivr=43.7 ivp=49.2 samples=61"
         ]
       },
       {
@@ -567,7 +567,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -577,7 +577,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=78.1 ivp=86.7 samples=60"
+          "ivr=85.6 ivp=95.1 samples=61"
         ]
       },
       {
@@ -605,7 +605,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -615,7 +615,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=92.6 ivp=96.7 samples=60"
+          "ivr=100.0 ivp=98.4 samples=61"
         ]
       },
       {
@@ -643,7 +643,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -653,7 +653,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=71.1 ivp=68.3 samples=60"
+          "ivr=60.5 ivp=60.7 samples=61"
         ]
       },
       {
@@ -681,7 +681,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -691,7 +691,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=77.2 ivp=51.7 samples=60"
+          "ivr=75.0 ivp=44.3 samples=61"
         ]
       },
       {
@@ -719,7 +719,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -729,7 +729,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=15.4 ivp=3.3 samples=60"
+          "ivr=0.0 ivp=0.0 samples=61"
         ]
       },
       {
@@ -757,7 +757,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -767,7 +767,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=73.4 ivp=95.0 samples=60"
+          "ivr=75.7 ivp=95.1 samples=61"
         ]
       },
       {
@@ -795,7 +795,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -805,7 +805,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=48.4 ivp=63.3 samples=60"
+          "ivr=41.5 ivp=50.8 samples=61"
         ]
       },
       {
@@ -828,12 +828,12 @@
             "status": "display_only_phase_1"
           },
           "valuation_expectation": {
-            "score": 9,
+            "score": 7,
             "max": 10,
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -843,7 +843,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=79.1 ivp=25.0 samples=60"
+          "ivr=78.3 ivp=21.3 samples=61"
         ]
       },
       {
@@ -871,7 +871,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -881,7 +881,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=92.5 ivp=95.0 samples=60"
+          "ivr=84.8 ivp=83.6 samples=61"
         ]
       },
       {
@@ -909,7 +909,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -919,7 +919,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=90.2 ivp=93.3 samples=60"
+          "ivr=79.9 ivp=72.1 samples=61"
         ]
       },
       {
@@ -947,7 +947,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -957,7 +957,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=62.0 ivp=80.0 samples=60"
+          "ivr=51.3 ivp=67.2 samples=61"
         ]
       },
       {
@@ -965,7 +965,7 @@
         "tier": "B",
         "pillars": {
           "fundamental_catalyst": {
-            "score": 32.0,
+            "score": 27.0,
             "max": 35,
             "status": "heuristic_v0"
           },
@@ -985,7 +985,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -995,7 +995,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=35.7 ivp=53.3 samples=60"
+          "ivr=30.8 ivp=49.2 samples=61"
         ]
       },
       {
@@ -1023,7 +1023,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1033,7 +1033,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=84.2 ivp=70.0 samples=60"
+          "ivr=80.7 ivp=67.2 samples=61"
         ]
       },
       {
@@ -1056,12 +1056,12 @@
             "status": "display_only_phase_1"
           },
           "valuation_expectation": {
-            "score": 5,
+            "score": 7,
             "max": 10,
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1071,7 +1071,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=76.2 ivp=66.7 samples=60"
+          "ivr=53.4 ivp=54.1 samples=61"
         ]
       },
       {
@@ -1099,7 +1099,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1109,7 +1109,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=84.9 ivp=65.0 samples=60"
+          "ivr=73.9 ivp=52.5 samples=61"
         ]
       },
       {
@@ -1137,7 +1137,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1147,7 +1147,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=86.1 ivp=75.0 samples=60"
+          "ivr=81.5 ivp=72.1 samples=61"
         ]
       },
       {
@@ -1155,7 +1155,7 @@
         "tier": "B",
         "pillars": {
           "fundamental_catalyst": {
-            "score": 29.0,
+            "score": 32.0,
             "max": 35,
             "status": "heuristic_v0"
           },
@@ -1175,7 +1175,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1185,7 +1185,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=49.9 ivp=65.0 samples=60"
+          "ivr=23.8 ivp=29.5 samples=61"
         ]
       },
       {
@@ -1213,7 +1213,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1223,7 +1223,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=50.1 ivp=58.3 samples=60"
+          "ivr=38.8 ivp=54.1 samples=61"
         ]
       },
       {
@@ -1251,7 +1251,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1261,7 +1261,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=68.9 ivp=91.5 samples=59"
+          "ivr=63.0 ivp=83.3 samples=60"
         ]
       },
       {
@@ -1289,7 +1289,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1299,7 +1299,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=86.8 ivp=63.3 samples=60"
+          "ivr=91.3 ivp=86.9 samples=61"
         ]
       },
       {
@@ -1327,7 +1327,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1337,7 +1337,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=90.8 ivp=95.0 samples=60"
+          "ivr=74.9 ivp=80.3 samples=61"
         ]
       },
       {
@@ -1365,7 +1365,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1375,7 +1375,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=100.0 ivp=98.3 samples=60"
+          "ivr=87.9 ivp=95.1 samples=61"
         ]
       },
       {
@@ -1403,7 +1403,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1413,7 +1413,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=45.9 ivp=66.7 samples=60"
+          "ivr=31.7 ivp=57.4 samples=61"
         ]
       },
       {
@@ -1441,7 +1441,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1451,7 +1451,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=18.4 ivp=23.3 samples=60"
+          "ivr=33.8 ivp=59.0 samples=61"
         ]
       },
       {
@@ -1474,12 +1474,12 @@
             "status": "display_only_phase_1"
           },
           "valuation_expectation": {
-            "score": 2,
+            "score": 5,
             "max": 10,
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1489,7 +1489,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=22.8 ivp=64.7 samples=51"
+          "ivr=12.8 ivp=36.5 samples=52"
         ]
       },
       {
@@ -1517,7 +1517,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1527,7 +1527,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=85.6 ivp=93.3 samples=60"
+          "ivr=62.8 ivp=73.8 samples=61"
         ]
       },
       {
@@ -1555,7 +1555,7 @@
             "status": "heuristic_v0"
           },
           "risk_macro_geopolitical": {
-            "score": 8,
+            "score": 12,
             "max": 15,
             "status": "heuristic_v0_macro_only"
           }
@@ -1565,7 +1565,7 @@
         "action_band": null,
         "not_a_trade_signal": true,
         "notes": [
-          "ivr=87.1 ivp=78.3 samples=60"
+          "ivr=91.6 ivp=85.2 samples=61"
         ]
       }
     ]

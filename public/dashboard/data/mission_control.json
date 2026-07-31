@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T17:14:02.524707+08:00",
+  "generated_at": "2026-07-31T09:02:25.083434+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -14,22 +14,22 @@
   ],
   "data": {
     "summary": {
-      "regime": "neutral",
-      "regime_modifier": 5,
+      "regime": "risk_on",
+      "regime_modifier": 10,
       "position_configured": false,
       "position_count": 0,
       "position_source": null,
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-07-30T08:43:14.456684+00:00",
+      "trump_monitor_checked_at": "2026-07-30T23:40:50.363669+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
       "tracked_theme_count": 3,
       "tracked_thesis_count": 3,
       "allocation_candidate_count": 4,
-      "needs_attention_count": 4
+      "needs_attention_count": 8
     },
     "attention": [
       {
@@ -38,6 +38,34 @@
         "symbol": null,
         "title": "Cloud position monitoring has no valid private position input",
         "detail": "Create POSITIONS_JSON and POSITION_STATE_KEY in GitHub Actions secrets, then manually run Position Management Check."
+      },
+      {
+        "severity": "P1",
+        "category": "review",
+        "symbol": "MU",
+        "title": "Scheduled thesis review is due",
+        "detail": "Review date: 2026-07-31"
+      },
+      {
+        "severity": "P1",
+        "category": "review",
+        "symbol": "NVDA",
+        "title": "Scheduled thesis review is due",
+        "detail": "Review date: 2026-07-31"
+      },
+      {
+        "severity": "P1",
+        "category": "review",
+        "symbol": "SNDK",
+        "title": "Scheduled thesis review is due",
+        "detail": "Review date: 2026-07-31"
+      },
+      {
+        "severity": "P1",
+        "category": "source_health",
+        "symbol": null,
+        "title": "Trump monitor health is stale",
+        "detail": "Last verified check is approximately 1.4 hours old."
       },
       {
         "severity": "P1",
@@ -81,9 +109,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-07-30T01:18:18.306000+00:00",
-      "checked_at": "2026-07-30T08:43:14.456684+00:00",
-      "health_age_hours": 0.5,
+      "latest_post_at": "2026-07-30T23:13:14.046000+00:00",
+      "checked_at": "2026-07-30T23:40:50.363669+00:00",
+      "health_age_hours": 1.4,
       "attempts": [
         {
           "status": "unavailable",
@@ -96,23 +124,23 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 35008,
+          "raw_count": 35014,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-07-30T01:18:18.306000+00:00",
+          "latest_post_at": "2026-07-30T23:13:14.046000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 35008,
+      "source_raw_count": 35014,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 224,
-      "new_count": 0,
-      "delivered_count": 0,
-      "delivery_status": "no_new_posts",
+      "eligible_count": 230,
+      "new_count": 3,
+      "delivered_count": 3,
+      "delivery_status": "delivered_all",
       "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
       "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
       "content_published_here": false
@@ -298,8 +326,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 56.6,
-        "ivp": 28.3,
+        "ivr": 50.2,
+        "ivp": 19.7,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -316,8 +344,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 100.0,
-        "ivp": 98.3,
+        "ivr": 71.8,
+        "ivp": 78.7,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -360,7 +388,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-07-30T09:14:02.524686+00:00",
+      "generated_at": "2026-07-31T01:02:25.083411+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",

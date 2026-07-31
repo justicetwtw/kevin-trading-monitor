@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T17:14:02.309519+08:00",
+  "generated_at": "2026-07-31T09:02:24.892544+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -9,39 +9,11 @@
     "alerts": [],
     "earnings_calendar": [
       {
-        "symbol": "MSFT",
-        "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "META",
-        "earnings_date": "2026-07-29"
-      },
-      {
         "symbol": "QCOM",
         "earnings_date": "2026-07-29"
       },
       {
-        "symbol": "VRT",
-        "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "LRCX",
-        "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "APH",
-        "earnings_date": "2026-07-29"
-      },
-      {
         "symbol": "ARM",
-        "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "FLS",
-        "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "SOFI",
         "earnings_date": "2026-07-29"
       },
       {
@@ -137,10 +109,6 @@
         "earnings_date": "2026-08-06"
       },
       {
-        "symbol": "NBIS",
-        "earnings_date": "2026-08-06"
-      },
-      {
         "symbol": "MP",
         "earnings_date": "2026-08-06"
       },
@@ -171,6 +139,10 @@
       {
         "symbol": "CRWV",
         "earnings_date": "2026-08-11"
+      },
+      {
+        "symbol": "NBIS",
+        "earnings_date": "2026-08-12"
       },
       {
         "symbol": "ONDS",
@@ -265,6 +237,14 @@
         "earnings_date": "2026-10-20"
       },
       {
+        "symbol": "VRT",
+        "earnings_date": "2026-10-21"
+      },
+      {
+        "symbol": "LRCX",
+        "earnings_date": "2026-10-21"
+      },
+      {
         "symbol": "TSLA",
         "earnings_date": "2026-10-21"
       },
@@ -297,6 +277,18 @@
         "earnings_date": "2026-10-27"
       },
       {
+        "symbol": "FLS",
+        "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "SOFI",
+        "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "MSFT",
+        "earnings_date": "2026-10-28"
+      },
+      {
         "symbol": "GOOG",
         "earnings_date": "2026-10-28"
       },
@@ -305,11 +297,19 @@
         "earnings_date": "2026-10-28"
       },
       {
+        "symbol": "META",
+        "earnings_date": "2026-10-28"
+      },
+      {
         "symbol": "NOW",
         "earnings_date": "2026-10-28"
       },
       {
         "symbol": "KLAC",
+        "earnings_date": "2026-10-28"
+      },
+      {
+        "symbol": "APH",
         "earnings_date": "2026-10-28"
       },
       {
