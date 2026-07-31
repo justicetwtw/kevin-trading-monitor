@@ -27,5 +27,15 @@
     "tags": [
       "⚠Trump_Tier1"
     ]
+  },
+  "QCOM::leaps_entry": {
+    "last_sent": "2026-07-31T15:25:12.419692+00:00",
+    "alert_level": "green",
+    "tags": []
+  },
+  "META::leaps_entry": {
+    "last_sent": "2026-07-31T15:25:13.456180+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
