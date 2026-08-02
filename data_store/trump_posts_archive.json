@@ -27471,5 +27471,50 @@
       }
     },
     "captured_at": "2026-08-02T03:50:44.608069+00:00"
+  },
+  "117025646575450964": {
+    "id": "117025646575450964",
+    "created_at": "2026-08-02T11:20:56.001Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117025646575450964",
+    "text": "Trump's new NIH chief outlines sweeping reforms like new pandemic playbook, vaccine injury body: https://justthenews.com/government/federal-agencies/trumps-new-nih-chief-outlines-sweeping-reforms-such-new-pandemic",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-02T11:37:53.465541+00:00"
+  },
+  "117025644223308461": {
+    "id": "117025644223308461",
+    "created_at": "2026-08-02T11:20:20.104Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117025644223308461",
+    "text": "Trump administration creating 'incubators' to develop new tech to counter drone terror attacks: https://justthenews.com/government/security/combatting-fury-skies-drone-warfare-necessitates-new-protection-technology",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack",
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "technology"
+        ]
+      }
+    },
+    "captured_at": "2026-08-02T11:37:53.465644+00:00"
   }
 }
