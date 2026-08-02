@@ -27516,5 +27516,77 @@
       }
     },
     "captured_at": "2026-08-02T11:37:53.465644+00:00"
+  },
+  "117026031118146577": {
+    "id": "117026031118146577",
+    "created_at": "2026-08-02T12:58:43.652Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117026031118146577",
+    "text": "Why I Put President Trump's Name on Palm Beach's Airport: https://townhall.com/columnists/meg-weinberger/2026/07/14/why-i-put-president-trumps-name-on-palm-beachs-airport-n2679374",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-02T14:13:39.477921+00:00"
+  },
+  "117026028607181563": {
+    "id": "117026028607181563",
+    "created_at": "2026-08-02T12:58:05.342Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117026028607181563",
+    "text": "Trump's Energy Triumph: https://www.wsj.com/opinion/trumps-energy-triumph-82e4b953",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "energy"
+        ]
+      }
+    },
+    "captured_at": "2026-08-02T14:13:39.478026+00:00"
+  },
+  "117026027292723194": {
+    "id": "117026027292723194",
+    "created_at": "2026-08-02T12:57:45.281Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117026027292723194",
+    "text": "Mexico's Problem: https://www.billoreilly.com/b/Mexicos-Problem/-45344169968241838.html",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-02T14:13:39.478079+00:00"
+  },
+  "117026026144388651": {
+    "id": "117026026144388651",
+    "created_at": "2026-08-02T12:57:27.760Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117026026144388651",
+    "text": "'PO'd' Evers vows to resist any FBI effort to seize Milwaukee ballots: https://www.jsonline.com/story/news/politics/2026/03/11/tony-evers-vows-to-resist-any-effort-to-seize-2020-milwaukee-ballots/89097930007/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-02T14:13:39.478144+00:00"
   }
 }
