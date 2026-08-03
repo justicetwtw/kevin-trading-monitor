@@ -24352,12 +24352,12 @@
       "post_id": "117033930949223051",
       "created_at": "2026-08-03T22:27:45.510Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-03T23:16:07.950650+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-03T23:16:11.339998+00:00",
       "run_id": "30861456616",
       "workflow_attempt_id": "30861456616:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117033925451969299": {
       "post_id": "117033925451969299",
