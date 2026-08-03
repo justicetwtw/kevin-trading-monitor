@@ -1,9 +1,4 @@
 {
-  "2026-07-27": {
-    "tw_open": true,
-    "tw_close": true,
-    "us_premarket": true
-  },
   "2026-07-28": {
     "us_midday": true,
     "us_eod": true,
@@ -40,5 +35,8 @@
     "tw_open": true,
     "tw_close": true,
     "us_premarket": true
+  },
+  "2026-08-04": {
+    "us_midday": true
   }
 }
