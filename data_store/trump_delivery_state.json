@@ -24418,12 +24418,12 @@
       "post_id": "117033913654735171",
       "created_at": "2026-08-03T22:23:21.617Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-03T23:15:30.918212+00:00",
       "resolved_at": null,
       "run_id": "30861456616",
       "workflow_attempt_id": "30861456616:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117033900758405336": {
       "post_id": "117033900758405336",
