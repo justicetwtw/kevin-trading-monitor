@@ -1,8 +1,4 @@
 {
-  "2026-07-25": {
-    "us_midday": true,
-    "us_eod": true
-  },
   "2026-07-27": {
     "tw_open": true,
     "tw_close": true,
@@ -39,5 +35,8 @@
   "2026-08-01": {
     "us_midday": true,
     "us_eod": true
+  },
+  "2026-08-03": {
+    "tw_open": true
   }
 }
