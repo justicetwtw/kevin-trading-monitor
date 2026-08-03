@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-01T09:02:49.909180+08:00",
+  "generated_at": "2026-08-03T18:13:03.638524+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -13,19 +13,7 @@
         "earnings_date": "2026-07-29"
       },
       {
-        "symbol": "XOM",
-        "earnings_date": "2026-07-31"
-      },
-      {
-        "symbol": "CVX",
-        "earnings_date": "2026-07-31"
-      },
-      {
         "symbol": "ETN",
-        "earnings_date": "2026-07-31"
-      },
-      {
-        "symbol": "CCJ",
         "earnings_date": "2026-07-31"
       },
       {
@@ -315,6 +303,18 @@
       {
         "symbol": "SO",
         "earnings_date": "2026-10-29"
+      },
+      {
+        "symbol": "XOM",
+        "earnings_date": "2026-10-30"
+      },
+      {
+        "symbol": "CVX",
+        "earnings_date": "2026-10-30"
+      },
+      {
+        "symbol": "CCJ",
+        "earnings_date": "2026-10-30"
       }
     ]
   }
