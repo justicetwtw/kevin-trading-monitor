@@ -39,6 +39,7 @@
   "2026-08-04": {
     "us_midday": true,
     "us_eod": true,
-    "tw_open": true
+    "tw_open": true,
+    "tw_close": true
   }
 }
