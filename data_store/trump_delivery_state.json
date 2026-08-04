@@ -24935,12 +24935,12 @@
       "post_id": "117038574177461795",
       "created_at": "2026-08-04T18:08:35.549Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-04T18:55:01.410719+00:00",
       "resolved_at": null,
       "run_id": "30940729453",
       "workflow_attempt_id": "30940729453:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117038561113354682": {
       "post_id": "117038561113354682",
