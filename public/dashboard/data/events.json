@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-03T18:13:03.638524+08:00",
+  "generated_at": "2026-08-04T08:58:36.896064+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -11,10 +11,6 @@
       {
         "symbol": "ARM",
         "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "ETN",
-        "earnings_date": "2026-07-31"
       },
       {
         "symbol": "PLTR",
@@ -149,6 +145,10 @@
         "earnings_date": "2026-09-01"
       },
       {
+        "symbol": "AVGO",
+        "earnings_date": "2026-09-02"
+      },
+      {
         "symbol": "CRM",
         "earnings_date": "2026-09-02"
       },
@@ -159,10 +159,6 @@
       {
         "symbol": "CRDO",
         "earnings_date": "2026-09-02"
-      },
-      {
-        "symbol": "AVGO",
-        "earnings_date": "2026-09-03"
       },
       {
         "symbol": "RBRK",
@@ -315,6 +311,10 @@
       {
         "symbol": "CCJ",
         "earnings_date": "2026-10-30"
+      },
+      {
+        "symbol": "ETN",
+        "earnings_date": "2026-11-03"
       }
     ]
   }
