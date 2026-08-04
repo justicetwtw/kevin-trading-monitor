@@ -29539,11 +29539,7 @@
         ]
       }
     },
-    "captured_at": "2026-08-04T21:58:16.783565+00:00",
-    "events": [
-      "fed_powell_conflict"
-    ],
-    "scan_time": "2026-08-04T21:58:16.862793+00:00"
+    "captured_at": "2026-08-04T22:40:53.355733+00:00"
   },
   "117039413442491515": {
     "id": "117039413442491515",
@@ -29559,9 +29555,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-04T21:58:16.783278+00:00",
-    "events": [],
-    "scan_time": "2026-08-04T21:58:16.862775+00:00"
+    "captured_at": "2026-08-04T22:40:53.355428+00:00"
   },
   "117039401914044983": {
     "id": "117039401914044983",
@@ -29577,8 +29571,70 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-04T21:58:16.783407+00:00",
-    "events": [],
-    "scan_time": "2026-08-04T21:58:16.862788+00:00"
+    "captured_at": "2026-08-04T22:40:53.355528+00:00"
+  },
+  "117039543091617698": {
+    "id": "117039543091617698",
+    "created_at": "2026-08-04T22:15:00.006Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117039543091617698",
+    "text": "HAPPY 236th BIRTHDAY TO THE UNITED STATES COAST GUARD! Today we honor the incredible Men and Women of the United States Coast Guard, who protect our Borders, defend our Homeland, save countless American lives, and have done an AMAZING job taking deadly drugs off our streets before they can poison and kill our Citizens. America is SAFER because of their Courage and Devotion. We are very proud of them! Under my Administration and, with the tremendous leadership of Secretary of Homeland Security, Markwayne Mullin, we are rebuilding the Coast Guard like never before. The FIRST of 11 new Arctic Security Cutters that I ordered will be delivered in 2028, ensuring American Strength, Sovereignty, and Security in the Arctic for generations to come. Congress must FULLY SUPPORT and FULLY FUND the United States Coast Guard so they can continue carrying out this vital Mission. Thank you to Senators Dan Sullivan, Rick Scott, Katie Britt, and Tommy Tuberville for your outstanding leadership and your unwavering support of America's Coast Guard. To every Coast Guardsman, Active Duty, Reserve, Civilian, Auxiliary, Veteran, and your wonderful Families — THANK YOU for your Service to our Great Nation. SEMPER PARATUS! DONALD J. TRUMPPresident of the United States of America",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-04T22:40:53.355251+00:00"
+  },
+  "117039540734733872": {
+    "id": "117039540734733872",
+    "created_at": "2026-08-04T22:14:24.044Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117039540734733872",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-04T22:40:53.355289+00:00"
+  },
+  "117039441487438111": {
+    "id": "117039441487438111",
+    "created_at": "2026-08-04T21:49:09.650Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117039441487438111",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-04T22:40:53.355308+00:00"
+  },
+  "117039440296861894": {
+    "id": "117039440296861894",
+    "created_at": "2026-08-04T21:48:51.483Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117039440296861894",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-04T22:40:53.355324+00:00"
   }
 }
