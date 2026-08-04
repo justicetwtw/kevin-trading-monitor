@@ -28877,5 +28877,52 @@
       }
     },
     "captured_at": "2026-08-03T23:13:20.913665+00:00"
+  },
+  "117034128637453413": {
+    "id": "117034128637453413",
+    "created_at": "2026-08-03T23:18:01.993Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117034128637453413",
+    "text": "RT @realDonaldTrumpIt is my Great Honor to endorse MAGA Warrior, Rick Brattin, who is running to represent the wonderful people of Missouri's 5th Congressional District! Rick is strongly supported by many of the greatest America First Patriots in Missouri, including Governor Mike Kehoe, and Congressmen Jason Smith, Bob Onder, and Eric Burlison, among others! From bravely fighting for the U.S. Marine Corps, to strongly representing his community as a State Senator, Rick has served his State and Nation with great distinction, and will bring that same Fighting Spirit to the U.S. Congress. Everywhere Rick Brattin has gone, he has been respected! As your next Congressman, Rick will work tirelessly to Grow our Economy, Cut Taxes and Regulations, Promote MADE IN THE U.S.A., Unleash American Energy DOMINANCE, Keep our Border SECURE, Stop Migrant Crime, Strengthen our Incredible Military/Veterans, Safeguard our Elections, and Defend our always under siege Second Amendment, which I have flawlessly fought to protect for many years. Rick Brattin has my Complete and Total Endorsement to be the next Representative from Missouri's 5th Congressional District — RICK WILL NEVER LET YOU DOWN!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "energy": [
+          "energy"
+        ],
+        "market_general": [
+          "economy"
+        ]
+      }
+    },
+    "captured_at": "2026-08-04T00:15:51.603396+00:00"
+  },
+  "117034106669602255": {
+    "id": "117034106669602255",
+    "created_at": "2026-08-03T23:12:26.792Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117034106669602255",
+    "text": "It is my Great Honor to endorse America First Patriot, Jon Maples, who is running to represent the fantastic people of Florida's 87th State House District! Jon is a very successful Businessman and Civic Leader, who is known and loved, and also endorsed by so many of my Palm Beach County friends, including by Great State Representative \"MAGA\" Meg Weinberger. As your next State Representative, Jon will fight tirelessly to Grow the Economy, Cut Taxes and Regulations, Promote MADE IN THE U.S.A., Stop Migrant Crime, Advance Election Integrity, Support our Military, Veterans, and Law Enforcement, and Defend our always under siege Second Amendment. Jon Maples has my Complete and Total Endorsement — HE WILL NOT LET YOU DOWN!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "market_general": [
+          "economy"
+        ]
+      }
+    },
+    "captured_at": "2026-08-04T00:15:51.603605+00:00"
   }
 }
