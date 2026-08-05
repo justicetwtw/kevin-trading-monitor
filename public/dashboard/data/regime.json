@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-04T17:20:58.664044+08:00",
+  "generated_at": "2026-08-05T08:53:09.190014+08:00",
   "source_files": [
     "layer_macro_regime_state.json",
     "layer0_history.json"
@@ -10,11 +10,11 @@
     "modifier": 10,
     "indicators": {
       "yield_curve": {
-        "value": 46.99999999999997,
+        "value": 45.000000000000014,
         "regime": "risk_on"
       },
       "hy_oas": {
-        "value": 284.0,
+        "value": 278.0,
         "regime": "risk_on"
       },
       "dxy": {
@@ -22,52 +22,52 @@
         "regime": "risk_off"
       },
       "vix": {
-        "value": 15.859999656677246,
+        "value": 16.5,
         "regime": "risk_on"
       },
       "copper_gold": {
-        "value": 0.10664227570121426,
+        "value": 0.10728030520840343,
         "regime": "neutral"
       }
     },
     "risk_on_count": 3,
     "risk_off_count": 1,
-    "layer0_scan_time": "2026-08-03T23:33:24.240277+00:00",
+    "layer0_scan_time": "2026-08-04T23:30:42.403146+00:00",
     "submodules": {
       "macro_regime": {
         "regime": "risk_on",
         "modifier": 10,
-        "fetched_at": "2026-08-03T23:33:26.155590+00:00"
+        "fetched_at": "2026-08-04T23:30:44.629129+00:00"
       },
       "breadth": {
         "regime": "cold_start",
         "modifier": 0,
-        "fetched_at": "2026-08-03T23:33:27.403022+00:00"
+        "fetched_at": "2026-08-04T23:30:45.768385+00:00"
       },
       "distribution": {
         "regime": null,
         "modifier": null,
-        "fetched_at": "2026-08-03T23:33:27.911600+00:00"
+        "fetched_at": "2026-08-04T23:30:46.009417+00:00"
       },
       "bubble": {
         "regime": null,
         "modifier": 0,
-        "fetched_at": "2026-08-03T23:33:28.558290+00:00"
+        "fetched_at": "2026-08-04T23:30:46.310698+00:00"
       },
       "put_call": {
         "regime": "cold_start",
         "modifier": null,
-        "fetched_at": "2026-08-03T23:33:29.602724+00:00"
+        "fetched_at": "2026-08-04T23:30:46.822217+00:00"
       },
       "vix_structure": {
         "regime": null,
         "modifier": null,
-        "fetched_at": "2026-08-03T23:33:29.722067+00:00"
+        "fetched_at": "2026-08-04T23:30:46.869342+00:00"
       },
       "aaii": {
         "regime": "cold_start",
         "modifier": 0,
-        "fetched_at": "2026-08-03T23:33:34.078554+00:00"
+        "fetched_at": "2026-08-04T23:30:51.017974+00:00"
       }
     },
     "taiwan_geopolitical": {
