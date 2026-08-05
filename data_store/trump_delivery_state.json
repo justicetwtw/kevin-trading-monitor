@@ -25221,12 +25221,12 @@
       "post_id": "117040221425450904",
       "created_at": "2026-08-05T01:07:30.560Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-05T04:19:38.248810+00:00",
       "resolved_at": null,
       "run_id": "30974712592",
       "workflow_attempt_id": "30974712592:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117040220743780207": {
       "post_id": "117040220743780207",
