@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-05T17:19:09.363779+08:00",
+  "generated_at": "2026-08-06T08:50:22.726891+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -8,34 +8,6 @@
   "data": {
     "alerts": [],
     "earnings_calendar": [
-      {
-        "symbol": "ARM",
-        "earnings_date": "2026-07-29"
-      },
-      {
-        "symbol": "CAT",
-        "earnings_date": "2026-08-04"
-      },
-      {
-        "symbol": "AMD",
-        "earnings_date": "2026-08-04"
-      },
-      {
-        "symbol": "ANET",
-        "earnings_date": "2026-08-04"
-      },
-      {
-        "symbol": "DD",
-        "earnings_date": "2026-08-04"
-      },
-      {
-        "symbol": "KTOS",
-        "earnings_date": "2026-08-04"
-      },
-      {
-        "symbol": "TMDX",
-        "earnings_date": "2026-08-04"
-      },
       {
         "symbol": "MELI",
         "earnings_date": "2026-08-05"
@@ -129,16 +101,16 @@
         "earnings_date": "2026-08-26"
       },
       {
+        "symbol": "CRWD",
+        "earnings_date": "2026-08-26"
+      },
+      {
         "symbol": "SNPS",
         "earnings_date": "2026-08-26"
       },
       {
         "symbol": "MRVL",
         "earnings_date": "2026-08-27"
-      },
-      {
-        "symbol": "CRWD",
-        "earnings_date": "2026-09-01"
       },
       {
         "symbol": "AVGO",
@@ -285,6 +257,10 @@
         "earnings_date": "2026-10-29"
       },
       {
+        "symbol": "CAT",
+        "earnings_date": "2026-10-29"
+      },
+      {
         "symbol": "QCOM",
         "earnings_date": "2026-10-29"
       },
@@ -294,6 +270,10 @@
       },
       {
         "symbol": "SO",
+        "earnings_date": "2026-10-29"
+      },
+      {
+        "symbol": "TMDX",
         "earnings_date": "2026-10-29"
       },
       {
@@ -313,8 +293,28 @@
         "earnings_date": "2026-11-02"
       },
       {
+        "symbol": "AMD",
+        "earnings_date": "2026-11-03"
+      },
+      {
+        "symbol": "ANET",
+        "earnings_date": "2026-11-03"
+      },
+      {
         "symbol": "ETN",
         "earnings_date": "2026-11-03"
+      },
+      {
+        "symbol": "KTOS",
+        "earnings_date": "2026-11-03"
+      },
+      {
+        "symbol": "ARM",
+        "earnings_date": "2026-11-04"
+      },
+      {
+        "symbol": "DD",
+        "earnings_date": "2026-11-05"
       }
     ]
   }
