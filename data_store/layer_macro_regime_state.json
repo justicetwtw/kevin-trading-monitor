@@ -5,7 +5,7 @@
       "regime": "risk_on"
     },
     "hy_oas": {
-      "value": 273.0,
+      "value": 275.0,
       "regime": "risk_on"
     },
     "dxy": {
@@ -13,11 +13,11 @@
       "regime": "risk_off"
     },
     "vix": {
-      "value": 15.8100004196167,
+      "value": 15.350000381469727,
       "regime": "risk_on"
     },
     "copper_gold": {
-      "value": 0.10484035760798087,
+      "value": 0.10434024661914185,
       "regime": "neutral"
     }
   },
@@ -25,5 +25,5 @@
   "risk_off_count": 1,
   "modifier": 10,
   "regime": "risk_on",
-  "fetched_at": "2026-08-05T23:27:49.104286+00:00"
+  "fetched_at": "2026-08-06T15:24:22.291410+00:00"
 }
