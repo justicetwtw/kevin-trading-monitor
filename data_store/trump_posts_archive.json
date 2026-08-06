@@ -30542,5 +30542,57 @@
       }
     },
     "captured_at": "2026-08-06T03:57:13.951976+00:00"
+  },
+  "117046722881418522": {
+    "id": "117046722881418522",
+    "created_at": "2026-08-06T04:40:54.904Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117046722881418522",
+    "text": "Cash is king: Washington Republicans bankroll midterms as National Democrat coffers are in the red: https://justthenews.com/politics-policy/elections/cash-king-republicans-bankroll-midterms-democrat-coffers-are-red",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-06T06:25:03.198028+00:00"
+  },
+  "117046698987056229": {
+    "id": "117046698987056229",
+    "created_at": "2026-08-06T04:34:50.305Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117046698987056229",
+    "text": "The U.S. has massive amounts of \"munitions,\" especially of certain types. Additionally, large amounts are being manufactured and shipped to the U.S. as needed. Defense companies are building the largest number of plants and factories in our country's history. The \"leakers\" of these treasonous statements are being hunted down. Long term jail sentences will be sought! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-06T06:25:03.198170+00:00"
+  },
+  "117046573969365289": {
+    "id": "117046573969365289",
+    "created_at": "2026-08-06T04:03:02.687Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117046573969365289",
+    "text": "So beautiful! D.C. is better than ever. Tender, loving care! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-06T06:25:03.198222+00:00"
   }
 }
