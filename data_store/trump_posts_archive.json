@@ -30953,9 +30953,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031425+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109016+00:00"
+    "captured_at": "2026-08-07T03:27:38.318038+00:00"
   },
   "117051398671535118": {
     "id": "117051398671535118",
@@ -30971,9 +30969,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031579+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109029+00:00"
+    "captured_at": "2026-08-07T03:27:38.318079+00:00"
   },
   "117051395919942149": {
     "id": "117051395919942149",
@@ -30989,9 +30985,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031601+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109033+00:00"
+    "captured_at": "2026-08-07T03:27:38.318092+00:00"
   },
   "117051395561975802": {
     "id": "117051395561975802",
@@ -31007,9 +31001,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031620+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109036+00:00"
+    "captured_at": "2026-08-07T03:27:38.318104+00:00"
   },
   "117051394979234323": {
     "id": "117051394979234323",
@@ -31025,9 +31017,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031637+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109039+00:00"
+    "captured_at": "2026-08-07T03:27:38.318117+00:00"
   },
   "117051392252882278": {
     "id": "117051392252882278",
@@ -31043,9 +31033,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031653+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109041+00:00"
+    "captured_at": "2026-08-07T03:27:38.318130+00:00"
   },
   "117051391491903440": {
     "id": "117051391491903440",
@@ -31061,9 +31049,7 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031668+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109044+00:00"
+    "captured_at": "2026-08-07T03:27:38.318142+00:00"
   },
   "117051390549999528": {
     "id": "117051390549999528",
@@ -31079,8 +31065,190 @@
       "tier1": {},
       "tier2": {}
     },
-    "captured_at": "2026-08-07T00:56:04.031687+00:00",
-    "events": [],
-    "scan_time": "2026-08-07T00:56:04.109051+00:00"
+    "captured_at": "2026-08-07T03:27:38.318153+00:00"
+  },
+  "117051823334652132": {
+    "id": "117051823334652132",
+    "created_at": "2026-08-07T02:18:01.645Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051823334652132",
+    "text": "RT @realDonaldTrumpDonald Trump Won The Iran War: https://www.19fortyfive.com/2026/08/donald-trump-won-the-iran-war/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317812+00:00"
+  },
+  "117051821416334863": {
+    "id": "117051821416334863",
+    "created_at": "2026-08-07T02:17:32.374Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051821416334863",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317844+00:00"
+  },
+  "117051820850638344": {
+    "id": "117051820850638344",
+    "created_at": "2026-08-07T02:17:23.742Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051820850638344",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317861+00:00"
+  },
+  "117051820321214036": {
+    "id": "117051820321214036",
+    "created_at": "2026-08-07T02:17:15.665Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051820321214036",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317876+00:00"
+  },
+  "117051819608621322": {
+    "id": "117051819608621322",
+    "created_at": "2026-08-07T02:17:04.790Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051819608621322",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317889+00:00"
+  },
+  "117051819027001118": {
+    "id": "117051819027001118",
+    "created_at": "2026-08-07T02:16:55.915Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051819027001118",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317903+00:00"
+  },
+  "117051818499563426": {
+    "id": "117051818499563426",
+    "created_at": "2026-08-07T02:16:47.867Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051818499563426",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317915+00:00"
+  },
+  "117051817871512048": {
+    "id": "117051817871512048",
+    "created_at": "2026-08-07T02:16:38.284Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051817871512048",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317931+00:00"
+  },
+  "117051817199880380": {
+    "id": "117051817199880380",
+    "created_at": "2026-08-07T02:16:28.036Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051817199880380",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.317944+00:00"
+  },
+  "117051741714223391": {
+    "id": "117051741714223391",
+    "created_at": "2026-08-07T01:57:16.216Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051741714223391",
+    "text": "Donald Trump Won The Iran War: https://www.19fortyfive.com/2026/08/donald-trump-won-the-iran-war/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.318012+00:00"
+  },
+  "117051584852814396": {
+    "id": "117051584852814396",
+    "created_at": "2026-08-07T01:17:22.701Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117051584852814396",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-07T03:27:38.318025+00:00"
   }
 }
