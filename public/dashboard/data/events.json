@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-06T17:21:53.012474+08:00",
+  "generated_at": "2026-08-07T09:51:28.851186+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -9,31 +9,7 @@
     "alerts": [],
     "earnings_calendar": [
       {
-        "symbol": "MELI",
-        "earnings_date": "2026-08-05"
-      },
-      {
-        "symbol": "WDC",
-        "earnings_date": "2026-08-05"
-      },
-      {
         "symbol": "SNDK",
-        "earnings_date": "2026-08-05"
-      },
-      {
-        "symbol": "LEU",
-        "earnings_date": "2026-08-05"
-      },
-      {
-        "symbol": "SMR",
-        "earnings_date": "2026-08-05"
-      },
-      {
-        "symbol": "EOSE",
-        "earnings_date": "2026-08-05"
-      },
-      {
-        "symbol": "UUUU",
         "earnings_date": "2026-08-05"
       },
       {
@@ -101,6 +77,10 @@
         "earnings_date": "2026-08-26"
       },
       {
+        "symbol": "CRM",
+        "earnings_date": "2026-08-26"
+      },
+      {
         "symbol": "CRWD",
         "earnings_date": "2026-08-26"
       },
@@ -113,11 +93,11 @@
         "earnings_date": "2026-08-27"
       },
       {
-        "symbol": "AVGO",
-        "earnings_date": "2026-09-02"
+        "symbol": "RBRK",
+        "earnings_date": "2026-08-27"
       },
       {
-        "symbol": "CRM",
+        "symbol": "AVGO",
         "earnings_date": "2026-09-02"
       },
       {
@@ -127,10 +107,6 @@
       {
         "symbol": "CRDO",
         "earnings_date": "2026-09-02"
-      },
-      {
-        "symbol": "RBRK",
-        "earnings_date": "2026-09-08"
       },
       {
         "symbol": "ORCL",
@@ -293,6 +269,10 @@
         "earnings_date": "2026-11-02"
       },
       {
+        "symbol": "UUUU",
+        "earnings_date": "2026-11-02"
+      },
+      {
         "symbol": "AMD",
         "earnings_date": "2026-11-03"
       },
@@ -309,11 +289,31 @@
         "earnings_date": "2026-11-03"
       },
       {
+        "symbol": "MELI",
+        "earnings_date": "2026-11-04"
+      },
+      {
         "symbol": "ARM",
         "earnings_date": "2026-11-04"
       },
       {
+        "symbol": "LEU",
+        "earnings_date": "2026-11-04"
+      },
+      {
+        "symbol": "EOSE",
+        "earnings_date": "2026-11-04"
+      },
+      {
+        "symbol": "WDC",
+        "earnings_date": "2026-11-05"
+      },
+      {
         "symbol": "DD",
+        "earnings_date": "2026-11-05"
+      },
+      {
+        "symbol": "SMR",
         "earnings_date": "2026-11-05"
       }
     ]
