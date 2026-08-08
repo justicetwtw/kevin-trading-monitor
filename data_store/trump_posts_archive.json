@@ -31831,5 +31831,89 @@
       "tier2": {}
     },
     "captured_at": "2026-08-08T17:14:25.256824+00:00"
+  },
+  "117061655895656555": {
+    "id": "117061655895656555",
+    "created_at": "2026-08-08T19:58:34.618Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117061655895656555",
+    "text": "RT: https://truthsocial.com/users/mrddmia/statuses/117060035123254425Very true! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T20:05:40.509603+00:00"
+  },
+  "117061633436594617": {
+    "id": "117061633436594617",
+    "created_at": "2026-08-08T19:52:51.920Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117061633436594617",
+    "text": "Great Poll Numbers. Thank You!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T20:05:40.509720+00:00"
+  },
+  "117061628394581449": {
+    "id": "117061628394581449",
+    "created_at": "2026-08-08T19:51:34.985Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117061628394581449",
+    "text": "Cash is king: Washington Republicans bankroll midterms as National Democrat coffers are in the red: https://justthenews.com/politics-policy/elections/cash-king-republicans-bankroll-midterms-democrat-coffers-are-red",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T20:05:40.509790+00:00"
+  },
+  "117061626683883531": {
+    "id": "117061626683883531",
+    "created_at": "2026-08-08T19:51:08.881Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117061626683883531",
+    "text": "More than 600,000 voter files ripped off Arizona site in 2020 by hacker, but DOJ didn't prosecute: https://justthenews.com/government/courts-law/6amhundreds-thousands-voter-files-were-hacked-arizona-2020-doj-declined",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T20:05:40.509855+00:00"
+  },
+  "117061625172029469": {
+    "id": "117061625172029469",
+    "created_at": "2026-08-08T19:50:45.813Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117061625172029469",
+    "text": "New evidence further undermines claim that 2020 election was 'most secure' in history: https://justthenews.com/politics-policy/elections/new-evidence-further-undermines-claim-2020-election-was-most-secure",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-08T20:05:40.509919+00:00"
   }
 }
