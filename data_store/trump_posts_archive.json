@@ -31539,5 +31539,169 @@
       "tier2": {}
     },
     "captured_at": "2026-08-08T02:02:15.315188+00:00"
+  },
+  "117057627008755167": {
+    "id": "117057627008755167",
+    "created_at": "2026-08-08T02:53:58.687Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057627008755167",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117057626226861348",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396017+00:00"
+  },
+  "117057626226861348": {
+    "id": "117057626226861348",
+    "created_at": "2026-08-08T02:53:46.754Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057626226861348",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396053+00:00"
+  },
+  "117057509638719175": {
+    "id": "117057509638719175",
+    "created_at": "2026-08-08T02:24:07.760Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057509638719175",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396073+00:00"
+  },
+  "117057479378658176": {
+    "id": "117057479378658176",
+    "created_at": "2026-08-08T02:16:26.027Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057479378658176",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396090+00:00"
+  },
+  "117057476992290409": {
+    "id": "117057476992290409",
+    "created_at": "2026-08-08T02:15:49.615Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057476992290409",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396106+00:00"
+  },
+  "117057476136418935": {
+    "id": "117057476136418935",
+    "created_at": "2026-08-08T02:15:36.555Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057476136418935",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396120+00:00"
+  },
+  "117057475422420857": {
+    "id": "117057475422420857",
+    "created_at": "2026-08-08T02:15:25.660Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057475422420857",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396133+00:00"
+  },
+  "117057432376326350": {
+    "id": "117057432376326350",
+    "created_at": "2026-08-08T02:04:28.829Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057432376326350",
+    "text": "This great and very important military asset sits atop the heavily protected Ballroom at the White House. It provides National Security for Washington, D.C., and will protect future Presidents!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396236+00:00"
+  },
+  "117057342760619458": {
+    "id": "117057342760619458",
+    "created_at": "2026-08-08T01:41:41.401Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057342760619458",
+    "text": "Donald Trump Won The Iran War: https://www.19fortyfive.com/2026/08/donald-trump-won-the-iran-war/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396286+00:00"
+  },
+  "117057340319953837": {
+    "id": "117057340319953837",
+    "created_at": "2026-08-08T01:41:04.160Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117057340319953837",
+    "text": "Just kidding!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T03:39:52.396327+00:00"
   }
 }
