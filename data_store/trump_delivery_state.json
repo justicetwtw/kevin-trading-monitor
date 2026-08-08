@@ -26310,12 +26310,12 @@
       "post_id": "117061626683883531",
       "created_at": "2026-08-08T19:51:08.881Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-08T20:05:51.064243+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-08T20:05:54.881548+00:00",
       "run_id": "31276021913",
       "workflow_attempt_id": "31276021913:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117061625172029469": {
       "post_id": "117061625172029469",
