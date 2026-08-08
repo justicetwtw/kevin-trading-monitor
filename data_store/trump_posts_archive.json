@@ -31703,5 +31703,117 @@
       "tier2": {}
     },
     "captured_at": "2026-08-08T03:39:52.396327+00:00"
+  },
+  "117059578415762701": {
+    "id": "117059578415762701",
+    "created_at": "2026-08-08T11:10:14.793Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059578415762701",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117059577812036128",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469325+00:00"
+  },
+  "117059577812036128": {
+    "id": "117059577812036128",
+    "created_at": "2026-08-08T11:10:05.579Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059577812036128",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469361+00:00"
+  },
+  "117059577111765428": {
+    "id": "117059577111765428",
+    "created_at": "2026-08-08T11:09:54.893Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059577111765428",
+    "text": "RT @realDonaldTrump",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469438+00:00"
+  },
+  "117059576602896182": {
+    "id": "117059576602896182",
+    "created_at": "2026-08-08T11:09:47.130Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059576602896182",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469489+00:00"
+  },
+  "117059576070730051": {
+    "id": "117059576070730051",
+    "created_at": "2026-08-08T11:09:39.012Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059576070730051",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469513+00:00"
+  },
+  "117059574061763276": {
+    "id": "117059574061763276",
+    "created_at": "2026-08-08T11:09:08.356Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059574061763276",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469528+00:00"
+  },
+  "117059569406743326": {
+    "id": "117059569406743326",
+    "created_at": "2026-08-08T11:07:57.325Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117059569406743326",
+    "text": "Eric Schmitt is a STAR!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-08T11:44:53.469581+00:00"
   }
 }
