@@ -1,7 +1,7 @@
 {
   "status": "healthy",
   "source": "cnn_historical_archive",
-  "latest_post_at": "2026-08-08T11:10:14.793000+00:00",
+  "latest_post_at": "2026-08-08T17:08:39.059000+00:00",
   "attempts": [
     {
       "status": "unavailable",
@@ -14,28 +14,28 @@
     },
     {
       "source": "cnn_historical_archive",
-      "raw_count": 35265,
+      "raw_count": 35266,
       "returned_count": 1000,
       "source_limit": 1000,
       "status": "healthy",
-      "latest_post_at": "2026-08-08T11:10:14.793000+00:00",
+      "latest_post_at": "2026-08-08T17:08:39.059000+00:00",
       "error": null
     }
   ],
-  "source_raw_count": 35265,
+  "source_raw_count": 35266,
   "source_returned_count": 1000,
   "source_limit": 1000,
   "source_window_bounded": true,
   "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
   "initial_backfill_hours": 24,
-  "eligible_count": 481,
+  "eligible_count": 482,
   "timestamp_missing_count": 0,
-  "new_count": 0,
-  "archived_count": 0,
-  "delivered_count": 0,
-  "delivery_status": "no_new_posts",
+  "new_count": 1,
+  "archived_count": 1,
+  "delivered_count": 1,
+  "delivery_status": "delivered_all",
   "delivery_requires_all_recipients": true,
-  "checked_at": "2026-08-08T16:47:38.983878+00:00",
+  "checked_at": "2026-08-08T17:14:34.367620+00:00",
   "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
   "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
   "source_completeness_verified": false,
@@ -49,14 +49,19 @@
   "translation_failed_count": 0,
   "translation_budget_exhausted_count": 0,
   "translation_fidelity_mismatch_count": 0,
+  "delivery_ambiguous_count": 0,
+  "delivery_failed_count": 0,
+  "delivery_blocked_count": 0,
+  "delivery_retried_from_archive_count": 0,
   "delivery_unresolved_backlog_count": 0,
+  "delivery_pending_backlog_count": 0,
   "delivery_failed_backlog_count": 0,
   "delivery_archive_missing_failed_count": 0,
   "delivery_ledger_counts": {
-    "failed": 0,
     "ambiguous": 0,
-    "sent": 2580,
+    "pending": 0,
+    "failed": 0,
     "claimed": 0,
-    "pending": 0
+    "sent": 2581
   }
 }
