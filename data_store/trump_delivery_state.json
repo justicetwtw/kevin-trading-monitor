@@ -26409,12 +26409,12 @@
       "post_id": "117063162955258981",
       "created_at": "2026-08-09T02:21:50.524Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-09T03:07:30.067587+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-09T03:07:33.287538+00:00",
       "run_id": "31291726656",
       "workflow_attempt_id": "31291726656:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117063162328917337": {
       "post_id": "117063162328917337",
