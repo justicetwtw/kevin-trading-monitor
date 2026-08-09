@@ -32222,5 +32222,37 @@
       "tier2": {}
     },
     "captured_at": "2026-08-09T14:18:25.980647+00:00"
+  },
+  "117066600252281502": {
+    "id": "117066600252281502",
+    "created_at": "2026-08-09T16:55:59.514Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117066600252281502",
+    "text": "Gary Player at Trump Turnberry!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-09T17:24:43.845763+00:00"
+  },
+  "117066584024874286": {
+    "id": "117066584024874286",
+    "created_at": "2026-08-09T16:51:51.904Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117066584024874286",
+    "text": "Hillary Clinton: \"The world may not like Trump's Gaza plan — but there is no alternative: If even I, an implacable opponent of the president, can accept this as the best option, then surely others can too?\"https://www.ft.com/content/2472e584-758b-4a3f-83d1-9fba042a9312",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-09T17:24:43.845910+00:00"
   }
 }
