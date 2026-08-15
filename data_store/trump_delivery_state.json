@@ -28136,12 +28136,12 @@
       "post_id": "117073723077140051",
       "created_at": "2026-08-10T23:07:25.195Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-15T13:00:22.611108+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-15T13:00:26.189753+00:00",
       "run_id": "31885873538",
       "workflow_attempt_id": "31885873538:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117073721724178813": {
       "post_id": "117073721724178813",
