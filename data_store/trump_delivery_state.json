@@ -28598,12 +28598,12 @@
       "post_id": "117101661290326953",
       "created_at": "2026-08-15T21:32:28.497Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-15T21:39:02.844718+00:00",
       "resolved_at": null,
       "run_id": "31909950587",
       "workflow_attempt_id": "31909950587:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117101660036144509": {
       "post_id": "117101660036144509",
