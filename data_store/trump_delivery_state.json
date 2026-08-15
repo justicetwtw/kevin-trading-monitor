@@ -26662,12 +26662,12 @@
       "post_id": "117097066845411134",
       "created_at": "2026-08-15T02:04:02.831Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-15T14:33:36.572764+00:00",
       "resolved_at": null,
-      "run_id": "31885873538",
-      "workflow_attempt_id": "31885873538:1",
-      "stage_code": "captured_pending"
+      "run_id": "31890062563",
+      "workflow_attempt_id": "31890062563:1",
+      "stage_code": "claimed_before_send"
     },
     "117097064279149887": {
       "post_id": "117097064279149887",
