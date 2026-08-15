@@ -27773,12 +27773,12 @@
       "post_id": "117080057770790960",
       "created_at": "2026-08-12T01:58:24.949Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-15T13:28:31.872510+00:00",
       "resolved_at": null,
-      "run_id": "31885873538",
-      "workflow_attempt_id": "31885873538:1",
-      "stage_code": "captured_pending"
+      "run_id": "31887135685",
+      "workflow_attempt_id": "31887135685:1",
+      "stage_code": "claimed_before_send"
     },
     "117080022043498211": {
       "post_id": "117080022043498211",
