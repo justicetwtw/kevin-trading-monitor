@@ -28169,12 +28169,12 @@
       "post_id": "117073717893943621",
       "created_at": "2026-08-10T23:06:06.106Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-15T13:00:01.062161+00:00",
       "resolved_at": null,
       "run_id": "31885873538",
       "workflow_attempt_id": "31885873538:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117073716512485609": {
       "post_id": "117073716512485609",
