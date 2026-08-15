@@ -26761,12 +26761,12 @@
       "post_id": "117097008439618569",
       "created_at": "2026-08-15T01:49:11.630Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-15T14:32:39.034331+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-15T14:32:42.878169+00:00",
       "run_id": "31890062563",
       "workflow_attempt_id": "31890062563:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117097008006254308": {
       "post_id": "117097008006254308",
