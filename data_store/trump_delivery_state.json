@@ -28785,12 +28785,12 @@
       "post_id": "117105403616486905",
       "created_at": "2026-08-16T13:24:11.862Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-16T13:39:19.718245+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-16T13:39:22.620959+00:00",
       "run_id": "31950391238",
       "workflow_attempt_id": "31950391238:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
