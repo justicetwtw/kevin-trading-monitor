@@ -28664,12 +28664,12 @@
       "post_id": "117105421071927675",
       "created_at": "2026-08-16T13:28:38.212Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-16T13:40:15.261321+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-16T13:40:18.259278+00:00",
       "run_id": "31950391238",
       "workflow_attempt_id": "31950391238:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117105419212048502": {
       "post_id": "117105419212048502",
