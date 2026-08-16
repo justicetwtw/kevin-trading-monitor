@@ -35,7 +35,7 @@
   "delivered_count": 0,
   "delivery_status": "unresolved_delivery_backlog",
   "delivery_requires_all_recipients": true,
-  "checked_at": "2026-08-16T11:56:37.067456+00:00",
+  "checked_at": "2026-08-16T12:23:07.987962+00:00",
   "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
   "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
   "source_completeness_verified": false,
@@ -54,9 +54,9 @@
   "delivery_archive_missing_failed_count": 0,
   "delivery_ledger_counts": {
     "failed": 0,
-    "ambiguous": 0,
+    "pending": 0,
     "claimed": 3,
-    "sent": 2795,
-    "pending": 0
+    "ambiguous": 0,
+    "sent": 2795
   }
 }
