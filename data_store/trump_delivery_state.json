@@ -29027,12 +29027,12 @@
       "post_id": "117113519814962467",
       "created_at": "2026-08-17T23:48:15.224Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-17T23:55:08.795880+00:00",
       "resolved_at": null,
       "run_id": "32082282911",
       "workflow_attempt_id": "32082282911:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117113518610928478": {
       "post_id": "117113518610928478",
