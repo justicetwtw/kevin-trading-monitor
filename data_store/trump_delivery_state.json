@@ -28851,12 +28851,12 @@
       "post_id": "117108149059035107",
       "created_at": "2026-08-17T01:02:23.990Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-17T01:24:33.333243+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-17T01:24:37.006351+00:00",
       "run_id": "31984795879",
       "workflow_attempt_id": "31984795879:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117108144716925846": {
       "post_id": "117108144716925846",
