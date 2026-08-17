@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T07:56:44.049955+08:00",
+  "generated_at": "2026-08-17T15:32:58.370489+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -9,56 +9,16 @@
     "alerts": [],
     "earnings_calendar": [
       {
-        "symbol": "CEG",
-        "earnings_date": "2026-08-06"
-      },
-      {
-        "symbol": "VST",
-        "earnings_date": "2026-08-07"
-      },
-      {
         "symbol": "OKLO",
         "earnings_date": "2026-08-07"
-      },
-      {
-        "symbol": "ASTS",
-        "earnings_date": "2026-08-10"
-      },
-      {
-        "symbol": "RKLB",
-        "earnings_date": "2026-08-10"
-      },
-      {
-        "symbol": "USAR",
-        "earnings_date": "2026-08-10"
-      },
-      {
-        "symbol": "SMCI",
-        "earnings_date": "2026-08-11"
-      },
-      {
-        "symbol": "CRWV",
-        "earnings_date": "2026-08-11"
       },
       {
         "symbol": "UAMY",
         "earnings_date": "2026-08-11"
       },
       {
-        "symbol": "NBIS",
-        "earnings_date": "2026-08-12"
-      },
-      {
         "symbol": "NNE",
         "earnings_date": "2026-08-12"
-      },
-      {
-        "symbol": "AMAT",
-        "earnings_date": "2026-08-13"
-      },
-      {
-        "symbol": "ONDS",
-        "earnings_date": "2026-08-13"
       },
       {
         "symbol": "WMT",
@@ -89,6 +49,10 @@
         "earnings_date": "2026-08-27"
       },
       {
+        "symbol": "CRDO",
+        "earnings_date": "2026-09-01"
+      },
+      {
         "symbol": "AVGO",
         "earnings_date": "2026-09-02"
       },
@@ -97,12 +61,8 @@
         "earnings_date": "2026-09-02"
       },
       {
-        "symbol": "CRDO",
-        "earnings_date": "2026-09-02"
-      },
-      {
         "symbol": "ORCL",
-        "earnings_date": "2026-09-09"
+        "earnings_date": "2026-09-10"
       },
       {
         "symbol": "ADBE",
@@ -277,6 +237,10 @@
         "earnings_date": "2026-11-03"
       },
       {
+        "symbol": "SMCI",
+        "earnings_date": "2026-11-03"
+      },
+      {
         "symbol": "KTOS",
         "earnings_date": "2026-11-03"
       },
@@ -297,6 +261,10 @@
         "earnings_date": "2026-11-04"
       },
       {
+        "symbol": "VST",
+        "earnings_date": "2026-11-05"
+      },
+      {
         "symbol": "WDC",
         "earnings_date": "2026-11-05"
       },
@@ -313,8 +281,40 @@
         "earnings_date": "2026-11-05"
       },
       {
+        "symbol": "USAR",
+        "earnings_date": "2026-11-05"
+      },
+      {
         "symbol": "SNDK",
         "earnings_date": "2026-11-06"
+      },
+      {
+        "symbol": "CEG",
+        "earnings_date": "2026-11-09"
+      },
+      {
+        "symbol": "ASTS",
+        "earnings_date": "2026-11-09"
+      },
+      {
+        "symbol": "RKLB",
+        "earnings_date": "2026-11-09"
+      },
+      {
+        "symbol": "NBIS",
+        "earnings_date": "2026-11-10"
+      },
+      {
+        "symbol": "CRWV",
+        "earnings_date": "2026-11-11"
+      },
+      {
+        "symbol": "AMAT",
+        "earnings_date": "2026-11-12"
+      },
+      {
+        "symbol": "ONDS",
+        "earnings_date": "2026-11-12"
       }
     ]
   }

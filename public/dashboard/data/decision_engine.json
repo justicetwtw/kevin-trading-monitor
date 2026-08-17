@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-07T23:56:44.569173+00:00",
+  "generated_at": "2026-08-17T07:32:58.852522+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -61,6 +61,7 @@
         "catalyst_not_future",
         "complete_screen_score_missing",
         "evidence_quality_not_reviewable",
+        "market_context_stale",
         "scenario_missing",
         "threshold_origin_unapproved",
         "watchlist_coverage_below_80pct"
@@ -119,6 +120,7 @@
         "catalyst_not_future",
         "complete_screen_score_missing",
         "evidence_quality_not_reviewable",
+        "market_context_stale",
         "scenario_missing",
         "threshold_origin_unapproved",
         "watchlist_coverage_below_80pct"
@@ -177,6 +179,7 @@
         "catalyst_not_future",
         "complete_screen_score_missing",
         "evidence_quality_not_reviewable",
+        "market_context_stale",
         "scenario_missing",
         "symbol_thesis_missing",
         "thesis_invalidation_missing",
@@ -239,6 +242,7 @@
         "catalyst_not_future",
         "complete_screen_score_missing",
         "evidence_quality_not_reviewable",
+        "market_context_stale",
         "scenario_missing",
         "threshold_origin_unapproved",
         "watchlist_coverage_missing"
@@ -323,7 +327,7 @@
   "portfolio_decision_risk": {},
   "market_context_health": {
     "status": "healthy",
-    "stale": false,
+    "stale": true,
     "generated_at": "2026-08-07T22:58:16.725147+00:00",
     "unavailable_count": 0,
     "partial_count": 0,
