@@ -37279,5 +37279,25 @@
       }
     },
     "captured_at": "2026-08-17T22:55:56.634047+00:00"
+  },
+  "117113347902795107": {
+    "id": "117113347902795107",
+    "created_at": "2026-08-17T23:04:32.051Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117113347902795107",
+    "text": "Earlier this month, India's Chief Election Commissioner, Gyanesh Kumar, asked our Administration — How can you have Elections in the U.S. without a valid Photo ID? India's last Election had 646,000,000 Voters! Less than 1% voted by mail, and every single Voter had to have a VALID Photo Identity Document. We need to pass THE SAVE AMERICA ACT, now! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-17T23:14:02.906236+00:00"
   }
 }
