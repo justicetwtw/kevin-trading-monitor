@@ -28906,12 +28906,12 @@
       "post_id": "117110334410901963",
       "created_at": "2026-08-17T10:18:09.814Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-17T10:50:31.753716+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-17T10:50:35.800256+00:00",
       "run_id": "32021976568",
       "workflow_attempt_id": "32021976568:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
