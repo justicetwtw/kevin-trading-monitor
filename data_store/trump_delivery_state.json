@@ -29115,12 +29115,12 @@
       "post_id": "117113510618692004",
       "created_at": "2026-08-17T23:45:54.899Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-17T23:54:25.518823+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-17T23:54:28.736289+00:00",
       "run_id": "32082282911",
       "workflow_attempt_id": "32082282911:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117113507236763193": {
       "post_id": "117113507236763193",
