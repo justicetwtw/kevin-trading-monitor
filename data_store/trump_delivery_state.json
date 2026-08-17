@@ -29038,12 +29038,12 @@
       "post_id": "117113518610928478",
       "created_at": "2026-08-17T23:47:56.851Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-17T23:55:03.847678+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-17T23:55:06.903015+00:00",
       "run_id": "32082282911",
       "workflow_attempt_id": "32082282911:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117113517318085766": {
       "post_id": "117113517318085766",
