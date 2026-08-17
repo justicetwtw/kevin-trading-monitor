@@ -37146,5 +37146,21 @@
       "fed_powell_conflict"
     ],
     "scan_time": "2026-08-17T19:32:36.942449+00:00"
+  },
+  "117112539574360815": {
+    "id": "117112539574360815",
+    "created_at": "2026-08-17T19:38:57.938Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117112539574360815",
+    "text": "RT @rapidresponse47.@realDonaldTrump: \"You're very disrespectful in front of this young man... You're a loud, boisterous person. You're Fake News. Be quiet. Be quiet. Be quiet. You're a fake reporter and you report FAKE NEWS.\"",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-17T19:56:16.232008+00:00"
   }
 }
