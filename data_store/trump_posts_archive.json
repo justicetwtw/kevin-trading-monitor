@@ -36519,5 +36519,25 @@
       "tier2": {}
     },
     "captured_at": "2026-08-17T10:50:25.370504+00:00"
+  },
+  "117110479507145029": {
+    "id": "117110479507145029",
+    "created_at": "2026-08-17T10:55:03.807Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117110479507145029",
+    "text": "Trump Bump: Tax refunds jumped 17% after president's signature law, GAO reports: https://justthenews.com/government/federal-agencies/total-tax-refunds-issued-2025-jumped-17-compared-2024-paper-check",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-17T11:11:04.410269+00:00"
   }
 }
