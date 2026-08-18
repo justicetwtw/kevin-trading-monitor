@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-08-18T19:42:25.386087+00:00",
+  "scan_time": "2026-08-18T20:01:06.065936+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 15.609999656677246,
+          "value": 15.699999809265137,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.09816089113314866,
+          "value": 0.09830367688907105,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-08-18T19:42:27.928197+00:00"
+      "fetched_at": "2026-08-18T20:01:33.378626+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,17 +36,17 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-08-18T15:42:27.929193-04:00"
+        "fetched_at": "2026-08-18T16:01:33.379633-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-08-18T19:42:28.827364+00:00"
+      "fetched_at": "2026-08-18T20:01:34.093358+00:00"
     },
     "distribution": {
       "spy": {
         "symbol": "SPY",
         "lookback": 25,
-        "count": 5,
+        "count": 6,
         "days": [
           {
             "date": "2026-07-16",
@@ -77,10 +77,16 @@
             "drop_pct": -0.004727366641364418,
             "volume": 34356600,
             "prev_volume": 31367900
+          },
+          {
+            "date": "2026-08-18",
+            "drop_pct": -0.006872271054964976,
+            "volume": 35495440,
+            "prev_volume": 34356600
           }
         ],
-        "level": "pressure",
-        "fetched_at": "2026-08-18T19:42:29.017564+00:00"
+        "level": "distribution",
+        "fetched_at": "2026-08-18T20:01:34.285744+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -131,13 +137,13 @@
           },
           {
             "date": "2026-08-18",
-            "drop_pct": -0.016852299553695,
-            "volume": 41534050,
+            "drop_pct": -0.016934502629578557,
+            "volume": 46944046,
             "prev_volume": 26452600
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-08-18T19:42:29.200331+00:00"
+        "fetched_at": "2026-08-18T20:01:34.442860+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -145,7 +151,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-08-18T19:42:29.201298+00:00"
+      "fetched_at": "2026-08-18T20:01:34.444285+00:00"
     },
     "bubble": {
       "score": 0,
@@ -161,9 +167,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-08-18T15:42:30.056598-04:00"
+        "fetched_at": "2026-08-18T16:01:35.301139-04:00"
       },
-      "fetched_at": "2026-08-18T19:42:30.056634+00:00"
+      "fetched_at": "2026-08-18T20:01:35.301181+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -173,13 +179,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-08-18T19:42:30.677822+00:00"
+      "fetched_at": "2026-08-18T20:01:36.018693+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 15.609999656677246,
-        "vix9d": 13.3100004196167,
-        "vix3m": 19.1299991607666,
+        "vix": 15.699999809265137,
+        "vix9d": 13.420000076293945,
+        "vix3m": 19.170000076293945,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -189,13 +195,13 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-08-18T19:42:30.730855+00:00"
+      "fetched_at": "2026-08-18T20:01:36.068737+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-08-18T19:42:34.974039+00:00"
+      "fetched_at": "2026-08-18T20:01:40.237642+00:00"
     }
   },
   "aggregate_modifiers": {
