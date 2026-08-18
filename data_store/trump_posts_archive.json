@@ -38559,5 +38559,41 @@
       "hormuz_iran"
     ],
     "scan_time": "2026-08-18T22:01:04.332455+00:00"
+  },
+  "117118759965215830": {
+    "id": "117118759965215830",
+    "created_at": "2026-08-18T22:00:53.570Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117118759965215830",
+    "text": "I am pleased to nominate Robert (Bobby) Long to serve as Judge on the U.S. District Court for the Middle District of Florida. Bobby is currently a Judge on Florida's First District Court of Appeal. A longtime member of the Navy JAG Corps, Bobby was previously a Trial Judge on Florida's Second Judicial Circuit Court and, prior to that, General Counsel of the Leon County Sheriff's Office, where he was a Police Officer before becoming a lawyer. Bobby received his Law Degree from the University of Florida College of Law, and his Undergraduate Degree from Florida State University. Robert Long can always be counted on to protect the Public Safety and Constitutional Rights of Floridians. Congratulations Bobby! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-18T22:17:55.273415+00:00"
+  },
+  "117118742340410434": {
+    "id": "117118742340410434",
+    "created_at": "2026-08-18T21:56:24.637Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117118742340410434",
+    "text": "I am pleased to nominate Peter Mansfield, who has the strong support of Senator John Kennedy and Senator Bill Cassidy, to serve as Judge on the U.S. District Court for the Eastern District of Louisiana. Peter has been an Assistant U.S. Attorney in New Orleans for more than twenty years, currently working as Chief of the Civil Division and, previously, as First Assistant. He received his Law Degree from Ave Maria School of Law, and his Undergraduate Degree from Franciscan University of Steubenville. The people of Louisiana are lucky to have a dedicated Public Servant like Peter join the Federal Bench. Congratulations Peter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-18T22:17:55.273557+00:00"
   }
 }

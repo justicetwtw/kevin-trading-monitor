@@ -29572,6 +29572,28 @@
       "run_id": "32190327393",
       "workflow_attempt_id": "32190327393:1",
       "stage_code": "resolved_sent"
+    },
+    "117118759965215830": {
+      "post_id": "117118759965215830",
+      "created_at": "2026-08-18T22:00:53.570Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "32191975361",
+      "workflow_attempt_id": "32191975361:1",
+      "stage_code": "captured_pending"
+    },
+    "117118742340410434": {
+      "post_id": "117118742340410434",
+      "created_at": "2026-08-18T21:56:24.637Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "32191975361",
+      "workflow_attempt_id": "32191975361:1",
+      "stage_code": "captured_pending"
     }
   }
 }
