@@ -42,7 +42,7 @@
       }
     ],
     "level": "distribution",
-    "fetched_at": "2026-08-19T21:05:27.800411+00:00"
+    "fetched_at": "2026-08-19T21:43:26.920580+00:00"
   },
   "qqq": {
     "symbol": "QQQ",
@@ -93,7 +93,7 @@
       }
     ],
     "level": "distribution",
-    "fetched_at": "2026-08-19T21:05:28.005186+00:00"
+    "fetched_at": "2026-08-19T21:43:27.075812+00:00"
   },
   "level": "distribution",
   "modifiers": {
@@ -101,5 +101,5 @@
     "sell_put": -15,
     "sell_call": 5
   },
-  "fetched_at": "2026-08-19T21:05:28.006152+00:00"
+  "fetched_at": "2026-08-19T21:43:27.077346+00:00"
 }
