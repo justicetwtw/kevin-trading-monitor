@@ -39043,5 +39043,49 @@
       "tier2": {}
     },
     "captured_at": "2026-08-19T02:22:19.823351+00:00"
+  },
+  "117119807819944656": {
+    "id": "117119807819944656",
+    "created_at": "2026-08-19T02:27:22.565Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117119807819944656",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-19T03:15:23.239891+00:00"
+  },
+  "117119761850520698": {
+    "id": "117119761850520698",
+    "created_at": "2026-08-19T02:15:41.128Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117119761850520698",
+    "text": "I have paused the 50% Tariffs against Canada, that were scheduled to kick in tomorrow morning for a three day period, based on the fact that Canada and the U.S.A., subject to the finalization of documents, have a DEAL! The great Keystone XL Pipeline, long ago killed by Sleepy Joe Biden, may be awoken from the grave! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-19T03:15:23.243387+00:00"
   }
 }
