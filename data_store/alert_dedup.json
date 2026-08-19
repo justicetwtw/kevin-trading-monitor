@@ -1,40 +1,11 @@
 {
-  "TSLA::leaps_entry": {
-    "last_sent": "2026-07-27T17:49:04.351129+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "MP::leaps_entry": {
-    "last_sent": "2026-07-24T18:25:13.549572+00:00",
-    "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1"
-    ]
-  },
-  "TSM::leaps_entry": {
-    "last_sent": "2026-07-27T17:49:05.190523+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "META::sell_put": {
-    "last_sent": "2026-07-30T16:55:27.216175+00:00",
-    "alert_level": "green",
-    "tags": []
-  },
-  "VRT::leaps_entry": {
-    "last_sent": "2026-07-30T22:50:05.746368+00:00",
-    "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1"
-    ]
-  },
-  "QCOM::leaps_entry": {
-    "last_sent": "2026-07-31T15:25:12.419692+00:00",
+  "AVGO::leaps_entry": {
+    "last_sent": "2026-08-19T13:51:25.836268+00:00",
     "alert_level": "green",
     "tags": []
   },
   "META::leaps_entry": {
-    "last_sent": "2026-07-31T15:25:13.456180+00:00",
+    "last_sent": "2026-08-19T13:51:26.629105+00:00",
     "alert_level": "green",
     "tags": []
   }
