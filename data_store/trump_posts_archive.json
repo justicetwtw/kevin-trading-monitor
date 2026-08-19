@@ -39171,5 +39171,21 @@
     "captured_at": "2026-08-19T13:50:01.885053+00:00",
     "events": [],
     "scan_time": "2026-08-19T13:50:01.971417+00:00"
+  },
+  "117122454656898588": {
+    "id": "117122454656898588",
+    "created_at": "2026-08-19T13:40:30.091Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117122454656898588",
+    "text": "I told Congressman Cory Mills of Florida, a friend of mine, to get out of the Race, but he wouldn't listen. He thought he could win, so who can blame him? We now have a great candidate, Ryan Elijah, running in his place! Ryan stands for EVERYTHING MAGA, and is respected by ALL. He has my Complete and Total Endorsement! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-19T13:55:46.934646+00:00"
   }
 }
