@@ -29775,12 +29775,12 @@
       "post_id": "117119273375861239",
       "created_at": "2026-08-19T00:11:27.596Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-19T01:04:17.622071+00:00",
       "resolved_at": null,
       "run_id": "32203499545",
       "workflow_attempt_id": "32203499545:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117119272883328354": {
       "post_id": "117119272883328354",
