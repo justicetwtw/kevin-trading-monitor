@@ -39441,5 +39441,21 @@
       "tier2": {}
     },
     "captured_at": "2026-08-20T03:33:39.102157+00:00"
+  },
+  "117125718254050188": {
+    "id": "117125718254050188",
+    "created_at": "2026-08-20T03:30:28.632Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117125718254050188",
+    "text": "MORNING GLORY: SCOTUS should urgently allow construction at the White House to proceed: https://www.foxnews.com/opinion/morning-glory-scotus-should-urgently-allow-construction-white-house-proceed",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T04:11:00.694866+00:00"
   }
 }
