@@ -30237,12 +30237,12 @@
       "post_id": "117130257407138275",
       "created_at": "2026-08-20T22:44:50.612Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-20T22:57:48.158635+00:00",
       "resolved_at": null,
       "run_id": "32426537330",
       "workflow_attempt_id": "32426537330:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
