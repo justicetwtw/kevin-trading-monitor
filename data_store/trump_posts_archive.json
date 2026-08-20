@@ -39573,5 +39573,25 @@
     "captured_at": "2026-08-20T19:02:26.888918+00:00",
     "events": [],
     "scan_time": "2026-08-20T19:02:26.978195+00:00"
+  },
+  "117129360852240314": {
+    "id": "117129360852240314",
+    "created_at": "2026-08-20T18:56:50.270Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117129360852240314",
+    "text": "I am pleased to nominate Phil Axt to the U.S. District Court for the District of North Dakota. Phil is the Solicitor General of North Dakota, and has litigated numerous important cases for the State, including challenges to harmful Biden Administration policies. Before becoming a lawyer, Phil attended the U.S. Military Academy, and served our Country admirably, including deployments to Afghanistan. He is a former Law Clerk to Judge Jennifer Elrod of the Fifth Circuit, and Graduate of Yale Law School. Phil is a true warrior, and will always be a strong defender of the Constitution and Rule of Law. Congratulations Phil! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T19:29:48.048879+00:00"
   }
 }
