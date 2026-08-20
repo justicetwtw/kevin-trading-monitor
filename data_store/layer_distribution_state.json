@@ -2,14 +2,8 @@
   "spy": {
     "symbol": "SPY",
     "lookback": 25,
-    "count": 6,
+    "count": 5,
     "days": [
-      {
-        "date": "2026-07-16",
-        "drop_pct": -0.005418617756386107,
-        "volume": 46409800,
-        "prev_volume": 43844800
-      },
       {
         "date": "2026-07-17",
         "drop_pct": -0.009897156017872166,
@@ -41,20 +35,14 @@
         "prev_volume": 34356600
       }
     ],
-    "level": "distribution",
-    "fetched_at": "2026-08-19T22:48:22.663653+00:00"
+    "level": "pressure",
+    "fetched_at": "2026-08-20T13:52:10.020998+00:00"
   },
   "qqq": {
     "symbol": "QQQ",
     "lookback": 25,
-    "count": 7,
+    "count": 6,
     "days": [
-      {
-        "date": "2026-07-16",
-        "drop_pct": -0.016440476988213396,
-        "volume": 39402000,
-        "prev_volume": 32627600
-      },
       {
         "date": "2026-07-17",
         "drop_pct": -0.015029585113280416,
@@ -93,7 +81,7 @@
       }
     ],
     "level": "distribution",
-    "fetched_at": "2026-08-19T22:48:22.782735+00:00"
+    "fetched_at": "2026-08-20T13:52:10.142382+00:00"
   },
   "level": "distribution",
   "modifiers": {
@@ -101,5 +89,5 @@
     "sell_put": -15,
     "sell_call": 5
   },
-  "fetched_at": "2026-08-19T22:48:22.784236+00:00"
+  "fetched_at": "2026-08-20T13:52:10.143259+00:00"
 }
