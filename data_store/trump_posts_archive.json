@@ -39361,5 +39361,69 @@
       }
     },
     "captured_at": "2026-08-19T23:34:01.533763+00:00"
+  },
+  "117125341278153871": {
+    "id": "117125341278153871",
+    "created_at": "2026-08-20T01:54:36.438Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117125341278153871",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117125340444071624",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T02:49:56.648544+00:00"
+  },
+  "117125340444071624": {
+    "id": "117125340444071624",
+    "created_at": "2026-08-20T01:54:23.710Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117125340444071624",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T02:49:56.648580+00:00"
+  },
+  "117125320372310851": {
+    "id": "117125320372310851",
+    "created_at": "2026-08-20T01:49:17.440Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117125320372310851",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117125319695089292",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T02:49:56.648636+00:00"
+  },
+  "117125319695089292": {
+    "id": "117125319695089292",
+    "created_at": "2026-08-20T01:49:07.106Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117125319695089292",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T02:49:56.648654+00:00"
   }
 }
