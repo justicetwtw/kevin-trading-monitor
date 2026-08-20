@@ -39705,5 +39705,21 @@
     "captured_at": "2026-08-20T22:11:19.902073+00:00",
     "events": [],
     "scan_time": "2026-08-20T22:11:19.999787+00:00"
+  },
+  "117130257407138275": {
+    "id": "117130257407138275",
+    "created_at": "2026-08-20T22:44:50.612Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117130257407138275",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-20T22:57:42.409456+00:00"
   }
 }
