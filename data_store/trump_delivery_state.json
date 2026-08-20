@@ -30116,12 +30116,12 @@
       "post_id": "117125949632758649",
       "created_at": "2026-08-20T04:29:19.192Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-20T04:50:54.201838+00:00",
       "resolved_at": null,
       "run_id": "32333295816",
       "workflow_attempt_id": "32333295816:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117125911763587334": {
       "post_id": "117125911763587334",
