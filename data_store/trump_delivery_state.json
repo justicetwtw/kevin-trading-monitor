@@ -30501,12 +30501,12 @@
       "post_id": "117134430528835875",
       "created_at": "2026-08-21T16:26:07.397Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-21T16:52:31.131849+00:00",
       "resolved_at": null,
       "run_id": "32505084226",
       "workflow_attempt_id": "32505084226:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117134429829202518": {
       "post_id": "117134429829202518",
