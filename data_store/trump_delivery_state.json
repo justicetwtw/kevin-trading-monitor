@@ -30567,12 +30567,12 @@
       "post_id": "117134657793309927",
       "created_at": "2026-08-21T17:23:55.176Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-21T17:49:51.519392+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-21T17:49:55.620771+00:00",
       "run_id": "32509830621",
       "workflow_attempt_id": "32509830621:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117134656767200357": {
       "post_id": "117134656767200357",
