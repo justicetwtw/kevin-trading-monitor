@@ -40750,5 +40750,57 @@
       }
     },
     "captured_at": "2026-08-21T17:47:02.159030+00:00"
+  },
+  "117134908401668938": {
+    "id": "117134908401668938",
+    "created_at": "2026-08-21T18:27:39.156Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117134908401668938",
+    "text": "Ed Martin has been with me from the very beginning, and done an incredible job as an Attorney, Director of the Weaponization Working Group, and the United States Attorney for the District of Columbia. Ed is now leaving to go outside to fight Legal Battles for the upcoming Midterm Election, and the Presidential Election of 2028. I know he will do an outstanding job, ensure Free, Fair, and Honest Elections, and strongly advance our Constitutional Rights. Good luck Ed! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-21T18:51:01.714747+00:00"
+  },
+  "117134849304439845": {
+    "id": "117134849304439845",
+    "created_at": "2026-08-21T18:12:37.405Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117134849304439845",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-21T18:51:01.714794+00:00"
+  },
+  "117134845877719345": {
+    "id": "117134845877719345",
+    "created_at": "2026-08-21T18:11:45.119Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117134845877719345",
+    "text": "Dr. Sebastian Gorka: \"Kevin Rideout, the Christian Missionary taken by ISIS, was reunited with his wife. See pictures below. He sounds incredibly good and wouldn't stop saying how grateful he is to President Trump. (He even shared that he kept singing in his head the song 'Proud to be an American!' when he knew he would be coming home.\"",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-21T18:51:01.714880+00:00"
   }
 }
