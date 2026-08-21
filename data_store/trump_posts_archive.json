@@ -40914,5 +40914,53 @@
     "captured_at": "2026-08-21T21:03:31.633061+00:00",
     "events": [],
     "scan_time": "2026-08-21T21:03:31.720688+00:00"
+  },
+  "117135561220383573": {
+    "id": "117135561220383573",
+    "created_at": "2026-08-21T21:13:40.381Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117135561220383573",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-21T21:16:20.301824+00:00"
+  },
+  "117135559489217035": {
+    "id": "117135559489217035",
+    "created_at": "2026-08-21T21:13:13.963Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117135559489217035",
+    "text": "EXCLUSIVE: Fentanyl deaths plunge 22% as Trump White House touts crackdown on deadly drug crisis: https://www.foxnews.com/politics/exclusive-fentanyl-deaths-plunge-22-trump-white-house-touts-crackdown-deadly-drug-crisis",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-21T21:16:20.331433+00:00"
+  },
+  "117135555611644462": {
+    "id": "117135555611644462",
+    "created_at": "2026-08-21T21:12:14.799Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117135555611644462",
+    "text": "https://www.bloomberg.com/news/articles/2026-08-21/us-business-activity-expands-at-the-fastest-pace-since-2022",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-21T21:16:20.331536+00:00"
   }
 }
