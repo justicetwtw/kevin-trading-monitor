@@ -30424,12 +30424,12 @@
       "post_id": "117134439935650398",
       "created_at": "2026-08-21T16:28:30.933Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-21T16:53:11.007928+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-21T16:53:14.210493+00:00",
       "run_id": "32505084226",
       "workflow_attempt_id": "32505084226:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117134437554179764": {
       "post_id": "117134437554179764",
