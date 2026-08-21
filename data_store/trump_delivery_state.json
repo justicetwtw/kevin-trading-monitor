@@ -30776,12 +30776,12 @@
       "post_id": "117134600943313462",
       "created_at": "2026-08-21T17:09:27.714Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-21T17:47:49.901118+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-21T17:47:53.307614+00:00",
       "run_id": "32509830621",
       "workflow_attempt_id": "32509830621:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117134600045602327": {
       "post_id": "117134600045602327",
