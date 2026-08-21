@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-21T15:24:41.971332+08:00",
+  "generated_at": "2026-08-22T07:46:47.014266+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -15,10 +15,6 @@
       {
         "symbol": "NNE",
         "earnings_date": "2026-08-12"
-      },
-      {
-        "symbol": "WMT",
-        "earnings_date": "2026-08-20"
       },
       {
         "symbol": "NVDA",
@@ -315,6 +311,10 @@
       {
         "symbol": "UAMY",
         "earnings_date": "2026-11-16"
+      },
+      {
+        "symbol": "WMT",
+        "earnings_date": "2026-11-19"
       }
     ]
   }
