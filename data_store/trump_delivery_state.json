@@ -30259,12 +30259,12 @@
       "post_id": "117131409354478560",
       "created_at": "2026-08-21T03:37:47.934Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-21T04:19:44.904567+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-21T04:19:47.954477+00:00",
       "run_id": "32446478082",
       "workflow_attempt_id": "32446478082:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117131396522866670": {
       "post_id": "117131396522866670",
