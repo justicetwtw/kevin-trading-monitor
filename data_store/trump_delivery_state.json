@@ -30908,12 +30908,12 @@
       "post_id": "117135361970854867",
       "created_at": "2026-08-21T20:23:00.072Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-21T20:37:55.906224+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-21T20:37:59.174841+00:00",
       "run_id": "32524462809",
       "workflow_attempt_id": "32524462809:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
