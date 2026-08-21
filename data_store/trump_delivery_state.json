@@ -30743,12 +30743,12 @@
       "post_id": "117134642322045474",
       "created_at": "2026-08-21T17:19:59.103Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-21T17:48:07.909254+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-21T17:48:11.130474+00:00",
       "run_id": "32509830621",
       "workflow_attempt_id": "32509830621:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117134622109680955": {
       "post_id": "117134622109680955",
