@@ -31084,12 +31084,12 @@
       "post_id": "117141177283721411",
       "created_at": "2026-08-22T21:01:54.706Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-22T21:23:16.955190+00:00",
       "resolved_at": null,
       "run_id": "32599393845",
       "workflow_attempt_id": "32599393845:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
