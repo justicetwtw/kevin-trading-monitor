@@ -41257,5 +41257,58 @@
       "tier2": {}
     },
     "captured_at": "2026-08-23T09:25:15.109875+00:00"
+  },
+  "117144988493215562": {
+    "id": "117144988493215562",
+    "created_at": "2026-08-23T13:11:09.146Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117144988493215562",
+    "text": "RT @realDonaldTrumpCanada wants the benefits of being a State, without being one!!! They have also charged our great farmers, for many years, massive amounts of Tariffs. No more!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-23T13:22:37.649021+00:00"
+  },
+  "117144988108827513": {
+    "id": "117144988108827513",
+    "created_at": "2026-08-23T13:11:03.282Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117144988108827513",
+    "text": "RT @realDonaldTrump",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-23T13:22:37.649095+00:00"
+  },
+  "117144987049568805": {
+    "id": "117144987049568805",
+    "created_at": "2026-08-23T13:10:47.119Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117144987049568805",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-23T13:22:37.649114+00:00"
   }
 }
