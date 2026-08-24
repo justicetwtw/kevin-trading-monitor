@@ -31568,12 +31568,12 @@
       "post_id": "117151537334045486",
       "created_at": "2026-08-24T16:56:36.527Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-24T17:17:45.004498+00:00",
       "resolved_at": null,
       "run_id": "32755641924",
       "workflow_attempt_id": "32755641924:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117151536426663116": {
       "post_id": "117151536426663116",
