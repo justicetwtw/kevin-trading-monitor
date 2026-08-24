@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-22T07:46:47.270043+08:00",
+  "generated_at": "2026-08-24T15:37:29.343503+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-08-21T23:31:21.143169+00:00",
+      "trump_monitor_checked_at": "2026-08-24T07:15:17.373615+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -102,9 +102,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-08-21T22:12:18.234000+00:00",
-      "checked_at": "2026-08-21T23:31:21.143169+00:00",
-      "health_age_hours": 0.3,
+      "latest_post_at": "2026-08-24T04:34:10.335000+00:00",
+      "checked_at": "2026-08-24T07:15:17.373615+00:00",
+      "health_age_hours": 0.4,
       "attempts": [
         {
           "status": "unavailable",
@@ -117,20 +117,20 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 35695,
+          "raw_count": 35723,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-08-21T22:12:18.234000+00:00",
+          "latest_post_at": "2026-08-24T04:34:10.335000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 35695,
+      "source_raw_count": 35723,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
       "initial_backfill_hours": 24,
-      "eligible_count": 911,
+      "eligible_count": 939,
       "new_count": 0,
       "delivered_count": 0,
       "delivery_status": "unresolved_delivery_backlog",
@@ -381,7 +381,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-08-21T23:46:47.270022+00:00",
+      "generated_at": "2026-08-24T07:37:29.343481+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
