@@ -31590,12 +31590,12 @@
       "post_id": "117151535369616658",
       "created_at": "2026-08-24T16:56:06.551Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-24T17:17:30.815394+00:00",
       "resolved_at": null,
       "run_id": "32755641924",
       "workflow_attempt_id": "32755641924:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117151534307707658": {
       "post_id": "117151534307707658",
