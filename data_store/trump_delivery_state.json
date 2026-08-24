@@ -31172,12 +31172,12 @@
       "post_id": "117147806182467462",
       "created_at": "2026-08-24T01:07:43.675Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-24T02:12:55.405424+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-24T02:12:59.055424+00:00",
       "run_id": "32682254867",
       "workflow_attempt_id": "32682254867:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117147749847925768": {
       "post_id": "117147749847925768",
