@@ -31315,12 +31315,12 @@
       "post_id": "117148823903421618",
       "created_at": "2026-08-24T05:26:32.863Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-24T09:46:02.704604+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-24T09:46:06.484531+00:00",
       "run_id": "32713169729",
       "workflow_attempt_id": "32713169729:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117148822269956937": {
       "post_id": "117148822269956937",
