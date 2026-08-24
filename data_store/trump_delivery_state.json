@@ -31304,12 +31304,12 @@
       "post_id": "117148833275862351",
       "created_at": "2026-08-24T05:28:55.875Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-24T09:46:09.420428+00:00",
       "resolved_at": null,
       "run_id": "32713169729",
       "workflow_attempt_id": "32713169729:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117148823903421618": {
       "post_id": "117148823903421618",
