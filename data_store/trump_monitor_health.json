@@ -35,7 +35,7 @@
   "delivered_count": 0,
   "delivery_status": "unresolved_delivery_backlog",
   "delivery_requires_all_recipients": true,
-  "checked_at": "2026-08-24T21:48:20.518975+00:00",
+  "checked_at": "2026-08-24T22:03:40.362985+00:00",
   "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
   "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
   "source_completeness_verified": false,
@@ -55,8 +55,8 @@
   "delivery_ledger_counts": {
     "ambiguous": 0,
     "claimed": 3,
-    "failed": 0,
+    "pending": 0,
     "sent": 3066,
-    "pending": 0
+    "failed": 0
   }
 }
