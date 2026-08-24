@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-08-24T19:34:21.451328+00:00",
+  "scan_time": "2026-08-24T20:04:31.383052+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 15.770000457763672,
+          "value": 15.850000381469727,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.09409127890546931,
+          "value": 0.09399803667931039,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-08-24T19:34:23.594211+00:00"
+      "fetched_at": "2026-08-24T20:04:33.883709+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-08-24T15:34:23.595095-04:00"
+        "fetched_at": "2026-08-24T16:04:33.884542-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-08-24T19:34:24.781830+00:00"
+      "fetched_at": "2026-08-24T20:04:34.890007+00:00"
     },
     "distribution": {
       "spy": {
@@ -80,12 +80,12 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-08-24T19:34:24.979513+00:00"
+        "fetched_at": "2026-08-24T20:04:35.098758+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
         "lookback": 25,
-        "count": 5,
+        "count": 6,
         "days": [
           {
             "date": "2026-07-23",
@@ -116,18 +116,24 @@
             "drop_pct": -0.016934502629578557,
             "volume": 48997200,
             "prev_volume": 26452600
+          },
+          {
+            "date": "2026-08-24",
+            "drop_pct": -0.009979809224073127,
+            "volume": 35150941,
+            "prev_volume": 33297600
           }
         ],
-        "level": "pressure",
-        "fetched_at": "2026-08-24T19:34:25.185017+00:00"
+        "level": "distribution",
+        "fetched_at": "2026-08-24T20:04:35.281712+00:00"
       },
-      "level": "pressure",
+      "level": "distribution",
       "modifiers": {
-        "leaps_entry": -10,
-        "sell_put": -5,
-        "sell_call": 0
+        "leaps_entry": -20,
+        "sell_put": -15,
+        "sell_call": 5
       },
-      "fetched_at": "2026-08-24T19:34:25.185873+00:00"
+      "fetched_at": "2026-08-24T20:04:35.282582+00:00"
     },
     "bubble": {
       "score": 0,
@@ -143,9 +149,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-08-24T15:34:26.056548-04:00"
+        "fetched_at": "2026-08-24T16:04:36.058859-04:00"
       },
-      "fetched_at": "2026-08-24T19:34:26.056591+00:00"
+      "fetched_at": "2026-08-24T20:04:36.058897+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -155,13 +161,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-08-24T19:34:26.752282+00:00"
+      "fetched_at": "2026-08-24T20:04:37.229995+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 15.770000457763672,
-        "vix9d": 14.020000457763672,
-        "vix3m": 18.510000228881836,
+        "vix": 15.850000381469727,
+        "vix9d": 14.100000381469727,
+        "vix3m": 18.540000915527344,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -171,19 +177,19 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-08-24T19:34:26.799763+00:00"
+      "fetched_at": "2026-08-24T20:04:37.297673+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-08-24T19:34:31.037876+00:00"
+      "fetched_at": "2026-08-24T20:04:41.549781+00:00"
     }
   },
   "aggregate_modifiers": {
-    "sell_call": -3,
-    "sell_put": 5,
-    "leaps_entry": 0,
+    "sell_call": 2,
+    "sell_put": -5,
+    "leaps_entry": -10,
     "leaps_entry_veto": false
   }
 }
