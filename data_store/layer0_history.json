@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-08-21T22:47:49.976751+00:00",
+  "scan_time": "2026-08-24T13:56:12.981317+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 15.130000114440918,
+          "value": 15.84000015258789,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.0944586240129867,
+          "value": 0.09382401749467639,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-08-21T22:47:51.637563+00:00"
+      "fetched_at": "2026-08-24T13:56:15.332718+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-08-21T18:47:51.766704-04:00"
+        "fetched_at": "2026-08-24T09:56:15.333772-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-08-21T22:47:52.889477+00:00"
+      "fetched_at": "2026-08-24T13:56:16.128317+00:00"
     },
     "distribution": {
       "spy": {
@@ -80,7 +80,7 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-08-21T22:47:53.297081+00:00"
+        "fetched_at": "2026-08-24T13:56:16.328301+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -119,7 +119,7 @@
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-08-21T22:47:53.402951+00:00"
+        "fetched_at": "2026-08-24T13:56:16.911527+00:00"
       },
       "level": "pressure",
       "modifiers": {
@@ -127,7 +127,7 @@
         "sell_put": -5,
         "sell_call": 0
       },
-      "fetched_at": "2026-08-21T22:47:53.504889+00:00"
+      "fetched_at": "2026-08-24T13:56:16.912520+00:00"
     },
     "bubble": {
       "score": 0,
@@ -137,15 +137,15 @@
       "snapshot": {
         "score": null,
         "indicators": {
-          "buffett_indicator": 2.19,
+          "buffett_indicator": 2.44,
           "shiller_cape": 41.96,
           "sp500_top10_concentration": null,
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-08-21T18:47:53.966600-04:00"
+        "fetched_at": "2026-08-24T09:56:17.717072-04:00"
       },
-      "fetched_at": "2026-08-21T22:47:53.966639+00:00"
+      "fetched_at": "2026-08-24T13:56:17.717117+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -155,13 +155,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-08-21T22:47:54.826390+00:00"
+      "fetched_at": "2026-08-24T13:56:18.461170+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 15.130000114440918,
-        "vix9d": 12.579999923706055,
-        "vix3m": 18.5,
+        "vix": 15.84000015258789,
+        "vix9d": 14.369999885559082,
+        "vix3m": 18.56999969482422,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -171,13 +171,13 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-08-21T22:47:54.915612+00:00"
+      "fetched_at": "2026-08-24T13:56:18.537081+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-08-21T22:47:59.324060+00:00"
+      "fetched_at": "2026-08-24T13:56:22.890284+00:00"
     }
   },
   "aggregate_modifiers": {
