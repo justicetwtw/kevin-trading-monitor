@@ -41526,5 +41526,108 @@
       "tier2": {}
     },
     "captured_at": "2026-08-24T04:56:53.615143+00:00"
+  },
+  "117148833275862351": {
+    "id": "117148833275862351",
+    "created_at": "2026-08-24T05:28:55.875Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117148833275862351",
+    "text": "https://truthsocial.com/@thatswhattimeitis/117143083463839683",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-24T09:45:29.334212+00:00"
+  },
+  "117148823903421618": {
+    "id": "117148823903421618",
+    "created_at": "2026-08-24T05:26:32.863Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117148823903421618",
+    "text": "https://truthsocial.com/@Imaluckyangel/117144139439955914",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-24T09:45:29.334299+00:00"
+  },
+  "117148822269956937": {
+    "id": "117148822269956937",
+    "created_at": "2026-08-24T05:26:07.938Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117148822269956937",
+    "text": "https://truthsocial.com/@HBTX8/117143029405001507",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-24T09:45:29.334346+00:00"
+  },
+  "117148820570832936": {
+    "id": "117148820570832936",
+    "created_at": "2026-08-24T05:25:42.012Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117148820570832936",
+    "text": "https://truthsocial.com/@Imaluckyangel/117144135008099133",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-24T09:45:29.334387+00:00"
+  },
+  "117148818788198933": {
+    "id": "117148818788198933",
+    "created_at": "2026-08-24T05:25:14.810Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117148818788198933",
+    "text": "https://truthsocial.com/@talkthestreet/117143159621440227",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-24T09:45:29.334432+00:00"
+  },
+  "117148812663367626": {
+    "id": "117148812663367626",
+    "created_at": "2026-08-24T05:23:41.353Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117148812663367626",
+    "text": "RT @katy_libertyMark Levin just laid it out clearly.Trump is cutting and reviewing regulations to restore American energy independence, put more money in people's paychecks, and make homeownership attainable again — while still looking out for the environment and American workers.Blue-state governors are sabotaging that progress every chance they get.Democrats claim \"he's not focused on affordability.\" He's all about affordability. They're just furious he's delivering it.Stop listening to the liberal media and your blue-state governors. Do your own research. The Democrats have been the reason we can't have nice things.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "energy"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-24T09:45:29.334547+00:00"
   }
 }
