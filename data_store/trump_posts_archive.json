@@ -42420,5 +42420,67 @@
       }
     },
     "captured_at": "2026-08-25T13:56:59.225249+00:00"
+  },
+  "117156524147615725": {
+    "id": "117156524147615725",
+    "created_at": "2026-08-25T14:04:49.265Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117156524147615725",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-25T14:34:49.557277+00:00"
+  },
+  "117156507875234061": {
+    "id": "117156507875234061",
+    "created_at": "2026-08-25T14:00:40.967Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117156507875234061",
+    "text": "Over the last 10 years, the United States lost, on average, 60 Billion Dollars a year with Canada. No more! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-25T14:34:49.560734+00:00"
+  },
+  "117156429202842827": {
+    "id": "117156429202842827",
+    "created_at": "2026-08-25T13:40:40.521Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117156429202842827",
+    "text": "Canada has been \"Ripping Off\" the U.S.A. for decades. They have been charging our Farmers 400% Tariffs, and more. They have driven many wonderful U.S. companies out of business. For 10 years they wouldn't certify Gulfstream Jets, until I got involved. They wanted 100% of the market for Gulfstream's Canadian competitor. I deal with many countries, and Canada is easily the most difficult and unreasonable. They feel entitled, but they are not a State, and will be entitled no longer! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs",
+          "100%"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ]
+      }
+    },
+    "captured_at": "2026-08-25T14:34:49.560816+00:00"
   }
 }
