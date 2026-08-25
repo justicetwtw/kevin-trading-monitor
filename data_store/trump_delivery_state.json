@@ -31876,12 +31876,12 @@
       "post_id": "117156902282061140",
       "created_at": "2026-08-25T15:40:59.136Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-25T16:07:03.107187+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-25T16:07:07.959326+00:00",
       "run_id": "32869750339",
       "workflow_attempt_id": "32869750339:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117156901249242368": {
       "post_id": "117156901249242368",
