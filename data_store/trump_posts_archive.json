@@ -42376,5 +42376,25 @@
       }
     },
     "captured_at": "2026-08-25T11:42:18.722998+00:00"
+  },
+  "117155941181023687": {
+    "id": "117155941181023687",
+    "created_at": "2026-08-25T11:36:33.899Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117155941181023687",
+    "text": "I would never interfere with Canadians speaking French! In fact, I have never even thought of doing such a stupid thing. This lie was made up by a weak and ineffective Prime Minister in an attempt to gain political support, which he has totally lost, from the people of Quebec. I love French Canadians! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-25T12:02:11.997375+00:00"
   }
 }
