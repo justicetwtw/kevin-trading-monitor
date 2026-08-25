@@ -42356,5 +42356,25 @@
       "tier2": {}
     },
     "captured_at": "2026-08-25T11:12:39.573046+00:00"
+  },
+  "117155835599867728": {
+    "id": "117155835599867728",
+    "created_at": "2026-08-25T11:09:42.859Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117155835599867728",
+    "text": "The failing Islamic Republic of Iran is not paying large segments of their military, while at the same time killing protesters, even when they are not protesting, at levels not seen before. It is a humanitarian  crisis of epic proportions, and must be stopped, NOW. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-25T11:42:18.722998+00:00"
   }
 }
