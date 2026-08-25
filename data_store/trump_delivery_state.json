@@ -31700,12 +31700,12 @@
       "post_id": "117153498897353817",
       "created_at": "2026-08-25T01:15:27.608Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-25T02:06:53.391155+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-25T02:06:56.553243+00:00",
       "run_id": "32800089073",
       "workflow_attempt_id": "32800089073:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117153496831869958": {
       "post_id": "117153496831869958",
