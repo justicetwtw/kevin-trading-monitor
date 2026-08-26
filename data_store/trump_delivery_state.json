@@ -32096,12 +32096,12 @@
       "post_id": "117161576325328403",
       "created_at": "2026-08-26T11:29:39.378Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-26T11:42:31.173297+00:00",
       "resolved_at": null,
       "run_id": "32964589787",
       "workflow_attempt_id": "32964589787:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117161536085670834": {
       "post_id": "117161536085670834",
