@@ -32305,12 +32305,12 @@
       "post_id": "117162765062024017",
       "created_at": "2026-08-26T16:31:58.062Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-26T16:58:13.441654+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-26T16:58:17.518161+00:00",
       "run_id": "32991060928",
       "workflow_attempt_id": "32991060928:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117162764682245358": {
       "post_id": "117162764682245358",
