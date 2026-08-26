@@ -43084,5 +43084,185 @@
     "captured_at": "2026-08-26T14:55:44.167307+00:00",
     "events": [],
     "scan_time": "2026-08-26T14:55:44.236176+00:00"
+  },
+  "117162595986147332": {
+    "id": "117162595986147332",
+    "created_at": "2026-08-26T15:48:58.168Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162595986147332",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.957812+00:00"
+  },
+  "117162591991461737": {
+    "id": "117162591991461737",
+    "created_at": "2026-08-26T15:47:57.213Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162591991461737",
+    "text": "I-95 exit sign now reads 'President Donald Trump Int'l Airport': https://www.palmbeachpost.com/story/news/trump/2026/07/02/i-95-exit-sign-change-kicks-off-trumps-renaming-of-palm-beach-airport/90779825007/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-26T16:06:06.960679+00:00"
+  },
+  "117162576006975126": {
+    "id": "117162576006975126",
+    "created_at": "2026-08-26T15:43:53.309Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162576006975126",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960700+00:00"
+  },
+  "117162575525780977": {
+    "id": "117162575525780977",
+    "created_at": "2026-08-26T15:43:45.968Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162575525780977",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960711+00:00"
+  },
+  "117162574475742777": {
+    "id": "117162574475742777",
+    "created_at": "2026-08-26T15:43:29.945Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162574475742777",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960720+00:00"
+  },
+  "117162572939245146": {
+    "id": "117162572939245146",
+    "created_at": "2026-08-26T15:43:06.500Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162572939245146",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960729+00:00"
+  },
+  "117162570262085889": {
+    "id": "117162570262085889",
+    "created_at": "2026-08-26T15:42:25.650Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162570262085889",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117162569163470489",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960770+00:00"
+  },
+  "117162569163470489": {
+    "id": "117162569163470489",
+    "created_at": "2026-08-26T15:42:08.887Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162569163470489",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117162567997143475",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960805+00:00"
+  },
+  "117162567997143475": {
+    "id": "117162567997143475",
+    "created_at": "2026-08-26T15:41:51.090Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162567997143475",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960816+00:00"
+  },
+  "117162563343140683": {
+    "id": "117162563343140683",
+    "created_at": "2026-08-26T15:40:40.075Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162563343140683",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960825+00:00"
+  },
+  "117162555565968816": {
+    "id": "117162555565968816",
+    "created_at": "2026-08-26T15:38:41.404Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117162555565968816",
+    "text": "Every Dumocratvoted, \"NO,\" to THE SAVE AMERICA ACT!1. ALL VOTERS MUST SHOW PHOTO I.D. (IDENTIFICATION!) - Meaning they want to CHEAT!2. ALL VOTERS MUST SHOW PROOF OF CITIZENSHIP - Meaning they want Criminal Illegal Aliens to VOTE!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-26T16:06:06.960873+00:00"
   }
 }
