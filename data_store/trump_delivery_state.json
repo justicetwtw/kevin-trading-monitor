@@ -32712,12 +32712,12 @@
       "post_id": "117169868107304305",
       "created_at": "2026-08-27T22:38:21.931Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-28T04:31:58.278158+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-28T04:32:01.845445+00:00",
       "run_id": "33141942958",
       "workflow_attempt_id": "33141942958:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117169851902805924": {
       "post_id": "117169851902805924",
