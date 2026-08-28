@@ -37,6 +37,7 @@
   "2026-08-28": {
     "tw_close": true,
     "us_premarket": true,
-    "us_midday": true
+    "us_midday": true,
+    "us_eod": true
   }
 }
