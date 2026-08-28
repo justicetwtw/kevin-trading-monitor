@@ -32756,12 +32756,12 @@
       "post_id": "117169687813608839",
       "created_at": "2026-08-27T21:52:30.867Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-28T04:31:34.488737+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-28T04:31:38.014805+00:00",
       "run_id": "33141942958",
       "workflow_attempt_id": "33141942958:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117169685597690201": {
       "post_id": "117169685597690201",
