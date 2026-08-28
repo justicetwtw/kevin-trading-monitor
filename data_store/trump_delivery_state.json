@@ -32866,12 +32866,12 @@
       "post_id": "117169369129142648",
       "created_at": "2026-08-27T20:31:28.129Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-28T04:30:33.838040+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-28T04:30:37.518416+00:00",
       "run_id": "33141942958",
       "workflow_attempt_id": "33141942958:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117169368845267312": {
       "post_id": "117169368845267312",
