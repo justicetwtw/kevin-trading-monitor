@@ -33504,12 +33504,12 @@
       "post_id": "117179455037482321",
       "created_at": "2026-08-29T15:16:26.876Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-29T17:10:11.106688+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-29T17:10:15.610563+00:00",
       "run_id": "33264835460",
       "workflow_attempt_id": "33264835460:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117179453982170906": {
       "post_id": "117179453982170906",
