@@ -33350,12 +33350,12 @@
       "post_id": "117173821641287461",
       "created_at": "2026-08-28T15:23:48.073Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-29T00:46:06.293571+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-29T00:46:09.869110+00:00",
       "run_id": "33224425754",
       "workflow_attempt_id": "33224425754:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117173820921004362": {
       "post_id": "117173820921004362",
