@@ -33581,12 +33581,12 @@
       "post_id": "117180270499874239",
       "created_at": "2026-08-29T18:43:49.845Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-29T19:43:33.111601+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-29T19:43:36.093679+00:00",
       "run_id": "33271563593",
       "workflow_attempt_id": "33271563593:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117180138298064622": {
       "post_id": "117180138298064622",
