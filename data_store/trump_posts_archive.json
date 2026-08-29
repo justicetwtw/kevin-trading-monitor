@@ -45659,5 +45659,45 @@
       "tier2": {}
     },
     "captured_at": "2026-08-29T17:09:13.744474+00:00"
+  },
+  "117180270499874239": {
+    "id": "117180270499874239",
+    "created_at": "2026-08-29T18:43:49.845Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117180270499874239",
+    "text": "NASA Administrator Jared Isaacman, Secretary of Education Linda McMahon, Stephanie McMahon, and Triple H, at Kennedy Space Center! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-29T19:43:20.374760+00:00"
+  },
+  "117180138298064622": {
+    "id": "117180138298064622",
+    "created_at": "2026-08-29T18:10:12.604Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117180138298064622",
+    "text": "At the request of the PGA Tour, and its Great new Commissioner, Brian Rolapp, it is my Honor to accept being the Honorary Chairman of the upcoming Presidents Cup, which will take place at the Medinah Country Club in Chicago. This will be a particularly exciting event. Both teams are \"loaded\" with Talent. I look forward to being there, and greeting all of these fantastic athletes, on both teams! Thank you for your attention to this matter. See you in Chicago! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-29T19:43:20.374857+00:00"
   }
 }
