@@ -33471,12 +33471,12 @@
       "post_id": "117179458822974337",
       "created_at": "2026-08-29T15:17:24.639Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-29T17:10:34.291335+00:00",
       "resolved_at": null,
       "run_id": "33264835460",
       "workflow_attempt_id": "33264835460:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117179458199513865": {
       "post_id": "117179458199513865",
