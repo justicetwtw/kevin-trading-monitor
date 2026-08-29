@@ -33273,12 +33273,12 @@
       "post_id": "117173835662782534",
       "created_at": "2026-08-28T15:27:22.024Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-29T00:46:49.065159+00:00",
       "resolved_at": null,
       "run_id": "33224425754",
       "workflow_attempt_id": "33224425754:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117173826597377945": {
       "post_id": "117173826597377945",
