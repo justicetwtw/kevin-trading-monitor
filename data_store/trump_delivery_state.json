@@ -33691,12 +33691,12 @@
       "post_id": "117184423734793149",
       "created_at": "2026-08-30T12:20:03.179Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-30T13:08:27.924016+00:00",
       "resolved_at": null,
       "run_id": "33313308441",
       "workflow_attempt_id": "33313308441:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117184422478750334": {
       "post_id": "117184422478750334",
