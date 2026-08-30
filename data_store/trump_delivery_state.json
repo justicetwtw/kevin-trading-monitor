@@ -33735,12 +33735,12 @@
       "post_id": "117185403938534473",
       "created_at": "2026-08-30T16:29:19.902Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-08-30T17:25:35.341562+00:00",
       "resolved_at": null,
       "run_id": "33325144662",
       "workflow_attempt_id": "33325144662:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117185234758035541": {
       "post_id": "117185234758035541",
