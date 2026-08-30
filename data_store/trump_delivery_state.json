@@ -33779,12 +33779,12 @@
       "post_id": "117184832932244590",
       "created_at": "2026-08-30T14:04:07.038Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-30T17:25:13.081543+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-30T17:25:16.237534+00:00",
       "run_id": "33325144662",
       "workflow_attempt_id": "33325144662:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117184815452316443": {
       "post_id": "117184815452316443",
