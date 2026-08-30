@@ -46098,5 +46098,51 @@
       }
     },
     "captured_at": "2026-08-30T17:24:38.121513+00:00"
+  },
+  "117185864353206503": {
+    "id": "117185864353206503",
+    "created_at": "2026-08-30T18:26:25.271Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117185864353206503",
+    "text": "Let all Canadian Companies that are doing business with America move to the United States, immediately. Many of them are Companies that moved out years ago due to stupid U.S. Leadership. When you move back, there are no TARIFFS! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-30T19:54:34.981766+00:00"
+  },
+  "117185823993660126": {
+    "id": "117185823993660126",
+    "created_at": "2026-08-30T18:16:09.434Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117185823993660126",
+    "text": "When I announced that I was running in the 2024 Presidential Election, right at the beginning, Ford was getting ready to close their Big Factory, in Detroit. Then, because I was leading in the Polls, they figured they would leave it open a little longer to see what happened. Now it's running 24/7, and it's one of the most profitable Car Plants in the World! There are many other examples, for both Ford, General Motors, and others. I've revived, and indeed saved, the Automobile Business in our America. That's because of what I've done with TARIFFS. One of the Worst Abusers is Canada. I don't want Canadian cars, I don't want Canadian parts, I don't want Canadian anything. They've been ripping us off for decades, and it's going to stop. This should have happened long ago with other Presidents, just as stopping Iran should have happened long ago. They want to be treated like a State, but they aren't one. I deal with the Leadership of many Countries, but I find Canada to be the worst. They are entitled no longer! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ]
+      }
+    },
+    "captured_at": "2026-08-30T19:54:34.981917+00:00"
   }
 }
