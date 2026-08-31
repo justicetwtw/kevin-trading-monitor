@@ -33966,12 +33966,12 @@
       "post_id": "117187722429803464",
       "created_at": "2026-08-31T02:18:57.272Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-31T06:01:40.353807+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-31T06:01:44.362797+00:00",
       "run_id": "33362511768",
       "workflow_attempt_id": "33362511768:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117187484009660027": {
       "post_id": "117187484009660027",
