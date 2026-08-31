@@ -46180,5 +46180,109 @@
       "tier2": {}
     },
     "captured_at": "2026-08-30T22:10:24.349687+00:00"
+  },
+  "117187278603098753": {
+    "id": "117187278603098753",
+    "created_at": "2026-08-31T00:26:05.013Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117187278603098753",
+    "text": "For many years, the USA has been losing more than 60 Billion Dollars a year with Canada. Why??? Our long ago stolen businesses are now coming back to America in order to avoid paying tariffs. They are lining up, just like the rest of the World!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "tariff",
+          "tariffs"
+        ],
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-31T00:34:29.663882+00:00"
+  },
+  "117187247747260967": {
+    "id": "117187247747260967",
+    "created_at": "2026-08-31T00:18:14.190Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117187247747260967",
+    "text": "Governor Kathy Hochul just released 7000 hard core criminals onto the streets on New York. What is wrong with her? She is grossly incompetent and must be voted out of office! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-08-31T00:34:29.663967+00:00"
+  },
+  "117187163336215939": {
+    "id": "117187163336215939",
+    "created_at": "2026-08-30T23:56:46.181Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117187163336215939",
+    "text": "A wonderful new book by Ted Cruz, about a Great Supreme Court Justice, Clarence Thomas, is just out! It tells the true story about Justice Thomas's rise, and all of the wonderful things he has done for America. A MUST READ! Get your copy now: https://www.amazon.com/dp/B0GXNLZ6W8?lv=shuf&channelId=500&plpRedirect=mhFallback",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Amazon"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-08-31T00:34:29.664066+00:00"
+  },
+  "117186955648564622": {
+    "id": "117186955648564622",
+    "created_at": "2026-08-30T23:03:57.117Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117186955648564622",
+    "text": "Kennedy Center is an old and decrepit building that is badly in need of a major construction and public relations fix before it can attain greatness and prestige, perhaps far greater than ever before. It has been losing a fortune for many years, and will continue to do so if the highly conflicted judge on the case doesn't allow us to do what has to be done!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-31T00:34:29.664148+00:00"
+  },
+  "117186896081344697": {
+    "id": "117186896081344697",
+    "created_at": "2026-08-30T22:48:48.196Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117186896081344697",
+    "text": "Look what VANDALS did to the grass connecting the vandalized World War II Monument and the vandalized Reflecting Pool, which will be opened again, and better than ever, shortly. Anybody who thinks the Reflecting Pool wasn't vandalized should go back to Law School! The grass is being replaced shortly, and the Reflecting Pool is almost completely fixed, including the various inflow and outflow pipes, which we were saving for the end of the year, but will do now. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-08-31T00:34:29.664225+00:00"
   }
 }
