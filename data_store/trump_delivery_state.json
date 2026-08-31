@@ -34186,12 +34186,12 @@
       "post_id": "117190838057767304",
       "created_at": "2026-08-31T15:31:17.981Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-31T19:32:05.952823+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-31T19:32:08.991237+00:00",
       "run_id": "33430976814",
       "workflow_attempt_id": "33430976814:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117190837232373323": {
       "post_id": "117190837232373323",
