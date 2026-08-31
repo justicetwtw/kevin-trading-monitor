@@ -33911,12 +33911,12 @@
       "post_id": "117187163336215939",
       "created_at": "2026-08-30T23:56:46.181Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-31T00:34:47.108687+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-31T00:34:49.762188+00:00",
       "run_id": "33344931495",
       "workflow_attempt_id": "33344931495:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117186955648564622": {
       "post_id": "117186955648564622",
