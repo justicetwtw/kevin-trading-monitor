@@ -34109,12 +34109,12 @@
       "post_id": "117190844666700928",
       "created_at": "2026-08-31T15:32:58.825Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-31T19:32:42.843777+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-31T19:32:45.625590+00:00",
       "run_id": "33430976814",
       "workflow_attempt_id": "33430976814:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117190843791390411": {
       "post_id": "117190843791390411",
