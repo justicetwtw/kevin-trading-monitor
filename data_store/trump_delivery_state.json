@@ -34208,12 +34208,12 @@
       "post_id": "117190835952782276",
       "created_at": "2026-08-31T15:30:45.861Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-08-31T19:31:55.049995+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-08-31T19:31:58.255092+00:00",
       "run_id": "33430976814",
       "workflow_attempt_id": "33430976814:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117190477440173795": {
       "post_id": "117190477440173795",
