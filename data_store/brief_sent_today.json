@@ -36,6 +36,7 @@
     "tw_close": true
   },
   "2026-09-01": {
-    "us_premarket": true
+    "us_premarket": true,
+    "us_midday": true
   }
 }
