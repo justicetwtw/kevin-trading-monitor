@@ -47002,5 +47002,61 @@
       "tier2": {}
     },
     "captured_at": "2026-09-01T06:49:24.810833+00:00"
+  },
+  "117195516438814990": {
+    "id": "117195516438814990",
+    "created_at": "2026-09-01T11:21:04.410Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117195516438814990",
+    "text": "Cheaper drugs, cheaper beef, cheaper gas. Trump lines up fall affordability before Labor Day: https://justthenews.com/government/white-house/cheaper-drugs-cheaper-beef-cheaper-gas-trump-lines-his-fall-affordability",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-01T12:05:50.856725+00:00"
+  },
+  "117194678237730264": {
+    "id": "117194678237730264",
+    "created_at": "2026-09-01T07:47:54.477Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117194678237730264",
+    "text": "https://truthsocial.com/@breitbartnews/117191556794156468",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-01T12:05:50.856800+00:00"
+  },
+  "117194670372847111": {
+    "id": "117194670372847111",
+    "created_at": "2026-09-01T07:45:54.468Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117194670372847111",
+    "text": "Chicago violence is unchecked and at record levels. It has never been worse! This weekend 41 people were shot, 3 DEAD. These numbers are becoming normalized. It is out of control! The city will die if the Federal Government, a fine tuned crime fighting machine, is not invited in, by the Mayor or Governor, to HELP. I am awaiting the call. Nobody should be forced to live under these conditions. Like D.C. and others, they will have almost no crime, FAST! The State and City can't do what I do. Governor Pritzker, CALL!!! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-01T12:05:50.856883+00:00"
   }
 }
