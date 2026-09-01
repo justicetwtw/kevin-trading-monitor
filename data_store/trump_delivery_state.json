@@ -34384,12 +34384,12 @@
       "post_id": "117197726086943631",
       "created_at": "2026-09-01T20:43:00.966Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-01T21:58:12.615527+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-01T21:58:15.823609+00:00",
       "run_id": "33563656974",
       "workflow_attempt_id": "33563656974:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117197596651722690": {
       "post_id": "117197596651722690",
