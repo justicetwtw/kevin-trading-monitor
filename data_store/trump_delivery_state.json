@@ -34263,12 +34263,12 @@
       "post_id": "117195516438814990",
       "created_at": "2026-09-01T11:21:04.410Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-01T12:06:10.092136+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-01T12:06:13.160138+00:00",
       "run_id": "33505768460",
       "workflow_attempt_id": "33505768460:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117194678237730264": {
       "post_id": "117194678237730264",
