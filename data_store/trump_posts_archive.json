@@ -46986,5 +46986,21 @@
     "captured_at": "2026-08-31T23:51:58.853655+00:00",
     "events": [],
     "scan_time": "2026-08-31T23:51:58.917968+00:00"
+  },
+  "117193480976456985": {
+    "id": "117193480976456985",
+    "created_at": "2026-09-01T02:43:25.720Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117193480976456985",
+    "text": "A great Senator and a great golfer!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-01T06:49:24.810833+00:00"
   }
 }
