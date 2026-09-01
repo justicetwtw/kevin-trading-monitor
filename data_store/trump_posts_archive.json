@@ -47728,9 +47728,7 @@
       },
       "tier2": {}
     },
-    "captured_at": "2026-09-01T22:37:29.161879+00:00",
-    "events": [],
-    "scan_time": "2026-09-01T22:37:29.249943+00:00"
+    "captured_at": "2026-09-01T23:42:32.461544+00:00"
   },
   "117198100068865592": {
     "id": "117198100068865592",
@@ -47750,9 +47748,7 @@
       },
       "tier2": {}
     },
-    "captured_at": "2026-09-01T22:37:29.161999+00:00",
-    "events": [],
-    "scan_time": "2026-09-01T22:37:29.249963+00:00"
+    "captured_at": "2026-09-01T23:42:32.461609+00:00"
   },
   "117198053082904336": {
     "id": "117198053082904336",
@@ -47775,9 +47771,7 @@
         ]
       }
     },
-    "captured_at": "2026-09-01T22:37:29.162148+00:00",
-    "events": [],
-    "scan_time": "2026-09-01T22:37:29.249967+00:00"
+    "captured_at": "2026-09-01T23:42:32.461723+00:00"
   },
   "117198047887443075": {
     "id": "117198047887443075",
@@ -47797,8 +47791,111 @@
       },
       "tier2": {}
     },
-    "captured_at": "2026-09-01T22:37:29.162236+00:00",
-    "events": [],
-    "scan_time": "2026-09-01T22:37:29.249971+00:00"
+    "captured_at": "2026-09-01T23:42:32.461807+00:00"
+  },
+  "117198246813661789": {
+    "id": "117198246813661789",
+    "created_at": "2026-09-01T22:55:26.626Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198246813661789",
+    "text": "Very productive and positive conversations were had today at the G20 Finance Ministers Meeting in Asheville. North Carolina is a GREAT State — Strong, resilient, and filled with incredible people. After Hurricane Helene, Sleepy Joe turned his back on this beautiful State, but as soon as I came into Office, I worked hard, and got everything done in record time. I NEVER forgot North Carolina, and never will. I WON BIG there three times, and North Carolinians know I will ALWAYS have their backs! Thank you to Secretary of the Treasury, Scott Bessent, who is working hard for us, and doing a fantastic job representing the U.S.A. WE ARE THE WORLD'S BIGGEST AND BEST ECONOMY, and we are keeping it that way. Other Countries should follow our lead, and cut Taxes, Regulations and, where possible, DRILL BABY DRILL. GROWTH, GROWTH, GROWTH. We are leading the way, and the World is watching! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "market_general": [
+          "economy",
+          "growth"
+        ]
+      }
+    },
+    "captured_at": "2026-09-01T23:42:32.461236+00:00"
+  },
+  "117198235291587483": {
+    "id": "117198235291587483",
+    "created_at": "2026-09-01T22:52:30.811Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198235291587483",
+    "text": "I am pleased to nominate a true WARRIOR, Hung Cao, to become the next Secretary of the Navy. We need Patriots like Hung leading our Navy and Marine Corps, and I can think of no one better than him to make sure our Great Navy and Marine Corps remain the FIERCEST and BEST Force the World has ever seen. The Senate needs to confirm this Warfighter, ASAP, so he can continue the fantastic work he has been doing over the past 4 months. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-01T23:42:32.461325+00:00"
+  },
+  "117198196070322926": {
+    "id": "117198196070322926",
+    "created_at": "2026-09-01T22:42:32.342Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198196070322926",
+    "text": "I just informed Governor Greg Abbott, of the GREAT State of Texas (who has my Complete and Total Endorsement for Re-Election!), that I am sending 50.5 Million Dollars to assist recovery efforts from the severe storms, winds, tornadoes, and flooding that hit them hard. Texas is a special place, and I will be back soon to support Governor Abbott, Lieutenant Governor Dan Patrick, Ken Paxton for U.S. Senate, and the entire ticket of Republican Candidates, who have my Complete and Total Endorsement. See you soon! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-01T23:42:32.461389+00:00"
+  },
+  "117198165412719460": {
+    "id": "117198165412719460",
+    "created_at": "2026-09-01T22:34:44.544Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198165412719460",
+    "text": "I just spoke with Governor Kelly Armstrong, of the beautiful State of North Dakota, and told him I am approving 3.4 Million Dollars for the severe storms, winds, and tornadoes they recently experienced. I love the people of North Dakota, which I won BIG all three times. MAGA! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-01T23:42:32.461436+00:00"
+  },
+  "117198143393658444": {
+    "id": "117198143393658444",
+    "created_at": "2026-09-01T22:29:08.560Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198143393658444",
+    "text": "I just informed Senator Roger Marshall, who has my Complete and Total Endorsement, that I am granting 13.2 Million Dollars and, separately, 7.3 Million Dollars, to help the wonderful people of Kansas recover from the TWO storms that hit their State this summer, causing severe winds, tornadoes, and flooding. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-01T23:42:32.461487+00:00"
   }
 }
