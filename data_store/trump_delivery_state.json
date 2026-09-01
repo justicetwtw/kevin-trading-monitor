@@ -34527,12 +34527,12 @@
       "post_id": "117197445893521689",
       "created_at": "2026-09-01T19:31:45.553Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-01T21:56:56.369792+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-01T21:56:59.853572+00:00",
       "run_id": "33563656974",
       "workflow_attempt_id": "33563656974:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117197444316575505": {
       "post_id": "117197444316575505",
