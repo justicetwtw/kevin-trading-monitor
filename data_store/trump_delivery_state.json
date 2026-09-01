@@ -34648,12 +34648,12 @@
       "post_id": "117198053082904336",
       "created_at": "2026-09-01T22:06:10.527Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-01T23:42:47.557180+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-01T23:42:51.650596+00:00",
       "run_id": "33572151933",
       "workflow_attempt_id": "33572151933:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117198047887443075": {
       "post_id": "117198047887443075",
