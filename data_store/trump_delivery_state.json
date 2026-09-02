@@ -34670,12 +34670,12 @@
       "post_id": "117198896372245586",
       "created_at": "2026-09-02T01:40:38.101Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-02T05:59:42.141512+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-02T05:59:44.996428+00:00",
       "run_id": "33596848115",
       "workflow_attempt_id": "33596848115:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117198856483138040": {
       "post_id": "117198856483138040",
