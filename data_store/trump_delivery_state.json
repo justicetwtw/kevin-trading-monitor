@@ -34714,12 +34714,12 @@
       "post_id": "117198788283772326",
       "created_at": "2026-09-02T01:13:08.802Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-02T05:59:21.084425+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-02T05:59:24.265865+00:00",
       "run_id": "33596848115",
       "workflow_attempt_id": "33596848115:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
