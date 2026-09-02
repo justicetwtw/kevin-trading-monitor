@@ -34736,12 +34736,12 @@
       "post_id": "117201327731957959",
       "created_at": "2026-09-02T11:58:57.706Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-02T14:43:30.630374+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-02T14:43:34.213074+00:00",
       "run_id": "33643787497",
       "workflow_attempt_id": "33643787497:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117201326595105097": {
       "post_id": "117201326595105097",
