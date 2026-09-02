@@ -1,7 +1,7 @@
 {
   "status": "healthy",
   "source": "cnn_historical_archive",
-  "latest_post_at": "2026-09-02T11:59:15.961000+00:00",
+  "latest_post_at": "2026-09-02T15:23:35.596000+00:00",
   "attempts": [
     {
       "status": "unavailable",
@@ -14,15 +14,15 @@
     },
     {
       "source": "cnn_historical_archive",
-      "raw_count": 36037,
+      "raw_count": 36039,
       "returned_count": 1000,
       "source_limit": 1000,
       "status": "healthy",
-      "latest_post_at": "2026-09-02T11:59:15.961000+00:00",
+      "latest_post_at": "2026-09-02T15:23:35.596000+00:00",
       "error": null
     }
   ],
-  "source_raw_count": 36037,
+  "source_raw_count": 36039,
   "source_returned_count": 1000,
   "source_limit": 1000,
   "source_window_bounded": true,
@@ -30,12 +30,12 @@
   "initial_backfill_hours": 24,
   "eligible_count": 1000,
   "timestamp_missing_count": 0,
-  "new_count": 3,
-  "archived_count": 3,
-  "delivered_count": 3,
+  "new_count": 2,
+  "archived_count": 0,
+  "delivered_count": 2,
   "delivery_status": "delivery_ambiguous",
   "delivery_requires_all_recipients": true,
-  "checked_at": "2026-09-02T14:43:44.502695+00:00",
+  "checked_at": "2026-09-02T18:05:14.801930+00:00",
   "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
   "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
   "source_completeness_verified": false,
@@ -58,10 +58,10 @@
   "delivery_failed_backlog_count": 0,
   "delivery_archive_missing_failed_count": 0,
   "delivery_ledger_counts": {
-    "claimed": 5,
+    "sent": 3349,
+    "pending": 0,
     "ambiguous": 0,
     "failed": 0,
-    "sent": 3347,
-    "pending": 0
+    "claimed": 5
   }
 }
