@@ -47897,5 +47897,104 @@
       "tier2": {}
     },
     "captured_at": "2026-09-01T23:42:32.461487+00:00"
+  },
+  "117198896372245586": {
+    "id": "117198896372245586",
+    "created_at": "2026-09-02T01:40:38.101Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198896372245586",
+    "text": "Woman is indicted over World War II Memorial vandalism incident:https://www.washingtonpost.com/dc-md-va/2026/08/28/melissa-farris-suspect-wwii-memorial-vandalism-indicted-two-charges/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-02T05:59:13.249269+00:00"
+  },
+  "117198856483138040": {
+    "id": "117198856483138040",
+    "created_at": "2026-09-02T01:30:29.442Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198856483138040",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-02T05:59:13.249301+00:00"
+  },
+  "117198854348293163": {
+    "id": "117198854348293163",
+    "created_at": "2026-09-02T01:29:56.867Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198854348293163",
+    "text": "9 Weeks Left: Reframe Election to 'Capitalism vs. Socialism' for a Win: https://www.newsmax.com/mclaughlin/capitalism-midterm-socialism/2026/08/26/id/1267365/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-02T05:59:13.249369+00:00"
+  },
+  "117198808039611928": {
+    "id": "117198808039611928",
+    "created_at": "2026-09-02T01:18:10.252Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198808039611928",
+    "text": "Trump is winning the Iran war— stay the course: https://nypost.com/2026/08/23/opinion/trump-is-winning-the-iran-war-stay-the-course/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-02T05:59:13.249436+00:00"
+  },
+  "117198788283772326": {
+    "id": "117198788283772326",
+    "created_at": "2026-09-02T01:13:08.802Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117198788283772326",
+    "text": "I'm not trying to force Iran to the bargaining table, as ABC Fake News reported. I couldn't care less if they sign a worthless, to them, agreement. I like our position now much better, with almost total control of the Hormuz Strait, and their economy totally collapsing. They are just playing out the inevitable. When are the Iranian people going to rise up and fight? President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "Hormuz"
+        ]
+      },
+      "tier2": {
+        "market_general": [
+          "economy"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-02T05:59:13.249507+00:00"
   }
 }
