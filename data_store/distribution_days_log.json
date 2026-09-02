@@ -1,14 +1,8 @@
 {
   "symbol": "QQQ",
   "lookback": 25,
-  "count": 6,
+  "count": 5,
   "days": [
-    {
-      "date": "2026-07-29",
-      "drop_pct": -0.02037041253690626,
-      "volume": 57233300,
-      "prev_volume": 51398700
-    },
     {
       "date": "2026-08-11",
       "drop_pct": -0.0033570309855424736,
@@ -36,10 +30,10 @@
     {
       "date": "2026-09-01",
       "drop_pct": -0.012723917340435424,
-      "volume": 34409539,
+      "volume": 35145300,
       "prev_volume": 32237200
     }
   ],
-  "level": "distribution",
-  "fetched_at": "2026-09-02T00:22:05.421971+00:00"
+  "level": "pressure",
+  "fetched_at": "2026-09-02T17:05:29.066729+00:00"
 }
