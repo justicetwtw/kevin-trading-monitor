@@ -34824,12 +34824,12 @@
       "post_id": "117206881233100864",
       "created_at": "2026-09-03T11:31:17.410Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-03T14:02:30.265541+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-03T14:02:33.819346+00:00",
       "run_id": "33764397371",
       "workflow_attempt_id": "33764397371:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117206830744287806": {
       "post_id": "117206830744287806",
