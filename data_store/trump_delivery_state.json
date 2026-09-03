@@ -34868,12 +34868,12 @@
       "post_id": "117207687594983323",
       "created_at": "2026-09-03T14:56:21.515Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-03T17:46:44.186820+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-03T17:46:48.439624+00:00",
       "run_id": "33786440802",
       "workflow_attempt_id": "33786440802:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117207685733693672": {
       "post_id": "117207685733693672",
