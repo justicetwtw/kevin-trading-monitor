@@ -48211,5 +48211,65 @@
       "tier2": {}
     },
     "captured_at": "2026-09-03T05:21:38.710773+00:00"
+  },
+  "117206881233100864": {
+    "id": "117206881233100864",
+    "created_at": "2026-09-03T11:31:17.410Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117206881233100864",
+    "text": "Sec. Lutnick had Venezuela on his mind when he said nobody was killed. 18 people were killed in Iran!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-03T14:02:08.595959+00:00"
+  },
+  "117206830744287806": {
+    "id": "117206830744287806",
+    "created_at": "2026-09-03T11:18:27.011Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117206830744287806",
+    "text": "This is GREAT! President DONALD J. TRUMPSyria is pitching itself as an alternative to the Strait of Hormuz: https://www.washingtonpost.com/world/2026/09/02/syria-eyeing-role-middle-east-hub-offers-options-bypass-hormuz/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "Hormuz"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-03T14:02:08.596025+00:00"
+  },
+  "117206799377569441": {
+    "id": "117206799377569441",
+    "created_at": "2026-09-03T11:10:28.394Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117206799377569441",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-03T14:02:08.596037+00:00"
   }
 }
