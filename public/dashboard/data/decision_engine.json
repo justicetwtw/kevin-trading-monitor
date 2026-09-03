@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-02T11:35:27.297555+00:00",
+  "generated_at": "2026-09-03T01:16:33.878723+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -54,8 +54,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 0.3,
-      "ivp": 1.3,
+      "ivr": 0.0,
+      "ivp": 0.0,
       "regime": "risk_on",
       "missing_inputs": [
         "catalyst_not_future",
@@ -113,8 +113,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 1.2,
-      "ivp": 1.3,
+      "ivr": 21.2,
+      "ivp": 5.1,
       "regime": "risk_on",
       "missing_inputs": [
         "catalyst_not_future",
@@ -144,11 +144,11 @@
         "status": "healthy",
         "current_price": 868.950012,
         "as_of": "2026-09-01T00:00:00-04:00",
-        "return_1m": 0.217119,
-        "return_3m": -0.039834,
-        "return_6m": 0.109416,
+        "return_1m": 0.114196,
+        "return_3m": -0.155662,
+        "return_6m": 0.251314,
         "pct_from_52w_high": -0.199626,
-        "realized_vol_20d": 1.00989,
+        "realized_vol_20d": 0.980872,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -328,7 +328,7 @@
   "market_context_health": {
     "status": "healthy",
     "stale": false,
-    "generated_at": "2026-09-02T00:19:37.235900+00:00",
+    "generated_at": "2026-09-03T00:20:58.281397+00:00",
     "unavailable_count": 0,
     "partial_count": 0,
     "contract": "market_context_only_not_valuation_or_trade_instruction"
