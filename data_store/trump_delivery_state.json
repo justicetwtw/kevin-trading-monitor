@@ -34978,12 +34978,12 @@
       "post_id": "117212924349074596",
       "created_at": "2026-09-04T13:08:08.041Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-04T13:25:13.610066+00:00",
       "resolved_at": null,
       "run_id": "33877849323",
       "workflow_attempt_id": "33877849323:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117212442535979837": {
       "post_id": "117212442535979837",
