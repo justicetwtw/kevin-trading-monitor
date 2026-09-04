@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-03T19:31:53.855048+08:00",
+  "generated_at": "2026-09-04T09:08:05.302115+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -11,10 +11,6 @@
       {
         "symbol": "NNE",
         "earnings_date": "2026-08-12"
-      },
-      {
-        "symbol": "CRM",
-        "earnings_date": "2026-08-26"
       },
       {
         "symbol": "SNPS",
@@ -315,6 +311,10 @@
       {
         "symbol": "MRVL",
         "earnings_date": "2026-12-01"
+      },
+      {
+        "symbol": "CRM",
+        "earnings_date": "2026-12-02"
       }
     ]
   }

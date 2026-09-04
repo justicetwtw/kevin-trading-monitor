@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-03T19:31:54.133986+08:00",
+  "generated_at": "2026-09-04T09:08:05.585466+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,14 +22,14 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-09-03T09:56:45.434376+00:00",
+      "trump_monitor_checked_at": "2026-09-04T00:18:12.352129+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
       "tracked_theme_count": 3,
       "tracked_thesis_count": 3,
       "allocation_candidate_count": 4,
-      "needs_attention_count": 8
+      "needs_attention_count": 7
     },
     "attention": [
       {
@@ -59,13 +59,6 @@
         "symbol": "SNDK",
         "title": "Scheduled thesis review is due",
         "detail": "Review date: 2026-07-31"
-      },
-      {
-        "severity": "P1",
-        "category": "source_health",
-        "symbol": null,
-        "title": "Trump monitor health is stale",
-        "detail": "Last verified check is approximately 1.6 hours old."
       },
       {
         "severity": "P1",
@@ -109,9 +102,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-09-03T03:18:19.692000+00:00",
-      "checked_at": "2026-09-03T09:56:45.434376+00:00",
-      "health_age_hours": 1.6,
+      "latest_post_at": "2026-09-03T23:16:14.923000+00:00",
+      "checked_at": "2026-09-04T00:18:12.352129+00:00",
+      "health_age_hours": 0.8,
       "attempts": [
         {
           "status": "unavailable",
@@ -124,23 +117,23 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 36043,
+          "raw_count": 36051,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-09-03T03:18:19.692000+00:00",
+          "latest_post_at": "2026-09-03T23:16:14.923000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 36043,
+      "source_raw_count": 36051,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
       "initial_backfill_hours": 24,
       "eligible_count": 1000,
-      "new_count": 0,
-      "delivered_count": 0,
-      "delivery_status": "unresolved_delivery_backlog",
+      "new_count": 2,
+      "delivered_count": 2,
+      "delivery_status": "delivery_ambiguous",
       "capture_policy": "all_posts_replies_retruths_after_capture_checkpoint",
       "keyword_policy": "tier_is_metadata_and_notification_urgency_only",
       "content_published_here": false
@@ -326,8 +319,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 0.0,
-        "ivp": 0.0,
+        "ivr": 4.0,
+        "ivp": 2.5,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -344,8 +337,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 21.2,
-        "ivp": 5.1,
+        "ivr": 4.0,
+        "ivp": 3.8,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -388,7 +381,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-09-03T11:31:54.133963+00:00",
+      "generated_at": "2026-09-04T01:08:05.585439+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
