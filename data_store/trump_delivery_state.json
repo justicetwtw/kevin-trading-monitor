@@ -35396,12 +35396,12 @@
       "post_id": "117225587361150130",
       "created_at": "2026-09-06T18:48:30.272Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-06T19:32:31.796837+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-06T19:32:35.076461+00:00",
       "run_id": "34055050585",
       "workflow_attempt_id": "34055050585:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117225585294047619": {
       "post_id": "117225585294047619",
