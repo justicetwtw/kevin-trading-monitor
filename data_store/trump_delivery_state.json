@@ -35616,12 +35616,12 @@
       "post_id": "117225348204994362",
       "created_at": "2026-09-06T17:47:41.039Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-06T19:30:31.369521+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-06T19:30:34.865716+00:00",
       "run_id": "34055050585",
       "workflow_attempt_id": "34055050585:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117225346749407203": {
       "post_id": "117225346749407203",
