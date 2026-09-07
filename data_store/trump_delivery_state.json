@@ -36023,12 +36023,12 @@
       "post_id": "117230287192828119",
       "created_at": "2026-09-07T14:43:44.011Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-07T16:00:38.085211+00:00",
       "resolved_at": null,
       "run_id": "34140911763",
       "workflow_attempt_id": "34140911763:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117230286557431140": {
       "post_id": "117230286557431140",
