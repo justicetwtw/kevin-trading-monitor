@@ -9,8 +9,8 @@
       "regime": "risk_on"
     },
     "dxy": {
-      "value": 118.7479,
-      "regime": "risk_off"
+      "value": null,
+      "regime": "neutral"
     },
     "vix": {
       "value": 15.300000190734863,
@@ -22,8 +22,8 @@
     }
   },
   "risk_on_count": 3,
-  "risk_off_count": 1,
+  "risk_off_count": 0,
   "modifier": 10,
   "regime": "risk_on",
-  "fetched_at": "2026-09-07T23:47:45.244198+00:00"
+  "fetched_at": "2026-09-08T00:33:48.359424+00:00"
 }
