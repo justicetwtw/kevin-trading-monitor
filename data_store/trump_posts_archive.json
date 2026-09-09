@@ -51401,5 +51401,46 @@
       }
     },
     "captured_at": "2026-09-09T05:01:46.435518+00:00"
+  },
+  "117241367309466443": {
+    "id": "117241367309466443",
+    "created_at": "2026-09-09T13:41:33.175Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117241367309466443",
+    "text": "\"Words of Wisdom\" from Phil Flynn, one of the World's Great Oil and Energy Analysts — A MUST SEE! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "oil",
+          "energy"
+        ]
+      }
+    },
+    "captured_at": "2026-09-09T13:52:09.365786+00:00"
+  },
+  "117240971806030051": {
+    "id": "117240971806030051",
+    "created_at": "2026-09-09T12:00:58.270Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117240971806030051",
+    "text": "Declassified FBI notes expose discrepancies between Flynn interview, official FBI records: https://justthenews.com/accountability/russia-and-ukraine-scandals/hld6am-declassified-fbi-notes-reveal-discrepancies-flynn",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-09T13:52:09.365880+00:00"
   }
 }
