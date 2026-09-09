@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-08T11:35:18.825675+00:00",
+  "generated_at": "2026-09-09T01:21:29.523369+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -54,8 +54,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 19.4,
-      "ivp": 14.6,
+      "ivr": 15.9,
+      "ivp": 10.8,
       "regime": "risk_on",
       "missing_inputs": [
         "catalyst_not_future",
@@ -113,8 +113,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 18.2,
-      "ivp": 7.3,
+      "ivr": 13.2,
+      "ivp": 6.0,
       "regime": "risk_on",
       "missing_inputs": [
         "catalyst_not_future",
@@ -328,7 +328,7 @@
   "market_context_health": {
     "status": "healthy",
     "stale": false,
-    "generated_at": "2026-09-08T00:29:25.218230+00:00",
+    "generated_at": "2026-09-09T00:20:43.576099+00:00",
     "unavailable_count": 0,
     "partial_count": 0,
     "contract": "market_context_only_not_valuation_or_trade_instruction"
