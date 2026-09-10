@@ -36870,12 +36870,12 @@
       "post_id": "117246804565502433",
       "created_at": "2026-09-10T12:44:19.119Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-10T16:26:22.310380+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-10T16:26:26.777847+00:00",
       "run_id": "34501911398",
       "workflow_attempt_id": "34501911398:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117246672542721632": {
       "post_id": "117246672542721632",
