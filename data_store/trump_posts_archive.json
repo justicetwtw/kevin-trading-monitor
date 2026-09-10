@@ -51568,5 +51568,57 @@
     "captured_at": "2026-09-09T22:34:08.956423+00:00",
     "events": [],
     "scan_time": "2026-09-09T22:34:09.044341+00:00"
+  },
+  "117246615793515891": {
+    "id": "117246615793515891",
+    "created_at": "2026-09-10T11:56:18.685Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117246615793515891",
+    "text": "https://truthsocial.com/@realDonaldTrump/117183895840900319",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-10T12:15:05.117868+00:00"
+  },
+  "117246608653597951": {
+    "id": "117246608653597951",
+    "created_at": "2026-09-10T11:54:29.739Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117246608653597951",
+    "text": "https://truthsocial.com/@realDonaldTrump/117184422478750334",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-10T12:15:05.117958+00:00"
+  },
+  "117246607022445743": {
+    "id": "117246607022445743",
+    "created_at": "2026-09-10T11:54:04.850Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117246607022445743",
+    "text": "The Republican Midterm Convention last night, in Dallas, was a major, sold out hit, far bigger, better, and more important than anyone thought possible. It was really something, streaming all over the place, and really big numbers, despite going up against the NFL. The overall numbers beat the NFL. The Arena, which was really nice, beat its own attendance records. The place was packed! There were thousands of people outside who couldn't get in. Screens were provided. I guess people LOVE TRUMP POLITICS! I'll be there again tonight to close out the show. Exciting \"Stuff!\" MAKE AMERICA GREAT AGAIN!!!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-10T12:15:05.118057+00:00"
   }
 }
