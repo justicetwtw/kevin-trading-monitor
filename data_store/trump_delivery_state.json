@@ -36705,12 +36705,12 @@
       "post_id": "117247527370149354",
       "created_at": "2026-09-10T15:48:08.241Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-10T16:28:14.984449+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-10T16:28:19.255967+00:00",
       "run_id": "34501911398",
       "workflow_attempt_id": "34501911398:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117247429017543248": {
       "post_id": "117247429017543248",
