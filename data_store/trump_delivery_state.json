@@ -36749,12 +36749,12 @@
       "post_id": "117246836238536386",
       "created_at": "2026-09-10T12:52:22.411Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-10T16:27:45.260276+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-10T16:27:49.345752+00:00",
       "run_id": "34501911398",
       "workflow_attempt_id": "34501911398:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117246833816059029": {
       "post_id": "117246833816059029",
