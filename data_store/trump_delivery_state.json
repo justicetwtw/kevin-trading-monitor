@@ -36826,12 +36826,12 @@
       "post_id": "117246810836573647",
       "created_at": "2026-09-10T12:45:54.810Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-10T16:26:52.859042+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-10T16:26:57.164607+00:00",
       "run_id": "34501911398",
       "workflow_attempt_id": "34501911398:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117246807924826850": {
       "post_id": "117246807924826850",
