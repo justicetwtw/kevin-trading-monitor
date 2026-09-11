@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-10T19:41:21.278013+08:00",
+  "generated_at": "2026-09-11T09:17:42.652650+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -19,14 +19,6 @@
       {
         "symbol": "RBRK",
         "earnings_date": "2026-08-27"
-      },
-      {
-        "symbol": "AVGO",
-        "earnings_date": "2026-09-02"
-      },
-      {
-        "symbol": "AVAV",
-        "earnings_date": "2026-09-09"
       },
       {
         "symbol": "ORCL",
@@ -98,6 +90,10 @@
       },
       {
         "symbol": "STX",
+        "earnings_date": "2026-10-27"
+      },
+      {
+        "symbol": "BE",
         "earnings_date": "2026-10-27"
       },
       {
@@ -311,6 +307,14 @@
       {
         "symbol": "CRM",
         "earnings_date": "2026-12-02"
+      },
+      {
+        "symbol": "AVAV",
+        "earnings_date": "2026-12-02"
+      },
+      {
+        "symbol": "AVGO",
+        "earnings_date": "2026-12-09"
       }
     ]
   }
