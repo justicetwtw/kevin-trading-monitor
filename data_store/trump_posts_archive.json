@@ -52022,5 +52022,37 @@
     "captured_at": "2026-09-11T16:58:40.294009+00:00",
     "events": [],
     "scan_time": "2026-09-11T16:58:40.368073+00:00"
+  },
+  "117253628890078139": {
+    "id": "117253628890078139",
+    "created_at": "2026-09-11T17:39:50.047Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117253628890078139",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-11T17:53:08.689289+00:00"
+  },
+  "117253612174974971": {
+    "id": "117253612174974971",
+    "created_at": "2026-09-11T17:35:34.996Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117253612174974971",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-11T17:53:08.689325+00:00"
   }
 }
