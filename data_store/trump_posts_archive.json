@@ -52156,5 +52156,80 @@
     "captured_at": "2026-09-11T22:35:57.496309+00:00",
     "events": [],
     "scan_time": "2026-09-11T22:35:57.561470+00:00"
+  },
+  "117256041596508411": {
+    "id": "117256041596508411",
+    "created_at": "2026-09-12T03:53:25.026Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117256041596508411",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-12T04:52:20.739060+00:00"
+  },
+  "117255916246451243": {
+    "id": "117255916246451243",
+    "created_at": "2026-09-12T03:21:32.335Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117255916246451243",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-12T04:52:20.739103+00:00"
+  },
+  "117255720319253709": {
+    "id": "117255720319253709",
+    "created_at": "2026-09-12T02:31:42.724Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117255720319253709",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117255718355537976I am calling on the Smithsonian Institution to honor the Life and Legacy of George Washington, America's Greatest Hero, with a five-year exhibition at the National Museum of American History, beginning now, and continuing through, February 22, 2032, the 300th anniversary of Washington's birth.I am also calling on the Smithsonian to erect a 30-foot \"Colossus statue\" of the Father of Our Country outside the Museum, to replace the so-called \"Infinity\" sculpture that stands there today. That strange modernist sculpture tells visitors nothing about America, inspires no one, and honors none of our Great American Heroes.George Washington does. He is easily America's Greatest Hero. Without him, our Country and our Freedoms wouldn't exist.And yet, during our Nation's 250th Anniversary Year, the Museum has failed to give George Washington and our other Founding Fathers the celebration they deserve. Washington's Heroic Crossing of the Delaware on December 25, 1776—One of the greatest moments and turning points of the Revolution—is not even mentioned in the Museum. His Victory at Trenton, and the stories of the Americans who fought and died for our Independence, deserve far more attention.Under recently ended leadership, the Smithsonian created a \"Center for Restorative History,\" and commissioned a \"Decolonization Plan,\" to focus attention overwhelmingly on those who have been oppressed, but there is almost no attention paid to those who triumphed over great oppression, and against great odds. One current exhibit describes the period of 1492 to 1776, including Christopher Columbus's discovery of the New World, and the European settlement of America, as the \"Great Unsettling\" of the Continent.That tells you all you need to know about how twisted the thinking is today at the Smithsonian.Instead of a Center for Restorative History, America's National History Museum should have a Center for American Heroes.Tell the stories of Americans who faced great challenges, overcame them, built great things, defended our Country, made America better, and helped our Nation more fully live up to our Founding Ideals.That is a History worth teaching, because it is America's story.Instead of focusing on ideological activism, the leaders of America's taxpayer-funded, National History Museum should be focused on telling America's story—fairly, accurately, and coherently—and there is no better person to start with than George Washington.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-12T04:52:20.742661+00:00"
+  },
+  "117255718355537976": {
+    "id": "117255718355537976",
+    "created_at": "2026-09-12T02:31:12.761Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117255718355537976",
+    "text": "So, I'm asking for the Smithsonian to install the 11-foot Washington statue that was featured at the recent Freedom 250 Grand Prix Race in the Museum's Flag Hall, and dedicate it this Constitution Day, September 17, 2026.Immediately design and display a five-year exhibition worthy of the Life, Sacrifice, and Contributions of George Washington.Then, as soon as it is ready, install a 30-foot Washington Colossus where \"Infinity\" stands today.Replace a sculpture that says nothing about America with the man who, more than anyone else, says everything about America.This is how we should begin to honor George Washington in the lead-up to his 300th birthday in 2032. Thank you for your attention to this matter! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-12T04:52:20.742812+00:00"
   }
 }
