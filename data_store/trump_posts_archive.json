@@ -52279,5 +52279,25 @@
       "tier2": {}
     },
     "captured_at": "2026-09-13T11:16:46.444306+00:00"
+  },
+  "117265397440548141": {
+    "id": "117265397440548141",
+    "created_at": "2026-09-13T19:32:43.876Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117265397440548141",
+    "text": "The Spectacular Ballroom being built at the White House. Will be the GREATEST of its kind anywhere in the World! Also, it is a Gift to the U.S.A. from me and other American Patriots — No Taxpayer Dollars will be expended in its Construction. President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-13T19:53:04.003587+00:00"
   }
 }
