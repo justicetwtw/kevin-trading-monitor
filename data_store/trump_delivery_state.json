@@ -37178,12 +37178,12 @@
       "post_id": "117266581125200415",
       "created_at": "2026-09-14T00:33:45.471Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-14T01:37:14.234735+00:00",
       "resolved_at": null,
       "run_id": "34796451354",
       "workflow_attempt_id": "34796451354:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117266432742201277": {
       "post_id": "117266432742201277",
