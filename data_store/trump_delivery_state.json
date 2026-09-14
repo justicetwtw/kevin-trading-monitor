@@ -37189,12 +37189,12 @@
       "post_id": "117266432742201277",
       "created_at": "2026-09-13T23:56:01.325Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-14T01:37:08.330158+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-14T01:37:11.744058+00:00",
       "run_id": "34796451354",
       "workflow_attempt_id": "34796451354:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117266420132610360": {
       "post_id": "117266420132610360",
