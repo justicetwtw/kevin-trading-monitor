@@ -52949,5 +52949,149 @@
       }
     },
     "captured_at": "2026-09-15T00:34:46.453671+00:00"
+  },
+  "117273031775671511": {
+    "id": "117273031775671511",
+    "created_at": "2026-09-15T03:54:14.586Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273031775671511",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117273030816566258",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138460+00:00"
+  },
+  "117273030816566258": {
+    "id": "117273030816566258",
+    "created_at": "2026-09-15T03:53:59.951Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273030816566258",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138485+00:00"
+  },
+  "117273029820025573": {
+    "id": "117273029820025573",
+    "created_at": "2026-09-15T03:53:44.746Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273029820025573",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117273029042752027",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138517+00:00"
+  },
+  "117273029042752027": {
+    "id": "117273029042752027",
+    "created_at": "2026-09-15T03:53:32.884Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273029042752027",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138527+00:00"
+  },
+  "117273027393365712": {
+    "id": "117273027393365712",
+    "created_at": "2026-09-15T03:53:07.718Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273027393365712",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117273026439561125",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138551+00:00"
+  },
+  "117273026439561125": {
+    "id": "117273026439561125",
+    "created_at": "2026-09-15T03:52:53.163Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273026439561125",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138559+00:00"
+  },
+  "117273024744047319": {
+    "id": "117273024744047319",
+    "created_at": "2026-09-15T03:52:27.292Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273024744047319",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117273023815860960",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138580+00:00"
+  },
+  "117273023815860960": {
+    "id": "117273023815860960",
+    "created_at": "2026-09-15T03:52:13.128Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117273023815860960",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138593+00:00"
+  },
+  "117272909637512817": {
+    "id": "117272909637512817",
+    "created_at": "2026-09-15T03:23:10.904Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117272909637512817",
+    "text": "National Weather Service begins changing 'Lake Ontario' to 'Lake America' on maps, weather forecasts: https://justthenews.com/government/national-weather-service-begins-changing-lake-ontario-lake-america-maps-weather",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-15T05:14:34.138632+00:00"
   }
 }
