@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-09-15T00:45:07.833754+00:00",
+  "scan_time": "2026-09-15T17:35:10.392464+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -8,7 +8,7 @@
           "regime": "risk_on"
         },
         "hy_oas": {
-          "value": 265.0,
+          "value": 271.0,
           "regime": "risk_on"
         },
         "dxy": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 17.100000381469727,
+          "value": 17.639999389648438,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": NaN,
+          "value": 0.09786685641557816,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-09-15T00:45:09.971624+00:00"
+      "fetched_at": "2026-09-15T17:35:12.498924+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-09-14T20:45:09.973451-04:00"
+        "fetched_at": "2026-09-15T13:35:12.499918-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-15T00:45:11.171532+00:00"
+      "fetched_at": "2026-09-15T17:35:13.277787+00:00"
     },
     "distribution": {
       "spy": {
@@ -98,12 +98,12 @@
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-15T00:45:11.254826+00:00"
+        "fetched_at": "2026-09-15T17:35:13.449628+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
         "lookback": 25,
-        "count": 6,
+        "count": 7,
         "days": [
           {
             "date": "2026-08-11",
@@ -140,10 +140,16 @@
             "drop_pct": -0.01063784554614455,
             "volume": 31414400,
             "prev_volume": 26763400
+          },
+          {
+            "date": "2026-09-14",
+            "drop_pct": -0.007973383180531998,
+            "volume": 35101000,
+            "prev_volume": 26649100
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-15T00:45:11.436910+00:00"
+        "fetched_at": "2026-09-15T17:35:13.631362+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -151,7 +157,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-09-15T00:45:11.439828+00:00"
+      "fetched_at": "2026-09-15T17:35:13.632372+00:00"
     },
     "bubble": {
       "score": 0,
@@ -167,9 +173,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-09-14T20:45:12.220034-04:00"
+        "fetched_at": "2026-09-15T13:35:14.604734-04:00"
       },
-      "fetched_at": "2026-09-15T00:45:12.220073+00:00"
+      "fetched_at": "2026-09-15T17:35:14.604765+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -179,35 +185,35 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-09-15T00:45:13.369640+00:00"
+      "fetched_at": "2026-09-15T17:35:15.220192+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 17.100000381469727,
-        "vix9d": 16.90999984741211,
-        "vix3m": 19.280000686645508,
-        "vix9d_inverted": false,
+        "vix": 17.639999389648438,
+        "vix9d": 17.690000534057617,
+        "vix3m": 19.59000015258789,
+        "vix9d_inverted": true,
         "vix3m_inverted": false
       },
       "modifiers": {
-        "sell_put": 0,
-        "leaps_entry": 0,
+        "sell_put": 15,
+        "leaps_entry": 15,
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-09-15T00:45:13.474752+00:00"
+      "fetched_at": "2026-09-15T17:35:15.276139+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-15T00:45:17.930432+00:00"
+      "fetched_at": "2026-09-15T17:35:19.507425+00:00"
     }
   },
   "aggregate_modifiers": {
     "sell_call": 2,
-    "sell_put": -5,
-    "leaps_entry": -10,
+    "sell_put": 10,
+    "leaps_entry": 5,
     "leaps_entry_veto": false
   }
 }

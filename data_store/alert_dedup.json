@@ -1,13 +1,11 @@
 {
   "AVGO::leaps_entry": {
-    "last_sent": "2026-08-24T13:58:10.007573+00:00",
+    "last_sent": "2026-09-15T17:36:38.689772+00:00",
     "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1"
-    ]
+    "tags": []
   },
-  "META::leaps_entry": {
-    "last_sent": "2026-08-19T13:51:26.629105+00:00",
+  "KLAC::leaps_entry": {
+    "last_sent": "2026-09-15T17:36:39.490780+00:00",
     "alert_level": "green",
     "tags": []
   }
