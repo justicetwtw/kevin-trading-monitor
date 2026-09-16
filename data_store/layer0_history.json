@@ -1,10 +1,10 @@
 {
-  "scan_time": "2026-09-16T17:34:26.420362+00:00",
+  "scan_time": "2026-09-16T20:26:41.781203+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
         "yield_curve": {
-          "value": 31.99999999999994,
+          "value": 33.00000000000001,
           "regime": "risk_on"
         },
         "hy_oas": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 16.84000015258789,
+          "value": 17.719999313354492,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.09779803635401339,
+          "value": 0.09850921814109352,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-09-16T17:34:27.982057+00:00"
+      "fetched_at": "2026-09-16T20:26:44.040460+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,17 +36,17 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-09-16T13:34:27.982977-04:00"
+        "fetched_at": "2026-09-16T16:26:44.043968-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-16T17:34:29.141421+00:00"
+      "fetched_at": "2026-09-16T20:26:45.697290+00:00"
     },
     "distribution": {
       "spy": {
         "symbol": "SPY",
         "lookback": 25,
-        "count": 9,
+        "count": 10,
         "days": [
           {
             "date": "2026-08-17",
@@ -99,12 +99,18 @@
           {
             "date": "2026-09-15",
             "drop_pct": -0.00458678137417018,
-            "volume": 46131100,
+            "volume": 46195000,
             "prev_volume": 43992400
+          },
+          {
+            "date": "2026-09-16",
+            "drop_pct": -0.004409916675517714,
+            "volume": 54319710,
+            "prev_volume": 46195000
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-16T17:34:29.291646+00:00"
+        "fetched_at": "2026-09-16T20:26:45.824027+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -149,7 +155,7 @@
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-16T17:34:29.419786+00:00"
+        "fetched_at": "2026-09-16T20:26:45.945775+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -157,7 +163,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-09-16T17:34:29.420693+00:00"
+      "fetched_at": "2026-09-16T20:26:45.946910+00:00"
     },
     "bubble": {
       "score": 0,
@@ -173,9 +179,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-09-16T13:34:29.787655-04:00"
+        "fetched_at": "2026-09-16T16:26:46.456596-04:00"
       },
-      "fetched_at": "2026-09-16T17:34:29.787692+00:00"
+      "fetched_at": "2026-09-16T20:26:46.456637+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -185,13 +191,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-09-16T17:34:30.492419+00:00"
+      "fetched_at": "2026-09-16T20:26:46.810536+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 16.84000015258789,
-        "vix9d": 16.479999542236328,
-        "vix3m": 19.229999542236328,
+        "vix": 17.719999313354492,
+        "vix9d": 17.399999618530273,
+        "vix3m": 19.739999771118164,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -201,13 +207,13 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-09-16T17:34:30.531408+00:00"
+      "fetched_at": "2026-09-16T20:26:46.878496+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-16T17:34:34.696095+00:00"
+      "fetched_at": "2026-09-16T20:26:51.225870+00:00"
     }
   },
   "aggregate_modifiers": {
