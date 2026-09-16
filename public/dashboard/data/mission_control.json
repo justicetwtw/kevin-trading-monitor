@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-15T19:59:36.442254+08:00",
+  "generated_at": "2026-09-16T09:30:36.068143+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-09-15T10:05:59.577585+00:00",
+      "trump_monitor_checked_at": "2026-09-15T23:43:14.022517+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -65,7 +65,7 @@
         "category": "source_health",
         "symbol": null,
         "title": "Trump monitor health is stale",
-        "detail": "Last verified check is approximately 1.9 hours old."
+        "detail": "Last verified check is approximately 1.8 hours old."
       },
       {
         "severity": "P1",
@@ -109,9 +109,9 @@
     "trump_monitor": {
       "status": "healthy",
       "source": "cnn_historical_archive",
-      "latest_post_at": "2026-09-15T03:54:14.586000+00:00",
-      "checked_at": "2026-09-15T10:05:59.577585+00:00",
-      "health_age_hours": 1.9,
+      "latest_post_at": "2026-09-15T19:11:57.733000+00:00",
+      "checked_at": "2026-09-15T23:43:14.022517+00:00",
+      "health_age_hours": 1.8,
       "attempts": [
         {
           "status": "unavailable",
@@ -124,15 +124,15 @@
         },
         {
           "source": "cnn_historical_archive",
-          "raw_count": 36288,
+          "raw_count": 36295,
           "returned_count": 1000,
           "source_limit": 1000,
           "status": "healthy",
-          "latest_post_at": "2026-09-15T03:54:14.586000+00:00",
+          "latest_post_at": "2026-09-15T19:11:57.733000+00:00",
           "error": null
         }
       ],
-      "source_raw_count": 36288,
+      "source_raw_count": 36295,
       "source_returned_count": 1000,
       "source_limit": 1000,
       "capture_started_at": "2026-07-21T03:36:31.193788+00:00",
@@ -326,8 +326,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 2.3,
-        "ivp": 2.3,
+        "ivr": 0.0,
+        "ivp": 0.0,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -344,8 +344,8 @@
         "total_score": null,
         "coverage": 0.6,
         "action_band": null,
-        "ivr": 15.1,
-        "ivp": 8.0,
+        "ivr": 14.3,
+        "ivp": 6.8,
         "options_status": "ok",
         "not_a_trade_signal": true
       },
@@ -388,7 +388,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-09-15T11:59:36.442222+00:00",
+      "generated_at": "2026-09-16T01:30:36.068119+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
