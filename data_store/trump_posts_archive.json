@@ -53315,5 +53315,89 @@
     "captured_at": "2026-09-16T20:26:58.584090+00:00",
     "events": [],
     "scan_time": "2026-09-16T20:26:58.674101+00:00"
+  },
+  "117282972517655406": {
+    "id": "117282972517655406",
+    "created_at": "2026-09-16T22:02:18.270Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117282972517655406",
+    "text": "First-Ever Midterm RNC Garnered Over 100 Million Live Stream Views: https://www.breitbart.com/politics/2026/09/16/first-ever-midterm-rnc-garnered-over-100-million-live-stream-views/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-16T22:21:03.370317+00:00"
+  },
+  "117282768740023694": {
+    "id": "117282768740023694",
+    "created_at": "2026-09-16T21:10:28.870Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117282768740023694",
+    "text": "https://www.reuters.com/world/us-poverty-rate-102-2025-census-bureau-says-2026-09-15/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-16T22:21:03.370367+00:00"
+  },
+  "117282643318690567": {
+    "id": "117282643318690567",
+    "created_at": "2026-09-16T20:38:35.091Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117282643318690567",
+    "text": "Interest Rates in the United States should be 1%, or less, because we are the Best Credit in the World — BY FAR. Our Country is BOOMING with new Investment! If we stopped Trading with every country that we have a Deficit with, which is most of them, we would make, at least, 1.5 Trillion Dollars a year. The word \"Deficit\" is nothing more than a fancy word for LOSS. We are \"carrying\" almost every country in the World, and that cannot go on any longer. LOWER THE INTEREST RATES FOR THE UNITED STATES OF AMERICA, AND FAST! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-16T22:21:03.370439+00:00"
+  },
+  "117282617360268122": {
+    "id": "117282617360268122",
+    "created_at": "2026-09-16T20:31:59.001Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117282617360268122",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117282599441012397",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-16T22:21:03.370468+00:00"
+  },
+  "117282599441012397": {
+    "id": "117282599441012397",
+    "created_at": "2026-09-16T20:27:25.574Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117282599441012397",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-16T22:21:03.370478+00:00"
   }
 }
