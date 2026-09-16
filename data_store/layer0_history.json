@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-09-16T00:35:06.668457+00:00",
+  "scan_time": "2026-09-16T17:34:26.420362+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
@@ -8,7 +8,7 @@
           "regime": "risk_on"
         },
         "hy_oas": {
-          "value": 271.0,
+          "value": 276.0,
           "regime": "risk_on"
         },
         "dxy": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 17.200000762939453,
+          "value": 16.84000015258789,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": NaN,
+          "value": 0.09779803635401339,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 10,
       "regime": "risk_on",
-      "fetched_at": "2026-09-16T00:35:08.265317+00:00"
+      "fetched_at": "2026-09-16T17:34:27.982057+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,17 +36,17 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-09-15T20:35:08.266838-04:00"
+        "fetched_at": "2026-09-16T13:34:27.982977-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-16T00:35:09.469901+00:00"
+      "fetched_at": "2026-09-16T17:34:29.141421+00:00"
     },
     "distribution": {
       "spy": {
         "symbol": "SPY",
         "lookback": 25,
-        "count": 8,
+        "count": 9,
         "days": [
           {
             "date": "2026-08-17",
@@ -95,22 +95,22 @@
             "drop_pct": -0.005994238166152997,
             "volume": 42740400,
             "prev_volume": 32812400
+          },
+          {
+            "date": "2026-09-15",
+            "drop_pct": -0.00458678137417018,
+            "volume": 46131100,
+            "prev_volume": 43992400
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-16T00:35:09.543639+00:00"
+        "fetched_at": "2026-09-16T17:34:29.291646+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
         "lookback": 25,
-        "count": 7,
+        "count": 6,
         "days": [
-          {
-            "date": "2026-08-11",
-            "drop_pct": -0.0033570309855424736,
-            "volume": 29286100,
-            "prev_volume": 26243200
-          },
           {
             "date": "2026-08-18",
             "drop_pct": -0.016934502629578557,
@@ -149,7 +149,7 @@
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-16T00:35:09.646694+00:00"
+        "fetched_at": "2026-09-16T17:34:29.419786+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -157,7 +157,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-09-16T00:35:09.647673+00:00"
+      "fetched_at": "2026-09-16T17:34:29.420693+00:00"
     },
     "bubble": {
       "score": 0,
@@ -173,9 +173,9 @@
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-09-15T20:35:10.309832-04:00"
+        "fetched_at": "2026-09-16T13:34:29.787655-04:00"
       },
-      "fetched_at": "2026-09-16T00:35:10.309871+00:00"
+      "fetched_at": "2026-09-16T17:34:29.787692+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -185,35 +185,35 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-09-16T00:35:10.756140+00:00"
+      "fetched_at": "2026-09-16T17:34:30.492419+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 17.200000762939453,
-        "vix9d": 17.209999084472656,
-        "vix3m": 19.360000610351562,
-        "vix9d_inverted": true,
+        "vix": 16.84000015258789,
+        "vix9d": 16.479999542236328,
+        "vix3m": 19.229999542236328,
+        "vix9d_inverted": false,
         "vix3m_inverted": false
       },
       "modifiers": {
-        "sell_put": 15,
-        "leaps_entry": 15,
+        "sell_put": 0,
+        "leaps_entry": 0,
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-09-16T00:35:10.817672+00:00"
+      "fetched_at": "2026-09-16T17:34:30.531408+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-16T00:35:15.168115+00:00"
+      "fetched_at": "2026-09-16T17:34:34.696095+00:00"
     }
   },
   "aggregate_modifiers": {
     "sell_call": 2,
-    "sell_put": 10,
-    "leaps_entry": 5,
+    "sell_put": -5,
+    "leaps_entry": -10,
     "leaps_entry_veto": false
   }
 }
