@@ -37805,12 +37805,12 @@
       "post_id": "117288682914955882",
       "created_at": "2026-09-17T22:14:32.018Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-17T23:42:53.374163+00:00",
       "resolved_at": null,
       "run_id": "35287958559",
       "workflow_attempt_id": "35287958559:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117288669331309351": {
       "post_id": "117288669331309351",
