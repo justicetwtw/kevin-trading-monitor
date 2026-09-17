@@ -1,107 +1,6 @@
 {
   "schema_version": 1,
   "sessions": {
-    "us_open:2026-08-26": {
-      "schema_version": 1,
-      "brief_type": "us_open",
-      "session_date_et": "2026-08-26",
-      "session_key": "us_open:2026-08-26",
-      "expected_at_taipei": "2026-08-26T21:30:00+08:00",
-      "workflow_started_at": "2026-08-26T14:20:26Z",
-      "runner_started_at": "2026-08-26T22:21:08.340102+08:00",
-      "generation_started_at": "2026-08-26T22:21:08.770116+08:00",
-      "generation_finished_at": "2026-08-26T22:21:24.577146+08:00",
-      "sent_at": "2026-08-26T22:21:27.670122+08:00",
-      "lateness_minutes": 51,
-      "schedule_source": "32 13 * * 1-5",
-      "workflow_run_id": "32979661250",
-      "workflow_attempt_id": "32979661250:1",
-      "delivery_state": "sent",
-      "status": "intraday_recovery",
-      "stage_code": null,
-      "observed_attempts": [
-        {
-          "at": "2026-08-26T22:21:27.670333+08:00",
-          "outcome": "sent",
-          "stage_code": null,
-          "status": "intraday_recovery",
-          "lateness_minutes": 51,
-          "workflow_run_id": "32979661250",
-          "schedule_source": "32 13 * * 1-5",
-          "workflow_started_at": "2026-08-26T14:20:26Z"
-        },
-        {
-          "at": "2026-08-26T22:25:00.571124+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32980043438",
-          "schedule_source": "39 13 * * 1-5",
-          "workflow_started_at": "2026-08-26T14:24:07Z"
-        },
-        {
-          "at": "2026-08-26T22:29:34.364018+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32980528344",
-          "schedule_source": "48 13 * * 1-5",
-          "workflow_started_at": "2026-08-26T14:28:48Z"
-        },
-        {
-          "at": "2026-08-26T22:52:07.574402+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32982847576",
-          "schedule_source": "3 14 * * 1-5",
-          "workflow_started_at": "2026-08-26T14:51:19Z"
-        },
-        {
-          "at": "2026-08-26T23:58:07.999386+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32986437557",
-          "schedule_source": "32 14 * * 1-5",
-          "workflow_started_at": "2026-08-26T15:57:29Z"
-        },
-        {
-          "at": "2026-08-27T00:04:10.949305+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32986688214",
-          "schedule_source": "39 14 * * 1-5",
-          "workflow_started_at": "2026-08-26T16:03:30Z"
-        },
-        {
-          "at": "2026-08-27T00:05:29.484859+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32986745213",
-          "schedule_source": "48 14 * * 1-5",
-          "workflow_started_at": "2026-08-26T16:04:49Z"
-        },
-        {
-          "at": "2026-08-27T00:25:36.565793+08:00",
-          "outcome": "duplicate",
-          "stage_code": null,
-          "status": null,
-          "lateness_minutes": null,
-          "workflow_run_id": "32988245548",
-          "schedule_source": "3 15 * * 1-5",
-          "workflow_started_at": "2026-08-26T16:24:54Z"
-        }
-      ]
-    },
     "us_open:2026-08-27": {
       "schema_version": 1,
       "brief_type": "us_open",
@@ -1586,6 +1485,26 @@
           "workflow_started_at": "2026-09-16T18:49:53Z"
         }
       ]
+    },
+    "us_open:2026-09-17": {
+      "schema_version": 1,
+      "brief_type": "us_open",
+      "session_date_et": "2026-09-17",
+      "session_key": "us_open:2026-09-17",
+      "expected_at_taipei": "2026-09-17T21:30:00+08:00",
+      "workflow_started_at": "2026-09-17T17:43:26Z",
+      "runner_started_at": "2026-09-18T01:44:06.734776+08:00",
+      "generation_started_at": "2026-09-18T01:44:06.992608+08:00",
+      "generation_finished_at": "2026-09-18T01:44:21.371661+08:00",
+      "sent_at": null,
+      "lateness_minutes": 254,
+      "schedule_source": "32 13 * * 1-5",
+      "workflow_run_id": "35254449674",
+      "workflow_attempt_id": "35254449674:1",
+      "delivery_state": "claimed",
+      "status": "intraday_recovery",
+      "stage_code": null,
+      "observed_attempts": []
     }
   }
 }
