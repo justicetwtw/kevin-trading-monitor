@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T11:58:18.244963+00:00",
+  "generated_at": "2026-09-18T01:22:09.008435+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -20,13 +20,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 927.599976,
-        "as_of": "2026-09-15T00:00:00-04:00",
-        "return_1m": -0.045345,
-        "return_3m": -0.147419,
-        "return_6m": 1.099593,
-        "pct_from_52w_high": -0.260877,
-        "realized_vol_20d": 0.544147,
+        "current_price": 926.549988,
+        "as_of": "2026-09-16T00:00:00-04:00",
+        "return_1m": -0.084211,
+        "return_3m": -0.092294,
+        "return_6m": 1.006866,
+        "pct_from_52w_high": -0.261713,
+        "realized_vol_20d": 0.484309,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -54,8 +54,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 4.3,
-      "ivp": 4.5,
+      "ivr": 0.6,
+      "ivp": 1.1,
       "regime": "risk_on",
       "missing_inputs": [
         "catalyst_not_future",
@@ -83,13 +83,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 212.169998,
-        "as_of": "2026-09-15T00:00:00-04:00",
-        "return_1m": -0.057692,
-        "return_3m": -0.001318,
-        "return_6m": 0.158007,
-        "pct_from_52w_high": -0.103027,
-        "realized_vol_20d": 0.460858,
+        "current_price": 213.899994,
+        "as_of": "2026-09-16T00:00:00-04:00",
+        "return_1m": -0.049376,
+        "return_3m": 0.031291,
+        "return_6m": 0.175727,
+        "pct_from_52w_high": -0.095713,
+        "realized_vol_20d": 0.455483,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -113,8 +113,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 16.0,
-      "ivp": 10.1,
+      "ivr": 0.0,
+      "ivp": 0.0,
       "regime": "risk_on",
       "missing_inputs": [
         "catalyst_not_future",
@@ -142,13 +142,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 838.960022,
-        "as_of": "2026-09-15T00:00:00-04:00",
-        "return_1m": -0.094133,
-        "return_3m": -0.123564,
-        "return_6m": 0.34268,
-        "pct_from_52w_high": -0.227249,
-        "realized_vol_20d": 0.897268,
+        "current_price": 919.400024,
+        "as_of": "2026-09-16T00:00:00-04:00",
+        "return_1m": -0.051089,
+        "return_3m": 0.050311,
+        "return_6m": 0.41542,
+        "pct_from_52w_high": -0.153157,
+        "realized_vol_20d": 0.895541,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -204,13 +204,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 1530.89502,
-        "as_of": "2026-09-15T00:00:00-04:00",
-        "return_1m": -0.067159,
-        "return_3m": -0.273721,
-        "return_6m": 1.17571,
-        "pct_from_52w_high": -0.34977,
-        "realized_vol_20d": 0.698195,
+        "current_price": 1519.969971,
+        "as_of": "2026-09-16T00:00:00-04:00",
+        "return_1m": -0.149358,
+        "return_3m": -0.23679,
+        "return_6m": 1.110571,
+        "pct_from_52w_high": -0.35441,
+        "realized_vol_20d": 0.625118,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -328,7 +328,7 @@
   "market_context_health": {
     "status": "healthy",
     "stale": false,
-    "generated_at": "2026-09-17T00:38:15.868426+00:00",
+    "generated_at": "2026-09-18T00:26:59.665023+00:00",
     "unavailable_count": 0,
     "partial_count": 0,
     "contract": "market_context_only_not_valuation_or_trade_instruction"
