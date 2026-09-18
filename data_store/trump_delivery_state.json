@@ -38135,12 +38135,12 @@
       "post_id": "117293447626672058",
       "created_at": "2026-09-18T18:26:15.749Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-18T21:01:01.557611+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-18T21:01:04.540312+00:00",
       "run_id": "35394406240",
       "workflow_attempt_id": "35394406240:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117293443739276008": {
       "post_id": "117293443739276008",
