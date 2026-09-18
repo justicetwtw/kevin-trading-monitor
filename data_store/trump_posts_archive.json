@@ -54414,10 +54414,22 @@
       },
       "tier2": {}
     },
-    "captured_at": "2026-09-18T22:35:24.195714+00:00",
-    "events": [
-      "hormuz_iran"
-    ],
-    "scan_time": "2026-09-18T22:35:24.283839+00:00"
+    "captured_at": "2026-09-18T23:07:02.650867+00:00"
+  },
+  "117294485458402353": {
+    "id": "117294485458402353",
+    "created_at": "2026-09-18T22:50:11.806Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117294485458402353",
+    "text": "TOP 25 TRUMP ACCOMPLISHMENTS OF TERM THREE:",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-18T23:07:02.650698+00:00"
   }
 }
