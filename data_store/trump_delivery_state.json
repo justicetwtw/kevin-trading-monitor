@@ -38003,12 +38003,12 @@
       "post_id": "117293999250317993",
       "created_at": "2026-09-18T20:46:32.858Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-18T21:02:06.639453+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-18T21:02:10.075678+00:00",
       "run_id": "35394406240",
       "workflow_attempt_id": "35394406240:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117293599348325006": {
       "post_id": "117293599348325006",
