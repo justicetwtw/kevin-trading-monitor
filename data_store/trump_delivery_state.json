@@ -38366,12 +38366,12 @@
       "post_id": "117305109272193640",
       "created_at": "2026-09-20T19:51:58.337Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-20T21:37:34.500620+00:00",
       "resolved_at": null,
       "run_id": "35539229390",
       "workflow_attempt_id": "35539229390:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
