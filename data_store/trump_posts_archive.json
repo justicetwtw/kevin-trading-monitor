@@ -54724,5 +54724,77 @@
       "tier2": {}
     },
     "captured_at": "2026-09-21T01:23:17.551321+00:00"
+  },
+  "117307260504631667": {
+    "id": "117307260504631667",
+    "created_at": "2026-09-21T04:59:03.540Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117307260504631667",
+    "text": "Trump bans CNN, MSNOW, and Politico from White House: https://justthenews.com/politics-policy/all-things-trump/trump-bans-cnn-msnow-and-politico-white-house",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-21T06:33:39.936061+00:00"
+  },
+  "117307257715841389": {
+    "id": "117307257715841389",
+    "created_at": "2026-09-21T04:58:20.987Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117307257715841389",
+    "text": "Biden-era inspection reports expose Kennedy Center disrepair, safety hazards that Trump seeks to fix: https://justthenews.com/politics-policy/all-things-trump/biden-era-inspections-exposed-kennedy-center-disrepair-safety",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-21T06:33:39.936146+00:00"
+  },
+  "117307255154500060": {
+    "id": "117307255154500060",
+    "created_at": "2026-09-21T04:57:41.904Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117307255154500060",
+    "text": "Prosecutors zero in on John Brennan's role in Trump-Russia collusion narrative in conspiracy case: https://justthenews.com/government/courts-law/prosecutors-zero-john-brennans-role-trump-russia-collusion-narrative",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-21T06:33:39.936211+00:00"
+  },
+  "117306567834657729": {
+    "id": "117306567834657729",
+    "created_at": "2026-09-21T02:02:54.235Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117306567834657729",
+    "text": "Gas prices were much higher under Biden than under \"TRUMP.\" So were almost all other prices. President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "gas prices"
+        ]
+      }
+    },
+    "captured_at": "2026-09-21T06:33:39.936262+00:00"
   }
 }
