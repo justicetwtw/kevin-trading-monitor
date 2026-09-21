@@ -38410,12 +38410,12 @@
       "post_id": "117307257715841389",
       "created_at": "2026-09-21T04:58:20.987Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-21T06:33:59.529671+00:00",
       "resolved_at": null,
       "run_id": "35568953581",
       "workflow_attempt_id": "35568953581:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117307255154500060": {
       "post_id": "117307255154500060",
