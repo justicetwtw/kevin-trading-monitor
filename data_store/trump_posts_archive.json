@@ -54796,5 +54796,80 @@
       }
     },
     "captured_at": "2026-09-21T06:33:39.936262+00:00"
+  },
+  "117308930224398545": {
+    "id": "117308930224398545",
+    "created_at": "2026-09-21T12:03:41.441Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117308930224398545",
+    "text": "Russia has unfortunately lost control of its Diesel Oil Industry due to its War with Ukraine. A large number of their Diesel refineries have been blown up and are, at least temporarily, out of commission. This ridiculous and never ending War with Ukraine must be ended. The whole World suffers as 25,000 people, mostly soldiers, are being killed each month. What a shame! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-21T13:15:58.978097+00:00"
+  },
+  "117308890736529824": {
+    "id": "117308890736529824",
+    "created_at": "2026-09-21T11:53:38.904Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117308890736529824",
+    "text": "The White House is not instituting an assault on the Free Press, something which I cherish. It is instituting an assault on the FAKE NEWS, something that has grown like Cancer in our beloved United States of America. It is corrupt, purposeful, pervasive, fully coordinated, and totally out of control. It is a threat to our National Security, and must be stopped, NOW! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-21T13:15:58.978213+00:00"
+  },
+  "117307292070204943": {
+    "id": "117307292070204943",
+    "created_at": "2026-09-21T05:07:05.192Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117307292070204943",
+    "text": "https://truthsocial.com/@breitbartnews/117305295296594991",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-21T13:15:58.978260+00:00"
+  },
+  "117307289681145880": {
+    "id": "117307289681145880",
+    "created_at": "2026-09-21T05:06:28.739Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117307289681145880",
+    "text": "https://truthsocial.com/@realDonaldTrump/117304284426928910",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-21T13:15:58.978303+00:00"
   }
 }
