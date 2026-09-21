@@ -54708,5 +54708,21 @@
       "tier2": {}
     },
     "captured_at": "2026-09-20T23:29:38.209259+00:00"
+  },
+  "117306342307545273": {
+    "id": "117306342307545273",
+    "created_at": "2026-09-21T01:05:32.964Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117306342307545273",
+    "text": "Hitting balls with Bryson D.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-21T01:23:17.551321+00:00"
   }
 }
