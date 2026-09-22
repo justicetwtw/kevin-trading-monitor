@@ -5,7 +5,7 @@
       "regime": "risk_on"
     },
     "hy_oas": {
-      "value": 268.0,
+      "value": 266.0,
       "regime": "risk_on"
     },
     "dxy": {
@@ -25,5 +25,5 @@
   "risk_off_count": 1,
   "modifier": 10,
   "regime": "risk_on",
-  "fetched_at": "2026-09-22T20:29:45.557479+00:00"
+  "fetched_at": "2026-09-22T22:57:34.118551+00:00"
 }
