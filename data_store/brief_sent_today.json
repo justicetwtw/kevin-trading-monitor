@@ -39,6 +39,7 @@
   "2026-09-22": {
     "us_premarket": true,
     "us_midday": true,
-    "us_eod": true
+    "us_eod": true,
+    "tw_open": true
   }
 }
