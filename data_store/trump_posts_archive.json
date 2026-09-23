@@ -55274,5 +55274,100 @@
       "tier2": {}
     },
     "captured_at": "2026-09-22T23:43:27.520358+00:00"
+  },
+  "117318371569831036": {
+    "id": "117318371569831036",
+    "created_at": "2026-09-23T04:04:44.940Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117318371569831036",
+    "text": "Ruddy: 'A Rising Trump Lifts All Boats': https://www.newsmax.com/ruddy/ruddy-donald-trump-economy/2026/09/13/id/1269294/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "market_general": [
+          "economy"
+        ]
+      }
+    },
+    "captured_at": "2026-09-23T06:45:36.187678+00:00"
+  },
+  "117318370203435194": {
+    "id": "117318370203435194",
+    "created_at": "2026-09-23T04:04:24.091Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117318370203435194",
+    "text": "Azerbaijan's Hajiyev to Newsmax: Trump Peacemaker, Iran Deal Possible: https://www.newsmax.com/newsfront/azerbaijan-ilham-aliyev-armenia/2026/09/14/id/1269433/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-23T06:45:36.187759+00:00"
+  },
+  "117318368847920040": {
+    "id": "117318368847920040",
+    "created_at": "2026-09-23T04:04:03.407Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117318368847920040",
+    "text": "Netanyahu Bloc Takes Lead in Latest Israeli Election Poll: https://www.newsmax.com/newsfront/israel-benjamin-netanyahu-likud/2026/09/17/id/1269830/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-23T06:45:36.187818+00:00"
+  },
+  "117318365806497574": {
+    "id": "117318365806497574",
+    "created_at": "2026-09-23T04:03:16.999Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117318365806497574",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-23T06:45:36.187837+00:00"
+  },
+  "117318329260090686": {
+    "id": "117318329260090686",
+    "created_at": "2026-09-23T03:53:59.344Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117318329260090686",
+    "text": "All of the SLEAZEBAGS, like Third Rate \"Reporter,\" Kaitlan Collins, of Fake News CNN, a truly unhappy person, said they weren't going to be covering me. Then why were they ranting and raving like Lunatics, in the Press Area, at the United Nations? Why was she there? She's got a \"TRUMP\" addiction, and so does CNN and MSDNC. They're all sick, treasonous, and demented! The \"good news\" is that they have a great, for them, and totally disloyal Judge. MAKE AMERICA GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-23T06:45:36.187921+00:00"
   }
 }
