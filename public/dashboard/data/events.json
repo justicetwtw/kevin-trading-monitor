@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-22T19:57:10.585169+08:00",
+  "generated_at": "2026-09-23T09:37:14.973714+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -26,7 +26,7 @@
       },
       {
         "symbol": "UEC",
-        "earnings_date": "2026-09-24"
+        "earnings_date": "2026-09-29"
       },
       {
         "symbol": "MU",
@@ -141,10 +141,6 @@
         "earnings_date": "2026-10-29"
       },
       {
-        "symbol": "QCOM",
-        "earnings_date": "2026-10-29"
-      },
-      {
         "symbol": "AAPL",
         "earnings_date": "2026-10-29"
       },
@@ -195,6 +191,10 @@
       {
         "symbol": "KTOS",
         "earnings_date": "2026-11-03"
+      },
+      {
+        "symbol": "QCOM",
+        "earnings_date": "2026-11-04"
       },
       {
         "symbol": "MELI",
