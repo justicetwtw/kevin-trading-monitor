@@ -38729,12 +38729,12 @@
       "post_id": "117320385350427395",
       "created_at": "2026-09-23T12:36:52.794Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-23T17:02:42.782131+00:00",
       "resolved_at": null,
       "run_id": "35892784244",
       "workflow_attempt_id": "35892784244:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
