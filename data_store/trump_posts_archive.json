@@ -56071,5 +56071,68 @@
       }
     },
     "captured_at": "2026-09-25T00:44:21.264308+00:00"
+  },
+  "117331749278785253": {
+    "id": "117331749278785253",
+    "created_at": "2026-09-25T12:46:52.579Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117331749278785253",
+    "text": "Very productive meeting with President Xi for both the U.S.A. and China. Tremendous things will be happening. Like almost everyone else, he seemed to like calling the poorly and inaccurately named Artificial Intelligence to a far more accurate and important name, SUPER INTELLIGENCE. That would be \"SUPER!\" Everyone last night agreed, also. President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Intel"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "China"
+        ],
+        "tech_broad": [
+          "artificial intelligence"
+        ]
+      }
+    },
+    "captured_at": "2026-09-25T15:20:54.354209+00:00"
+  },
+  "117331365166932627": {
+    "id": "117331365166932627",
+    "created_at": "2026-09-25T11:09:11.497Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117331365166932627",
+    "text": "RT @Schoenlawhttps://www.census.gov/newsroom/press-releases/2026/income-poverty-health-insurance-coverage.html",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-25T15:20:54.354291+00:00"
+  },
+  "117331168888375355": {
+    "id": "117331168888375355",
+    "created_at": "2026-09-25T10:19:16.524Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117331168888375355",
+    "text": "God bless American Patriot and Warrior, James Copenhaver, and his incredible family. May he rest in peace!!! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-25T15:20:54.354344+00:00"
   }
 }
