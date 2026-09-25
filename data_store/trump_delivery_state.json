@@ -39092,12 +39092,12 @@
       "post_id": "117331168888375355",
       "created_at": "2026-09-25T10:19:16.524Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-09-25T15:21:02.528068+00:00",
       "resolved_at": null,
       "run_id": "36153449488",
       "workflow_attempt_id": "36153449488:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
