@@ -39950,12 +39950,12 @@
       "post_id": "117339595987738159",
       "created_at": "2026-09-26T22:02:23.856Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-26T22:50:17.751691+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-26T22:50:20.623923+00:00",
       "run_id": "36277464483",
       "workflow_attempt_id": "36277464483:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117339595344002712": {
       "post_id": "117339595344002712",
