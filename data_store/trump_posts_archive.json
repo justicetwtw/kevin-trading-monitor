@@ -56611,5 +56611,533 @@
       "tier2": {}
     },
     "captured_at": "2026-09-26T05:33:49.474947+00:00"
+  },
+  "117337563385196014": {
+    "id": "117337563385196014",
+    "created_at": "2026-09-26T13:25:28.803Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337563385196014",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879920+00:00"
+  },
+  "117337562817997862": {
+    "id": "117337562817997862",
+    "created_at": "2026-09-26T13:25:20.148Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337562817997862",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879955+00:00"
+  },
+  "117337562138904273": {
+    "id": "117337562138904273",
+    "created_at": "2026-09-26T13:25:09.787Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337562138904273",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879966+00:00"
+  },
+  "117337561585606406": {
+    "id": "117337561585606406",
+    "created_at": "2026-09-26T13:25:01.343Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337561585606406",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879975+00:00"
+  },
+  "117337555438970724": {
+    "id": "117337555438970724",
+    "created_at": "2026-09-26T13:23:27.553Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337555438970724",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879983+00:00"
+  },
+  "117337555068452986": {
+    "id": "117337555068452986",
+    "created_at": "2026-09-26T13:23:21.900Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337555068452986",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879990+00:00"
+  },
+  "117337554905327419": {
+    "id": "117337554905327419",
+    "created_at": "2026-09-26T13:23:19.410Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337554905327419",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.879998+00:00"
+  },
+  "117337554252680986": {
+    "id": "117337554252680986",
+    "created_at": "2026-09-26T13:23:09.453Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337554252680986",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880009+00:00"
+  },
+  "117337552716803527": {
+    "id": "117337552716803527",
+    "created_at": "2026-09-26T13:22:46.017Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337552716803527",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880017+00:00"
+  },
+  "117337545332163657": {
+    "id": "117337545332163657",
+    "created_at": "2026-09-26T13:20:53.337Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337545332163657",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880028+00:00"
+  },
+  "117337544317575633": {
+    "id": "117337544317575633",
+    "created_at": "2026-09-26T13:20:37.857Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337544317575633",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880036+00:00"
+  },
+  "117337541233609775": {
+    "id": "117337541233609775",
+    "created_at": "2026-09-26T13:19:50.798Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337541233609775",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880043+00:00"
+  },
+  "117337538836314073": {
+    "id": "117337538836314073",
+    "created_at": "2026-09-26T13:19:14.217Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337538836314073",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880051+00:00"
+  },
+  "117337538123089885": {
+    "id": "117337538123089885",
+    "created_at": "2026-09-26T13:19:03.334Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337538123089885",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880058+00:00"
+  },
+  "117337537057603991": {
+    "id": "117337537057603991",
+    "created_at": "2026-09-26T13:18:47.077Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337537057603991",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880066+00:00"
+  },
+  "117337535044080608": {
+    "id": "117337535044080608",
+    "created_at": "2026-09-26T13:18:16.353Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337535044080608",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880073+00:00"
+  },
+  "117337515298516566": {
+    "id": "117337515298516566",
+    "created_at": "2026-09-26T13:13:15.058Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337515298516566",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.880081+00:00"
+  },
+  "117337317276437965": {
+    "id": "117337317276437965",
+    "created_at": "2026-09-26T12:22:53.480Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337317276437965",
+    "text": "FAKE NEWS SHOULD NOT BE ALLOWED IN THE WHITE HOUSE!!! IT HAS GONE ON FAR TOO LONG, AT A TREMENDOUS COST TO OUR COUNTRY. President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.882901+00:00"
+  },
+  "117337298336162712": {
+    "id": "117337298336162712",
+    "created_at": "2026-09-26T12:18:04.475Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337298336162712",
+    "text": "IRAN CAN NOT HAVE A NUCLEAR WEAPON!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.882951+00:00"
+  },
+  "117337288574793449": {
+    "id": "117337288574793449",
+    "created_at": "2026-09-26T12:15:35.529Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117337288574793449",
+    "text": "A MUST SEE ON THE CLIMATE HOAX. President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.882984+00:00"
+  },
+  "117336958253518518": {
+    "id": "117336958253518518",
+    "created_at": "2026-09-26T10:51:35.225Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336958253518518",
+    "text": "Why should perpetrators of FAKE NEWS, like CNN and MSDNC, be allowed access to a very sacred place, the White House? Despite my big Election Win, almost 100% of \"TRUMP\" coverage is negative, and has been for years!Defiant White House slaps down journalists: 'Access is a privilege - not a right': https://justthenews.com/politics-policy/defiant-white-house-slaps-down-journalists-access-privilege-not-right",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "100%"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883026+00:00"
+  },
+  "117336955762275361": {
+    "id": "117336955762275361",
+    "created_at": "2026-09-26T10:50:57.212Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336955762275361",
+    "text": "Animal welfare groups praise Trump administration for more moves to reduce animal testing: https://justthenews.com/government/federal-agencies/animal-welfare-groups-praise-trump-administration-more-moves-reduce",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-09-26T14:27:06.883066+00:00"
+  },
+  "117336883864922392": {
+    "id": "117336883864922392",
+    "created_at": "2026-09-26T10:32:40.145Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336883864922392",
+    "text": "Keep the lights on, sideline Big Brother: Trump EPA rollback could save ratepayers $310 billion: https://justthenews.com/government/federal-agencies/trumps-epa-gets-action-roots-out-30-billion-waste-fraud-and-abuse",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883104+00:00"
+  },
+  "117336881513699850": {
+    "id": "117336881513699850",
+    "created_at": "2026-09-26T10:32:04.269Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336881513699850",
+    "text": "Feds arrest, indict hundreds in Trump voter fraud crackdown: 'Catching it all over the country': https://justthenews.com/politics-policy/elections/feds-have-arrested-indicted-hundreds-voter-fraud-crackdown-catching-it",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883144+00:00"
+  },
+  "117336880365536098": {
+    "id": "117336880365536098",
+    "created_at": "2026-09-26T10:31:46.749Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336880365536098",
+    "text": "Agent in Jack Smith case says he was kept in dark that subpoenaed phone data belonged to Congress: https://justthenews.com/accountability/political-ethics/agent-jack-smith-case-says-he-was-kept-dark-subpoenaed-phone-data",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883188+00:00"
+  },
+  "117336878808999802": {
+    "id": "117336878808999802",
+    "created_at": "2026-09-26T10:31:22.999Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336878808999802",
+    "text": "Trump's U.N. speech reveals a world realigned by his policy and pressure, with China in the wings: https://justthenews.com/government/white-house/trump-0",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "China"
+        ]
+      }
+    },
+    "captured_at": "2026-09-26T14:27:06.883224+00:00"
+  },
+  "117336875720742753": {
+    "id": "117336875720742753",
+    "created_at": "2026-09-26T10:30:35.875Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336875720742753",
+    "text": "White House press monopoly exposes risks of news blackout, as RAV steps in with new pool feed: https://justthenews.com/government/white-house/real-first-amendment-issue-press-monopoly-creates-gaps-coverage-limits-news",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883267+00:00"
+  },
+  "117336873800272630": {
+    "id": "117336873800272630",
+    "created_at": "2026-09-26T10:30:06.571Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336873800272630",
+    "text": "Fantastic news for America!SCOTUS reinstates Trump's voter citizenship verification rules: https://justthenews.com/government/courts-law/scotus-reinstates-trumps-voter-citizenship-verification-rules",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883309+00:00"
+  },
+  "117336867875974840": {
+    "id": "117336867875974840",
+    "created_at": "2026-09-26T10:28:36.173Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336867875974840",
+    "text": "Justice Department charges four aliens in Pennsylvania with election fraud: https://justthenews.com/government/federal-agencies/justice-department-charges-four-migrants-pennsylvania-election-fraud",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883347+00:00"
+  },
+  "117336866629561228": {
+    "id": "117336866629561228",
+    "created_at": "2026-09-26T10:28:17.155Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336866629561228",
+    "text": "Two-tiered justice: Local DAs shield noncitizens from immigration consequences: https://justthenews.com/nation/crime/two-tiered-justice-local-das-shield-noncitizens-immigration-consequences",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883389+00:00"
+  },
+  "117336865039856065": {
+    "id": "117336865039856065",
+    "created_at": "2026-09-26T10:27:52.898Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117336865039856065",
+    "text": "A big WIN for Republicans!!!Trump stacks wins: SCOTUS unleashes voter citizenship checks while feds put machines on leash: https://justthenews.com/government/white-house/supreme-court-cisa",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-09-26T14:27:06.883424+00:00"
   }
 }
