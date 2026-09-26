@@ -39609,12 +39609,12 @@
       "post_id": "117337288574793449",
       "created_at": "2026-09-26T12:15:35.529Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-09-26T14:28:21.181949+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-09-26T14:28:24.505479+00:00",
       "run_id": "36248494508",
       "workflow_attempt_id": "36248494508:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117336958253518518": {
       "post_id": "117336958253518518",
