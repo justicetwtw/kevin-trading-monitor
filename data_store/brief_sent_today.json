@@ -1,9 +1,4 @@
 {
-  "2026-09-21": {
-    "tw_open": true,
-    "tw_close": true,
-    "us_premarket": true
-  },
   "2026-09-22": {
     "us_premarket": true,
     "us_midday": true,
@@ -39,5 +34,8 @@
   "2026-09-28": {
     "tw_open": true,
     "tw_close": true
+  },
+  "2026-09-29": {
+    "us_premarket": true
   }
 }
