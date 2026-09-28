@@ -1472,15 +1472,15 @@
       "session_date_et": "2026-09-28",
       "session_key": "us_open:2026-09-28",
       "expected_at_taipei": "2026-09-28T21:30:00+08:00",
-      "workflow_started_at": "2026-09-28T20:12:22Z",
-      "runner_started_at": "2026-09-29T04:13:08.411030+08:00",
+      "workflow_started_at": "2026-09-28T20:13:21Z",
+      "runner_started_at": "2026-09-29T04:14:10.736623+08:00",
       "generation_started_at": null,
       "generation_finished_at": null,
       "sent_at": null,
-      "lateness_minutes": 403,
-      "schedule_source": "32 13 * * 1-5",
-      "workflow_run_id": "36477529258",
-      "workflow_attempt_id": "36477529258:1",
+      "lateness_minutes": 404,
+      "schedule_source": "39 13 * * 1-5",
+      "workflow_run_id": "36477644956",
+      "workflow_attempt_id": "36477644956:1",
       "delivery_state": "skipped",
       "status": "expired",
       "stage_code": "schedule_delay",
@@ -1494,6 +1494,16 @@
           "workflow_run_id": "36477529258",
           "schedule_source": "32 13 * * 1-5",
           "workflow_started_at": "2026-09-28T20:12:22Z"
+        },
+        {
+          "at": "2026-09-29T04:14:11.190863+08:00",
+          "outcome": "expired_miss",
+          "stage_code": "schedule_delay",
+          "status": "expired",
+          "lateness_minutes": 404,
+          "workflow_run_id": "36477644956",
+          "schedule_source": "39 13 * * 1-5",
+          "workflow_started_at": "2026-09-28T20:13:21Z"
         }
       ]
     }
