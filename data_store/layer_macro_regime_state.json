@@ -17,7 +17,7 @@
       "regime": "risk_on"
     },
     "copper_gold": {
-      "value": NaN,
+      "value": 0.10499854441708245,
       "regime": "neutral"
     }
   },
@@ -25,5 +25,5 @@
   "risk_off_count": 1,
   "modifier": 10,
   "regime": "risk_on",
-  "fetched_at": "2026-09-29T00:22:35.069934+00:00"
+  "fetched_at": "2026-09-29T02:06:39.208319+00:00"
 }
