@@ -58663,5 +58663,21 @@
       "tier2": {}
     },
     "captured_at": "2026-09-29T12:41:36.295289+00:00"
+  },
+  "117355137125519227": {
+    "id": "117355137125519227",
+    "created_at": "2026-09-29T15:54:42.800Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117355137125519227",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-09-29T18:15:17.767440+00:00"
   }
 }
