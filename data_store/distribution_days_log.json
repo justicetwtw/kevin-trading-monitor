@@ -1,7 +1,7 @@
 {
   "symbol": "QQQ",
   "lookback": 25,
-  "count": 6,
+  "count": 5,
   "days": [
     {
       "date": "2026-08-24",
@@ -32,14 +32,8 @@
       "drop_pct": -0.007973383180531998,
       "volume": 35219000,
       "prev_volume": 26649100
-    },
-    {
-      "date": "2026-09-28",
-      "drop_pct": -0.01070513190480188,
-      "volume": 39057596,
-      "prev_volume": 30249200
     }
   ],
-  "level": "distribution",
-  "fetched_at": "2026-09-28T20:04:12.204026+00:00"
+  "level": "pressure",
+  "fetched_at": "2026-09-29T00:22:36.686880+00:00"
 }
