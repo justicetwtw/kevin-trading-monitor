@@ -1,10 +1,10 @@
 {
-  "scan_time": "2026-09-29T18:31:48.466510+00:00",
+  "scan_time": "2026-09-29T22:40:08.345607+00:00",
   "submodules": {
     "macro_regime": {
       "indicators": {
         "yield_curve": {
-          "value": 36.00000000000003,
+          "value": 32.00000000000003,
           "regime": "risk_on"
         },
         "hy_oas": {
@@ -16,11 +16,11 @@
           "regime": "risk_off"
         },
         "vix": {
-          "value": 16.170000076293945,
+          "value": 16.040000915527344,
           "regime": "risk_on"
         },
         "copper_gold": {
-          "value": 0.10430229857302654,
+          "value": 0.1042858230237181,
           "regime": "neutral"
         }
       },
@@ -28,7 +28,7 @@
       "risk_off_count": 1,
       "modifier": 5,
       "regime": "neutral",
-      "fetched_at": "2026-09-29T18:31:54.118206+00:00"
+      "fetched_at": "2026-09-29T22:40:11.033436+00:00"
     },
     "breadth": {
       "snapshot": {
@@ -36,11 +36,11 @@
         "spx_above_200ma_pct": null,
         "nyse_new_highs": null,
         "advance_decline_line": null,
-        "fetched_at": "2026-09-29T14:31:54.119256-04:00"
+        "fetched_at": "2026-09-29T18:40:11.034332-04:00"
       },
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-29T18:31:55.813045+00:00"
+      "fetched_at": "2026-09-29T22:40:13.024463+00:00"
     },
     "distribution": {
       "spy": {
@@ -99,12 +99,12 @@
           {
             "date": "2026-09-28",
             "drop_pct": -0.00744148624625904,
-            "volume": 42296700,
+            "volume": 42694500,
             "prev_volume": 36666700
           }
         ],
         "level": "distribution",
-        "fetched_at": "2026-09-29T18:31:55.952178+00:00"
+        "fetched_at": "2026-09-29T22:40:13.229843+00:00"
       },
       "qqq": {
         "symbol": "QQQ",
@@ -138,12 +138,12 @@
           {
             "date": "2026-09-28",
             "drop_pct": -0.01070513190480188,
-            "volume": 41716200,
+            "volume": 41775000,
             "prev_volume": 30283800
           }
         ],
         "level": "pressure",
-        "fetched_at": "2026-09-29T18:31:56.092046+00:00"
+        "fetched_at": "2026-09-29T22:40:13.416153+00:00"
       },
       "level": "distribution",
       "modifiers": {
@@ -151,7 +151,7 @@
         "sell_put": -15,
         "sell_call": 5
       },
-      "fetched_at": "2026-09-29T18:31:56.093100+00:00"
+      "fetched_at": "2026-09-29T22:40:13.417181+00:00"
     },
     "bubble": {
       "score": 0,
@@ -162,14 +162,14 @@
         "score": null,
         "indicators": {
           "buffett_indicator": 2.44,
-          "shiller_cape": 41.16,
+          "shiller_cape": 41.08,
           "sp500_top10_concentration": null,
           "margin_debt_yoy": null
         },
         "n_available": 2,
-        "fetched_at": "2026-09-29T14:31:56.724204-04:00"
+        "fetched_at": "2026-09-29T18:40:14.247019-04:00"
       },
-      "fetched_at": "2026-09-29T18:31:56.724244+00:00"
+      "fetched_at": "2026-09-29T22:40:14.247066+00:00"
     },
     "put_call": {
       "pcr": null,
@@ -179,13 +179,13 @@
         "sell_call": 0,
         "leaps_entry": 0
       },
-      "fetched_at": "2026-09-29T18:31:57.085923+00:00"
+      "fetched_at": "2026-09-29T22:40:15.131197+00:00"
     },
     "vix_structure": {
       "snapshot": {
-        "vix": 16.170000076293945,
-        "vix9d": 14.430000305175781,
-        "vix3m": 18.1299991607666,
+        "vix": 16.040000915527344,
+        "vix9d": 14.210000038146973,
+        "vix3m": 18.09000015258789,
         "vix9d_inverted": false,
         "vix3m_inverted": false
       },
@@ -195,13 +195,13 @@
         "sell_call": 0
       },
       "leaps_entry_veto": false,
-      "fetched_at": "2026-09-29T18:31:57.154067+00:00"
+      "fetched_at": "2026-09-29T22:40:15.249908+00:00"
     },
     "aaii": {
       "data": {},
       "modifier": 0,
       "regime": "cold_start",
-      "fetched_at": "2026-09-29T18:32:01.387556+00:00"
+      "fetched_at": "2026-09-29T22:40:19.523598+00:00"
     }
   },
   "aggregate_modifiers": {
