@@ -2,7 +2,7 @@
   "spy": {
     "symbol": "SPY",
     "lookback": 25,
-    "count": 9,
+    "count": 10,
     "days": [
       {
         "date": "2026-08-28",
@@ -57,10 +57,16 @@
         "drop_pct": -0.00744148624625904,
         "volume": 42694500,
         "prev_volume": 36666700
+      },
+      {
+        "date": "2026-09-30",
+        "drop_pct": -0.002054445562863215,
+        "volume": 61123546,
+        "prev_volume": 36910500
       }
     ],
     "level": "distribution",
-    "fetched_at": "2026-09-30T18:20:37.993295+00:00"
+    "fetched_at": "2026-09-30T22:30:52.365497+00:00"
   },
   "qqq": {
     "symbol": "QQQ",
@@ -99,7 +105,7 @@
       }
     ],
     "level": "pressure",
-    "fetched_at": "2026-09-30T18:20:38.122775+00:00"
+    "fetched_at": "2026-09-30T22:30:52.508874+00:00"
   },
   "level": "distribution",
   "modifiers": {
@@ -107,5 +113,5 @@
     "sell_put": -15,
     "sell_call": 5
   },
-  "fetched_at": "2026-09-30T18:20:38.123681+00:00"
+  "fetched_at": "2026-09-30T22:30:52.509883+00:00"
 }
