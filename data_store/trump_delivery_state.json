@@ -41050,12 +41050,12 @@
       "post_id": "117366845448721312",
       "created_at": "2026-10-01T17:32:17.634Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-01T19:42:29.829709+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-01T19:42:32.920714+00:00",
       "run_id": "36916040913",
       "workflow_attempt_id": "36916040913:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117366844728020252": {
       "post_id": "117366844728020252",
