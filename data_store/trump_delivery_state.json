@@ -40951,12 +40951,12 @@
       "post_id": "117363089683591337",
       "created_at": "2026-10-01T01:37:09.206Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-01T07:15:35.855962+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-01T07:15:40.008354+00:00",
       "run_id": "36829182377",
       "workflow_attempt_id": "36829182377:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117363088922196903": {
       "post_id": "117363088922196903",
