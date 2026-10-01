@@ -1476,15 +1476,26 @@
       "runner_started_at": "2026-10-02T03:00:37.436210+08:00",
       "generation_started_at": "2026-10-02T03:00:38.096531+08:00",
       "generation_finished_at": "2026-10-02T03:00:53.609407+08:00",
-      "sent_at": null,
+      "sent_at": "2026-10-02T03:00:57.536335+08:00",
       "lateness_minutes": 330,
       "schedule_source": "32 13 * * 1-5",
       "workflow_run_id": "36910971847",
       "workflow_attempt_id": "36910971847:1",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "status": "intraday_recovery",
       "stage_code": null,
-      "observed_attempts": []
+      "observed_attempts": [
+        {
+          "at": "2026-10-02T03:00:57.536564+08:00",
+          "outcome": "sent",
+          "stage_code": null,
+          "status": "intraday_recovery",
+          "lateness_minutes": 330,
+          "workflow_run_id": "36910971847",
+          "schedule_source": "32 13 * * 1-5",
+          "workflow_started_at": "2026-10-01T18:59:39Z"
+        }
+      ]
     }
   }
 }
