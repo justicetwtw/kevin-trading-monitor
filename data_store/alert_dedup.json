@@ -1,9 +1,7 @@
 {
   "LMT::leaps_entry": {
-    "last_sent": "2026-09-30T23:51:30.889281+00:00",
+    "last_sent": "2026-10-01T23:55:17.887741+00:00",
     "alert_level": "green",
-    "tags": [
-      "⚠Trump_Tier1"
-    ]
+    "tags": []
   }
 }
