@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-01T21:44:45.513062+08:00",
+  "generated_at": "2026-10-02T10:23:40.808328+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -21,20 +21,12 @@
         "earnings_date": "2026-08-27"
       },
       {
-        "symbol": "MU",
-        "earnings_date": "2026-09-30"
-      },
-      {
         "symbol": "ASML",
         "earnings_date": "2026-10-14"
       },
       {
         "symbol": "TSM",
         "earnings_date": "2026-10-15"
-      },
-      {
-        "symbol": "LMT",
-        "earnings_date": "2026-10-20"
       },
       {
         "symbol": "RTX",
@@ -51,6 +43,10 @@
       {
         "symbol": "TSLA",
         "earnings_date": "2026-10-21"
+      },
+      {
+        "symbol": "LMT",
+        "earnings_date": "2026-10-22"
       },
       {
         "symbol": "VLO",
@@ -315,6 +311,10 @@
       {
         "symbol": "ORCL",
         "earnings_date": "2026-12-10"
+      },
+      {
+        "symbol": "MU",
+        "earnings_date": "2026-12-23"
       }
     ]
   }
