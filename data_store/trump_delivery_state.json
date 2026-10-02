@@ -41248,12 +41248,12 @@
       "post_id": "117373586079029403",
       "created_at": "2026-10-02T22:06:31.491Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-02T23:17:26.439617+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-02T23:17:31.293217+00:00",
       "run_id": "37076749903",
       "workflow_attempt_id": "37076749903:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117373388463106981": {
       "post_id": "117373388463106981",
