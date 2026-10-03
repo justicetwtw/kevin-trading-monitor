@@ -41611,12 +41611,12 @@
       "post_id": "117377086414457258",
       "created_at": "2026-10-03T12:56:42.371Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-03T16:48:45.385779+00:00",
       "resolved_at": null,
       "run_id": "37138131222",
       "workflow_attempt_id": "37138131222:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117377074810245973": {
       "post_id": "117377074810245973",
