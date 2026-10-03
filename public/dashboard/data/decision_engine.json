@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-02T12:59:53.493567+00:00",
+  "generated_at": "2026-10-03T02:10:46.024793+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -88,7 +88,7 @@
         "return_1m": 0.061718,
         "return_3m": 0.18493,
         "return_6m": 0.31357,
-        "pct_from_52w_high": -0.024013,
+        "pct_from_52w_high": -0.02947,
         "realized_vol_20d": 0.250698,
         "source": "yfinance_delayed_public_market_data"
       },
@@ -113,8 +113,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 4.5,
-      "ivp": 4.0,
+      "ivr": 0.0,
+      "ivp": 0.0,
       "regime": "neutral",
       "missing_inputs": [
         "catalyst_not_future",
@@ -147,7 +147,7 @@
         "return_1m": 0.203498,
         "return_3m": 0.43588,
         "return_6m": 0.367658,
-        "pct_from_52w_high": -0.036751,
+        "pct_from_52w_high": -0.041984,
         "realized_vol_20d": 0.7951,
         "source": "yfinance_delayed_public_market_data"
       },
@@ -328,7 +328,7 @@
   "market_context_health": {
     "status": "healthy",
     "stale": false,
-    "generated_at": "2026-10-02T01:43:34.161704+00:00",
+    "generated_at": "2026-10-03T01:14:33.317481+00:00",
     "unavailable_count": 0,
     "partial_count": 0,
     "contract": "market_context_only_not_valuation_or_trade_instruction"
