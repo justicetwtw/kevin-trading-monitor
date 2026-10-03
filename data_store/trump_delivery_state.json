@@ -41446,12 +41446,12 @@
       "post_id": "117376711131261545",
       "created_at": "2026-10-03T11:21:16.005Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-03T12:52:30.123873+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-03T12:52:32.647656+00:00",
       "run_id": "37124199963",
       "workflow_attempt_id": "37124199963:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117376710253781330": {
       "post_id": "117376710253781330",
