@@ -41435,12 +41435,12 @@
       "post_id": "117374600935041605",
       "created_at": "2026-10-03T02:24:36.964Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-03T07:55:45.764864+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-03T07:55:48.950809+00:00",
       "run_id": "37107930010",
       "workflow_attempt_id": "37107930010:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
