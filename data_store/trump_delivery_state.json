@@ -41886,12 +41886,12 @@
       "post_id": "117383743484621823",
       "created_at": "2026-10-04T17:09:41.199Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-04T19:56:41.622429+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-04T19:56:44.938841+00:00",
       "run_id": "37230008181",
       "workflow_attempt_id": "37230008181:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117383742409715196": {
       "post_id": "117383742409715196",
