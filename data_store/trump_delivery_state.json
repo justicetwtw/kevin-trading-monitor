@@ -42128,12 +42128,12 @@
       "post_id": "117390550758872714",
       "created_at": "2026-10-05T22:00:51.961Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-05T22:13:51.146169+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-05T22:13:54.727027+00:00",
       "run_id": "37380907684",
       "workflow_attempt_id": "37380907684:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117390404347091382": {
       "post_id": "117390404347091382",
