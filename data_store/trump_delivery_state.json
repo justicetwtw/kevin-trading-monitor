@@ -42106,12 +42106,12 @@
       "post_id": "117386191183722432",
       "created_at": "2026-10-05T03:32:10.122Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-05T07:02:13.666118+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-05T07:02:17.485809+00:00",
       "run_id": "37275400484",
       "workflow_attempt_id": "37275400484:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
