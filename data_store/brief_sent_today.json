@@ -36,6 +36,7 @@
     "tw_close": true
   },
   "2026-10-07": {
-    "us_premarket": true
+    "us_premarket": true,
+    "us_midday": true
   }
 }
