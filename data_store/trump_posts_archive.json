@@ -61813,5 +61813,25 @@
       "tier2": {}
     },
     "captured_at": "2026-10-06T15:51:23.810094+00:00"
+  },
+  "117397200762855537": {
+    "id": "117397200762855537",
+    "created_at": "2026-10-07T02:12:02.968Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117397200762855537",
+    "text": "Jack Smith Spied on Trump Staffer's Communications and 20+ Lawyers: Report: https://usajournal.news/2026/10/05/jack-smith-spied-on-susie-wiles-phone-and-emails-while-she-ran-trumps-campaign/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-07T05:45:03.730795+00:00"
   }
 }
