@@ -42370,12 +42370,12 @@
       "post_id": "117399306525636867",
       "created_at": "2026-10-07T11:07:34.360Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-07T12:02:22.967331+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-07T12:02:26.778734+00:00",
       "run_id": "37618015858",
       "workflow_attempt_id": "37618015858:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117399305601073573": {
       "post_id": "117399305601073573",
