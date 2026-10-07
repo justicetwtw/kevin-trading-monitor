@@ -61833,5 +61833,85 @@
       }
     },
     "captured_at": "2026-10-07T05:45:03.730795+00:00"
+  },
+  "117399306894086851": {
+    "id": "117399306894086851",
+    "created_at": "2026-10-07T11:07:39.982Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117399306894086851",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T12:01:54.985033+00:00"
+  },
+  "117399306525636867": {
+    "id": "117399306525636867",
+    "created_at": "2026-10-07T11:07:34.360Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117399306525636867",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117399305601073573",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T12:01:54.985497+00:00"
+  },
+  "117399305601073573": {
+    "id": "117399305601073573",
+    "created_at": "2026-10-07T11:07:20.251Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117399305601073573",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T12:01:54.985519+00:00"
+  },
+  "117399304671862654": {
+    "id": "117399304671862654",
+    "created_at": "2026-10-07T11:07:06.074Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117399304671862654",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117399303994327712",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T12:01:54.985643+00:00"
+  },
+  "117399303994327712": {
+    "id": "117399303994327712",
+    "created_at": "2026-10-07T11:06:55.734Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117399303994327712",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T12:01:54.985662+00:00"
   }
 }
