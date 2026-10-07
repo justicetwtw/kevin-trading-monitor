@@ -61913,5 +61913,77 @@
       "tier2": {}
     },
     "captured_at": "2026-10-07T12:01:54.985662+00:00"
+  },
+  "117401043822124853": {
+    "id": "117401043822124853",
+    "created_at": "2026-10-07T18:29:23.399Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117401043822124853",
+    "text": "Steve Witkoff keeps the light on: https://www.washingtonexaminer.com/opinion/columnists/4755159/steve-witkoff-marc-fogel-reunion-russia-prisoner-exchange/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T18:48:26.913463+00:00"
+  },
+  "117400465758567373": {
+    "id": "117400465758567373",
+    "created_at": "2026-10-07T16:02:22.850Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117400465758567373",
+    "text": "Chris LaCivita and James Blair are outside consultants. They do not work for me, other than as outside consultants. They most likely have numerous clients, but for that, you would have to ask them. They are allowed to do work for others, just like all consultants in Washington, D.C. I do not have any idea who else they work for but will, on reflection, ask them and, if there's a conflict, I will terminate them, immediately! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-07T18:48:26.913658+00:00"
+  },
+  "117400280030146024": {
+    "id": "117400280030146024",
+    "created_at": "2026-10-07T15:15:08.859Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117400280030146024",
+    "text": "I just spoke with Tom Tiffany, who has my Complete and Total Endorsement to be the next Governor of the Great State of Wisconsin. I told Tom that I will be approving 17.9 Million Dollars for the Severe Storms and Tornadoes that Wisconsin has experienced. The people are tough and smart, and will come back stronger than ever — 18 Million Dollars should help, A LOT. See you soon Wisconsin — I LOVE YOU ALL! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T18:48:26.913823+00:00"
+  },
+  "117399931237063983": {
+    "id": "117399931237063983",
+    "created_at": "2026-10-07T13:46:26.698Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117399931237063983",
+    "text": "We Can't Trust Annie Andrews: https://www.youtube.com/watch?v=hNsGcNiCJ3U",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-07T18:48:26.913946+00:00"
   }
 }
