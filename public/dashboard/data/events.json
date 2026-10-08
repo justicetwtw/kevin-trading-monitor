@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-07T21:43:25.207332+08:00",
+  "generated_at": "2026-10-08T10:48:48.285175+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -41,6 +41,10 @@
         "earnings_date": "2026-10-21"
       },
       {
+        "symbol": "NEE",
+        "earnings_date": "2026-10-21"
+      },
+      {
         "symbol": "TSLA",
         "earnings_date": "2026-10-21"
       },
@@ -53,15 +57,7 @@
         "earnings_date": "2026-10-22"
       },
       {
-        "symbol": "INTC",
-        "earnings_date": "2026-10-22"
-      },
-      {
         "symbol": "GLW",
-        "earnings_date": "2026-10-27"
-      },
-      {
-        "symbol": "NEE",
         "earnings_date": "2026-10-27"
       },
       {
@@ -129,7 +125,7 @@
         "earnings_date": "2026-10-29"
       },
       {
-        "symbol": "AAPL",
+        "symbol": "INTC",
         "earnings_date": "2026-10-29"
       },
       {
@@ -151,6 +147,10 @@
       {
         "symbol": "CCJ",
         "earnings_date": "2026-10-30"
+      },
+      {
+        "symbol": "AAPL",
+        "earnings_date": "2026-11-02"
       },
       {
         "symbol": "PLTR",
