@@ -42535,12 +42535,12 @@
       "post_id": "117406176604364910",
       "created_at": "2026-10-08T16:14:43.441Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-08T16:48:46.419767+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-08T16:48:50.638987+00:00",
       "run_id": "37811542954",
       "workflow_attempt_id": "37811542954:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117405289555366837": {
       "post_id": "117405289555366837",
