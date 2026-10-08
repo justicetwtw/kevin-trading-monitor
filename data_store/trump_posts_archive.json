@@ -62100,5 +62100,73 @@
       "tier2": {}
     },
     "captured_at": "2026-10-08T09:29:44.391698+00:00"
+  },
+  "117406186276133332": {
+    "id": "117406186276133332",
+    "created_at": "2026-10-08T16:17:11.021Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117406186276133332",
+    "text": "We are having productive discussions with the Islamic Republic of Iran. I want to make it clear to everybody that, while Iran is in very bad condition, both Economically and Militarily, and while the Blockade will remain in full force and effect, with Oil flowing in Record Numbers of Barrels through the Hormuz Strait (22 Million Barrels, last night alone, with not one barrel coming from, or going to, Iran!), we will not be attacking Iran at any time prior to the Midterm Elections to be held in the United States on November 3rd. IRAN WILL NOT HAVE A NUCLEAR WEAPON! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack",
+          "Hormuz"
+        ]
+      },
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-08T16:48:29.193169+00:00"
+  },
+  "117406176604364910": {
+    "id": "117406176604364910",
+    "created_at": "2026-10-08T16:14:43.441Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117406176604364910",
+    "text": "The White House considers anyone that uses the term, \"Artificial Intelligence,\" as opposed to the highly accepted new and more accurate term, \"Super Intelligence,\" THE ENEMY! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Intel"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "artificial intelligence"
+        ]
+      }
+    },
+    "captured_at": "2026-10-08T16:48:29.193320+00:00"
+  },
+  "117405289555366837": {
+    "id": "117405289555366837",
+    "created_at": "2026-10-08T12:29:08.148Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117405289555366837",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-08T16:48:29.193341+00:00"
   }
 }
