@@ -42491,12 +42491,12 @@
       "post_id": "117403159101992814",
       "created_at": "2026-10-08T03:27:20.009Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-08T09:30:08.647008+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-08T09:30:13.196985+00:00",
       "run_id": "37756920892",
       "workflow_attempt_id": "37756920892:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117403140590234301": {
       "post_id": "117403140590234301",
