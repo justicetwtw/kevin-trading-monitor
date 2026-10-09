@@ -62411,5 +62411,66 @@
       }
     },
     "captured_at": "2026-10-09T19:40:24.521712+00:00"
+  },
+  "117413185767843476": {
+    "id": "117413185767843476",
+    "created_at": "2026-10-09T21:57:14.788Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117413185767843476",
+    "text": "RT @katiezachariaThank you to President Trump for the distinguished privilege of serving as White House Press Secretary.Serving President Trump and the American people at this critical 250-year mark is the honor of a lifetime. President Trump has shown America that we can be great again, and he works to effectuate that greatness every single day. His confidence is a true privilege, and his leadership is a blessing to this country.The work ahead is to continue delivering strong results for our Country and communicating to the American people the major wins that this Administration is making every single day. I look forward to working with the White House press corps, and with reporters across the country, to get that record out. Following the fabulous Karoline Leavitt is a high standard, and one worth meeting.God bless President Trump, and God bless America.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-09T23:29:23.408871+00:00"
+  },
+  "117412672479473994": {
+    "id": "117412672479473994",
+    "created_at": "2026-10-09T19:46:42.627Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117412672479473994",
+    "text": "It is my Great Honor to have just appointed, as Press Secretary, Katie Zacharia. Katie currently serves as Senior Communications Advisor to Truth Social (Trump Media & Technology Group), where she has been outstanding! A native of California, Katie previously served as Spokesperson and Deputy Assistant Secretary for Public Affairs at the Department of Homeland Security. Katie is a distinguished Graduate of Pepperdine University, and the Pepperdine Caruso School of Law, an attorney, and a frequent Commentator on outlets, including Fox News and Newsmax. She was previously involved in my Campaigns, assisting in key Swing States, where we won 7 out of 7. She has an unblemished record of support, and has been a loyal and brilliant supporter, right from the beginning. She is, likewise, a devoted fan and member of MAGA! I am confident that Katie will deliver strong results for our Country as the next White House Press Secretary, as she has the respect of, and will work fantastically with, the Media, the American People, and my Administration. Katie is replacing the fabulous Karoline Leavitt, who did a fantastic job as Press Secretary. Good luck Katie! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI",
+          "technology"
+        ]
+      }
+    },
+    "captured_at": "2026-10-09T23:29:23.409118+00:00"
+  },
+  "117412623263536077": {
+    "id": "117412623263536077",
+    "created_at": "2026-10-09T19:34:11.653Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117412623263536077",
+    "text": "Based on the fact that a huge Hurricane/Storm is coming, it is important to have our wonderful First Responders, Law Enforcement, and others, focused on that Storm, and in no way be thinking about the safety, or presence, of the President of the United States, ME! Therefore, I will miss that potentially unbelievable Game, Alabama vs.Georgia but, hopefully, the Game will go on despite the weather! I will be visiting both of those Teams at a later date. Instead, I will go to Tennessee, where we have quickly called a Big Rally in order to get our fantastic Congressional Candidates, our Great Senator, Bill Hagerty, and a woman who will go down as one of the most impactful Governors in the State's History, Marsha Blackburn, elected! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-09T23:29:23.409294+00:00"
   }
 }
