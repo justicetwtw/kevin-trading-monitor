@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-08T21:52:01.786527+08:00",
+  "generated_at": "2026-10-09T11:00:33.052977+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -54,6 +54,10 @@
       },
       {
         "symbol": "VLO",
+        "earnings_date": "2026-10-22"
+      },
+      {
+        "symbol": "WDC",
         "earnings_date": "2026-10-22"
       },
       {
@@ -206,10 +210,6 @@
       },
       {
         "symbol": "SO",
-        "earnings_date": "2026-11-05"
-      },
-      {
-        "symbol": "WDC",
         "earnings_date": "2026-11-05"
       },
       {
