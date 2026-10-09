@@ -62224,5 +62224,101 @@
       "tier2": {}
     },
     "captured_at": "2026-10-08T21:34:10.823460+00:00"
+  },
+  "117408281179466427": {
+    "id": "117408281179466427",
+    "created_at": "2026-10-09T01:09:56.709Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117408281179466427",
+    "text": "The Dumocrats are Scammers. These are the real FACTS!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-09T01:22:38.976298+00:00"
+  },
+  "117408228489272278": {
+    "id": "117408228489272278",
+    "created_at": "2026-10-09T00:56:32.720Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117408228489272278",
+    "text": "Melania Trump makes history presiding over UN Security Council — remarking on Iran war deaths: https://nypost.com/2026/03/02/us-news/melania-trump-makes-history-presiding-over-un-security-council-acknowledges-challenging-times/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-09T01:22:38.976479+00:00"
+  },
+  "117408226875989984": {
+    "id": "117408226875989984",
+    "created_at": "2026-10-09T00:56:08.103Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117408226875989984",
+    "text": "Trump's men at the United Nations: https://www.washingtonexaminer.com/magazine-features/4684766/trump-administration-push-reform-united-nations/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-09T01:22:38.976614+00:00"
+  },
+  "117408209620927226": {
+    "id": "117408209620927226",
+    "created_at": "2026-10-09T00:51:44.812Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117408209620927226",
+    "text": "How Trump defied the 'experts' — and pushed the UN toward post-Oct. 7 peace: https://nypost.com/2026/10/08/opinion/how-trump-defied-the-experts-and-pushed-the-un-to-post-oct-7-peace/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-09T01:22:38.976742+00:00"
+  },
+  "117407758597840565": {
+    "id": "117407758597840565",
+    "created_at": "2026-10-08T22:57:02.745Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117407758597840565",
+    "text": "Can you believe that Alaska, a State I love, and won BIG, all three times, has three Republicans running against one Dumocrat for Governor? What is that all about? How stupid are we to do this? On top of it all, we have the Corrupt Ranked Choice System of Voting, which shouldn't be allowed in our Country and will, hopefully, be repealed in the November Vote! In any event, we have one Great Candidate running for the United States Senate. His name is Dan S. Sullivan, and he is the Incumbent, and doing a phenomenal job — Bringing more business to Alaska than any other Senator in U.S. History. Alaska needs Senator Dan S. Sullivan in the Senate, and Congressman Nick Begich, in Congress — That is a fantastic team. GET OUT AND VOTE! I'll be coming to Alaska soon, and look forward to seeing you all just to make sure you do so. Early Voting starts October 19th. MAKE AMERICA GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-09T01:22:38.976921+00:00"
   }
 }
