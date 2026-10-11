@@ -62841,5 +62841,61 @@
       "tier2": {}
     },
     "captured_at": "2026-10-10T22:07:24.875765+00:00"
+  },
+  "117419345256359809": {
+    "id": "117419345256359809",
+    "created_at": "2026-10-11T00:03:41.124Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117419345256359809",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-11T00:55:59.857346+00:00"
+  },
+  "117419344133655598": {
+    "id": "117419344133655598",
+    "created_at": "2026-10-11T00:03:23.994Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117419344133655598",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-11T00:55:59.857381+00:00"
+  },
+  "117419271924268127": {
+    "id": "117419271924268127",
+    "created_at": "2026-10-10T23:45:02.164Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117419271924268127",
+    "text": "I am proud to announce that I have just appointed Katie Bailey as Director of the Office of Legislative Affairs. Katie is currently the Deputy Director of Legislative Affairs for the United States Senate, and has already delivered strong results, assisting in the confirmations of members of our Cabinet, including Secretary of Homeland Security, Markwayne Mullin, Director of National Intelligence, Jay Clayton, and Secretary of Labor, Keith Sonderling. After previously working on Capitol Hill, Katie understands how the Executive and Legislative Branches of Government can most effectively work together to achieve Great Success for the American People. Katie will take the place of James Braid, my longest tenured Legislative Affairs Director, who has done a fabulous job, and is now going into the private sector, where he will be very successful. I know Katie will be fantastic, and work tirelessly with Congress to pass Bills that help, MAKE AMERICA GREAT AGAIN, GREATER THAN EVER BEFORE. Good luck Katie! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Intel"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-11T00:55:59.857858+00:00"
   }
 }
