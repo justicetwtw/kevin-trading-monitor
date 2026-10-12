@@ -43404,12 +43404,12 @@
       "post_id": "117427674986856382",
       "created_at": "2026-10-12T11:22:02.726Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-12T16:51:59.335545+00:00",
       "resolved_at": null,
       "run_id": "38280117719",
       "workflow_attempt_id": "38280117719:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117427669196183256": {
       "post_id": "117427669196183256",
