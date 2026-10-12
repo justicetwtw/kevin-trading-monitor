@@ -43206,12 +43206,12 @@
       "post_id": "117428474535365465",
       "created_at": "2026-10-12T14:45:22.867Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-12T16:53:15.597725+00:00",
       "resolved_at": null,
       "run_id": "38280117719",
       "workflow_attempt_id": "38280117719:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117428474040306695": {
       "post_id": "117428474040306695",
