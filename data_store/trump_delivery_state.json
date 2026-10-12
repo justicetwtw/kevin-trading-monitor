@@ -43283,12 +43283,12 @@
       "post_id": "117428368910182859",
       "created_at": "2026-10-12T14:18:31.155Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-12T16:52:47.123439+00:00",
       "resolved_at": null,
       "run_id": "38280117719",
       "workflow_attempt_id": "38280117719:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117428329406671403": {
       "post_id": "117428329406671403",
