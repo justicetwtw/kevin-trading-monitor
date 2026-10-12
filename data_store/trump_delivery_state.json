@@ -43525,12 +43525,12 @@
       "post_id": "117427646931901834",
       "created_at": "2026-10-12T11:14:54.641Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-12T16:51:12.160154+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-12T16:51:14.665616+00:00",
       "run_id": "38280117719",
       "workflow_attempt_id": "38280117719:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117427646339985366": {
       "post_id": "117427646339985366",
