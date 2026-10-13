@@ -63837,5 +63837,123 @@
       }
     },
     "captured_at": "2026-10-13T03:36:20.277372+00:00"
+  },
+  "117434446535757477": {
+    "id": "117434446535757477",
+    "created_at": "2026-10-13T16:04:08.360Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117434446535757477",
+    "text": "The Houthis are behaving very badly. I thought they learned their lesson a year ago when we bombed the HELL out of them and, at their request, stopped. They've been silent for a long time, but now they've emerged again, probably at the behest of Iran, which is a Failing Nation, with No Navy, No Airforce, the World's Worst Economy, and 301% Inflation, in a very nasty way, hitting Saudi Arabia, and purposefully trying to drive up Oil Prices, probably prior to the U.S. Elections — NOT NICE. Somebody should explain to them that I'm not running in the Elections, I've already won, IN A MASSIVE LANDSLIDE, but I'll be there after the Elections, and I will never forget! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "bomb"
+        ]
+      },
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "market_general": [
+          "economy"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-13T18:06:48.309034+00:00"
+  },
+  "117434416172660722": {
+    "id": "117434416172660722",
+    "created_at": "2026-10-13T15:56:25.056Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117434416172660722",
+    "text": "Happy Birthday to the United States Navy! It is now 251 years of Victories, Old and New. What they've done with the impenetrable Steel Wall (Sometimes referred to as the Blockade) in the Hormuz Strait is another Historic Achievement, one of many. HAPPY BIRTHDAY U.S. NAVY! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "Hormuz"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-13T18:06:48.309236+00:00"
+  },
+  "117433340099512802": {
+    "id": "117433340099512802",
+    "created_at": "2026-10-13T11:22:45.486Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117433340099512802",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117433339316911783",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-13T18:06:48.309366+00:00"
+  },
+  "117433339316911783": {
+    "id": "117433339316911783",
+    "created_at": "2026-10-13T11:22:33.542Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117433339316911783",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-13T18:06:48.309386+00:00"
+  },
+  "117433336229580757": {
+    "id": "117433336229580757",
+    "created_at": "2026-10-13T11:21:46.434Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117433336229580757",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117433335383227958",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-13T18:06:48.309497+00:00"
+  },
+  "117433335383227958": {
+    "id": "117433335383227958",
+    "created_at": "2026-10-13T11:21:33.520Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117433335383227958",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-13T18:06:48.309516+00:00"
   }
 }
