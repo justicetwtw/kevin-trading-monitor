@@ -43712,12 +43712,12 @@
       "post_id": "117435356165640404",
       "created_at": "2026-10-13T19:55:28.212Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-13T22:39:07.102432+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-13T22:39:09.953532+00:00",
       "run_id": "38479058513",
       "workflow_attempt_id": "38479058513:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117435353994630003": {
       "post_id": "117435353994630003",
