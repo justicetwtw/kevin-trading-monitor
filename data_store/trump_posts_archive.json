@@ -63817,5 +63817,25 @@
       "tier2": {}
     },
     "captured_at": "2026-10-12T23:17:02.452680+00:00"
+  },
+  "117431307261297275": {
+    "id": "117431307261297275",
+    "created_at": "2026-10-13T02:45:46.833Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117431307261297275",
+    "text": "I see so many comments from the Radical Left Morons and Lunatics that China and Russia are helping the \"wonderful\" Islamic Republic of Iran. If they are, it's at a very low level, but I don't believe they are at all. They have too much to lose, and we would know about it, and know about it very fast! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "China"
+        ]
+      }
+    },
+    "captured_at": "2026-10-13T03:36:20.277372+00:00"
   }
 }
