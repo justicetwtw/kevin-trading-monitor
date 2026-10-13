@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-12T23:53:43.829197+08:00",
+  "generated_at": "2026-10-13T11:42:26.312315+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -61,15 +61,15 @@
         "earnings_date": "2026-10-22"
       },
       {
+        "symbol": "BE",
+        "earnings_date": "2026-10-22"
+      },
+      {
         "symbol": "GLW",
         "earnings_date": "2026-10-27"
       },
       {
         "symbol": "STX",
-        "earnings_date": "2026-10-27"
-      },
-      {
-        "symbol": "BE",
         "earnings_date": "2026-10-27"
       },
       {
