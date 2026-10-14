@@ -64113,5 +64113,117 @@
       }
     },
     "captured_at": "2026-10-13T22:38:48.257083+00:00"
+  },
+  "117436233134527530": {
+    "id": "117436233134527530",
+    "created_at": "2026-10-13T23:38:29.696Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436233134527530",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117436230839875415",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595587+00:00"
+  },
+  "117436230839875415": {
+    "id": "117436230839875415",
+    "created_at": "2026-10-13T23:37:54.682Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436230839875415",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595625+00:00"
+  },
+  "117436213910457560": {
+    "id": "117436213910457560",
+    "created_at": "2026-10-13T23:33:36.360Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436213910457560",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117436212824151092",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595750+00:00"
+  },
+  "117436212824151092": {
+    "id": "117436212824151092",
+    "created_at": "2026-10-13T23:33:19.783Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436212824151092",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595769+00:00"
+  },
+  "117436050104659116": {
+    "id": "117436050104659116",
+    "created_at": "2026-10-13T22:51:56.880Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436050104659116",
+    "text": "Gregg Jarrett is fantastic — A MUST WATCH! President DONALD J. TRUMPGREGG JARRETT: Trump was framed by the Russia collusion hoax. Now the whole story is exposed: https://www.foxnews.com/opinion/gregg-jarrett-trump-framed-russia-collusion-hoax-story-exposed",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595892+00:00"
+  },
+  "117436047401681071": {
+    "id": "117436047401681071",
+    "created_at": "2026-10-13T22:51:15.637Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436047401681071",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595907+00:00"
+  },
+  "117436046490491993": {
+    "id": "117436046490491993",
+    "created_at": "2026-10-13T22:51:01.733Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117436046490491993",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T01:22:51.595921+00:00"
   }
 }
