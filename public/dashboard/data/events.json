@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-13T22:28:33.825261+08:00",
+  "generated_at": "2026-10-14T10:03:02.344627+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -31,6 +31,10 @@
       {
         "symbol": "RTX",
         "earnings_date": "2026-10-20"
+      },
+      {
+        "symbol": "META",
+        "earnings_date": "2026-10-21"
       },
       {
         "symbol": "VRT",
@@ -98,10 +102,6 @@
       },
       {
         "symbol": "GOOGL",
-        "earnings_date": "2026-10-28"
-      },
-      {
-        "symbol": "META",
         "earnings_date": "2026-10-28"
       },
       {
