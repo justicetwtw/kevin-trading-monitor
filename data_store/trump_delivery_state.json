@@ -44075,12 +44075,12 @@
       "post_id": "117437596490163622",
       "created_at": "2026-10-14T05:25:12.851Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-14T11:56:27.548089+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-14T11:56:30.496094+00:00",
       "run_id": "38559958614",
       "workflow_attempt_id": "38559958614:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117437585370714227": {
       "post_id": "117437585370714227",
