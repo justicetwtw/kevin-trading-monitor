@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-13T03:04:50.803669+00:00",
+  "generated_at": "2026-10-14T01:16:54.899580+00:00",
   "status": "healthy",
   "rows": [
     {
@@ -9,7 +9,7 @@
       "current_price": 995.409973,
       "as_of": "2026-10-12T00:00:00-04:00",
       "source": "yfinance_delayed_public_market_data",
-      "sample_count": 251,
+      "sample_count": 250,
       "return_1m": 0.073762,
       "return_3m": 0.221662,
       "return_6m": 0.1426,
@@ -27,7 +27,7 @@
       "current_price": 989.039978,
       "as_of": "2026-10-12T00:00:00-04:00",
       "source": "yfinance_delayed_public_market_data",
-      "sample_count": 251,
+      "sample_count": 250,
       "return_1m": 0.01413,
       "return_3m": 0.006022,
       "return_6m": 1.318642,
@@ -45,7 +45,7 @@
       "current_price": 226.320007,
       "as_of": "2026-10-12T00:00:00-04:00",
       "source": "yfinance_delayed_public_market_data",
-      "sample_count": 251,
+      "sample_count": 250,
       "return_1m": 0.036786,
       "return_3m": 0.068555,
       "return_6m": 0.195499,
@@ -63,7 +63,7 @@
       "current_price": 1487.329956,
       "as_of": "2026-10-12T00:00:00-04:00",
       "source": "yfinance_delayed_public_market_data",
-      "sample_count": 251,
+      "sample_count": 250,
       "return_1m": -0.089399,
       "return_3m": -0.153878,
       "return_6m": 0.561501,
