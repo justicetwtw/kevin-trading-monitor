@@ -44108,12 +44108,12 @@
       "post_id": "117437575966465465",
       "created_at": "2026-10-14T05:19:59.684Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-14T11:56:11.844076+00:00",
       "resolved_at": null,
       "run_id": "38559958614",
       "workflow_attempt_id": "38559958614:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117437575496539011": {
       "post_id": "117437575496539011",
