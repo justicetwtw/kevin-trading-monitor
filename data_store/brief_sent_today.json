@@ -37,6 +37,7 @@
     "tw_close": true
   },
   "2026-10-15": {
-    "us_midday": true
+    "us_midday": true,
+    "us_eod": true
   }
 }
