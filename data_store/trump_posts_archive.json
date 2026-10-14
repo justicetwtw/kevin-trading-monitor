@@ -64765,5 +64765,118 @@
       "tier2": {}
     },
     "captured_at": "2026-10-14T16:10:57.372311+00:00"
+  },
+  "117441005010525427": {
+    "id": "117441005010525427",
+    "created_at": "2026-10-14T19:52:02.742Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117441005010525427",
+    "text": "I'm watching Right Side Broadcasting Network (RSBN) from Air Force One. They do a magnificent job of covering the Rallies, including the Interviews of people in lines that stretch for miles. So fascinating to see — So exciting! I love the Interviews they do of the people that are in line. Great Americans — They built this Country! There is Great Love and Respect in the air. Landing in Arizona now, then Montana. See you soon! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-14T20:11:09.267447+00:00"
+  },
+  "117440852087340473": {
+    "id": "117440852087340473",
+    "created_at": "2026-10-14T19:13:09.320Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117440852087340473",
+    "text": "https://www.youtube.com/live/3bbk6X8FoJE?si=zhVgVgfpgzuu_rTi",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-14T20:11:09.267592+00:00"
+  },
+  "117440248541514637": {
+    "id": "117440248541514637",
+    "created_at": "2026-10-14T16:39:39.942Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117440248541514637",
+    "text": "ANOTHER MASSIVE 21 BILLION DOLLAR INVESTMENT FOR AMERICA!Today, under my leadership, GlobalFoundries and my Department of Commerce led by Secretary Howard Lutnick announced a MASSIVE 21 BILLION INVESTMENT to build 2 giant new Semiconductor Manufacturing Facilities in Malta, New York.This DEAL will create 27,000 high paying Construction and Supply Chain Jobs and over 1,000 additional highly skilled Manufacturing Jobs in New York.Under my direction, JAPAN WILL PROVIDE THE CAPITAL for the 21 Billion Dollar Investment. This DEAL is a result of my HISTORIC TRADE DEALS to REVITALIZE the American Industrial Base, create HUNDREDS OF THOUSANDS OF GREAT AMERICAN JOBS, and strengthen our National and Economic Security.We are turning the Investment commitments from Japan, Korea and Taiwan into HUGE Construction Projects. These are TRANSFORMATIONAL AND GENERATIONAL DEALS FOR AMERICA — More Semiconductors, more Power, more Energy Security, and more Jobs for the U.S.A.As I showed with our massive WIN with INTEL, my Administration's Commerce Department is the first to ever earn money for America.  I am announcing an additional agreement with GlobalFoundries where the U.S. Taxpayer will receive shares in GlobalFoundries. My Commerce Department will invest 955 Million Dollars in Silicon Photonics, Silicon Germanium, and Advanced Packaging. This brings our total Investments to 1.63 Billion Dollars, and now, the U.S. Government's stake is worth over 2 Billion Dollars. We are the first Administration ever to turn Grants into money for America. Your great Businessman President running the Greatest Economy in the World — AN ALL-AROUND HUGE WIN FOR AMERICA! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Intel"
+        ],
+        "war_escalation": [
+          "war"
+        ],
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "trade deal",
+          "deal"
+        ],
+        "energy": [
+          "energy"
+        ],
+        "market_general": [
+          "economy"
+        ],
+        "tech_broad": [
+          "AI",
+          "semiconductor"
+        ]
+      }
+    },
+    "captured_at": "2026-10-14T20:11:09.267815+00:00"
+  },
+  "117440207836405365": {
+    "id": "117440207836405365",
+    "created_at": "2026-10-14T16:29:18.831Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117440207836405365",
+    "text": "I was just in Alaska launching the largest Energy Infrastructure Project in Alaska History— The Alaska LNG Project. This 50 Billion Dollar Infrastructure Investment from The Republic of Korea is part of their Trade and Investment Deal with me. I am also announcing today that my Commerce Secretary, Howard Lutnick, has secured an Offtake Commitment from Taiwan of between 70 to 80 Billion Dollars for Alaska LNG — That is 30% of the Pipeline for the next 20 years. This is the largest Offtake Agreement in History. On top of that, Taiwan has also agreed to Invest 4.4 Billion Dollars in Equity into the Project, because this is now a U.S. Federal Government Project, with all necessary permits secured, and all necessary authorizations delivered, and ready to go. This is the GREATEST Project in Alaska History, and this only happens with me in the White House. Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ],
+        "fed_intervention": [
+          "Fed"
+        ],
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "deal"
+        ],
+        "energy": [
+          "energy"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-14T20:11:09.268029+00:00"
   }
 }
