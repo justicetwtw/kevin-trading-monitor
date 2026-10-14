@@ -44196,12 +44196,12 @@
       "post_id": "117440248541514637",
       "created_at": "2026-10-14T16:39:39.942Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-14T20:11:23.763024+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-14T20:11:26.353145+00:00",
       "run_id": "38629773971",
       "workflow_attempt_id": "38629773971:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117440207836405365": {
       "post_id": "117440207836405365",
