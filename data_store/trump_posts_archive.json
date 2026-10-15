@@ -65171,5 +65171,37 @@
       "tier2": {}
     },
     "captured_at": "2026-10-15T15:38:43.302060+00:00"
+  },
+  "117445802849453813": {
+    "id": "117445802849453813",
+    "created_at": "2026-10-15T16:12:11.956Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117445802849453813",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117445800565005016",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T19:22:22.580969+00:00"
+  },
+  "117445800565005016": {
+    "id": "117445800565005016",
+    "created_at": "2026-10-15T16:11:37.098Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117445800565005016",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T19:22:22.581005+00:00"
   }
 }
