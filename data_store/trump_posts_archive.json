@@ -64926,5 +64926,121 @@
       "tier2": {}
     },
     "captured_at": "2026-10-15T06:07:10.121392+00:00"
+  },
+  "117443638283999228": {
+    "id": "117443638283999228",
+    "created_at": "2026-10-15T07:01:43.310Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443638283999228",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T11:19:57.166460+00:00"
+  },
+  "117443637733783253": {
+    "id": "117443637733783253",
+    "created_at": "2026-10-15T07:01:34.913Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443637733783253",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T11:19:57.166505+00:00"
+  },
+  "117443397258891596": {
+    "id": "117443397258891596",
+    "created_at": "2026-10-15T06:00:25.558Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443397258891596",
+    "text": "Jon Husted, who is running for the Senate in the Great State of Ohio, is an ALL AMERICAN FOOTBALL PLAYER! He played Safety and, in one season, had 17 Interceptions, a record. As everyone knows, he has, and always will have, my Complete and Total Endorsement! Jon is one of the Greatest Players in the History of the State of Ohio, and he will make a fabulous Senator, beating a guy, Sherrod Brown, who got thrown out by the people three years ago. He was beaten by a now fantastic Senator, Bernie Moreno. GET OUT AND VOTE FOR JON HUSTED! He will make Ohio proud, just like he made Jon Gruden and his teammates proud, in helping Dayton win so many Football games, some of which, they said, were unwinnable — Except for Jon Husted's brilliant playing. In Politics, he will be even better than he was at Football. AGAIN, JON HUSTED HAS MY COMPLETE AND TOTAL ENDORSEMENT — HE WILL NEVER LET YOU DOWN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-15T11:19:57.167098+00:00"
+  },
+  "117443188503232131": {
+    "id": "117443188503232131",
+    "created_at": "2026-10-15T05:07:20.199Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443188503232131",
+    "text": "Gross Output Signals an Economic Surge: https://www.wsj.com/opinion/gross-output-signals-an-economic-surge-ee8e462e",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T11:19:57.167206+00:00"
+  },
+  "117443148049952515": {
+    "id": "117443148049952515",
+    "created_at": "2026-10-15T04:57:02.932Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443148049952515",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T11:19:57.167223+00:00"
+  },
+  "117443144788808814": {
+    "id": "117443144788808814",
+    "created_at": "2026-10-15T04:56:13.173Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443144788808814",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117443139790546115Actual pictures of our fully renovated White House facade, facing South, with the new South Entrance, and Heliport! Over the years, the facade, both North and South, suffered tremendous wear, tear, and damage. The exterior walls and ornamentation, both missing and in bad condition, has been fully restored to the Highest Level, giving the White House many decades of additional life! It had to be done, and I am very proud to be the President who did it! Likewise, the Ballroom and Military Complex, is on time, and on budget, and will make an unbelievably beautiful addition, the first since the West Wing in 1901, to the White House. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T11:19:57.167388+00:00"
+  },
+  "117443139790546115": {
+    "id": "117443139790546115",
+    "created_at": "2026-10-15T04:54:56.902Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117443139790546115",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-15T11:19:57.167406+00:00"
   }
 }
