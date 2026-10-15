@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-14T20:14:28.062824+08:00",
+  "generated_at": "2026-10-15T09:37:26.353750+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -34,10 +34,6 @@
       },
       {
         "symbol": "META",
-        "earnings_date": "2026-10-21"
-      },
-      {
-        "symbol": "VRT",
         "earnings_date": "2026-10-21"
       },
       {
@@ -81,10 +77,6 @@
         "earnings_date": "2026-10-27"
       },
       {
-        "symbol": "FLS",
-        "earnings_date": "2026-10-27"
-      },
-      {
         "symbol": "FCX",
         "earnings_date": "2026-10-27"
       },
@@ -109,6 +101,10 @@
         "earnings_date": "2026-10-28"
       },
       {
+        "symbol": "VRT",
+        "earnings_date": "2026-10-28"
+      },
+      {
         "symbol": "KLAC",
         "earnings_date": "2026-10-28"
       },
@@ -118,6 +114,10 @@
       },
       {
         "symbol": "GEV",
+        "earnings_date": "2026-10-28"
+      },
+      {
+        "symbol": "FLS",
         "earnings_date": "2026-10-28"
       },
       {
