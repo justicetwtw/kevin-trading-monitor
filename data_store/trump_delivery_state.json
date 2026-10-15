@@ -44317,12 +44317,12 @@
       "post_id": "117443139790546115",
       "created_at": "2026-10-15T04:54:56.902Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-15T11:20:05.614394+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-15T11:20:08.646401+00:00",
       "run_id": "38726451323",
       "workflow_attempt_id": "38726451323:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
