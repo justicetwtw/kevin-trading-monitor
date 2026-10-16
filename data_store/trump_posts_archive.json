@@ -65263,5 +65263,81 @@
       }
     },
     "captured_at": "2026-10-16T00:33:29.192049+00:00"
+  },
+  "117449717537795453": {
+    "id": "117449717537795453",
+    "created_at": "2026-10-16T08:47:45.359Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117449717537795453",
+    "text": "A great man!!! President DJTJustice Alito confirms he is considering retirement: https://www.politico.com/news/2026/10/02/alito-supreme-court-retirement-01105789",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-16T09:21:36.864742+00:00"
+  },
+  "117449714031702223": {
+    "id": "117449714031702223",
+    "created_at": "2026-10-16T08:46:51.861Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117449714031702223",
+    "text": "RT @mrddmiaSam Adkisson worked with me on the Senate Judiciary Committee for Justice Kavanaugh's confirmation.He is a friend, outstanding colleague, brilliant attorney, and committed constitutionalist.President Trump hit a grand-slam by picking Sam for a lifetime appointment to the federal bench in Tennessee.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-16T09:21:36.864845+00:00"
+  },
+  "117448873604871574": {
+    "id": "117448873604871574",
+    "created_at": "2026-10-16T05:13:07.964Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117448873604871574",
+    "text": "Great Pollster Matt Towery was fantastic on Sean Hannity tonight. Looking good for Republicans! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-16T09:21:36.864909+00:00"
+  },
+  "117448794145800937": {
+    "id": "117448794145800937",
+    "created_at": "2026-10-16T04:52:55.516Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117448794145800937",
+    "text": "James TalaFREAKO, who is running for U.S. Senate against the greatest Attorney General in the history of Texas, recently stated, with a large mask covering his face as he spoke, that, \"FOSSIL FUELS ARE DESTROYING THE PLANET.\" In other words, no more drilling for Oil in Texas. That should be the end of his campaign!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "oil",
+          "drilling"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-16T09:21:36.864981+00:00"
   }
 }
