@@ -44460,12 +44460,12 @@
       "post_id": "117449717537795453",
       "created_at": "2026-10-16T08:47:45.359Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-16T09:21:58.918495+00:00",
       "resolved_at": null,
       "run_id": "38879824827",
       "workflow_attempt_id": "38879824827:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117449714031702223": {
       "post_id": "117449714031702223",
