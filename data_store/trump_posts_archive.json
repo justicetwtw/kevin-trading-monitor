@@ -65223,5 +65223,45 @@
       }
     },
     "captured_at": "2026-10-15T22:28:41.263989+00:00"
+  },
+  "117447552866730873": {
+    "id": "117447552866730873",
+    "created_at": "2026-10-15T23:37:15.101Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117447552866730873",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-16T00:33:29.191521+00:00"
+  },
+  "117447474430342324": {
+    "id": "117447474430342324",
+    "created_at": "2026-10-15T23:17:18.255Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117447474430342324",
+    "text": "Hello Iowa! I am going to be coming to your Great State, which I won in Landslides all three times, with the Highest Vote ever obtained by a Political Candidate (for any Office!), on Thursday, October 22nd, and Sunday, November 1st. The reason I'll be there is to get truly fantastic Warriors elected, including Ashley Hinson for U.S. Senate, Zach Lahn for Governor, Mariannette Miller-Meeks for Iowa's 1st Congressional District, Joe Mitchell for the 2nd District, Zach Nunn for the 3rd District, and Chris McGowan for the 4th District — They are all spectacular people, and have my Complete and Total Endorsement. I will see you on October 22nd, and again on November 1st, where we will have two spectacular Rallies honoring all of the above — and more. THANK YOU IOWA FOR YOUR GREAT SUPPORT — I WILL NEVER LET YOU DOWN, AND NEITHER WILL ANY OF OUR GREAT REPUBLICAN CANDIDATES! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-16T00:33:29.192049+00:00"
   }
 }
