@@ -65435,5 +65435,105 @@
       "tier2": {}
     },
     "captured_at": "2026-10-16T20:21:02.651855+00:00"
+  },
+  "117454292438977074": {
+    "id": "117454292438977074",
+    "created_at": "2026-10-17T04:11:12.813Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117454292438977074",
+    "text": "Best in History!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-17T05:04:32.519970+00:00"
+  },
+  "117454291461915390": {
+    "id": "117454291461915390",
+    "created_at": "2026-10-17T04:10:57.905Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117454291461915390",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-17T05:04:32.520008+00:00"
+  },
+  "117453450275734603": {
+    "id": "117453450275734603",
+    "created_at": "2026-10-17T00:37:02.422Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117453450275734603",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117453447477979909",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-17T05:04:32.520107+00:00"
+  },
+  "117453447477979909": {
+    "id": "117453447477979909",
+    "created_at": "2026-10-17T00:36:19.731Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117453447477979909",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-17T05:04:32.520125+00:00"
+  },
+  "117453415283228242": {
+    "id": "117453415283228242",
+    "created_at": "2026-10-17T00:28:08.479Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117453415283228242",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117453413930971351They will all go to jail for a long period of time!!!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-17T05:04:32.520215+00:00"
+  },
+  "117453413930971351": {
+    "id": "117453413930971351",
+    "created_at": "2026-10-17T00:27:47.844Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117453413930971351",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-17T05:04:32.520231+00:00"
   }
 }

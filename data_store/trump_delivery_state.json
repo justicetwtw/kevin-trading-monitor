@@ -44565,6 +44565,72 @@
       "run_id": "38961477516",
       "workflow_attempt_id": "38961477516:1",
       "stage_code": "resolved_sent"
+    },
+    "117454292438977074": {
+      "post_id": "117454292438977074",
+      "created_at": "2026-10-17T04:11:12.813Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39004869111",
+      "workflow_attempt_id": "39004869111:1",
+      "stage_code": "captured_pending"
+    },
+    "117454291461915390": {
+      "post_id": "117454291461915390",
+      "created_at": "2026-10-17T04:10:57.905Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39004869111",
+      "workflow_attempt_id": "39004869111:1",
+      "stage_code": "captured_pending"
+    },
+    "117453450275734603": {
+      "post_id": "117453450275734603",
+      "created_at": "2026-10-17T00:37:02.422Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39004869111",
+      "workflow_attempt_id": "39004869111:1",
+      "stage_code": "captured_pending"
+    },
+    "117453447477979909": {
+      "post_id": "117453447477979909",
+      "created_at": "2026-10-17T00:36:19.731Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39004869111",
+      "workflow_attempt_id": "39004869111:1",
+      "stage_code": "captured_pending"
+    },
+    "117453415283228242": {
+      "post_id": "117453415283228242",
+      "created_at": "2026-10-17T00:28:08.479Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39004869111",
+      "workflow_attempt_id": "39004869111:1",
+      "stage_code": "captured_pending"
+    },
+    "117453413930971351": {
+      "post_id": "117453413930971351",
+      "created_at": "2026-10-17T00:27:47.844Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39004869111",
+      "workflow_attempt_id": "39004869111:1",
+      "stage_code": "captured_pending"
     }
   }
 }
