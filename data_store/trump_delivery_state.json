@@ -44856,12 +44856,12 @@
       "post_id": "117464065930232379",
       "created_at": "2026-10-18T21:36:44.454Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-18T23:01:24.084575+00:00",
       "resolved_at": null,
       "run_id": "39174663481",
       "workflow_attempt_id": "39174663481:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
