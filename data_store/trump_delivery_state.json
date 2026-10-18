@@ -44801,12 +44801,12 @@
       "post_id": "117463320034402295",
       "created_at": "2026-10-18T18:27:02.987Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-18T18:49:45.390791+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-18T18:49:47.861620+00:00",
       "run_id": "39155855167",
       "workflow_attempt_id": "39155855167:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117463319181671522": {
       "post_id": "117463319181671522",
