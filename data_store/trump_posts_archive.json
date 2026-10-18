@@ -65851,5 +65851,34 @@
       "tier2": {}
     },
     "captured_at": "2026-10-18T18:49:27.923944+00:00"
+  },
+  "117463828588421761": {
+    "id": "117463828588421761",
+    "created_at": "2026-10-18T20:36:22.905Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117463828588421761",
+    "text": "My decision on Russia is a very simple one. I am in the process of negotiating Peace in the war between Russia and Ukraine, and don't want to do anything that will drive, foolishly, Russia away from the bargaining table. Great progress is being made, and that includes current hostage negotiations! Signing that document at this time will do that, and I can sign it later, or any time that I want! Perhaps more importantly, Russia is doing very little, if anything, to help the Islamic Republic of Iran, compared to what they could be doing, and I want to keep it that way, and will, unless stupid people get in the way. Lastly, Zelenskyy is using Diesel Refineries in Russia as a target, knowing that these attacks are seriously hurting the world diesel markets, including those in the United States. Farmers, ranchers, and businesses of all kinds are suffering greatly from this, but Russia is, nevertheless, sending, at a low price, millions of barrels of diesel to the World. Zelenskyy doesn't care, and frankly, with all of the money that Europe is famously giving him, and that Crooked Joe Biden gave him in the past, he doesn't want to end this war, and probably never did. He could have made a better deal two years ago than he can now. His country is in shambles, a large portion of his land is lost, his oceans and seas are gone, and his male population is low, wounded, and/or dead. I WANT THIS WAR END! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack",
+          "war"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "deal",
+          "negotiation"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-18T21:05:32.307659+00:00"
   }
 }
