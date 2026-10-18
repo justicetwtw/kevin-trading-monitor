@@ -44757,12 +44757,12 @@
       "post_id": "117462515726539405",
       "created_at": "2026-10-18T15:02:30.221Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-18T16:31:11.672859+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-18T16:31:14.437646+00:00",
       "run_id": "39145252296",
       "workflow_attempt_id": "39145252296:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117462449149582042": {
       "post_id": "117462449149582042",
