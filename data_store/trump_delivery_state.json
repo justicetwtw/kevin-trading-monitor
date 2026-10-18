@@ -44768,12 +44768,12 @@
       "post_id": "117462449149582042",
       "created_at": "2026-10-18T14:45:34.338Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-18T16:31:07.606957+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-18T16:31:10.112005+00:00",
       "run_id": "39145252296",
       "workflow_attempt_id": "39145252296:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117462306089931035": {
       "post_id": "117462306089931035",
