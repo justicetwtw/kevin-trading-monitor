@@ -66000,5 +66000,77 @@
       }
     },
     "captured_at": "2026-10-19T05:48:40.228621+00:00"
+  },
+  "117467191755462147": {
+    "id": "117467191755462147",
+    "created_at": "2026-10-19T10:51:40.760Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117467191755462147",
+    "text": "I'm going to the Great State of Kansas today to Rally support for Roger Marshall, one of the absolutely best Senators in the U.S. Senate. His opponent is a Fake, and would be a DISASTER for Kansas, a State I won all three times, getting the highest vote in the history of Kansas - Such an honor! See you all later!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-19T11:18:41.152253+00:00"
+  },
+  "117467023218108167": {
+    "id": "117467023218108167",
+    "created_at": "2026-10-19T10:08:49.084Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117467023218108167",
+    "text": "The United States Department of Interior wants to take a terrible and very unsafe golf course, and make it into a great, safe, and prestigious golf course. They have an absolute right to do so. It's as simple as that! The judge on the case is a crazed lunatic whose courthouse tapes will reveal, may be insane? The tapes have been blocked from usage by the judge. The random golfer bringing the ridiculous lawsuit has ZERO STANDING! The experts at \"Interior\" are allowed to do this First Class renovation \"as of right.\" They do not need an approval. Work is scheduled to begin IMMEDIATELY! The finished product will be World Class, and bring income and great prestige back to D.C. Thank you for your attention to this matter! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-19T11:18:41.152480+00:00"
+  },
+  "117466841292482027": {
+    "id": "117466841292482027",
+    "created_at": "2026-10-19T09:22:33.120Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117466841292482027",
+    "text": "How Trump defied the 'experts' — and pushed the UN toward post-Oct. 7 peace: https://nypost.com/2026/10/08/opinion/how-trump-defied-the-experts-and-pushed-the-un-to-post-oct-7-peace/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-19T11:18:41.152615+00:00"
+  },
+  "117466809182909023": {
+    "id": "117466809182909023",
+    "created_at": "2026-10-19T09:14:23.166Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117466809182909023",
+    "text": "Melania Trump makes history presiding over UN Security Council — remarking on Iran war deaths: https://nypost.com/2026/03/02/us-news/melania-trump-makes-history-presiding-over-un-security-council-acknowledges-challenging-times/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-19T11:18:41.152746+00:00"
   }
 }
