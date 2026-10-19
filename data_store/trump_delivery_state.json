@@ -45043,12 +45043,12 @@
       "post_id": "117467262597886072",
       "created_at": "2026-10-19T11:09:41.730Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-19T17:33:18.662087+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-19T17:33:21.924530+00:00",
       "run_id": "39294923469",
       "workflow_attempt_id": "39294923469:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117467256855900007": {
       "post_id": "117467256855900007",
