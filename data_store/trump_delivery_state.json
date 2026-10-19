@@ -45186,12 +45186,12 @@
       "post_id": "117468926113371267",
       "created_at": "2026-10-19T18:12:44.963Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-19T21:43:01.219000+00:00",
       "resolved_at": null,
       "run_id": "39329551847",
       "workflow_attempt_id": "39329551847:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     }
   }
 }
