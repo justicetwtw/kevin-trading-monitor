@@ -45175,12 +45175,12 @@
       "post_id": "117468927432881624",
       "created_at": "2026-10-19T18:13:05.097Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-19T21:43:06.359922+00:00",
       "resolved_at": null,
       "run_id": "39329551847",
       "workflow_attempt_id": "39329551847:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117468926113371267": {
       "post_id": "117468926113371267",
