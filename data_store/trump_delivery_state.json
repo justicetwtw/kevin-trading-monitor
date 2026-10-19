@@ -44889,12 +44889,12 @@
       "post_id": "117464943162220490",
       "created_at": "2026-10-19T01:19:49.950Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-19T05:48:59.765456+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-19T05:49:02.941148+00:00",
       "run_id": "39206390181",
       "workflow_attempt_id": "39206390181:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117464867147953620": {
       "post_id": "117464867147953620",
