@@ -45615,12 +45615,12 @@
       "post_id": "117471024745207734",
       "created_at": "2026-10-20T03:06:27.543Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T05:17:38.898233+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T05:17:41.716488+00:00",
       "run_id": "39373883862",
       "workflow_attempt_id": "39373883862:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117470919606451999": {
       "post_id": "117470919606451999",
