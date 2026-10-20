@@ -45450,12 +45450,12 @@
       "post_id": "117471357170544761",
       "created_at": "2026-10-20T04:30:59.951Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T05:18:51.280756+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T05:18:53.898562+00:00",
       "run_id": "39373883862",
       "workflow_attempt_id": "39373883862:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117471356670966028": {
       "post_id": "117471356670966028",
