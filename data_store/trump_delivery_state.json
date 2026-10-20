@@ -46011,12 +46011,12 @@
       "post_id": "117474904278478680",
       "created_at": "2026-10-20T19:33:04.522Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T22:00:56.999094+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T22:01:00.295016+00:00",
       "run_id": "39504728537",
       "workflow_attempt_id": "39504728537:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117474902194097867": {
       "post_id": "117474902194097867",
