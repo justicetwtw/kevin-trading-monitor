@@ -45197,12 +45197,12 @@
       "post_id": "117470380723173497",
       "created_at": "2026-10-20T00:22:40.546Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-20T00:40:50.767308+00:00",
       "resolved_at": null,
       "run_id": "39348938261",
       "workflow_attempt_id": "39348938261:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117470376164503349": {
       "post_id": "117470376164503349",
