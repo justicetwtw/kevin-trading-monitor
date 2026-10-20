@@ -45571,12 +45571,12 @@
       "post_id": "117471257185488161",
       "created_at": "2026-10-20T04:05:34.300Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T05:17:58.088866+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T05:18:00.956487+00:00",
       "run_id": "39373883862",
       "workflow_attempt_id": "39373883862:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117471239022307669": {
       "post_id": "117471239022307669",
