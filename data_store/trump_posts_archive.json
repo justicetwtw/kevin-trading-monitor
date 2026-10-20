@@ -67615,5 +67615,29 @@
       "tier2": {}
     },
     "captured_at": "2026-10-20T14:59:19.968816+00:00"
+  },
+  "117474337843871362": {
+    "id": "117474337843871362",
+    "created_at": "2026-10-20T17:09:01.416Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117474337843871362",
+    "text": "Because of my belief in the Republican Party, and all of our Policies and Principles, and especially after witnessing what is taking place in France, and other locations throughout Europe, I am pleased to announce that, having to do with the Most Important Midterm Elections in our Country's History, I have spent, or will be spending, over 400 Million Dollars by Election Day. More than 300 Million Dollars has already been spent on Advertising, Direct and Indirect Voter Contact, Rallies, Rally Arenas, Telerallies, Get Out the Vote Programs, Election Integrity, and more. It is my Great Honor to do so on behalf of the Republican Party, which has done so much to bring our Country back from the Edge of Oblivion. MAKE AMERICA GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-20T18:56:50.785631+00:00"
   }
 }
