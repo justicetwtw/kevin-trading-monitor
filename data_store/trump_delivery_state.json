@@ -45329,12 +45329,12 @@
       "post_id": "117471385009015527",
       "created_at": "2026-10-20T04:38:04.733Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T05:19:42.228862+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T05:19:45.123975+00:00",
       "run_id": "39373883862",
       "workflow_attempt_id": "39373883862:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117471363594788735": {
       "post_id": "117471363594788735",
