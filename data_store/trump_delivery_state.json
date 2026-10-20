@@ -45208,12 +45208,12 @@
       "post_id": "117470376164503349",
       "created_at": "2026-10-20T00:21:30.986Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T00:40:46.667212+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T00:40:49.071706+00:00",
       "run_id": "39348938261",
       "workflow_attempt_id": "39348938261:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117470368203080253": {
       "post_id": "117470368203080253",
