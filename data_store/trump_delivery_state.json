@@ -45692,12 +45692,12 @@
       "post_id": "117470599886832710",
       "created_at": "2026-10-20T01:18:24.718Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T05:17:05.278886+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T05:17:08.270967+00:00",
       "run_id": "39373883862",
       "workflow_attempt_id": "39373883862:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117470598444052539": {
       "post_id": "117470598444052539",
