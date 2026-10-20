@@ -66539,7 +66539,7 @@
       },
       "tier2": {}
     },
-    "captured_at": "2026-10-20T05:16:00.216802+00:00"
+    "captured_at": "2026-10-20T10:06:39.877675+00:00"
   },
   "117471412913926533": {
     "id": "117471412913926533",
@@ -67471,5 +67471,117 @@
       }
     },
     "captured_at": "2026-10-20T05:16:00.220243+00:00"
+  },
+  "117471498052081961": {
+    "id": "117471498052081961",
+    "created_at": "2026-10-20T05:06:49.635Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471498052081961",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117471474650381574",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877144+00:00"
+  },
+  "117471494164657339": {
+    "id": "117471494164657339",
+    "created_at": "2026-10-20T05:05:50.316Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471494164657339",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117471491419200330Collapsing Sea Wall — Very dangerous to one's health! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877271+00:00"
+  },
+  "117471491419200330": {
+    "id": "117471491419200330",
+    "created_at": "2026-10-20T05:05:08.425Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471491419200330",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877286+00:00"
+  },
+  "117471474650381574": {
+    "id": "117471474650381574",
+    "created_at": "2026-10-20T05:00:52.553Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471474650381574",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117471471550327950Here are pictures of Trash Island for the Judge to study. This is just a small area, and better than some! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877377+00:00"
+  },
+  "117471471550327950": {
+    "id": "117471471550327950",
+    "created_at": "2026-10-20T05:00:05.250Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471471550327950",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117471466710724607",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877469+00:00"
+  },
+  "117471466710724607": {
+    "id": "117471466710724607",
+    "created_at": "2026-10-20T04:58:51.404Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471466710724607",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117471464480692811",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877553+00:00"
+  },
+  "117471464480692811": {
+    "id": "117471464480692811",
+    "created_at": "2026-10-20T04:58:17.377Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117471464480692811",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-20T10:06:39.877566+00:00"
   }
 }
