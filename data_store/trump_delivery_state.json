@@ -45604,12 +45604,12 @@
       "post_id": "117471040549784543",
       "created_at": "2026-10-20T03:10:28.703Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-20T05:17:43.603632+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-20T05:17:46.476637+00:00",
       "run_id": "39373883862",
       "workflow_attempt_id": "39373883862:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117471024745207734": {
       "post_id": "117471024745207734",
