@@ -46132,12 +46132,12 @@
       "post_id": "117479429782667061",
       "created_at": "2026-10-21T14:43:58.239Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-21T15:03:01.294637+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-21T15:03:05.375629+00:00",
       "run_id": "39621743505",
       "workflow_attempt_id": "39621743505:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117479428956407249": {
       "post_id": "117479428956407249",
