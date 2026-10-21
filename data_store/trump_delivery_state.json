@@ -46231,12 +46231,12 @@
       "post_id": "117479083730049250",
       "created_at": "2026-10-21T13:15:57.892Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-21T15:01:53.251246+00:00",
       "resolved_at": null,
       "run_id": "39621743505",
       "workflow_attempt_id": "39621743505:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117479081625461199": {
       "post_id": "117479081625461199",
