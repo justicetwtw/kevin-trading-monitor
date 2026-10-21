@@ -68298,5 +68298,61 @@
       }
     },
     "captured_at": "2026-10-21T15:00:31.130552+00:00"
+  },
+  "117480046790001681": {
+    "id": "117480046790001681",
+    "created_at": "2026-10-21T17:20:53.024Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117480046790001681",
+    "text": "Stephen Hubbard and Family COMING HOME from Russia. Should have been done a long time ago by Sleepy Joe Biden and the Dumocrats! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T19:10:12.436205+00:00"
+  },
+  "117480043339306684": {
+    "id": "117480043339306684",
+    "created_at": "2026-10-21T17:20:00.368Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117480043339306684",
+    "text": "RT @realDonaldTrumpNumerous people, who requested that sanctions be immediately imposed on Russia, have called to apologize to President Trump in that they didn't know that he was negotiating the release of Stephen Hubbard, a truly big  and important deal for the U.S. If sanctions would have been placed, certainly those negotiations would have come to a complete and total halt.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "deal",
+          "negotiation"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-21T19:10:12.436368+00:00"
+  },
+  "117480043201176772": {
+    "id": "117480043201176772",
+    "created_at": "2026-10-21T17:19:58.260Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117480043201176772",
+    "text": "RT @realDonaldTrumpBiden should have done the Hubbard release long ago! What a difference a President makes!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T19:10:12.436493+00:00"
   }
 }
