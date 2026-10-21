@@ -67835,5 +67835,105 @@
       "tier2": {}
     },
     "captured_at": "2026-10-21T00:26:25.063215+00:00"
+  },
+  "117476398692995492": {
+    "id": "117476398692995492",
+    "created_at": "2026-10-21T01:53:07.478Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117476398692995492",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T05:05:33.219834+00:00"
+  },
+  "117476372995585848": {
+    "id": "117476372995585848",
+    "created_at": "2026-10-21T01:46:35.368Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117476372995585848",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T05:05:33.219873+00:00"
+  },
+  "117476371905344581": {
+    "id": "117476371905344581",
+    "created_at": "2026-10-21T01:46:18.732Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117476371905344581",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T05:05:33.219890+00:00"
+  },
+  "117476367455300194": {
+    "id": "117476367455300194",
+    "created_at": "2026-10-21T01:45:10.830Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117476367455300194",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T05:05:33.219905+00:00"
+  },
+  "117476366950321293": {
+    "id": "117476366950321293",
+    "created_at": "2026-10-21T01:45:03.124Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117476366950321293",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T05:05:33.219920+00:00"
+  },
+  "117476365886992522": {
+    "id": "117476365886992522",
+    "created_at": "2026-10-21T01:44:46.898Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117476365886992522",
+    "text": "Cook Political Report shifts Minnesota Senate race toward GOP: https://justthenews.com/politics-policy/cook-political-report-shifts-minnesota-senate-race-toward-gop",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-21T05:05:33.220452+00:00"
   }
 }
