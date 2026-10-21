@@ -46176,12 +46176,12 @@
       "post_id": "117479404058364292",
       "created_at": "2026-10-21T14:37:25.715Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-21T15:02:32.419551+00:00",
       "resolved_at": null,
       "run_id": "39621743505",
       "workflow_attempt_id": "39621743505:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117479403384414491": {
       "post_id": "117479403384414491",
