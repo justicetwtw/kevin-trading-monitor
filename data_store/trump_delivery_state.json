@@ -46286,12 +46286,12 @@
       "post_id": "117478593489864840",
       "created_at": "2026-10-21T11:11:17.421Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-21T15:01:11.415636+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-21T15:01:15.974752+00:00",
       "run_id": "39621743505",
       "workflow_attempt_id": "39621743505:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117478575893014344": {
       "post_id": "117478575893014344",
