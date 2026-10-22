@@ -68617,5 +68617,597 @@
       "tier2": {}
     },
     "captured_at": "2026-10-22T10:20:20.783358+00:00"
+  },
+  "117485141128793234": {
+    "id": "117485141128793234",
+    "created_at": "2026-10-22T14:56:26.464Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485141128793234",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117485139748807928",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573115+00:00"
+  },
+  "117485139748807928": {
+    "id": "117485139748807928",
+    "created_at": "2026-10-22T14:56:05.406Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485139748807928",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573151+00:00"
+  },
+  "117485125846049246": {
+    "id": "117485125846049246",
+    "created_at": "2026-10-22T14:52:33.269Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485125846049246",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117485125160894590",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573277+00:00"
+  },
+  "117485125160894590": {
+    "id": "117485125160894590",
+    "created_at": "2026-10-22T14:52:22.812Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485125160894590",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573299+00:00"
+  },
+  "117485117656819697": {
+    "id": "117485117656819697",
+    "created_at": "2026-10-22T14:50:28.309Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485117656819697",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117485115943802855",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573421+00:00"
+  },
+  "117485115943802855": {
+    "id": "117485115943802855",
+    "created_at": "2026-10-22T14:50:02.172Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485115943802855",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573440+00:00"
+  },
+  "117485115137858032": {
+    "id": "117485115137858032",
+    "created_at": "2026-10-22T14:49:49.874Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485115137858032",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117485114128057793",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573551+00:00"
+  },
+  "117485114128057793": {
+    "id": "117485114128057793",
+    "created_at": "2026-10-22T14:49:34.464Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485114128057793",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573572+00:00"
+  },
+  "117485094463997684": {
+    "id": "117485094463997684",
+    "created_at": "2026-10-22T14:44:34.415Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117485094463997684",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573588+00:00"
+  },
+  "117484963999998375": {
+    "id": "117484963999998375",
+    "created_at": "2026-10-22T14:11:23.693Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484963999998375",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484963129105736",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573704+00:00"
+  },
+  "117484963129105736": {
+    "id": "117484963129105736",
+    "created_at": "2026-10-22T14:11:10.403Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484963129105736",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573722+00:00"
+  },
+  "117484823796917199": {
+    "id": "117484823796917199",
+    "created_at": "2026-10-22T13:35:44.363Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484823796917199",
+    "text": "RT @RealRogerStoneDonald Trump is a force of nature.He loves campaigning and gets strength from the American people.He is the GREATEST campaigner in our party since Theodore Roosevelt.He's particularly adept at turning out marginal, lower-propensity voters.",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.573850+00:00"
+  },
+  "117484789178664222": {
+    "id": "117484789178664222",
+    "created_at": "2026-10-22T13:26:56.132Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484789178664222",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484788448196895",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.573990+00:00"
+  },
+  "117484788448196895": {
+    "id": "117484788448196895",
+    "created_at": "2026-10-22T13:26:44.984Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484788448196895",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574007+00:00"
+  },
+  "117484760832154374": {
+    "id": "117484760832154374",
+    "created_at": "2026-10-22T13:19:43.599Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484760832154374",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484759649101356",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574118+00:00"
+  },
+  "117484759649101356": {
+    "id": "117484759649101356",
+    "created_at": "2026-10-22T13:19:25.545Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484759649101356",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574136+00:00"
+  },
+  "117484759382385894": {
+    "id": "117484759382385894",
+    "created_at": "2026-10-22T13:19:21.475Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484759382385894",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574151+00:00"
+  },
+  "117484758508541714": {
+    "id": "117484758508541714",
+    "created_at": "2026-10-22T13:19:08.141Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484758508541714",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574165+00:00"
+  },
+  "117484751921609459": {
+    "id": "117484751921609459",
+    "created_at": "2026-10-22T13:17:27.633Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484751921609459",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484750995773615",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574271+00:00"
+  },
+  "117484750995773615": {
+    "id": "117484750995773615",
+    "created_at": "2026-10-22T13:17:13.506Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484750995773615",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484750149421374",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574382+00:00"
+  },
+  "117484750149421374": {
+    "id": "117484750149421374",
+    "created_at": "2026-10-22T13:17:00.591Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484750149421374",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574400+00:00"
+  },
+  "117484742039933383": {
+    "id": "117484742039933383",
+    "created_at": "2026-10-22T13:14:56.850Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484742039933383",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484741288465425",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574507+00:00"
+  },
+  "117484741288465425": {
+    "id": "117484741288465425",
+    "created_at": "2026-10-22T13:14:45.384Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484741288465425",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574524+00:00"
+  },
+  "117484735949973985": {
+    "id": "117484735949973985",
+    "created_at": "2026-10-22T13:13:23.924Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484735949973985",
+    "text": "Impeaching Impeachment: Declassified memos challenge key witness testimony from 2019 Trump case: https://justthenews.com/accountability/russia-and-ukraine-scandals/declassified-records-challenge-key-2019-trump",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.574650+00:00"
+  },
+  "117484631365361174": {
+    "id": "117484631365361174",
+    "created_at": "2026-10-22T12:46:48.090Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484631365361174",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484620681663989TO THE GREAT PEOPLE OF SOUTH CAROLINA, GET OUT AND VOTE FOR: – Darline Graham for U.S. Senate– Alan Wilson for Governor– Cody Simpson for Agriculture Commissioner– Jenny Costa Honeycutt for U.S. Congress (SC-01)– Joe Wilson for U.S. Congress (SC-02)– Sheri Biggs for U.S. Congress (SC-03)– William Timmons for U.S. Congress (SC-04)– Wes Climer for U.S. Congress (SC-05)– Russell Fry for U.S. Congress (SC-07) These Great Patriots have my Complete and Total Endorsement — They will never let you down! President DONALD J. TRUMPhttps://swampthevoteusa.com/south-carolina/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.574824+00:00"
+  },
+  "117484629450934515": {
+    "id": "117484629450934515",
+    "created_at": "2026-10-22T12:46:18.878Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484629450934515",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484618730589847TO THE GREAT PEOPLE OF GEORGIA, GET OUT AND VOTE FOR: – Mike Collins for U.S. Senate– Rick Jackson for Governor– Greg Dolezal for Lieutenant Governor– Brian Strickland for Attorney General– Tim Fleming for Secretary of State– Jim Kingston for U.S. Congress (GA-01)– Brian Jack for U.S. Congress (GA-03)– Rich McCormick for U.S. Congress (GA-07)– Austin Scott for U.S. Congress (GA-08)– Andrew Clyde for U.S. Congress (GA-09)– Houston Gaines for U.S. Congress (GA-10)– John Cowan for U.S. Congress (GA-11)– Rick Allen for U.S. Congress (GA-12)– Clay Fuller for U.S. Congress (GA-14) These Great Patriots have my Complete and Total Endorsement — They will never let you down! President DONALD J. TRUMPhttps://swampthevoteusa.com/georgia/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.575030+00:00"
+  },
+  "117484627270559441": {
+    "id": "117484627270559441",
+    "created_at": "2026-10-22T12:45:45.608Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484627270559441",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484616158082454TO THE GREAT PEOPLE OF COLORADO, GET OUT AND VOTE FOR: – Jeff Hurd for U.S. Congress (CO-03)– Lauren Boebert for U.S. Congress (CO-04)– Jeff Crank for U.S. Congress (CO-05)– Gabe Evans for U.S. Congress (CO-08) These Great Patriots have my Complete and Total Endorsement — They will never let you down! President DONALD J. TRUMPhttps://swampthevoteusa.com/colorado/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.575176+00:00"
+  },
+  "117484624470584315": {
+    "id": "117484624470584315",
+    "created_at": "2026-10-22T12:45:02.884Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484624470584315",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484613863994238TO THE GREAT PEOPLE OF ARIZONA, GET OUT AND VOTE FOR:– Andy Biggs for Governor– Warren Petersen for Attorney General– Alexander Kolodin for Secretary of State– Jay Feely for U.S. Congress (AZ-01)– Eli Crane for U.S. Congress (AZ-02)– Mark Lamb for U.S. Congress (AZ-05)– Juan Ciscomani for U.S. Congress (AZ-06)– Abraham Hamadeh for U.S. Congress (AZ-08)– Paul Gosar for U.S. Congress (AZ-09)These Great Patriots have my Complete and Total Endorsement — They will never let you down! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.575321+00:00"
+  },
+  "117484620681663989": {
+    "id": "117484620681663989",
+    "created_at": "2026-10-22T12:44:05.069Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484620681663989",
+    "text": "🚨 SOUTH CAROLINA!Early Voting, in-person, is UNDERWAY NOW in the Great State of South Carolina. If you have a mail-in ballot, return it immediately and, if not, GO VOTE at the Polls RIGHT NOW, and get everyone you know to VOTE FOR THE REPUBLICAN IN EVERY RACE, UP AND DOWN THE BALLOT!Whether you VOTE early, absentee, by mail, or in-person, Republicans must SWAMP the Radical Left Dumocrats with massive turnout! In South Carolina, you can cast your early Vote, in-person, all the way through October 31st. SO IMPORTANT — PLEASE GET OUT AND VOTE. MAGA! President DONALD J. TRUMPhttps://swampthevoteusa.com/south-carolina/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.575494+00:00"
+  },
+  "117484618730589847": {
+    "id": "117484618730589847",
+    "created_at": "2026-10-22T12:43:35.298Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484618730589847",
+    "text": "🚨 GEORGIA!Early Voting, in-person, is UNDERWAY NOW in the Great State of Georgia. If you have a mail-in ballot, return it immediately and, if not, GO VOTE at the Polls RIGHT NOW, and get everyone you know to VOTE FOR THE REPUBLICAN IN EVERY RACE, UP AND DOWN THE BALLOT!Whether you VOTE early, absentee, by mail, or in-person, Republicans must SWAMP the Radical Left Dumocrats with massive turnout! In Georgia, you can cast your early Vote, in-person, all the way through October 30th. SO IMPORTANT — PLEASE GET OUT AND VOTE. MAGA!  President DONALD J. TRUMPhttps://swampthevoteusa.com/georgia/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.575657+00:00"
+  },
+  "117484616158082454": {
+    "id": "117484616158082454",
+    "created_at": "2026-10-22T12:42:56.044Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484616158082454",
+    "text": "🚨 COLORADO!Early Voting, in-person, is UNDERWAY NOW in the Great State of Colorado. If you have a mail-in ballot, return it immediately and, if not, GO VOTE at the Polls RIGHT NOW, and get everyone you know to VOTE FOR THE REPUBLICAN IN EVERY RACE, UP AND DOWN THE BALLOT!Whether you VOTE early, absentee, by mail, or in-person, Republicans must SWAMP the Radical Left Dumocrats with massive turnout! In Colorado, you can cast your early Vote, in-person, all the way through November 2nd. SO IMPORTANT — PLEASE GET OUT AND VOTE. MAGA! President DONALD J. TRUMPhttps://swampthevoteusa.com/colorado/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.575814+00:00"
+  },
+  "117484613863994238": {
+    "id": "117484613863994238",
+    "created_at": "2026-10-22T12:42:21.039Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484613863994238",
+    "text": "🚨 ARIZONA!Early Voting, in-person, is UNDERWAY NOW in the Great State of Arizona. If you have a mail-in ballot, return it immediately and, if not, GO VOTE at the Polls RIGHT NOW, and get everyone you know to VOTE FOR THE REPUBLICAN IN EVERY RACE, UP AND DOWN THE BALLOT!Whether you VOTE early, absentee, by mail, or in-person, Republicans must SWAMP the Radical Left Dumocrats with massive turnout! In Arizona, you can cast your early Vote, in-person, all the way through October 30th. SO IMPORTANT — PLEASE GET OUT AND VOTE. MAGA! President DONALD J. TRUMPhttps://swampthevoteusa.com/arizona/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-22T15:22:40.575991+00:00"
+  },
+  "117484048745552518": {
+    "id": "117484048745552518",
+    "created_at": "2026-10-22T10:18:38.018Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484048745552518",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117484047984542655",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.576101+00:00"
+  },
+  "117484047984542655": {
+    "id": "117484047984542655",
+    "created_at": "2026-10-22T10:18:26.406Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484047984542655",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.576119+00:00"
+  },
+  "117484043744815606": {
+    "id": "117484043744815606",
+    "created_at": "2026-10-22T10:17:21.712Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117484043744815606",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-22T15:22:40.576134+00:00"
   }
 }
