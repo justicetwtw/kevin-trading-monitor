@@ -46919,6 +46919,105 @@
       "run_id": "39804083123",
       "workflow_attempt_id": "39804083123:1",
       "stage_code": "resolved_sent"
+    },
+    "117486013862752010": {
+      "post_id": "117486013862752010",
+      "created_at": "2026-10-22T18:38:23.327Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485881463015989": {
+      "post_id": "117485881463015989",
+      "created_at": "2026-10-22T18:04:43.066Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485878480801847": {
+      "post_id": "117485878480801847",
+      "created_at": "2026-10-22T18:03:57.561Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485480701878421": {
+      "post_id": "117485480701878421",
+      "created_at": "2026-10-22T16:22:47.937Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485317207546802": {
+      "post_id": "117485317207546802",
+      "created_at": "2026-10-22T15:41:13.210Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485314798987090": {
+      "post_id": "117485314798987090",
+      "created_at": "2026-10-22T15:40:36.459Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485231398355728": {
+      "post_id": "117485231398355728",
+      "created_at": "2026-10-22T15:19:23.867Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485228824342638": {
+      "post_id": "117485228824342638",
+      "created_at": "2026-10-22T15:18:44.592Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
+    },
+    "117485228002980983": {
+      "post_id": "117485228002980983",
+      "created_at": "2026-10-22T15:18:32.057Z",
+      "source": "cnn_historical_archive",
+      "delivery_state": "pending",
+      "claimed_at": null,
+      "resolved_at": null,
+      "run_id": "39838672470",
+      "workflow_attempt_id": "39838672470:1",
+      "stage_code": "captured_pending"
     }
   }
 }
