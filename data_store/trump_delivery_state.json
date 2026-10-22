@@ -46561,12 +46561,12 @@
       "post_id": "117485125846049246",
       "created_at": "2026-10-22T14:52:33.269Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-22T15:26:11.843258+00:00",
       "resolved_at": null,
       "run_id": "39804083123",
       "workflow_attempt_id": "39804083123:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117485125160894590": {
       "post_id": "117485125160894590",
