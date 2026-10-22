@@ -46979,12 +46979,12 @@
       "post_id": "117485314798987090",
       "created_at": "2026-10-22T15:40:36.459Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-22T19:18:00.153200+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-22T19:18:04.704809+00:00",
       "run_id": "39838672470",
       "workflow_attempt_id": "39838672470:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117485231398355728": {
       "post_id": "117485231398355728",
