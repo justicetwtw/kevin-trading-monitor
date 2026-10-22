@@ -46418,12 +46418,12 @@
       "post_id": "117482201426939709",
       "created_at": "2026-10-22T02:28:50.172Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-22T05:24:17.727888+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-22T05:24:20.988691+00:00",
       "run_id": "39727642271",
       "workflow_attempt_id": "39727642271:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117482199679542683": {
       "post_id": "117482199679542683",
