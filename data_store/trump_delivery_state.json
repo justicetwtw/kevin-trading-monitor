@@ -46924,12 +46924,12 @@
       "post_id": "117486013862752010",
       "created_at": "2026-10-22T18:38:23.327Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-22T19:18:34.803346+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-22T19:18:38.391622+00:00",
       "run_id": "39838672470",
       "workflow_attempt_id": "39838672470:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117485881463015989": {
       "post_id": "117485881463015989",
