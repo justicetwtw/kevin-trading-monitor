@@ -1,11 +1,4 @@
 {
-  "2026-10-16": {
-    "us_midday": true,
-    "us_eod": true,
-    "tw_open": true,
-    "tw_close": true,
-    "us_premarket": true
-  },
   "2026-10-17": {
     "us_midday": true,
     "us_eod": true
@@ -41,5 +34,8 @@
     "tw_open": true,
     "tw_close": true,
     "us_premarket": true
+  },
+  "2026-10-24": {
+    "us_midday": true
   }
 }
