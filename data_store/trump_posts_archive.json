@@ -70672,5 +70672,89 @@
       }
     },
     "captured_at": "2026-10-23T05:25:10.245194+00:00"
+  },
+  "117491562153369137": {
+    "id": "117491562153369137",
+    "created_at": "2026-10-23T18:09:23.522Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117491562153369137",
+    "text": "The Power of Naming: How Trump Uses Names to Reaffirm American Identity: https://stonezone.com/the-power-of-naming-how-trump-uses-names-to-reaffirm-american-identity/",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-23T19:08:14.824833+00:00"
+  },
+  "117491464453293400": {
+    "id": "117491464453293400",
+    "created_at": "2026-10-23T17:44:32.737Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117491464453293400",
+    "text": "A healthy person has a thousand dreams. A sick person has only one (to get better)! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-23T19:08:14.825001+00:00"
+  },
+  "117491454528664650": {
+    "id": "117491454528664650",
+    "created_at": "2026-10-23T17:42:01.299Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117491454528664650",
+    "text": "https://www.youtube.com/live/_a7iclXCcPM?si=0ut11EXqxw1ZvykV",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-23T19:08:14.825126+00:00"
+  },
+  "117491281646455338": {
+    "id": "117491281646455338",
+    "created_at": "2026-10-23T16:58:03.326Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117491281646455338",
+    "text": "Heading to Florida! LIVE Coverage of the Event will be on Right Side Broadcasting Network (RSBN). They do a fantastic job, especially their interviewing of the Patriots standing on line. Tremendous Crowd, and Great Excitement. The Republican Party is \"HOTTER\" than it's ever been. MAKE AMERICA GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-23T19:08:14.825270+00:00"
+  },
+  "117491184147454321": {
+    "id": "117491184147454321",
+    "created_at": "2026-10-23T16:33:15.609Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117491184147454321",
+    "text": "The judge in the Charlie Kirk case is doing a terrible job! This case should be tried within a month, not three years — and it should be over with! The judge is desecrating the memory of the Great Charlie Kirk, while taking forever to ask questions that people already know the answer to. The whole Country is mocking him and our \"Legal\" System. JUSTICE FOR CHARLIE! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-23T19:08:14.825433+00:00"
   }
 }
