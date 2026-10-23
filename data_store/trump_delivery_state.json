@@ -47342,12 +47342,12 @@
       "post_id": "117486958617091093",
       "created_at": "2026-10-22T22:38:39.133Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-23T00:48:42.118915+00:00",
       "resolved_at": null,
       "run_id": "39879882222",
       "workflow_attempt_id": "39879882222:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117486955930613095": {
       "post_id": "117486955930613095",
