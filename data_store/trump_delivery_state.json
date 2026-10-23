@@ -47496,12 +47496,12 @@
       "post_id": "117486926814981679",
       "created_at": "2026-10-22T22:30:33.872Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-23T00:47:22.185475+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-23T00:47:25.646838+00:00",
       "run_id": "39879882222",
       "workflow_attempt_id": "39879882222:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117486923353255198": {
       "post_id": "117486923353255198",
