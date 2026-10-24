@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-23T19:56:24.915199+08:00",
+  "generated_at": "2026-10-24T09:46:12.181736+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -133,10 +133,6 @@
         "earnings_date": "2026-10-29"
       },
       {
-        "symbol": "TMDX",
-        "earnings_date": "2026-10-29"
-      },
-      {
         "symbol": "XOM",
         "earnings_date": "2026-10-30"
       },
@@ -213,6 +209,10 @@
         "earnings_date": "2026-11-05"
       },
       {
+        "symbol": "TMDX",
+        "earnings_date": "2026-11-05"
+      },
+      {
         "symbol": "MP",
         "earnings_date": "2026-11-05"
       },
@@ -222,6 +222,10 @@
       },
       {
         "symbol": "VST",
+        "earnings_date": "2026-11-06"
+      },
+      {
+        "symbol": "OKLO",
         "earnings_date": "2026-11-06"
       },
       {
@@ -238,10 +242,6 @@
       },
       {
         "symbol": "NBIS",
-        "earnings_date": "2026-11-10"
-      },
-      {
-        "symbol": "OKLO",
         "earnings_date": "2026-11-10"
       },
       {
