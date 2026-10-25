@@ -48123,12 +48123,12 @@
       "post_id": "117502729923088637",
       "created_at": "2026-10-25T17:29:30.164Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-25T18:21:58.036672+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-25T18:22:01.518951+00:00",
       "run_id": "40220788473",
       "workflow_attempt_id": "40220788473:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117502572828225324": {
       "post_id": "117502572828225324",
