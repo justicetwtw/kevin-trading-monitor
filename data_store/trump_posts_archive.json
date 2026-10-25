@@ -71276,5 +71276,36 @@
       "tier2": {}
     },
     "captured_at": "2026-10-25T18:21:36.431540+00:00"
+  },
+  "117504022227510179": {
+    "id": "117504022227510179",
+    "created_at": "2026-10-25T22:58:09.165Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117504022227510179",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117462449149582042To the people of Israel, to those who haven't seen it, I am attaching the Endorsement I gave one week ago to your Prime Minister, Bibi Netanyahu. As everyone is aware, including the enemy, Bibi and I have had a great relationship in winning together. I did the Venezuelan attack, one of the most successful Military Operations in History but, before that, we did Operation Midnight Hammer, stopping the World's Number One State Sponsor of Terror from obtaining a Nuclear Weapon. Then we did Operation Epic Fury, and Iran now has No Navy, No Air Force, and both their Military and Economy are in shambles, including the fact that Iran's Inflation is at 301%. The Naval Blockade has precluded them from getting Oil, and two levels of leadership, both Military and otherwise, are gone. When you go to the Polls please remember that Bibi has been an outstanding Warrior Prime Minister! Israel was called The Little Satan, with the United States being called The Big Satan, by some very evil people. There can no longer be the chant heard around the World of \"Death to America, Death to Israel,\" and there won't be. Vote for Bibi Netanyahu for Prime Minister, we have to finish the job that we started! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack",
+          "war"
+        ]
+      },
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "market_general": [
+          "economy"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-25T23:02:13.343847+00:00"
   }
 }
