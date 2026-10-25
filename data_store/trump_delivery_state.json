@@ -48079,12 +48079,12 @@
       "post_id": "117499201912583975",
       "created_at": "2026-10-25T02:32:16.997Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-25T06:26:09.966299+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-25T06:26:12.329401+00:00",
       "run_id": "40169002022",
       "workflow_attempt_id": "40169002022:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117499009249391196": {
       "post_id": "117499009249391196",
