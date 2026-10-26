@@ -48651,12 +48651,12 @@
       "post_id": "117509145083769998",
       "created_at": "2026-10-26T20:40:57.747Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-26T22:55:30.338264+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-26T22:55:33.734814+00:00",
       "run_id": "40415834156",
       "workflow_attempt_id": "40415834156:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117509141576629625": {
       "post_id": "117509141576629625",
