@@ -48321,12 +48321,12 @@
       "post_id": "117509498609678965",
       "created_at": "2026-10-26T22:10:52.126Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-26T22:58:32.991043+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-26T22:58:36.579843+00:00",
       "run_id": "40415834156",
       "workflow_attempt_id": "40415834156:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117509420824140105": {
       "post_id": "117509420824140105",
