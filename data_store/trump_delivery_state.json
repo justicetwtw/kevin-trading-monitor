@@ -48332,12 +48332,12 @@
       "post_id": "117509420824140105",
       "created_at": "2026-10-26T21:51:05.212Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-26T22:58:26.947090+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-26T22:58:30.519391+00:00",
       "run_id": "40415834156",
       "workflow_attempt_id": "40415834156:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117509368573544706": {
       "post_id": "117509368573544706",
