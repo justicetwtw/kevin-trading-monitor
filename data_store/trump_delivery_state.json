@@ -48420,12 +48420,12 @@
       "post_id": "117509196730737384",
       "created_at": "2026-10-26T20:54:05.818Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-26T22:57:37.382663+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-26T22:57:40.911641+00:00",
       "run_id": "40415834156",
       "workflow_attempt_id": "40415834156:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117509195327682999": {
       "post_id": "117509195327682999",
