@@ -48464,12 +48464,12 @@
       "post_id": "117509190777230049",
       "created_at": "2026-10-26T20:52:34.975Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-26T22:57:11.743034+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-26T22:57:16.112014+00:00",
       "run_id": "40415834156",
       "workflow_attempt_id": "40415834156:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117509189268383436": {
       "post_id": "117509189268383436",
