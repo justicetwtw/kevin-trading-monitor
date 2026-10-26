@@ -48244,12 +48244,12 @@
       "post_id": "117504177990449108",
       "created_at": "2026-10-25T23:37:45.919Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-26T01:05:48.820190+00:00",
       "resolved_at": null,
       "run_id": "40252395071",
       "workflow_attempt_id": "40252395071:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117504135188044166": {
       "post_id": "117504135188044166",
