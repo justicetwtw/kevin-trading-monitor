@@ -48706,12 +48706,12 @@
       "post_id": "117509118789637708",
       "created_at": "2026-10-26T20:34:16.531Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-26T22:55:00.323671+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-26T22:55:03.653033+00:00",
       "run_id": "40415834156",
       "workflow_attempt_id": "40415834156:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117509117381673025": {
       "post_id": "117509117381673025",
