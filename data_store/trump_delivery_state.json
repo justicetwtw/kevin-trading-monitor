@@ -48266,12 +48266,12 @@
       "post_id": "117504860004217059",
       "created_at": "2026-10-26T02:31:12.622Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-26T06:02:06.136471+00:00",
       "resolved_at": null,
       "run_id": "40277353321",
       "workflow_attempt_id": "40277353321:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117504850047003375": {
       "post_id": "117504850047003375",
