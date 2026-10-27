@@ -49069,12 +49069,12 @@
       "post_id": "117513446395316214",
       "created_at": "2026-10-27T14:54:50.553Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-27T18:19:19.956359+00:00",
       "resolved_at": null,
       "run_id": "40558657215",
       "workflow_attempt_id": "40558657215:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117513440975898446": {
       "post_id": "117513440975898446",
