@@ -73167,5 +73167,61 @@
       "tier2": {}
     },
     "captured_at": "2026-10-28T13:58:30.195209+00:00"
+  },
+  "117520108599434597": {
+    "id": "117520108599434597",
+    "created_at": "2026-10-28T19:09:07.721Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117520108599434597",
+    "text": "https://nursesfornursinghomes.cms.gov",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-28T19:19:58.380762+00:00"
+  },
+  "117520106264955050": {
+    "id": "117520106264955050",
+    "created_at": "2026-10-28T19:08:32.099Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117520106264955050",
+    "text": "It has just been determined that the Democrats in Alaska illegally searched for, and recruited, a man named Dan Sullivan to run against our distinguished Republican Senator, Dan Sullivan, in order to defraud, confuse, and obfuscate the Election, thereby taking votes away from the REAL Senator, Dan Sullivan. The New York Times reports that, \"Democrats have insisted they have nothing to do with the other Dan Sullivan on Alaska's Senate ballot. But aides with the Mary Peltola campaign and DSCC were part of a monthslong secret plan to recruit him to run — as well as other candidates.\" The Democrats' false statements were made under oath in Federal Court. Therefore, they perjured themselves, and should be liable for very serious consequences. Mary Peltola should suffer the Legal and Political consequences for what she has done, A FRAUD ON THE AMERICAN PUBLIC, and Dan Sullivan should be allowed to run without either Mary Peltola or FAKE Dan Sullivan on the Ballot. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-10-28T19:19:58.380978+00:00"
+  },
+  "117519060732843479": {
+    "id": "117519060732843479",
+    "created_at": "2026-10-28T14:42:38.546Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117519060732843479",
+    "text": "https://events.gop.com/events/midterm-rally-in-chillicothe-ohio-with-president-donald-j-trump-djt47",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-10-28T19:19:58.381098+00:00"
   }
 }
