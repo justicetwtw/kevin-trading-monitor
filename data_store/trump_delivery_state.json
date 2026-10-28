@@ -49289,12 +49289,12 @@
       "post_id": "117520175358921687",
       "created_at": "2026-10-28T19:26:06.390Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-28T23:19:25.482678+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-28T23:19:28.008846+00:00",
       "run_id": "40786388085",
       "workflow_attempt_id": "40786388085:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117520154668933347": {
       "post_id": "117520154668933347",
