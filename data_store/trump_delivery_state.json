@@ -49454,12 +49454,12 @@
       "post_id": "117525798353944575",
       "created_at": "2026-10-29T19:16:06.484Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-29T20:34:29.967274+00:00",
       "resolved_at": null,
       "run_id": "40949674983",
       "workflow_attempt_id": "40949674983:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117525796755388768": {
       "post_id": "117525796755388768",
