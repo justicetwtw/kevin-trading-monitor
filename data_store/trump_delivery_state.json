@@ -49388,12 +49388,12 @@
       "post_id": "117523929787664257",
       "created_at": "2026-10-29T11:20:54.427Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-29T15:36:25.588885+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-29T15:36:28.949272+00:00",
       "run_id": "40903028838",
       "workflow_attempt_id": "40903028838:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117523928716548011": {
       "post_id": "117523928716548011",
