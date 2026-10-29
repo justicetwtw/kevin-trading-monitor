@@ -49509,12 +49509,12 @@
       "post_id": "117525723707964253",
       "created_at": "2026-10-29T18:57:07.478Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-29T20:33:58.861300+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-29T20:34:04.323359+00:00",
       "run_id": "40949674983",
       "workflow_attempt_id": "40949674983:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117525715840384199": {
       "post_id": "117525715840384199",
