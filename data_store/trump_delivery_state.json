@@ -50026,12 +50026,12 @@
       "post_id": "117529183120003107",
       "created_at": "2026-10-30T09:36:53.918Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-10-30T11:37:36.221419+00:00",
       "resolved_at": null,
       "run_id": "41049246021",
       "workflow_attempt_id": "41049246021:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117529171874638931": {
       "post_id": "117529171874638931",
