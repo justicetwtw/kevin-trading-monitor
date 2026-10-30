@@ -50059,12 +50059,12 @@
       "post_id": "117529624881658729",
       "created_at": "2026-10-30T11:29:14.664Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-30T17:08:57.200840+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-30T17:09:00.389470+00:00",
       "run_id": "41096130171",
       "workflow_attempt_id": "41096130171:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
