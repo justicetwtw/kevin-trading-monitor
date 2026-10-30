@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-29T21:31:14.028218+08:00",
+  "generated_at": "2026-10-30T10:45:21.391376+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -69,10 +69,6 @@
         "earnings_date": "2026-10-27"
       },
       {
-        "symbol": "MSFT",
-        "earnings_date": "2026-10-28"
-      },
-      {
         "symbol": "GOOG",
         "earnings_date": "2026-10-28"
       },
@@ -81,19 +77,7 @@
         "earnings_date": "2026-10-28"
       },
       {
-        "symbol": "NOW",
-        "earnings_date": "2026-10-28"
-      },
-      {
         "symbol": "VRT",
-        "earnings_date": "2026-10-28"
-      },
-      {
-        "symbol": "KLAC",
-        "earnings_date": "2026-10-28"
-      },
-      {
-        "symbol": "APH",
         "earnings_date": "2026-10-28"
       },
       {
@@ -315,6 +299,22 @@
       {
         "symbol": "STX",
         "earnings_date": "2027-01-26"
+      },
+      {
+        "symbol": "MSFT",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "NOW",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "APH",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "KLAC",
+        "earnings_date": "2027-01-28"
       }
     ]
   }
