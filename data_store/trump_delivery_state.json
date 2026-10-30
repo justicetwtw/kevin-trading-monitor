@@ -49971,12 +49971,12 @@
       "post_id": "117529608108051260",
       "created_at": "2026-10-30T11:24:58.721Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-30T11:38:04.629392+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-30T11:38:07.950887+00:00",
       "run_id": "41049246021",
       "workflow_attempt_id": "41049246021:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117529570134101741": {
       "post_id": "117529570134101741",
