@@ -50609,12 +50609,12 @@
       "post_id": "117532198586240709",
       "created_at": "2026-10-30T22:23:46.279Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T00:57:35.361737+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T00:57:38.372755+00:00",
       "run_id": "41152759794",
       "workflow_attempt_id": "41152759794:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117532190174374656": {
       "post_id": "117532190174374656",
