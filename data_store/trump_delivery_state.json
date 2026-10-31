@@ -50411,12 +50411,12 @@
       "post_id": "117532226145345350",
       "created_at": "2026-10-30T22:30:46.797Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T00:59:01.759119+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T00:59:05.054764+00:00",
       "run_id": "41152759794",
       "workflow_attempt_id": "41152759794:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117532225205927400": {
       "post_id": "117532225205927400",
