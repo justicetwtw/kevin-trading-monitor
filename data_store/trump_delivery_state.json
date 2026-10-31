@@ -51247,12 +51247,12 @@
       "post_id": "117537138707777040",
       "created_at": "2026-10-31T19:20:06.552Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T23:41:16.391450+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T23:41:19.238947+00:00",
       "run_id": "41253415018",
       "workflow_attempt_id": "41253415018:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117537126776284431": {
       "post_id": "117537126776284431",
