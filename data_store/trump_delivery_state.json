@@ -50224,12 +50224,12 @@
       "post_id": "117532343779381536",
       "created_at": "2026-10-30T23:00:41.751Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T01:00:26.342772+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T01:00:29.721425+00:00",
       "run_id": "41152759794",
       "workflow_attempt_id": "41152759794:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117532343202592124": {
       "post_id": "117532343202592124",
