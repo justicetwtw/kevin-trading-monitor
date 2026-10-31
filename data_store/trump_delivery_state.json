@@ -50752,12 +50752,12 @@
       "post_id": "117531976551681094",
       "created_at": "2026-10-30T21:27:18.300Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T00:56:31.980668+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T00:56:34.765432+00:00",
       "run_id": "41152759794",
       "workflow_attempt_id": "41152759794:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117531965901848778": {
       "post_id": "117531965901848778",
