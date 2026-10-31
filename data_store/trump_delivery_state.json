@@ -50169,12 +50169,12 @@
       "post_id": "117532348300965743",
       "created_at": "2026-10-30T23:01:50.745Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T06:30:34.616227+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T06:30:37.669752+00:00",
       "run_id": "41176801508",
       "workflow_attempt_id": "41176801508:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117532347595325730": {
       "post_id": "117532347595325730",
