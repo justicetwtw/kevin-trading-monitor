@@ -51676,12 +51676,12 @@
       "post_id": "117536901725087025",
       "created_at": "2026-10-31T18:19:50.483Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-10-31T20:37:02.286981+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-10-31T20:37:05.233997+00:00",
       "run_id": "41239574669",
       "workflow_attempt_id": "41239574669:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117536884257691019": {
       "post_id": "117536884257691019",
