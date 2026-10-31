@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-30T21:20:03.734797+08:00",
+  "generated_at": "2026-10-31T10:37:01.757186+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -81,23 +81,11 @@
         "earnings_date": "2026-10-28"
       },
       {
-        "symbol": "GEV",
-        "earnings_date": "2026-10-28"
-      },
-      {
         "symbol": "FLS",
         "earnings_date": "2026-10-28"
       },
       {
         "symbol": "AMZN",
-        "earnings_date": "2026-10-29"
-      },
-      {
-        "symbol": "CAT",
-        "earnings_date": "2026-10-29"
-      },
-      {
-        "symbol": "INTC",
         "earnings_date": "2026-10-29"
       },
       {
@@ -213,15 +201,15 @@
         "earnings_date": "2026-11-09"
       },
       {
-        "symbol": "NBIS",
-        "earnings_date": "2026-11-10"
-      },
-      {
         "symbol": "CRWV",
         "earnings_date": "2026-11-10"
       },
       {
         "symbol": "AMAT",
+        "earnings_date": "2026-11-12"
+      },
+      {
+        "symbol": "NBIS",
         "earnings_date": "2026-11-12"
       },
       {
@@ -313,7 +301,19 @@
         "earnings_date": "2027-01-27"
       },
       {
+        "symbol": "GEV",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "CAT",
+        "earnings_date": "2027-01-28"
+      },
+      {
         "symbol": "KLAC",
+        "earnings_date": "2027-01-28"
+      },
+      {
+        "symbol": "INTC",
         "earnings_date": "2027-01-28"
       }
     ]
