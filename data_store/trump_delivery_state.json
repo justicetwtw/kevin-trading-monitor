@@ -52358,12 +52358,12 @@
       "post_id": "117542828067511679",
       "created_at": "2026-11-01T19:26:59.292Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-01T20:37:51.694058+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-01T20:37:54.484115+00:00",
       "run_id": "41347548232",
       "workflow_attempt_id": "41347548232:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117542827427827682": {
       "post_id": "117542827427827682",
