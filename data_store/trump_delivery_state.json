@@ -51907,12 +51907,12 @@
       "post_id": "117537502814993710",
       "created_at": "2026-10-31T20:52:42.387Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-01T02:35:02.601658+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-01T02:35:05.019506+00:00",
       "run_id": "41265612454",
       "workflow_attempt_id": "41265612454:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117537502084587758": {
       "post_id": "117537502084587758",
