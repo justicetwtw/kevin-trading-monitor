@@ -52468,12 +52468,12 @@
       "post_id": "117542820331746695",
       "created_at": "2026-11-01T19:25:01.254Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-01T20:37:05.159291+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-01T20:37:07.868158+00:00",
       "run_id": "41347548232",
       "workflow_attempt_id": "41347548232:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117542819739714060": {
       "post_id": "117542819739714060",
