@@ -50873,12 +50873,12 @@
       "post_id": "117537265869930711",
       "created_at": "2026-10-31T19:52:26.894Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-01T02:34:06.065880+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-01T02:34:08.484040+00:00",
       "run_id": "41265612454",
       "workflow_attempt_id": "41265612454:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117537264358690703": {
       "post_id": "117537264358690703",
