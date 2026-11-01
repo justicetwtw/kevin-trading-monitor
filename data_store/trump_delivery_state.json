@@ -52303,12 +52303,12 @@
       "post_id": "117542831858109940",
       "created_at": "2026-11-01T19:27:57.132Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-01T20:38:15.621293+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-01T20:38:18.270668+00:00",
       "run_id": "41347548232",
       "workflow_attempt_id": "41347548232:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117542831198371222": {
       "post_id": "117542831198371222",
