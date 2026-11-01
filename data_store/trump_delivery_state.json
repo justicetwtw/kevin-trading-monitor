@@ -51995,12 +51995,12 @@
       "post_id": "117537495738365453",
       "created_at": "2026-10-31T20:50:54.407Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-01T02:34:29.979314+00:00",
       "resolved_at": null,
-      "run_id": "41253415018",
-      "workflow_attempt_id": "41253415018:1",
-      "stage_code": "captured_pending"
+      "run_id": "41265612454",
+      "workflow_attempt_id": "41265612454:1",
+      "stage_code": "claimed_before_send"
     },
     "117537461725208948": {
       "post_id": "117537461725208948",
