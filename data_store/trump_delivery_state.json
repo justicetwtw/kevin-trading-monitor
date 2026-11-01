@@ -52644,12 +52644,12 @@
       "post_id": "117542639036452664",
       "created_at": "2026-11-01T18:38:54.906Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-01T20:35:52.110835+00:00",
       "resolved_at": null,
       "run_id": "41347548232",
       "workflow_attempt_id": "41347548232:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117542635687363113": {
       "post_id": "117542635687363113",
