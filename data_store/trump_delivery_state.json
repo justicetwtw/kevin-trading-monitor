@@ -51863,12 +51863,12 @@
       "post_id": "117537509750347225",
       "created_at": "2026-10-31T20:54:28.213Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-01T02:35:18.549932+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-01T02:35:20.986868+00:00",
       "run_id": "41265612454",
       "workflow_attempt_id": "41265612454:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117537506331717383": {
       "post_id": "117537506331717383",
