@@ -52347,12 +52347,12 @@
       "post_id": "117542828779415652",
       "created_at": "2026-11-01T19:27:10.155Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-01T20:37:56.860560+00:00",
       "resolved_at": null,
       "run_id": "41347548232",
       "workflow_attempt_id": "41347548232:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117542828067511679": {
       "post_id": "117542828067511679",
