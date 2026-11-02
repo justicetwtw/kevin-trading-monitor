@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-31T10:37:01.757186+08:00",
+  "generated_at": "2026-11-03T00:25:58.637739+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -9,63 +9,11 @@
     "alerts": [],
     "earnings_calendar": [
       {
-        "symbol": "NNE",
-        "earnings_date": "2026-08-12"
-      },
-      {
-        "symbol": "SNPS",
-        "earnings_date": "2026-08-26"
-      },
-      {
-        "symbol": "RBRK",
-        "earnings_date": "2026-08-27"
-      },
-      {
-        "symbol": "ASML",
-        "earnings_date": "2026-10-14"
-      },
-      {
-        "symbol": "RTX",
-        "earnings_date": "2026-10-20"
-      },
-      {
-        "symbol": "META",
-        "earnings_date": "2026-10-21"
-      },
-      {
-        "symbol": "LRCX",
-        "earnings_date": "2026-10-21"
-      },
-      {
-        "symbol": "NEE",
-        "earnings_date": "2026-10-21"
-      },
-      {
-        "symbol": "TSLA",
-        "earnings_date": "2026-10-21"
-      },
-      {
-        "symbol": "LMT",
-        "earnings_date": "2026-10-22"
-      },
-      {
-        "symbol": "VLO",
-        "earnings_date": "2026-10-22"
-      },
-      {
-        "symbol": "WDC",
-        "earnings_date": "2026-10-22"
-      },
-      {
         "symbol": "BE",
         "earnings_date": "2026-10-22"
       },
       {
         "symbol": "MIR",
-        "earnings_date": "2026-10-27"
-      },
-      {
-        "symbol": "SOFI",
         "earnings_date": "2026-10-27"
       },
       {
@@ -91,14 +39,6 @@
       {
         "symbol": "SNDK",
         "earnings_date": "2026-10-29"
-      },
-      {
-        "symbol": "XOM",
-        "earnings_date": "2026-10-30"
-      },
-      {
-        "symbol": "CVX",
-        "earnings_date": "2026-10-30"
       },
       {
         "symbol": "CCJ",
@@ -249,6 +189,10 @@
         "earnings_date": "2026-12-02"
       },
       {
+        "symbol": "RBRK",
+        "earnings_date": "2026-12-03"
+      },
+      {
         "symbol": "UEC",
         "earnings_date": "2026-12-08"
       },
@@ -261,12 +205,20 @@
         "earnings_date": "2026-12-09"
       },
       {
+        "symbol": "SNPS",
+        "earnings_date": "2026-12-09"
+      },
+      {
         "symbol": "COST",
         "earnings_date": "2026-12-10"
       },
       {
         "symbol": "ORCL",
         "earnings_date": "2026-12-14"
+      },
+      {
+        "symbol": "NNE",
+        "earnings_date": "2026-12-17"
       },
       {
         "symbol": "MU",
@@ -281,6 +233,14 @@
         "earnings_date": "2027-01-21"
       },
       {
+        "symbol": "LMT",
+        "earnings_date": "2027-01-26"
+      },
+      {
+        "symbol": "RTX",
+        "earnings_date": "2027-01-26"
+      },
+      {
         "symbol": "GLW",
         "earnings_date": "2027-01-26"
       },
@@ -293,7 +253,19 @@
         "earnings_date": "2027-01-27"
       },
       {
+        "symbol": "META",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "ASML",
+        "earnings_date": "2027-01-27"
+      },
+      {
         "symbol": "NOW",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "LRCX",
         "earnings_date": "2027-01-27"
       },
       {
@@ -305,6 +277,14 @@
         "earnings_date": "2027-01-27"
       },
       {
+        "symbol": "NEE",
+        "earnings_date": "2027-01-27"
+      },
+      {
+        "symbol": "TSLA",
+        "earnings_date": "2027-01-27"
+      },
+      {
         "symbol": "CAT",
         "earnings_date": "2027-01-28"
       },
@@ -313,8 +293,28 @@
         "earnings_date": "2027-01-28"
       },
       {
+        "symbol": "VLO",
+        "earnings_date": "2027-01-28"
+      },
+      {
         "symbol": "INTC",
         "earnings_date": "2027-01-28"
+      },
+      {
+        "symbol": "WDC",
+        "earnings_date": "2027-01-28"
+      },
+      {
+        "symbol": "XOM",
+        "earnings_date": "2027-01-29"
+      },
+      {
+        "symbol": "CVX",
+        "earnings_date": "2027-01-29"
+      },
+      {
+        "symbol": "SOFI",
+        "earnings_date": "2027-01-29"
       }
     ]
   }
