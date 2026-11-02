@@ -79974,5 +79974,41 @@
       "tier2": {}
     },
     "captured_at": "2026-11-01T20:35:32.466167+00:00"
+  },
+  "117544455342530109": {
+    "id": "117544455342530109",
+    "created_at": "2026-11-02T02:20:49.539Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117544455342530109",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-02T02:47:55.509236+00:00"
+  },
+  "117543867658627858": {
+    "id": "117543867658627858",
+    "created_at": "2026-11-01T23:51:22.194Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117543867658627858",
+    "text": "NY prosecutor claims Letitia James' office directed him to target Trump: https://www.timesunion.com/capitol/article/ny-prosecutor-claims-letitia-james-office-22409213.php",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-02T02:47:55.509673+00:00"
   }
 }
