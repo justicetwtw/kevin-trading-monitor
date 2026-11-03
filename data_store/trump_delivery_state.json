@@ -54118,12 +54118,12 @@
       "post_id": "117548730385164044",
       "created_at": "2026-11-02T20:28:01.511Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T02:17:00.225504+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T02:17:03.122385+00:00",
       "run_id": "41564917066",
       "workflow_attempt_id": "41564917066:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117548729505121580": {
       "post_id": "117548729505121580",
