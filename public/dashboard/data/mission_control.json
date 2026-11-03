@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T11:58:43.387903+08:00",
+  "generated_at": "2026-11-03T22:32:17.920303+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -65,7 +65,7 @@
         "category": "source_health",
         "symbol": null,
         "title": "Trump monitor health is stale",
-        "detail": "Last verified check is approximately 7.7 hours old."
+        "detail": "Last verified check is approximately 18.3 hours old."
       },
       {
         "severity": "P1",
@@ -111,7 +111,7 @@
       "source": "cnn_historical_archive",
       "latest_post_at": "2026-11-02T17:15:10.048000+00:00",
       "checked_at": "2026-11-02T20:15:39.861857+00:00",
-      "health_age_hours": 7.7,
+      "health_age_hours": 18.3,
       "attempts": [
         {
           "status": "unavailable",
@@ -388,7 +388,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-11-03T03:58:43.387882+00:00",
+      "generated_at": "2026-11-03T14:32:17.920284+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
