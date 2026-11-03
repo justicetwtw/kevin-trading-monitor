@@ -53942,12 +53942,12 @@
       "post_id": "117548979867696112",
       "created_at": "2026-11-02T21:31:28.313Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T02:18:21.874602+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T02:18:24.738954+00:00",
       "run_id": "41564917066",
       "workflow_attempt_id": "41564917066:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117548979193299382": {
       "post_id": "117548979193299382",
