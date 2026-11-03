@@ -55460,12 +55460,12 @@
       "post_id": "117552480855258770",
       "created_at": "2026-11-03T12:21:49.142Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T17:21:30.577801+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T17:21:41.663915+00:00",
       "run_id": "41682649799",
       "workflow_attempt_id": "41682649799:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552480272183176": {
       "post_id": "117552480272183176",
