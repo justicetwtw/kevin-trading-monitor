@@ -54140,12 +54140,12 @@
       "post_id": "117548728664861707",
       "created_at": "2026-11-02T20:27:35.262Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T02:16:49.680903+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T02:16:52.924074+00:00",
       "run_id": "41564917066",
       "workflow_attempt_id": "41564917066:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117548727340768491": {
       "post_id": "117548727340768491",
