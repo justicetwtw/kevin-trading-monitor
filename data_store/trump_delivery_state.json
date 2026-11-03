@@ -55119,12 +55119,12 @@
       "post_id": "117552692434683701",
       "created_at": "2026-11-03T13:15:37.588Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T22:24:16.191225+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T22:24:19.546525+00:00",
       "run_id": "41729758924",
       "workflow_attempt_id": "41729758924:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552691879958748": {
       "post_id": "117552691879958748",
