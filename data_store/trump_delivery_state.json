@@ -54173,12 +54173,12 @@
       "post_id": "117548723623311122",
       "created_at": "2026-11-02T20:26:18.334Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-03T02:16:34.656785+00:00",
       "resolved_at": null,
       "run_id": "41564917066",
       "workflow_attempt_id": "41564917066:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117548722241141969": {
       "post_id": "117548722241141969",
