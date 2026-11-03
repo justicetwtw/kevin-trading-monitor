@@ -53117,12 +53117,12 @@
       "post_id": "117549834474544371",
       "created_at": "2026-11-03T01:08:48.578Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T09:39:39.890350+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T09:39:42.656118+00:00",
       "run_id": "41612120495",
       "workflow_attempt_id": "41612120495:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117549834242650471": {
       "post_id": "117549834242650471",
