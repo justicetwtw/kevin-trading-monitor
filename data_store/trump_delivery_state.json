@@ -53414,12 +53414,12 @@
       "post_id": "117549388131357101",
       "created_at": "2026-11-02T23:15:17.921Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-03T09:37:38.262008+00:00",
       "resolved_at": null,
-      "run_id": "41564917066",
-      "workflow_attempt_id": "41564917066:1",
-      "stage_code": "captured_pending"
+      "run_id": "41612120495",
+      "workflow_attempt_id": "41612120495:1",
+      "stage_code": "claimed_before_send"
     },
     "117549387424202282": {
       "post_id": "117549387424202282",
