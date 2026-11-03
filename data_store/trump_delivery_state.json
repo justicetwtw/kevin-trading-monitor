@@ -54107,12 +54107,12 @@
       "post_id": "117548731761734326",
       "created_at": "2026-11-02T20:28:22.516Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T02:17:05.138488+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T02:17:08.205164+00:00",
       "run_id": "41564917066",
       "workflow_attempt_id": "41564917066:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117548730385164044": {
       "post_id": "117548730385164044",
