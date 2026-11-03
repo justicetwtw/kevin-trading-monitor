@@ -53370,12 +53370,12 @@
       "post_id": "117549392638329912",
       "created_at": "2026-11-02T23:16:26.692Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-03T09:37:56.125878+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-03T09:37:58.690450+00:00",
       "run_id": "41612120495",
       "workflow_attempt_id": "41612120495:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117549391621954717": {
       "post_id": "117549391621954717",
