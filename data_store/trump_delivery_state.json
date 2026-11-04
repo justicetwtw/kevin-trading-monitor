@@ -54283,12 +54283,12 @@
       "post_id": "117553605765659226",
       "created_at": "2026-11-03T17:07:53.913Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-04T17:28:54.568889+00:00",
       "resolved_at": null,
-      "run_id": "41682649799",
-      "workflow_attempt_id": "41682649799:1",
-      "stage_code": "captured_pending"
+      "run_id": "41877625514",
+      "workflow_attempt_id": "41877625514:1",
+      "stage_code": "claimed_before_send"
     },
     "117552850047209387": {
       "post_id": "117552850047209387",
