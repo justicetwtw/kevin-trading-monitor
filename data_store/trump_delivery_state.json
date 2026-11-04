@@ -54800,12 +54800,12 @@
       "post_id": "117552728427691304",
       "created_at": "2026-11-03T13:24:46.799Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-04T02:28:38.355090+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-04T02:28:41.241357+00:00",
       "run_id": "41760641022",
       "workflow_attempt_id": "41760641022:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552727628162432": {
       "post_id": "117552727628162432",
