@@ -54459,12 +54459,12 @@
       "post_id": "117552785929148974",
       "created_at": "2026-11-03T13:39:24.203Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-04T09:35:08.515018+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-04T09:35:11.961062+00:00",
       "run_id": "41808474364",
       "workflow_attempt_id": "41808474364:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552784642263422": {
       "post_id": "117552784642263422",
