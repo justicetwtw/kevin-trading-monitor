@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T11:04:57.685924+08:00",
+  "generated_at": "2026-11-04T22:47:29.107503+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
