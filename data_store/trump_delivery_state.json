@@ -54404,12 +54404,12 @@
       "post_id": "117552795061921562",
       "created_at": "2026-11-03T13:41:43.558Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-04T09:35:38.063352+00:00",
       "resolved_at": null,
-      "run_id": "41682649799",
-      "workflow_attempt_id": "41682649799:1",
-      "stage_code": "captured_pending"
+      "run_id": "41808474364",
+      "workflow_attempt_id": "41808474364:1",
+      "stage_code": "claimed_before_send"
     },
     "117552793703896847": {
       "post_id": "117552793703896847",
