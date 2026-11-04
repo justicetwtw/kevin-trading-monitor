@@ -54668,12 +54668,12 @@
       "post_id": "117552753900629339",
       "created_at": "2026-11-03T13:31:15.486Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-04T02:29:37.705445+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-04T02:29:40.943514+00:00",
       "run_id": "41760641022",
       "workflow_attempt_id": "41760641022:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552752333470129": {
       "post_id": "117552752333470129",
