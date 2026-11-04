@@ -54855,12 +54855,12 @@
       "post_id": "117552723964409284",
       "created_at": "2026-11-03T13:23:38.694Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-04T02:28:13.405883+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-04T02:28:16.264736+00:00",
       "run_id": "41760641022",
       "workflow_attempt_id": "41760641022:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552723229866028": {
       "post_id": "117552723229866028",
