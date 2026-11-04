@@ -55746,12 +55746,12 @@
       "post_id": "117556320287218255",
       "created_at": "2026-11-04T04:38:14.224Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-04T17:30:34.870005+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-04T17:30:37.965813+00:00",
       "run_id": "41877625514",
       "workflow_attempt_id": "41877625514:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117556309377726931": {
       "post_id": "117556309377726931",
