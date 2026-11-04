@@ -54888,12 +54888,12 @@
       "post_id": "117552721908914721",
       "created_at": "2026-11-03T13:23:07.329Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-04T02:27:57.945143+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-04T02:28:00.912289+00:00",
       "run_id": "41760641022",
       "workflow_attempt_id": "41760641022:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117552721140395824": {
       "post_id": "117552721140395824",
