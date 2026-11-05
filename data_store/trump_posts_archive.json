@@ -86181,5 +86181,57 @@
       }
     },
     "captured_at": "2026-11-05T02:49:54.794468+00:00"
+  },
+  "117564115835486203": {
+    "id": "117564115835486203",
+    "created_at": "2026-11-05T13:40:44.851Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117564115835486203",
+    "text": "The vote totals for the Fake Dan Sullivan, plus the other \"slug\" that the Dems put on the Ballot, should be immediately given to the REAL Dan Sullivan, and the Election is over - He easily wins. There is no other fair solution! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-05T17:43:52.784960+00:00"
+  },
+  "117564043402069442": {
+    "id": "117564043402069442",
+    "created_at": "2026-11-05T13:22:19.607Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117564043402069442",
+    "text": "https://truthsocial.com/@WhiteHouse/117550235500967429",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-05T17:43:52.785069+00:00"
+  },
+  "117563218876256792": {
+    "id": "117563218876256792",
+    "created_at": "2026-11-05T09:52:38.343Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117563218876256792",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-05T17:43:52.785085+00:00"
   }
 }
