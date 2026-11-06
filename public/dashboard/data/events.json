@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T22:52:06.101632+08:00",
+  "generated_at": "2026-11-06T11:30:59.727327+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -53,15 +53,7 @@
         "earnings_date": "2026-11-03"
       },
       {
-        "symbol": "QCOM",
-        "earnings_date": "2026-11-04"
-      },
-      {
         "symbol": "MELI",
-        "earnings_date": "2026-11-04"
-      },
-      {
-        "symbol": "ARM",
         "earnings_date": "2026-11-04"
       },
       {
@@ -315,6 +307,14 @@
       {
         "symbol": "SMCI",
         "earnings_date": "2027-02-02"
+      },
+      {
+        "symbol": "QCOM",
+        "earnings_date": "2027-02-03"
+      },
+      {
+        "symbol": "ARM",
+        "earnings_date": "2027-02-03"
       }
     ]
   }
