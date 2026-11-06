@@ -86292,5 +86292,44 @@
       }
     },
     "captured_at": "2026-11-06T02:54:33.868084+00:00"
+  },
+  "117569389226840480": {
+    "id": "117569389226840480",
+    "created_at": "2026-11-06T12:01:50.419Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117569389226840480",
+    "text": "As President, I am 100% in favor of Super Intelligence (SI), and will work with the many States in the U.S. that want to become RICH by having them. They are GOLD, and only foolish leadership will say \"NO\" to the riches they bring! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "100%"
+        ],
+        "company_named": [
+          "Intel"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-11-06T17:12:12.403822+00:00"
+  },
+  "117569336938341217": {
+    "id": "117569336938341217",
+    "created_at": "2026-11-06T11:48:32.560Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117569336938341217",
+    "text": "NEWSMAX: \"Trump is a Winner, and he's right on Iran!\"",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-06T17:12:12.403941+00:00"
   }
 }
