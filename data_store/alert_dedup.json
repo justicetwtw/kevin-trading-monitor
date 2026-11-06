@@ -1,6 +1,11 @@
 {
-  "LMT::leaps_entry": {
-    "last_sent": "2026-10-01T23:55:17.887741+00:00",
+  "00631L.TW::twstock": {
+    "last_sent": "2026-11-06T14:31:25.651961+00:00",
+    "alert_level": "green",
+    "tags": []
+  },
+  "2330.TW::twstock": {
+    "last_sent": "2026-11-06T14:31:26.753431+00:00",
     "alert_level": "green",
     "tags": []
   }
