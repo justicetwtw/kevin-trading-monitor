@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T22:30:12.038732+08:00",
+  "generated_at": "2026-11-07T10:59:10.926000+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -165,6 +165,10 @@
         "earnings_date": "2026-12-03"
       },
       {
+        "symbol": "SNPS",
+        "earnings_date": "2026-12-08"
+      },
+      {
         "symbol": "UEC",
         "earnings_date": "2026-12-08"
       },
@@ -174,10 +178,6 @@
       },
       {
         "symbol": "ADBE",
-        "earnings_date": "2026-12-09"
-      },
-      {
-        "symbol": "SNPS",
         "earnings_date": "2026-12-09"
       },
       {

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T14:30:12.692933+00:00",
+  "generated_at": "2026-11-07T02:59:11.865226+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -20,13 +20,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 656.390015,
-        "as_of": "2026-11-05T00:00:00-05:00",
-        "return_1m": -0.3967,
-        "return_3m": -0.252037,
-        "return_6m": 0.015094,
-        "pct_from_52w_high": -0.47698,
-        "realized_vol_20d": 0.852701,
+        "current_price": 690.0,
+        "as_of": "2026-11-06T00:00:00-05:00",
+        "return_1m": -0.333874,
+        "return_3m": -0.198606,
+        "return_6m": -0.07607,
+        "pct_from_52w_high": -0.450199,
+        "realized_vol_20d": 0.889623,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -54,8 +54,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 53.1,
-      "ivp": 48.0,
+      "ivr": 48.7,
+      "ivp": 46.0,
       "regime": "neutral",
       "missing_inputs": [
         "catalyst_not_future",
@@ -83,13 +83,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 181.600006,
-        "as_of": "2026-11-05T00:00:00-05:00",
-        "return_1m": -0.235272,
-        "return_3m": -0.189141,
-        "return_6m": -0.141371,
-        "pct_from_52w_high": -0.253811,
-        "realized_vol_20d": 0.444746,
+        "current_price": 186.639999,
+        "as_of": "2026-11-06T00:00:00-05:00",
+        "return_1m": -0.190212,
+        "return_3m": -0.142082,
+        "return_6m": -0.132714,
+        "pct_from_52w_high": -0.233102,
+        "realized_vol_20d": 0.465785,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -113,8 +113,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 100.0,
-      "ivp": 99.2,
+      "ivr": 86.8,
+      "ivp": 98.4,
       "regime": "neutral",
       "missing_inputs": [
         "catalyst_not_future",
@@ -328,7 +328,7 @@
   "market_context_health": {
     "status": "healthy",
     "stale": false,
-    "generated_at": "2026-11-06T02:33:56.724351+00:00",
+    "generated_at": "2026-11-07T02:00:12.434755+00:00",
     "unavailable_count": 0,
     "partial_count": 0,
     "contract": "market_context_only_not_valuation_or_trade_instruction"
