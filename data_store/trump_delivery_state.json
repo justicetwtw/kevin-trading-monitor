@@ -56054,12 +56054,12 @@
       "post_id": "117577381997659473",
       "created_at": "2026-11-07T21:54:30.422Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-07T22:26:00.097761+00:00",
       "resolved_at": null,
       "run_id": "42420436819",
       "workflow_attempt_id": "42420436819:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117577357040264617": {
       "post_id": "117577357040264617",
