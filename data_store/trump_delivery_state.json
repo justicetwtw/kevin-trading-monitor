@@ -56065,12 +56065,12 @@
       "post_id": "117577357040264617",
       "created_at": "2026-11-07T21:48:09.603Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-07T22:25:55.299001+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-07T22:25:58.180028+00:00",
       "run_id": "42420436819",
       "workflow_attempt_id": "42420436819:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117577356194134392": {
       "post_id": "117577356194134392",
