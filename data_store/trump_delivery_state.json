@@ -56296,12 +56296,12 @@
       "post_id": "117583459253586462",
       "created_at": "2026-11-08T23:40:01.989Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-09T02:02:40.885931+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-09T02:02:44.618703+00:00",
       "run_id": "42548607992",
       "workflow_attempt_id": "42548607992:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
