@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T00:44:41.656085+08:00",
+  "generated_at": "2026-11-10T12:42:36.869767+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -130,7 +130,7 @@
       },
       {
         "symbol": "UAMY",
-        "earnings_date": "2026-11-16"
+        "earnings_date": "2026-11-12"
       },
       {
         "symbol": "NVDA",
