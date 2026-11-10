@@ -56340,12 +56340,12 @@
       "post_id": "117589581287691662",
       "created_at": "2026-11-10T01:36:56.816Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-10T02:37:04.039816+00:00",
       "resolved_at": null,
       "run_id": "42743813967",
       "workflow_attempt_id": "42743813967:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117588981207857769": {
       "post_id": "117588981207857769",
