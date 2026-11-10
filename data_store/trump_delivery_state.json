@@ -56373,12 +56373,12 @@
       "post_id": "117588487146018273",
       "created_at": "2026-11-09T20:58:41.539Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-10T02:36:46.172745+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-10T02:36:50.222110+00:00",
       "run_id": "42743813967",
       "workflow_attempt_id": "42743813967:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
