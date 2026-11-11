@@ -87232,5 +87232,49 @@
       "tier2": {}
     },
     "captured_at": "2026-11-10T22:43:49.043618+00:00"
+  },
+  "117594826848361683": {
+    "id": "117594826848361683",
+    "created_at": "2026-11-10T23:50:57.720Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117594826848361683",
+    "text": "A Huge Victory against Fake News BBC, a terrible abuser of the truth, just handed down by highly respected District Court Judge, Jeffrey T. Kuntz, of the Southern District of Florida. In his powerful ruling, Judge Kuntz wrote, \"Here, the news entity created the story. BBC admitted as much by confirming it had edited a video to make it appear as though President Trump made a statement he never made.\" We will continue fighting against, and defeating, all of those who try to deceive the American People! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-11T02:16:19.062304+00:00"
+  },
+  "117594721408592840": {
+    "id": "117594721408592840",
+    "created_at": "2026-11-10T23:24:08.837Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117594721408592840",
+    "text": "The Democrats' attempt to impeach Secretary of War Pete Hegseth has miserably FAILED! Every single Republican, except Thomas Massie, a major LOSER, voted in favor of Pete. Again, Victories in Venezuela and Iran, the Best Recruitment Numbers in the History of the Military (Long waiting lists to get in!), and Spirit like rarely seen before, led to the EXONERATION of a Great American Patriot. The Democrats continue to weaponize and abuse the United States of America. They must be stopped! MAKE AMERICA GREAT AGAIN. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-11T02:16:19.062433+00:00"
   }
 }
