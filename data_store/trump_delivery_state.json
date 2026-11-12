@@ -56560,12 +56560,12 @@
       "post_id": "117603082123932016",
       "created_at": "2026-11-12T10:50:23.228Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-12T12:30:55.529996+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-12T12:30:59.356183+00:00",
       "run_id": "43218405366",
       "workflow_attempt_id": "43218405366:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
