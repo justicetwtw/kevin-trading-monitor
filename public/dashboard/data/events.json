@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T22:39:16.178552+08:00",
+  "generated_at": "2026-11-12T11:59:15.520023+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -141,7 +141,11 @@
         "earnings_date": "2026-11-19"
       },
       {
-        "symbol": "CRDO",
+        "symbol": "NNE",
+        "earnings_date": "2026-11-30"
+      },
+      {
+        "symbol": "RBRK",
         "earnings_date": "2026-11-30"
       },
       {
@@ -153,16 +157,16 @@
         "earnings_date": "2026-12-01"
       },
       {
+        "symbol": "CRDO",
+        "earnings_date": "2026-12-01"
+      },
+      {
         "symbol": "CRM",
         "earnings_date": "2026-12-02"
       },
       {
         "symbol": "AVAV",
         "earnings_date": "2026-12-02"
-      },
-      {
-        "symbol": "RBRK",
-        "earnings_date": "2026-12-03"
       },
       {
         "symbol": "SNPS",
@@ -187,10 +191,6 @@
       {
         "symbol": "ORCL",
         "earnings_date": "2026-12-14"
-      },
-      {
-        "symbol": "NNE",
-        "earnings_date": "2026-12-17"
       },
       {
         "symbol": "MU",
