@@ -56604,12 +56604,12 @@
       "post_id": "117604177898784579",
       "created_at": "2026-11-12T15:29:03.425Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-12T20:19:02.592486+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-12T20:19:06.194415+00:00",
       "run_id": "43298798812",
       "workflow_attempt_id": "43298798812:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117603685944533416": {
       "post_id": "117603685944533416",
