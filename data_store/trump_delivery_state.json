@@ -56648,12 +56648,12 @@
       "post_id": "117606259365899322",
       "created_at": "2026-11-13T00:18:24.093Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-13T01:10:46.274657+00:00",
       "resolved_at": null,
       "run_id": "43342714381",
       "workflow_attempt_id": "43342714381:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117606070721302149": {
       "post_id": "117606070721302149",
