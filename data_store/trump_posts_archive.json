@@ -87647,5 +87647,45 @@
       "tier2": {}
     },
     "captured_at": "2026-11-13T15:43:36.682101+00:00"
+  },
+  "117611608680849019": {
+    "id": "117611608680849019",
+    "created_at": "2026-11-13T22:58:48.161Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117611608680849019",
+    "text": "Thank you to the United States Coast Guard for doing such an incredible job of rescue, and other work, having to do with the crash of the two ships in Louisiana. Likewise, all of Law Enforcement and First Responders were fantastic! Incredibly, nobody was killed by this major collision. 32 people are in the hospital. Thank you to Governor Jeff Landry for your outstanding leadership during this very agonizing period of time. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-14T01:44:16.552273+00:00"
+  },
+  "117611584206041319": {
+    "id": "117611584206041319",
+    "created_at": "2026-11-13T22:52:34.706Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117611584206041319",
+    "text": "I am working with Senator Tim Scott and, believe it or not, Senator Adam Schiff, and, additionally, Senators John Cornyn, Raphael Warnock, Steve Daines, Bernie Moreno, Tim Sheehy, Alex Padilla, Mark Warner, Thom Tillis, Chris Coons, Katie Britt, and Dick Durbin, together with Representatives Jason Smith, Nathaniel Moran, Brian Jack, Linda Sanchez, and many others, both Republican and Democrat, on the Motion Picture, Television, and Entertainment Revitalization Act. The support and popularity of doing this, and bringing Entertainment back to the United States of America, has been unbelievable! Hollywood, and so many other places, have been virtually \"emptied out\" by the Tax Incentives, and much more, given by other Countries. Everyone feels strongly about the Motion Picture and Television Industry — and so do I, and we all want to save it. It was MADE IN AMERICA, and must STAY IN AMERICA. The Entertainment Industry has largely moved to Canada, the United Kingdom, Australia, and other countries, but the actors, producers, and all others involved want to come back home! Importantly, hundreds of thousands of Blue Collar Workers will be positively affected, BIG TIME, by the passage of this Bill. The amount of money spent on these Tax Incentives will be made up tenfold by the money pouring into the Treasury's coffers. Meetings are being set up, routinely, with the Leaders of both Parties in order to, GET THIS DONE! It is a very Bipartisan undertaking, especially in that so much of the money being lost to other countries is coming out of the Blue States. Hopefully Republicans and Democrats will get together and finalize this already very actively negotiated Legislation. It can be done quickly, accurately, efficiently and, importantly, will benefit all of America. MAKE OUR ENTERTAINMENT INDUSTRY GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-14T01:44:16.552493+00:00"
   }
 }
