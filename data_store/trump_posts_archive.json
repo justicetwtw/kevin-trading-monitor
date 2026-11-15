@@ -87903,5 +87903,45 @@
       "tier2": {}
     },
     "captured_at": "2026-11-14T23:21:14.711417+00:00"
+  },
+  "117617925898523147": {
+    "id": "117617925898523147",
+    "created_at": "2026-11-15T01:45:21.254Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117617925898523147",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-15T02:49:50.361926+00:00"
+  },
+  "117617708553644602": {
+    "id": "117617708553644602",
+    "created_at": "2026-11-15T00:50:04.833Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117617708553644602",
+    "text": "Has anyone noticed that immediately after the Election the Stock Market lost 3 Trillion Dollars in Value? In other words, Investors throughout the World hated seeing what took place on Election Day. But have no fear, the Market has since gone up, and America will soon be GREATER THAN EVER BEFORE! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {
+        "market_general": [
+          "stock market"
+        ]
+      }
+    },
+    "captured_at": "2026-11-15T02:49:50.362412+00:00"
   }
 }
