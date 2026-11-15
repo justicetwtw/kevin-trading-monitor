@@ -87991,5 +87991,117 @@
       "tier2": {}
     },
     "captured_at": "2026-11-15T09:58:29.995057+00:00"
+  },
+  "117621327546745159": {
+    "id": "117621327546745159",
+    "created_at": "2026-11-15T16:10:26.287Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117621327546745159",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-15T16:48:16.679270+00:00"
+  },
+  "117621326974892115": {
+    "id": "117621326974892115",
+    "created_at": "2026-11-15T16:10:17.561Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117621326974892115",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-15T16:48:16.679306+00:00"
+  },
+  "117620933637807515": {
+    "id": "117620933637807515",
+    "created_at": "2026-11-15T14:30:15.712Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117620933637807515",
+    "text": "Biden appointed Judge Reyes has delayed, for yet another two weeks, the fix up and reconstruction, by the Department of the Interior, of one of the worst and most dangerous golf courses anywhere in the U.S. \"Trash Island,\" as it is affectionately known, needs work, and needs it now! It is in a terrible state of disrepair, as anybody can see by just looking at the pictures that are now circulating all over the Country, and in the Court. They don't call it Trash Island for no reason! Why would a judge want to delay taking a terrible and very unsafe golf course, one that is mocked all over D.C.(and far beyond!), instead of quickly turning it into a great and admired one? \"INTERIOR\" has the absolute right to do so, and will immediately appeal, on an expedited basis, this highly destructive and political decision of the judge. Time is of the essence, or golf seasons, jobs, prestige, and much money, will be lost! Thank you for your attention to this matter! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-15T16:48:16.679786+00:00"
+  },
+  "117620744239777031": {
+    "id": "117620744239777031",
+    "created_at": "2026-11-15T13:42:05.729Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117620744239777031",
+    "text": "I am in the White House having meetings on many subjects. Very exciting times for the USA. Great things are happening - We are the \"hottest\" Country anywhere in the World! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-15T16:48:16.679885+00:00"
+  },
+  "117620719333478761": {
+    "id": "117620719333478761",
+    "created_at": "2026-11-15T13:35:45.689Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117620719333478761",
+    "text": "If Congress approves the desperately needed money for Air Traffic Control, we can get it built quickly and efficiently. It will be the BEST SYSTEM anywhere in the World. Much of our current air control system is 50 years old - RIDICULOUS! We have already started the work, but it should be done all at once, not in drips and drabs. Congress must approve. The Biden Administration set it back years! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-15T16:48:16.679995+00:00"
+  },
+  "117620643696909295": {
+    "id": "117620643696909295",
+    "created_at": "2026-11-15T13:16:31.565Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117620643696909295",
+    "text": "The Biden Administration was an FAA disaster. Everything they touched turned bad. Big money spent unwisely, making an old and broken system worse than when they began. We have the knowledge and plan for the Flight Control Systems, we need Congress to give the money, FAST! Our FAA is doing a great job, and is ready to go. President DJThttps://justthenews.com/government/federal-agencies/trump-admin-rips-biden-admin-handling-air-traffic-control-after-faa",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "fed_intervention": [
+          "Fed"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-15T16:48:16.680122+00:00"
   }
 }
