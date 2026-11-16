@@ -88123,5 +88123,125 @@
       "tier2": {}
     },
     "captured_at": "2026-11-15T21:21:07.538319+00:00"
+  },
+  "117623641217339970": {
+    "id": "117623641217339970",
+    "created_at": "2026-11-16T01:58:50.098Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623641217339970",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117623640519503406",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T07:55:05.735071+00:00"
+  },
+  "117623640519503406": {
+    "id": "117623640519503406",
+    "created_at": "2026-11-16T01:58:39.450Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623640519503406",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T07:55:05.735105+00:00"
+  },
+  "117623617958352976": {
+    "id": "117623617958352976",
+    "created_at": "2026-11-16T01:52:55.193Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623617958352976",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T07:55:05.735119+00:00"
+  },
+  "117623615345379583": {
+    "id": "117623615345379583",
+    "created_at": "2026-11-16T01:52:15.322Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623615345379583",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117623614337560938",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T07:55:05.735193+00:00"
+  },
+  "117623614337560938": {
+    "id": "117623614337560938",
+    "created_at": "2026-11-16T01:51:59.944Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623614337560938",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117623612801930113",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T07:55:05.735252+00:00"
+  },
+  "117623612801930113": {
+    "id": "117623612801930113",
+    "created_at": "2026-11-16T01:51:36.513Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623612801930113",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T07:55:05.735264+00:00"
+  },
+  "117623567982116164": {
+    "id": "117623567982116164",
+    "created_at": "2026-11-16T01:40:12.617Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117623567982116164",
+    "text": "A must read!!!If You Think War Is Unpopular, Wait Till You See Defeat:https://www.wsj.com/opinion/if-you-think-war-is-unpopular-wait-till-you-see-defeat-04608ab0",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-16T07:55:05.735326+00:00"
   }
 }
