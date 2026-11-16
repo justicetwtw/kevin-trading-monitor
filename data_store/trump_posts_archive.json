@@ -88243,5 +88243,65 @@
       }
     },
     "captured_at": "2026-11-16T07:55:05.735326+00:00"
+  },
+  "117626544494395657": {
+    "id": "117626544494395657",
+    "created_at": "2026-11-16T14:17:10.590Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117626544494395657",
+    "text": "The new people running 60 Minutes are even worse than their predecessors. A recent study on an attack in the early stages of Iran was not correctly stated. Since February 28, 2026, the start of Epic Fury, Iran has fired between 8,000-9,000 One-way Attack Drones. Only 2 of them got through, resulting in U.S. fatalities, both on the first day, hitting Kuwait and Saudi Arabia. Likewise, Iran has fired about 2,000 Ballistic Missiles. Only 1 out of the 2,0000 got through, and caused U.S. fatalities (Jordan). Translation: 99.99% of Iranian missiles and drones have been shot down or, in any event, not caused U.S. deaths. CENTCOM defensive measures have been historically effective. No one in the World has the ability to do so well. All of this being left out of the 60 Minutes \"report.\" Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack",
+          "missile"
+        ],
+        "fed_intervention": [
+          "fire"
+        ]
+      },
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-16T17:36:24.402111+00:00"
+  },
+  "117625792377654324": {
+    "id": "117625792377654324",
+    "created_at": "2026-11-16T11:05:54.200Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117625792377654324",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117625791706744860",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T17:36:24.402215+00:00"
+  },
+  "117625791706744860": {
+    "id": "117625791706744860",
+    "created_at": "2026-11-16T11:05:43.961Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117625791706744860",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-16T17:36:24.402227+00:00"
   }
 }
