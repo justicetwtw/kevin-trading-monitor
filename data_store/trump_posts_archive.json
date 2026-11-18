@@ -88502,5 +88502,30 @@
       "tier2": {}
     },
     "captured_at": "2026-11-18T08:05:27.456079+00:00"
+  },
+  "117636323928351024": {
+    "id": "117636323928351024",
+    "created_at": "2026-11-18T07:44:12.909Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117636323928351024",
+    "text": "I am now heading to China, from the Philippines, where we had a wonderful meeting on Trade, National Security, and other subjects. I am pleased to announce that we made a new and completely different Trade Deal with the Philippines, one that will be a true landmark and, in particular, a Deal that will be great for our Farmers and those in the business of \"Energy.\" President Marcos is a powerful leader, and a man of high integrity and substance. It was an Honor to be with him, and his beautiful wife and son. See you in China! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "trade_general": [
+          "trade deal",
+          "China",
+          "deal"
+        ],
+        "energy": [
+          "energy"
+        ]
+      }
+    },
+    "captured_at": "2026-11-18T17:10:43.155125+00:00"
   }
 }
