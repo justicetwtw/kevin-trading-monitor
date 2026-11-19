@@ -57242,12 +57242,12 @@
       "post_id": "117644724699997043",
       "created_at": "2026-11-19T19:20:38.512Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-19T21:35:07.306766+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-19T21:35:11.255900+00:00",
       "run_id": "44619869695",
       "workflow_attempt_id": "44619869695:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117644175826027343": {
       "post_id": "117644175826027343",
