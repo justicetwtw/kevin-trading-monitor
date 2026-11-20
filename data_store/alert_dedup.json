@@ -3,5 +3,10 @@
     "last_sent": "2026-11-19T15:59:29.820354+00:00",
     "alert_level": "green",
     "tags": []
+  },
+  "2330.TW::twstock": {
+    "last_sent": "2026-11-20T15:42:29.250603+00:00",
+    "alert_level": "green",
+    "tags": []
   }
 }
