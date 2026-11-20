@@ -57451,12 +57451,12 @@
       "post_id": "117645941688172584",
       "created_at": "2026-11-20T00:30:08.278Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-20T02:32:51.171506+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-20T02:32:54.421652+00:00",
       "run_id": "44661351137",
       "workflow_attempt_id": "44661351137:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117645541918545911": {
       "post_id": "117645541918545911",
