@@ -57418,12 +57418,12 @@
       "post_id": "117646008897162950",
       "created_at": "2026-11-20T00:47:13.805Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-20T02:33:07.028767+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-20T02:33:10.567455+00:00",
       "run_id": "44661351137",
       "workflow_attempt_id": "44661351137:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117645971016970582": {
       "post_id": "117645971016970582",
