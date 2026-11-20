@@ -88996,5 +88996,29 @@
       "tier2": {}
     },
     "captured_at": "2026-11-20T02:32:06.763189+00:00"
+  },
+  "117648902586194402": {
+    "id": "117648902586194402",
+    "created_at": "2026-11-20T13:03:07.996Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117648902586194402",
+    "text": "RT @SchoenlawBy engaging in an unprecedented tripartite summit with the leaders of China and Russia, countries with which we have profound differences, President Trump not only continues his well-founded policy of always seeking to keep dialogue open, but that policy is consistent with the great statesmen of generations past:Abraham Lincoln: \"Do I not destroy my enemies when I make them my friends?\"  Yitzhak Rabin:  \"You don't make peace with friends. You make it with very unsavory enemies.\"                                                Winston Churchill:  \"It is better to jaw-jaw than to war-war\"Lord Palmerston:  \"We have no eternal allies, and we have no perpetual enemies. Our interests are eternal and perpetual, and those interests it is our duty to follow.\"John F. Kennedy: \"Let us never negotiate out of fear. But let us never fear to negotiate.\" @realDonaldTrump",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "war"
+        ]
+      },
+      "tier2": {
+        "trade_general": [
+          "China"
+        ]
+      }
+    },
+    "captured_at": "2026-11-20T18:40:17.365065+00:00"
   }
 }
