@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-20T23:41:21.268621+08:00",
+  "generated_at": "2026-11-21T12:07:40.568006+08:00",
   "source_files": [
     "alerts_log.csv",
     "earnings_calendar.json"
@@ -129,10 +129,6 @@
         "earnings_date": "2026-11-17"
       },
       {
-        "symbol": "WMT",
-        "earnings_date": "2026-11-19"
-      },
-      {
         "symbol": "NNE",
         "earnings_date": "2026-11-30"
       },
@@ -186,7 +182,7 @@
       },
       {
         "symbol": "MU",
-        "earnings_date": "2026-12-23"
+        "earnings_date": "2026-12-17"
       },
       {
         "symbol": "TSM",
@@ -315,6 +311,10 @@
       {
         "symbol": "NBIS",
         "earnings_date": "2027-02-11"
+      },
+      {
+        "symbol": "WMT",
+        "earnings_date": "2027-02-18"
       }
     ]
   }
