@@ -57781,12 +57781,12 @@
       "post_id": "117656480707360822",
       "created_at": "2026-11-21T21:10:20.948Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-22T00:45:19.322621+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-22T00:45:22.719017+00:00",
       "run_id": "44967931089",
       "workflow_attempt_id": "44967931089:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117656475953478869": {
       "post_id": "117656475953478869",
