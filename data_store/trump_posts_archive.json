@@ -89660,5 +89660,201 @@
       "tier2": {}
     },
     "captured_at": "2026-11-22T00:43:32.020194+00:00"
+  },
+  "117660772187019609": {
+    "id": "117660772187019609",
+    "created_at": "2026-11-22T15:21:43.731Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660772187019609",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117660771450282590",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.827991+00:00"
+  },
+  "117660771450282590": {
+    "id": "117660771450282590",
+    "created_at": "2026-11-22T15:21:32.489Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660771450282590",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828022+00:00"
+  },
+  "117660725477492021": {
+    "id": "117660725477492021",
+    "created_at": "2026-11-22T15:09:51.000Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660725477492021",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117660724070925141",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828109+00:00"
+  },
+  "117660724070925141": {
+    "id": "117660724070925141",
+    "created_at": "2026-11-22T15:09:29.538Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660724070925141",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828124+00:00"
+  },
+  "117660723274437760": {
+    "id": "117660723274437760",
+    "created_at": "2026-11-22T15:09:17.385Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660723274437760",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117660722020393630",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828198+00:00"
+  },
+  "117660722020393630": {
+    "id": "117660722020393630",
+    "created_at": "2026-11-22T15:08:58.249Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660722020393630",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828210+00:00"
+  },
+  "117660716526739941": {
+    "id": "117660716526739941",
+    "created_at": "2026-11-22T15:07:34.423Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660716526739941",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117660715234270781",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828307+00:00"
+  },
+  "117660715234270781": {
+    "id": "117660715234270781",
+    "created_at": "2026-11-22T15:07:14.701Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660715234270781",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828324+00:00"
+  },
+  "117660692611602783": {
+    "id": "117660692611602783",
+    "created_at": "2026-11-22T15:01:29.507Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660692611602783",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117660691191971810",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828404+00:00"
+  },
+  "117660691191971810": {
+    "id": "117660691191971810",
+    "created_at": "2026-11-22T15:01:07.845Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660691191971810",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828417+00:00"
+  },
+  "117660378819768000": {
+    "id": "117660378819768000",
+    "created_at": "2026-11-22T13:41:41.423Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660378819768000",
+    "text": "It is going to be very hard for me to work with Chuck Schumer should he become Senate Majority Leader. He failed badly as \"Leader\" once before, one of the worst history, and I have little doubt that he will fail again. All he did was perpetuate the Russia, Russia, Russia Hoax, and many other Hoaxes and Scams, making my victory in 2024 an easy and glorious one. Here we go again! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-22T15:33:00.828509+00:00"
+  },
+  "117660247395378881": {
+    "id": "117660247395378881",
+    "created_at": "2026-11-22T13:08:16.047Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117660247395378881",
+    "text": "OPEN BORDERS DESTROY NATIONS! The USA was very close to being one of them until I came along!",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T15:33:00.828579+00:00"
   }
 }
