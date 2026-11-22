@@ -89856,5 +89856,99 @@
       "tier2": {}
     },
     "captured_at": "2026-11-22T15:33:00.828579+00:00"
+  },
+  "117662086130550876": {
+    "id": "117662086130550876",
+    "created_at": "2026-11-22T20:55:52.919Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117662086130550876",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T21:11:30.435560+00:00"
+  },
+  "117661447235607485": {
+    "id": "117661447235607485",
+    "created_at": "2026-11-22T18:13:24.155Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117661447235607485",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T21:11:30.435592+00:00"
+  },
+  "117661248657891612": {
+    "id": "117661248657891612",
+    "created_at": "2026-11-22T17:22:54.100Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117661248657891612",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T21:11:30.435604+00:00"
+  },
+  "117661238960252261": {
+    "id": "117661238960252261",
+    "created_at": "2026-11-22T17:20:26.126Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117661238960252261",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-22T21:11:30.435613+00:00"
+  },
+  "117661238591305263": {
+    "id": "117661238591305263",
+    "created_at": "2026-11-22T17:20:20.497Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117661238591305263",
+    "text": "The Market is down more than 6 Trillion Dollars since the Democrats' rather strange \"win\" on November 3rd. NASDAQ, by itself, is down 20%. This is 100% due to the fact that the Democrats are \"BAD\" due to their Anti Growth, and Retribution Only, Policies, and worse. If they don't change, FAST, it will only get worse. But fear not, our Country will soon be STRONG AGAIN — Lots of good things happening! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "tariff": [
+          "100%"
+        ],
+        "currency": [
+          "dollar"
+        ]
+      },
+      "tier2": {
+        "market_general": [
+          "growth"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-22T21:11:30.435962+00:00"
   }
 }
