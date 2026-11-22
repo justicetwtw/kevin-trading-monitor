@@ -57847,12 +57847,12 @@
       "post_id": "117656439718935659",
       "created_at": "2026-11-21T20:59:55.514Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-22T00:44:45.769262+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-22T00:44:48.956506+00:00",
       "run_id": "44967931089",
       "workflow_attempt_id": "44967931089:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117656439023369533": {
       "post_id": "117656439023369533",
