@@ -89950,5 +89950,92 @@
       }
     },
     "captured_at": "2026-11-22T21:11:30.435962+00:00"
+  },
+  "117662311303966632": {
+    "id": "117662311303966632",
+    "created_at": "2026-11-22T21:53:08.792Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117662311303966632",
+    "text": "It's incredible that Somalians have been able to completely take over the once great State of Minnesota. They own it, \"lock, stock, and barrel\" and, almost 95% are on some form of welfare. MAKE AMERICA GREAT AGAIN! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-23T01:38:29.516142+00:00"
+  },
+  "117662295722625733": {
+    "id": "117662295722625733",
+    "created_at": "2026-11-22T21:49:11.040Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117662295722625733",
+    "text": "Isn't it interesting that Oil prices have dropped precipitously after the Midterm Elections? I said that was going to happen. The whole thing is a Giant Hoax! President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-23T01:38:29.516289+00:00"
+  },
+  "117662290160182921": {
+    "id": "117662290160182921",
+    "created_at": "2026-11-22T21:47:46.164Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117662290160182921",
+    "text": "As everyone remembers, I predicted two things concerning the November 3rd Midterm Elections. One, that if the Democrats win, the Stock Markets would go down, substantially, which they have, and two, that the Islamic Republic of Iran, which has killed 81,000 protestors as of today, will grow more aggressive in their attacks, which has also occurred. Iran has launched more drones and missiles in the last week than at any time for over a year. Don't worry, they've all been knocked down, and done no damage. Iranian leaders consider the Democrats weak, ineffective, and Country destroying, but I won't let that happen! Both the Dems and Iran fought like hell to keep the Oil price up as long as possible and, since the Election, the Oil price has dropped by a record level. Too bad the Voters didn't understand this before they pulled the trigger, but the whole Election was very \"strange.\" In the end, America will win! Thank you for your attention to this matter. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "war_escalation": [
+          "attack",
+          "missile"
+        ]
+      },
+      "tier2": {
+        "energy": [
+          "oil"
+        ],
+        "market_general": [
+          "stock market"
+        ]
+      }
+    },
+    "captured_at": "2026-11-23T01:38:29.516460+00:00"
+  },
+  "117662138213122537": {
+    "id": "117662138213122537",
+    "created_at": "2026-11-22T21:09:07.635Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117662138213122537",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-23T01:38:29.516481+00:00"
   }
 }
