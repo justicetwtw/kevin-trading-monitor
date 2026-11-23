@@ -90037,5 +90037,57 @@
       "tier2": {}
     },
     "captured_at": "2026-11-23T01:38:29.516481+00:00"
+  },
+  "117664023227213831": {
+    "id": "117664023227213831",
+    "created_at": "2026-11-23T05:08:30.668Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117664023227213831",
+    "text": "RT: https://truthsocial.com/users/realDonaldTrump/statuses/117664020137490731",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-23T09:44:07.922410+00:00"
+  },
+  "117664020137490731": {
+    "id": "117664020137490731",
+    "created_at": "2026-11-23T05:07:43.522Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117664020137490731",
+    "text": "",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-23T09:44:07.922444+00:00"
+  },
+  "117663497310955803": {
+    "id": "117663497310955803",
+    "created_at": "2026-11-23T02:54:45.823Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117663497310955803",
+    "text": "I hope the Board of Nvidia rehires Jensen Huang. It would be the best thing for the Company, and also, for the U.S.A. President DONALD J. TRUMP",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier1",
+    "matched_keywords": {
+      "tier1": {
+        "company_named": [
+          "Nvidia"
+        ]
+      },
+      "tier2": {}
+    },
+    "captured_at": "2026-11-23T09:44:07.922542+00:00"
   }
 }
