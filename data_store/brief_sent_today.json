@@ -1,8 +1,4 @@
 {
-  "2026-11-16": {
-    "tw_open": true,
-    "tw_close": true
-  },
   "2026-11-17": {
     "us_premarket": true,
     "us_midday": true,
@@ -38,5 +34,8 @@
   },
   "2026-11-23": {
     "tw_open": true
+  },
+  "2026-11-24": {
+    "tw_close": true
   }
 }
