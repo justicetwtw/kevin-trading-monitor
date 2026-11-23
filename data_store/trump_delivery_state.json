@@ -58265,12 +58265,12 @@
       "post_id": "117666713950631493",
       "created_at": "2026-11-23T16:32:47.849Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-23T21:41:45.668872+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-23T21:41:48.865446+00:00",
       "run_id": "45272045243",
       "workflow_attempt_id": "45272045243:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117666313179684854": {
       "post_id": "117666313179684854",
