@@ -58199,12 +58199,12 @@
       "post_id": "117662138213122537",
       "created_at": "2026-11-22T21:09:07.635Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-23T01:38:40.450480+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-23T01:38:43.874805+00:00",
       "run_id": "45095601379",
       "workflow_attempt_id": "45095601379:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     }
   }
 }
