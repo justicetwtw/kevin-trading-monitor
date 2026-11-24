@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T15:00:36.996400+08:00",
+  "generated_at": "2026-11-25T02:06:12.845828+08:00",
   "source_files": [
     "position_snapshot.json",
     "drawdown_history.json",
@@ -22,7 +22,7 @@
       "position_workflow_status": null,
       "trump_monitor_status": "healthy",
       "trump_monitor_source": "cnn_historical_archive",
-      "trump_monitor_checked_at": "2026-11-24T05:31:25.663709+00:00",
+      "trump_monitor_checked_at": "2026-11-24T16:13:07.715003+00:00",
       "estimated_account_value": null,
       "snapshot_at": null,
       "snapshot_age_hours": null,
@@ -65,7 +65,7 @@
         "category": "source_health",
         "symbol": null,
         "title": "Trump monitor health is stale",
-        "detail": "Last verified check is approximately 1.5 hours old."
+        "detail": "Last verified check is approximately 1.9 hours old."
       },
       {
         "severity": "P1",
@@ -110,8 +110,8 @@
       "status": "healthy",
       "source": "cnn_historical_archive",
       "latest_post_at": "2026-11-23T18:55:49.748000+00:00",
-      "checked_at": "2026-11-24T05:31:25.663709+00:00",
-      "health_age_hours": 1.5,
+      "checked_at": "2026-11-24T16:13:07.715003+00:00",
+      "health_age_hours": 1.9,
       "attempts": [
         {
           "status": "unavailable",
@@ -388,7 +388,7 @@
     ],
     "focus_engine": {
       "schema_version": 1,
-      "generated_at": "2026-11-24T07:00:36.996380+00:00",
+      "generated_at": "2026-11-24T18:06:12.845809+00:00",
       "enabled": false,
       "mode": "shadow",
       "reason": "FOCUS_ENGINE_ENABLED != 1; shadow engine not displayed",
