@@ -58320,12 +58320,12 @@
       "post_id": "117672947522305995",
       "created_at": "2026-11-24T18:58:04.604Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-25T00:42:25.948448+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-25T00:42:28.387170+00:00",
       "run_id": "45519966367",
       "workflow_attempt_id": "45519966367:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117672641177788145": {
       "post_id": "117672641177788145",
