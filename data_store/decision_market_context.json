@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T06:08:40.746652+00:00",
-  "status": "healthy",
+  "generated_at": "2026-11-25T04:56:33.624916+00:00",
+  "status": "degraded",
   "rows": [
     {
       "symbol": "LITE",
       "status": "healthy",
-      "current_price": 544.380005,
-      "as_of": "2026-11-23T00:00:00-05:00",
+      "current_price": 487.119995,
+      "as_of": "2026-11-24T00:00:00-05:00",
       "source": "yfinance_delayed_public_market_data",
       "sample_count": 251,
-      "return_1m": -0.280082,
-      "return_3m": -0.385274,
-      "return_6m": -0.402312,
-      "pct_from_52w_high": -0.523727,
-      "realized_vol_20d": 1.52703,
+      "return_1m": -0.404572,
+      "return_3m": -0.481252,
+      "return_6m": -0.460141,
+      "pct_from_52w_high": -0.573823,
+      "realized_vol_20d": 1.531948,
       "missing_metrics": [],
       "limitations": [
         "delayed/unofficial market data",
@@ -24,15 +24,15 @@
     {
       "symbol": "MU",
       "status": "healthy",
-      "current_price": 707.700012,
-      "as_of": "2026-11-23T00:00:00-05:00",
+      "current_price": 629.789978,
+      "as_of": "2026-11-24T00:00:00-05:00",
       "source": "yfinance_delayed_public_market_data",
       "sample_count": 251,
-      "return_1m": -0.19355,
-      "return_3m": -0.241455,
-      "return_6m": -0.21005,
-      "pct_from_52w_high": -0.436096,
-      "realized_vol_20d": 1.317978,
+      "return_1m": -0.303098,
+      "return_3m": -0.328868,
+      "return_6m": -0.321647,
+      "pct_from_52w_high": -0.498175,
+      "realized_vol_20d": 1.357417,
       "missing_metrics": [],
       "limitations": [
         "delayed/unofficial market data",
@@ -42,15 +42,15 @@
     {
       "symbol": "NVDA",
       "status": "healthy",
-      "current_price": 165.050003,
-      "as_of": "2026-11-23T00:00:00-05:00",
+      "current_price": 155.380005,
+      "as_of": "2026-11-24T00:00:00-05:00",
       "source": "yfinance_delayed_public_market_data",
       "sample_count": 251,
-      "return_1m": -0.217624,
-      "return_3m": -0.225299,
-      "return_6m": -0.231825,
-      "pct_from_52w_high": -0.321814,
-      "realized_vol_20d": 1.369086,
+      "return_1m": -0.280648,
+      "return_3m": -0.258895,
+      "return_6m": -0.269144,
+      "pct_from_52w_high": -0.361548,
+      "realized_vol_20d": 1.377505,
       "missing_metrics": [],
       "limitations": [
         "delayed/unofficial market data",
@@ -59,26 +59,20 @@
     },
     {
       "symbol": "SNDK",
-      "status": "healthy",
+      "status": "unavailable",
       "current_price": 94.394997,
       "as_of": "2026-11-19T00:00:00-05:00",
       "source": "yfinance_delayed_public_market_data",
-      "sample_count": 249,
-      "return_1m": -0.452076,
-      "return_3m": -0.526866,
-      "return_6m": -0.510349,
-      "pct_from_52w_high": -0.679254,
-      "realized_vol_20d": 1.261944,
-      "missing_metrics": [],
-      "limitations": [
-        "delayed/unofficial market data",
-        "timing and risk context only; not valuation or a price target"
-      ]
+      "sample_count": 248,
+      "error_code": "stale_price_history",
+      "max_age_days": 5
     }
   ],
-  "unavailable_count": 0,
+  "unavailable_count": 1,
   "partial_count": 0,
-  "safe_error_symbols": [],
+  "safe_error_symbols": [
+    "SNDK"
+  ],
   "max_age_days": 5,
   "contract": "market_context_only_not_valuation_or_trade_instruction"
 }
