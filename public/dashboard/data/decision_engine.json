@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T18:06:13.168378+00:00",
+  "generated_at": "2026-11-25T05:34:04.155368+00:00",
   "readiness_counts": {
     "not_decision_grade": 3,
     "re_underwrite": 1
@@ -20,13 +20,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 707.700012,
-        "as_of": "2026-11-23T00:00:00-05:00",
-        "return_1m": -0.19355,
-        "return_3m": -0.241455,
-        "return_6m": -0.21005,
-        "pct_from_52w_high": -0.436096,
-        "realized_vol_20d": 1.317978,
+        "current_price": 629.789978,
+        "as_of": "2026-11-24T00:00:00-05:00",
+        "return_1m": -0.303098,
+        "return_3m": -0.328868,
+        "return_6m": -0.321647,
+        "pct_from_52w_high": -0.498175,
+        "realized_vol_20d": 1.357417,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -54,8 +54,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 0.0,
-      "ivp": 0.0,
+      "ivr": 68.2,
+      "ivp": 54.7,
       "regime": "neutral",
       "missing_inputs": [
         "catalyst_not_future",
@@ -83,13 +83,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 165.050003,
-        "as_of": "2026-11-23T00:00:00-05:00",
-        "return_1m": -0.217624,
-        "return_3m": -0.225299,
-        "return_6m": -0.231825,
-        "pct_from_52w_high": -0.321814,
-        "realized_vol_20d": 1.369086,
+        "current_price": 155.380005,
+        "as_of": "2026-11-24T00:00:00-05:00",
+        "return_1m": -0.280648,
+        "return_3m": -0.258895,
+        "return_6m": -0.269144,
+        "pct_from_52w_high": -0.361548,
+        "realized_vol_20d": 1.377505,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -113,8 +113,8 @@
         "defined_risk_options"
       ],
       "options_status": "ok",
-      "ivr": 0.0,
-      "ivp": 0.0,
+      "ivr": 72.6,
+      "ivp": 98.5,
       "regime": "neutral",
       "missing_inputs": [
         "catalyst_not_future",
@@ -142,13 +142,13 @@
       "screen_action_band": null,
       "market_context": {
         "status": "healthy",
-        "current_price": 544.380005,
-        "as_of": "2026-11-23T00:00:00-05:00",
-        "return_1m": -0.280082,
-        "return_3m": -0.385274,
-        "return_6m": -0.402312,
-        "pct_from_52w_high": -0.523727,
-        "realized_vol_20d": 1.52703,
+        "current_price": 487.119995,
+        "as_of": "2026-11-24T00:00:00-05:00",
+        "return_1m": -0.404572,
+        "return_3m": -0.481252,
+        "return_6m": -0.460141,
+        "pct_from_52w_high": -0.573823,
+        "realized_vol_20d": 1.531948,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -203,14 +203,14 @@
       "screen_coverage": null,
       "screen_action_band": null,
       "market_context": {
-        "status": "healthy",
+        "status": "unavailable",
         "current_price": 94.394997,
         "as_of": "2026-11-19T00:00:00-05:00",
-        "return_1m": -0.452076,
-        "return_3m": -0.526866,
-        "return_6m": -0.510349,
-        "pct_from_52w_high": -0.679254,
-        "realized_vol_20d": 1.261944,
+        "return_1m": null,
+        "return_3m": null,
+        "return_6m": null,
+        "pct_from_52w_high": null,
+        "realized_vol_20d": null,
         "source": "yfinance_delayed_public_market_data"
       },
       "scenario": null,
@@ -243,6 +243,8 @@
         "complete_screen_score_missing",
         "evidence_quality_not_reviewable",
         "evidence_stale_vs_market",
+        "market_context_stale",
+        "market_context_unhealthy",
         "scenario_missing",
         "threshold_origin_unapproved",
         "watchlist_coverage_missing"
@@ -326,10 +328,10 @@
   },
   "portfolio_decision_risk": {},
   "market_context_health": {
-    "status": "healthy",
+    "status": "degraded",
     "stale": false,
-    "generated_at": "2026-11-24T06:08:40.746652+00:00",
-    "unavailable_count": 0,
+    "generated_at": "2026-11-25T04:56:33.624916+00:00",
+    "unavailable_count": 1,
     "partial_count": 0,
     "contract": "market_context_only_not_valuation_or_trade_instruction"
   },
