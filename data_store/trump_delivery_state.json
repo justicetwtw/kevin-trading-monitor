@@ -58485,12 +58485,12 @@
       "post_id": "117681042348270942",
       "created_at": "2026-11-26T05:16:41.846Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "pending",
-      "claimed_at": null,
+      "delivery_state": "claimed",
+      "claimed_at": "2026-11-26T10:48:30.885554+00:00",
       "resolved_at": null,
       "run_id": "45804550562",
       "workflow_attempt_id": "45804550562:1",
-      "stage_code": "captured_pending"
+      "stage_code": "claimed_before_send"
     },
     "117681028182445943": {
       "post_id": "117681028182445943",
