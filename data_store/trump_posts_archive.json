@@ -90389,5 +90389,57 @@
       "tier2": {}
     },
     "captured_at": "2026-11-25T19:10:21.189908+00:00"
+  },
+  "117678999238130459": {
+    "id": "117678999238130459",
+    "created_at": "2026-11-25T20:37:06.460Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117678999238130459",
+    "text": "Fake News CNN was hoping for a bad outcome in Iowa. Their pre-coverage was inaccurate and deplorable. When a PERFECT detonation was completed and there for all to see, they went CRAZY with anger. They want our Country to lose. \"Another win for Trump!\"",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-26T02:10:06.320807+00:00"
+  },
+  "117678961891442355": {
+    "id": "117678961891442355",
+    "created_at": "2026-11-25T20:27:36.594Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117678961891442355",
+    "text": "Rob Sands, the new future Governor of Iowa, is obviously unhappy that the Obama created (2009!) mess was so perfectly handled by the U.S. Army through a flawless detonation, that he's now complaining about the lead up to the event. He hurt and delayed the process. Was absolutely no help. Just another politician. He should rejoice at this great success, not nitpick and issue phony complaints on \"transparency.\" I will remember! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier2",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {
+        "tech_broad": [
+          "AI"
+        ]
+      }
+    },
+    "captured_at": "2026-11-26T02:10:06.320910+00:00"
+  },
+  "117678867313533428": {
+    "id": "117678867313533428",
+    "created_at": "2026-11-25T20:03:33.451Z",
+    "url": "https://truthsocial.com/@realDonaldTrump/117678867313533428",
+    "text": "Great job by the Army, and others, in Iowa!!! President DJT",
+    "activity_type": "post",
+    "source": "cnn_historical_archive",
+    "original_account": null,
+    "media_count": 0,
+    "tier": "tier3",
+    "matched_keywords": {
+      "tier1": {},
+      "tier2": {}
+    },
+    "captured_at": "2026-11-26T02:10:06.320967+00:00"
   }
 }
