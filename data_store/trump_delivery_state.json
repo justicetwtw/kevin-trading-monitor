@@ -58672,12 +58672,12 @@
       "post_id": "117690129419902036",
       "created_at": "2026-11-27T19:47:39.556Z",
       "source": "cnn_historical_archive",
-      "delivery_state": "claimed",
+      "delivery_state": "sent",
       "claimed_at": "2026-11-27T19:55:26.284365+00:00",
-      "resolved_at": null,
+      "resolved_at": "2026-11-27T19:55:28.928817+00:00",
       "run_id": "46059899929",
       "workflow_attempt_id": "46059899929:1",
-      "stage_code": "claimed_before_send"
+      "stage_code": "resolved_sent"
     },
     "117688960220295521": {
       "post_id": "117688960220295521",
